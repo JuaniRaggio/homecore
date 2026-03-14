@@ -12,7 +12,7 @@
           v-model="email"
           type="email"
           label="Correo electronico"
-          placeholder="martin@homecore.com"
+          placeholder="juani@homecore.com"
           :error="errors.email"
           autocomplete="email"
           @blur="validateEmail"
@@ -41,7 +41,7 @@
       </div>
 
       <div class="auth-hint">
-        <p>Demo: martin@homecore.com / Home1234</p>
+        <p>Demo: juani@homecore.com / Home1234</p>
       </div>
     </div>
   </div>

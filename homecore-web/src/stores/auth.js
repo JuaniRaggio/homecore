@@ -9,8 +9,8 @@ export const useAuthStore = defineStore('auth', () => {
   const registeredUsers = ref([
     {
       id: 1,
-      name: 'Martin Lopez',
-      email: 'martin@homecore.com',
+      name: 'Juani Raggio',
+      email: 'juani@homecore.com',
       password: 'Home1234',
       avatar: null,
       verified: true,
