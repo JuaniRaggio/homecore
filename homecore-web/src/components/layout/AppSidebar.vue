@@ -1,7 +1,16 @@
 <template>
   <aside :class="['sidebar', { 'sidebar--collapsed': collapsed }]">
     <div class="sidebar__brand">
-      <div class="sidebar__logo">HC</div>
+      <div class="sidebar__logo">
+        <svg viewBox="0 0 44 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="22,0 44,13 44,39 22,52 0,39 0,13" fill="#0C447C" stroke="#378ADD" stroke-width="0.7"/>
+          <polygon points="22,7 36,15 36,36 8,36 8,15" fill="none" stroke="#B5D4F4" stroke-width="1" stroke-linejoin="round"/>
+          <polygon points="22,3 38,14 6,14" fill="#378ADD"/>
+          <rect x="16" y="24" width="12" height="12" rx="1.5" fill="#042C53"/>
+          <path d="M 14,30 A 8,8 0 0,1 30,30" fill="none" stroke="#85B7EB" stroke-width="0.9" opacity="0.5"/>
+          <circle cx="22" cy="34" r="1.5" fill="#378ADD"/>
+        </svg>
+      </div>
       <span v-if="!collapsed" class="sidebar__brand-text">HomeCore</span>
     </div>
 
@@ -13,18 +22,18 @@
         class="sidebar__link"
         :class="{ 'sidebar__link--active': isActive(item.to) }"
       >
-        <span class="sidebar__link-icon" v-html="item.icon"></span>
+        <HcIcon :name="item.icon" size="md" />
         <span v-if="!collapsed" class="sidebar__link-text">{{ item.label }}</span>
       </router-link>
     </nav>
 
     <div class="sidebar__footer">
       <router-link to="/configuracion" class="sidebar__link" :class="{ 'sidebar__link--active': isActive('/configuracion') }">
-        <span class="sidebar__link-icon">&#9881;</span>
+        <HcIcon name="settings" size="md" />
         <span v-if="!collapsed" class="sidebar__link-text">Configuracion</span>
       </router-link>
       <button class="sidebar__collapse-btn" @click="$emit('toggle')">
-        <span v-html="collapsed ? '&#9654;' : '&#9664;'"></span>
+        <HcIcon :name="collapsed ? 'collapseRight' : 'collapseLeft'" size="sm" />
       </button>
     </div>
   </aside>
@@ -32,6 +41,7 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
+import HcIcon from '../ui/HcIcon.vue'
 
 defineProps({
   collapsed: { type: Boolean, default: false }
@@ -42,12 +52,12 @@ defineEmits(['toggle'])
 const route = useRoute()
 
 const navItems = [
-  { to: '/', label: 'Inicio', icon: '&#9750;' },
-  { to: '/dispositivos', label: 'Dispositivos', icon: '&#9879;' },
-  { to: '/habitaciones', label: 'Habitaciones', icon: '&#8962;' },
-  { to: '/rutinas', label: 'Rutinas', icon: '&#9200;' },
-  { to: '/historial', label: 'Historial', icon: '&#9776;' },
-  { to: '/consumo', label: 'Consumo', icon: '&#9889;' }
+  { to: '/', label: 'Inicio', icon: 'home' },
+  { to: '/dispositivos', label: 'Dispositivos', icon: 'devices' },
+  { to: '/habitaciones', label: 'Habitaciones', icon: 'rooms' },
+  { to: '/rutinas', label: 'Rutinas', icon: 'routines' },
+  { to: '/historial', label: 'Historial', icon: 'history' },
+  { to: '/consumo', label: 'Consumo', icon: 'consumption' }
 ]
 
 function isActive(path) {
@@ -88,15 +98,12 @@ function isActive(path) {
 .sidebar__logo {
   width: 32px;
   height: 32px;
-  background: var(--hc-accent);
-  border-radius: var(--hc-radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: var(--hc-font-size-sm);
   flex-shrink: 0;
-  color: white;
+}
+
+.sidebar__logo svg {
+  width: 100%;
+  height: 100%;
 }
 
 .sidebar__brand-text {
@@ -134,13 +141,6 @@ function isActive(path) {
 .sidebar__link--active {
   background: rgba(99, 102, 241, 0.12);
   color: var(--hc-accent);
-}
-
-.sidebar__link-icon {
-  width: 20px;
-  text-align: center;
-  font-size: 1.15rem;
-  flex-shrink: 0;
 }
 
 .sidebar__link-text {

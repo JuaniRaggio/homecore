@@ -2,7 +2,7 @@
   <div class="alarm-control">
     <div class="alarm-control__visual">
       <div class="alarm-control__icon" :class="{ 'alarm-control__icon--armed': device.armed }">
-        <span>&#128276;</span>
+        <HcIcon name="alarm" size="2xl" />
       </div>
       <span class="alarm-control__status" :class="device.armed ? 'text-danger' : 'text-muted'">
         {{ device.armed ? 'Armada' : 'Desarmada' }}
@@ -41,6 +41,7 @@
 <script setup>
 import { useDevicesStore } from '../../stores/devices'
 import HcToggle from '../ui/HcToggle.vue'
+import HcIcon from '../ui/HcIcon.vue'
 
 const props = defineProps({
   device: { type: Object, required: true }
@@ -86,7 +87,6 @@ function toggleZone(zone, active) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
   transition: all var(--hc-transition-base);
 }
 

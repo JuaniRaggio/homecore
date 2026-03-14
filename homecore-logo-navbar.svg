@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 52" width="340" height="52">
+  <!-- Transparent background (for use on dark navbars) -->
+
+  <!-- Mini hex icon -->
+  <g transform="translate(0, 1)">
+    <polygon points="24,0 48,14 48,42 24,56 0,42 0,14" fill="#0C447C" stroke="#378ADD" stroke-width="0.9"/>
+    <polygon points="24,7 42,17 42,39 24,51 6,39 6,17" fill="none" stroke="#185FA5" stroke-width="0.5"/>
+    <polygon points="24,10 42,20 6,20" fill="#378ADD"/>
+    <polygon points="24,14 36,22 36,34 12,34 12,22" fill="none" stroke="#B5D4F4" stroke-width="1.2" stroke-linejoin="round"/>
+    <rect x="18" y="25" width="12" height="9" rx="1.5" fill="#042C53"/>
+    <path d="M 15,30 A 9,9 0 0,1 33,30" fill="none" stroke="#85B7EB" stroke-width="0.9" opacity="0.5"/>
+    <circle cx="24" cy="35" r="1.6" fill="#378ADD"/>
+  </g>
+
+  <!-- Wordmark compact -->
+  <text x="60" y="32" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="500" letter-spacing="-1" fill="white">Home<tspan fill="#85B7EB">Core</tspan></text>
+</svg>

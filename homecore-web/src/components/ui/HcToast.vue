@@ -7,10 +7,10 @@
         :class="['hc-toast', `hc-toast--${toast.type}`]"
       >
         <span class="hc-toast__icon">
-          <template v-if="toast.type === 'success'">&#10003;</template>
-          <template v-else-if="toast.type === 'error'">&#10007;</template>
-          <template v-else-if="toast.type === 'warning'">&#9888;</template>
-          <template v-else>&#8505;</template>
+          <HcIcon v-if="toast.type === 'success'" name="check" size="sm" />
+          <HcIcon v-else-if="toast.type === 'error'" name="close" size="sm" />
+          <HcIcon v-else-if="toast.type === 'warning'" name="warning" size="sm" />
+          <HcIcon v-else name="info" size="sm" />
         </span>
         <span class="hc-toast__message">{{ toast.message }}</span>
         <button class="hc-toast__close" @click="remove(toast.id)">&times;</button>
@@ -21,6 +21,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import HcIcon from './HcIcon.vue'
 
 const toasts = ref([])
 let nextId = 0

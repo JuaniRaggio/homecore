@@ -2,7 +2,7 @@
   <div class="faucet-control">
     <div class="faucet-control__visual">
       <div class="faucet-control__icon" :class="{ 'faucet-control__icon--on': device.on }">
-        <span>&#128167;</span>
+        <HcIcon name="faucet" size="2xl" />
       </div>
       <HcToggle :modelValue="device.on" @update:modelValue="toggle" label="Abierto" />
     </div>
@@ -26,6 +26,7 @@ import { ref } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import HcToggle from '../ui/HcToggle.vue'
 import HcSlider from '../ui/HcSlider.vue'
+import HcIcon from '../ui/HcIcon.vue'
 
 const props = defineProps({
   device: { type: Object, required: true }
@@ -66,7 +67,6 @@ function updateFlow(val) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
   transition: all var(--hc-transition-base);
 }
 

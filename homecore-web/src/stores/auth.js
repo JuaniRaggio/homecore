@@ -2,7 +2,21 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(null)
+  const defaultUser = {
+    id: 1,
+    name: 'Juani Raggio',
+    email: 'juani@homecore.com',
+    password: 'Home1234',
+    avatar: null,
+    verified: true,
+    notificationsEnabled: true,
+    pinEnabled: false,
+    homes: [
+      { id: 1, name: 'Departamento Palermo', active: true },
+      { id: 2, name: 'Casa Martinez', active: false }
+    ]
+  }
+  const user = ref({ ...defaultUser })
   const isAuthenticated = computed(() => !!user.value)
   const pin = ref('1234')
 

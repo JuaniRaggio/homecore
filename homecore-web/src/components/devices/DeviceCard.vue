@@ -6,7 +6,7 @@
   >
     <div class="device-card__header">
       <div class="device-card__icon" :class="`device-card__icon--${device.type}`">
-        {{ deviceIcon }}
+        <HcIcon :name="device.type" size="lg" />
       </div>
       <button
         class="device-card__favorite"
@@ -14,7 +14,7 @@
         @click.stop="devicesStore.toggleFavorite(device.id)"
         :aria-label="device.favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'"
       >
-        {{ device.favorite ? '\u2605' : '\u2606' }}
+        <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="md" />
       </button>
     </div>
 
@@ -39,6 +39,7 @@ import { computed } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import { useRoomsStore } from '../../stores/rooms'
 import HcToggle from '../ui/HcToggle.vue'
+import HcIcon from '../ui/HcIcon.vue'
 
 const props = defineProps({
   device: { type: Object, required: true }
@@ -48,9 +49,6 @@ defineEmits(['select'])
 
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
-
-const icons = { lamp: '\u{1F4A1}', door: '\u{1F6AA}', alarm: '\u{1F514}', faucet: '\u{1F4A7}', blinds: '\u2630' }
-const deviceIcon = computed(() => icons[props.device.type] || '?')
 
 const roomName = computed(() => {
   if (!props.device.roomId) return 'Sin habitacion'

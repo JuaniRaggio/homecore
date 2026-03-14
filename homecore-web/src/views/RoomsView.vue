@@ -10,8 +10,8 @@
         <div class="room-card__header">
           <h3 class="room-card__name">{{ room.name }}</h3>
           <div class="room-card__actions">
-            <button class="room-card__action-btn" @click="startEdit(room)">&#9998;</button>
-            <button class="room-card__action-btn room-card__action-btn--danger" @click="confirmDelete(room)">&#10005;</button>
+            <button class="room-card__action-btn" @click="startEdit(room)"><HcIcon name="edit" size="sm" /></button>
+            <button class="room-card__action-btn room-card__action-btn--danger" @click="confirmDelete(room)"><HcIcon name="close" size="sm" /></button>
           </div>
         </div>
         <div class="room-card__devices">
@@ -26,7 +26,7 @@
                 <HcBadge :variant="device.on ? 'success' : 'default'" size="sm">
                   {{ device.on ? 'On' : 'Off' }}
                 </HcBadge>
-                <button class="room-card__unlink" @click="roomsStore.unassignDevice(device.id)" title="Desvincular">&#10005;</button>
+                <button class="room-card__unlink" @click="roomsStore.unassignDevice(device.id)" title="Desvincular"><HcIcon name="unlink" size="xs" /></button>
               </div>
             </div>
           </div>
@@ -83,6 +83,7 @@ import HcButton from '../components/ui/HcButton.vue'
 import HcBadge from '../components/ui/HcBadge.vue'
 import HcInput from '../components/ui/HcInput.vue'
 import HcModal from '../components/ui/HcModal.vue'
+import HcIcon from '../components/ui/HcIcon.vue'
 
 const roomsStore = useRoomsStore()
 const devicesStore = useDevicesStore()

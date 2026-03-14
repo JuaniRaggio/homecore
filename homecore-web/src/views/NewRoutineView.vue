@@ -1,6 +1,6 @@
 <template>
   <div class="new-routine">
-    <button class="new-routine__back" @click="$router.back()">&#8592; Volver a rutinas</button>
+    <button class="new-routine__back" @click="$router.back()"><HcIcon name="arrowLeft" size="sm" /> Volver a rutinas</button>
     <h2>Nueva rutina</h2>
 
     <div class="new-routine__wizard">
@@ -12,7 +12,7 @@
           class="wizard-step"
           :class="{ 'wizard-step--active': step === i, 'wizard-step--done': step > i }"
         >
-          <span class="wizard-step__number">{{ step > i ? '\u2713' : i + 1 }}</span>
+          <span class="wizard-step__number"><template v-if="step > i"><HcIcon name="check" size="xs" /></template><template v-else>{{ i + 1 }}</template></span>
           <span class="wizard-step__label">{{ s }}</span>
         </div>
       </div>
@@ -110,13 +110,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoutinesStore } from '../stores/routines'
 import HcButton from '../components/ui/HcButton.vue'
 import HcInput from '../components/ui/HcInput.vue'
-import { inject } from 'vue'
+import HcIcon from '../components/ui/HcIcon.vue'
 
 const router = useRouter()
 const devicesStore = useDevicesStore()

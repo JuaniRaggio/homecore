@@ -2,7 +2,7 @@
   <div class="door-control">
     <div class="door-control__visual">
       <div class="door-control__icon" :class="{ 'door-control__icon--open': device.on }">
-        <span>&#128682;</span>
+        <HcIcon name="door" size="2xl" />
       </div>
       <span class="door-control__label">
         {{ device.on ? 'Abierta' : 'Cerrada' }}
@@ -31,6 +31,7 @@
 <script setup>
 import { useDevicesStore } from '../../stores/devices'
 import HcToggle from '../ui/HcToggle.vue'
+import HcIcon from '../ui/HcIcon.vue'
 
 const props = defineProps({
   device: { type: Object, required: true }
@@ -69,7 +70,6 @@ function toggleLock(val) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
   transition: all var(--hc-transition-base);
 }
 

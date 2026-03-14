@@ -2,7 +2,7 @@
   <div class="lamp-control">
     <div class="lamp-control__visual">
       <div class="lamp-control__bulb" :class="{ 'lamp-control__bulb--on': device.on }" :style="bulbStyle">
-        <span class="lamp-control__bulb-icon">&#128161;</span>
+        <HcIcon name="lamp" size="2xl" class="lamp-control__bulb-icon" />
       </div>
       <HcToggle :modelValue="device.on" @update:modelValue="toggle" label="Encendido" />
     </div>
@@ -45,6 +45,7 @@ import { ref, computed } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import HcToggle from '../ui/HcToggle.vue'
 import HcSlider from '../ui/HcSlider.vue'
+import HcIcon from '../ui/HcIcon.vue'
 
 const props = defineProps({
   device: { type: Object, required: true }
@@ -111,7 +112,6 @@ function setColor(color) {
 }
 
 .lamp-control__bulb-icon {
-  font-size: 2.5rem;
   opacity: 0.4;
   transition: opacity var(--hc-transition-base);
 }

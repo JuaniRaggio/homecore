@@ -2,7 +2,7 @@
   <div class="device-detail" v-if="device">
     <div class="device-detail__header">
       <button class="device-detail__back" @click="$router.back()">
-        &#8592; Volver
+        <HcIcon name="arrowLeft" size="sm" /> Volver
       </button>
       <div class="device-detail__title-row">
         <div>
@@ -19,7 +19,7 @@
           :class="{ 'device-detail__fav--active': device.favorite }"
           @click="devicesStore.toggleFavorite(device.id)"
         >
-          {{ device.favorite ? '\u2605 Favorito' : '\u2606 Agregar a favoritos' }}
+          <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="sm" /> {{ device.favorite ? 'Favorito' : 'Agregar a favoritos' }}
         </button>
       </div>
     </div>
@@ -81,6 +81,7 @@ import { useRoomsStore } from '../stores/rooms'
 import { useHistoryStore } from '../stores/history'
 import HcCard from '../components/ui/HcCard.vue'
 import HcBadge from '../components/ui/HcBadge.vue'
+import HcIcon from '../components/ui/HcIcon.vue'
 import LampControl from '../components/devices/LampControl.vue'
 import DoorControl from '../components/devices/DoorControl.vue'
 import AlarmControl from '../components/devices/AlarmControl.vue'

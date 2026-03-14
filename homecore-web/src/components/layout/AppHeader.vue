@@ -8,9 +8,9 @@
       <!-- Selector de hogar -->
       <div class="header__home-selector" v-if="activeHome">
         <button class="header__home-btn" @click="showHomeMenu = !showHomeMenu">
-          <span class="header__home-icon">&#8962;</span>
+          <HcIcon name="home" size="sm" />
           <span class="header__home-name">{{ activeHome.name }}</span>
-          <span class="header__chevron">&#9662;</span>
+          <HcIcon name="chevronDown" size="xs" class="header__chevron" />
         </button>
         <div v-if="showHomeMenu" class="header__dropdown" @click="showHomeMenu = false">
           <button
@@ -28,7 +28,7 @@
       <!-- Notificaciones -->
       <div class="header__notifications">
         <button class="header__icon-btn" @click="showNotifications = !showNotifications" aria-label="Notificaciones">
-          <span>&#128276;</span>
+          <HcIcon name="bell" size="md" />
           <span v-if="unreadCount > 0" class="header__badge">{{ unreadCount }}</span>
         </button>
         <div v-if="showNotifications" class="header__dropdown header__dropdown--notifications">
@@ -83,6 +83,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useNotificationsStore } from '../../stores/notifications'
+import HcIcon from '../ui/HcIcon.vue'
 
 const route = useRoute()
 const router = useRouter()

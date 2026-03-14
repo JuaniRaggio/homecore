@@ -9,7 +9,7 @@
     </div>
 
     <div class="routine-card__schedule" v-if="routine.schedule">
-      <span class="routine-card__time">&#9200; {{ routine.schedule.time }}</span>
+      <span class="routine-card__time"><HcIcon name="routines" size="sm" /> {{ routine.schedule.time }}</span>
       <span class="routine-card__days">{{ routine.schedule.days.join(', ') }}</span>
     </div>
 
@@ -32,6 +32,7 @@
 import { useRoutinesStore } from '../../stores/routines'
 import HcButton from '../ui/HcButton.vue'
 import HcToggle from '../ui/HcToggle.vue'
+import HcIcon from '../ui/HcIcon.vue'
 
 defineProps({
   routine: { type: Object, required: true }

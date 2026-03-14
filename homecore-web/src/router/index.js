@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
 import AppLayout from '../components/layout/AppLayout.vue'
 
 const routes = [
@@ -85,14 +84,12 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to) => {
-  const authStore = useAuthStore()
-  if (!to.meta.public && !authStore.isAuthenticated) {
-    return { name: 'login' }
-  }
-  if (to.meta.public && authStore.isAuthenticated && to.name === 'login') {
-    return { name: 'dashboard' }
-  }
-})
+// Auth guard disabled - auto-login enabled for prototype
+// router.beforeEach((to) => {
+//   const authStore = useAuthStore()
+//   if (!to.meta.public && !authStore.isAuthenticated) {
+//     return { name: 'login' }
+//   }
+// })
 
 export default router
