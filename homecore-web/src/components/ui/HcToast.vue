@@ -13,7 +13,7 @@
           <HcIcon v-else name="info" size="sm" />
         </span>
         <span class="hc-toast__message">{{ toast.message }}</span>
-        <button class="hc-toast__close" @click="remove(toast.id)">&times;</button>
+        <button class="hc-toast__close" @click="remove(toast.id)"><HcIcon name="close" size="xs" /></button>
       </div>
     </TransitionGroup>
   </Teleport>

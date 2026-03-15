@@ -5,26 +5,6 @@
     </div>
 
     <div class="header__right">
-      <!-- Selector de hogar -->
-      <div class="header__home-selector" v-if="activeHome">
-        <button class="header__home-btn" @click="showHomeMenu = !showHomeMenu">
-          <HcIcon name="home" size="sm" />
-          <span class="header__home-name">{{ activeHome.name }}</span>
-          <HcIcon name="chevronDown" size="xs" class="header__chevron" />
-        </button>
-        <div v-if="showHomeMenu" class="header__dropdown" @click="showHomeMenu = false">
-          <button
-            v-for="home in user?.homes || []"
-            :key="home.id"
-            class="header__dropdown-item"
-            :class="{ 'header__dropdown-item--active': home.active }"
-            @click="authStore.setActiveHome(home.id)"
-          >
-            {{ home.name }}
-          </button>
-        </div>
-      </div>
-
       <!-- Notificaciones -->
       <div class="header__notifications">
         <button class="header__icon-btn" @click="showNotifications = !showNotifications" aria-label="Notificaciones">
@@ -90,12 +70,10 @@ const router = useRouter()
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
 
-const showHomeMenu = ref(false)
 const showNotifications = ref(false)
 const showUserMenu = ref(false)
 
 const user = computed(() => authStore.user)
-const activeHome = computed(() => authStore.getActiveHome())
 const unreadCount = computed(() => notificationsStore.unreadCount)
 const recentNotifications = computed(() => notificationsStore.recent)
 
@@ -161,38 +139,6 @@ function handleLogout() {
   display: flex;
   align-items: center;
   gap: var(--hc-space-md);
-}
-
-/* Home selector */
-.header__home-selector {
-  position: relative;
-}
-
-.header__home-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--hc-bg-tertiary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  padding: 0.375rem 0.75rem;
-  color: var(--hc-text-primary);
-  cursor: pointer;
-  font-size: var(--hc-font-size-sm);
-  transition: all var(--hc-transition-fast);
-}
-
-.header__home-btn:hover {
-  border-color: var(--hc-accent);
-}
-
-.header__home-icon {
-  font-size: 1rem;
-}
-
-.header__chevron {
-  font-size: 0.7rem;
-  color: var(--hc-text-muted);
 }
 
 /* Notifications */

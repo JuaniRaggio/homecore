@@ -10,11 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     avatar: null,
     verified: true,
     notificationsEnabled: true,
-    pinEnabled: false,
-    homes: [
-      { id: 1, name: 'Departamento Palermo', active: true },
-      { id: 2, name: 'Casa Martinez', active: false }
-    ]
+    pinEnabled: false
   }
   const user = ref({ ...defaultUser })
   const isAuthenticated = computed(() => !!user.value)
@@ -29,11 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
       avatar: null,
       verified: true,
       notificationsEnabled: true,
-      pinEnabled: false,
-      homes: [
-        { id: 1, name: 'Departamento Palermo', active: true },
-        { id: 2, name: 'Casa Martinez', active: false }
-      ]
+      pinEnabled: false
     }
   ])
 
@@ -65,7 +57,6 @@ export const useAuthStore = defineStore('auth', () => {
       verified: false,
       notificationsEnabled: true,
       pinEnabled: false,
-      homes: [{ id: 1, name: 'Mi Hogar', active: true }]
     }
     registeredUsers.value.push(newUser)
     return { success: true }
@@ -107,19 +98,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function setActiveHome(homeId) {
-    if (user.value) {
-      user.value.homes.forEach(h => {
-        h.active = h.id === homeId
-      })
-    }
-  }
-
-  function getActiveHome() {
-    if (!user.value) return null
-    return user.value.homes.find(h => h.active) || user.value.homes[0]
-  }
-
   function verifyPin(inputPin) {
     return inputPin === pin.value
   }
@@ -138,8 +116,6 @@ export const useAuthStore = defineStore('auth', () => {
     recoverPassword,
     changePassword,
     toggleNotifications,
-    setActiveHome,
-    getActiveHome,
     verifyPin,
     logout
   }

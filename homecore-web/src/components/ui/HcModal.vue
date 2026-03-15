@@ -5,7 +5,7 @@
         <div class="hc-modal" :class="`hc-modal--${size}`" role="dialog" aria-modal="true">
           <div class="hc-modal__header">
             <h3 class="hc-modal__title">{{ title }}</h3>
-            <button class="hc-modal__close" @click="close" aria-label="Cerrar">&times;</button>
+            <button class="hc-modal__close" @click="close" aria-label="Cerrar"><HcIcon name="close" size="sm" /></button>
           </div>
           <div class="hc-modal__body">
             <slot />
@@ -20,6 +20,8 @@
 </template>
 
 <script setup>
+import HcIcon from './HcIcon.vue'
+
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   title: { type: String, default: '' },
