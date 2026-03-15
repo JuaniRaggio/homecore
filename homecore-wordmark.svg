@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" width="360" height="80">
+  <!-- Wordmark only, transparent background -->
+  <text x="0" y="54" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="56" font-weight="500" letter-spacing="-2.5" fill="white">Home<tspan fill="#85B7EB">Core</tspan></text>
+  <rect x="2" y="64" width="64" height="2.5" rx="1.2" fill="#378ADD"/>
+</svg>

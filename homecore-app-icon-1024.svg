@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- App icon background -->
+  <rect width="1024" height="1024" rx="220" fill="#0C447C"/>
+  <rect width="1024" height="1024" rx="220" fill="none" stroke="#378ADD" stroke-width="8"/>
+
+  <!-- Hexagon centered -->
+  <g transform="translate(172, 140)">
+    <polygon points="340,0 680,196 680,588 340,784 0,588 0,196" fill="#185FA5" stroke="#378ADD" stroke-width="6"/>
+    <polygon points="340,55 630,210 630,562 340,718 50,562 50,210" fill="none" stroke="#0C447C" stroke-width="4"/>
+
+    <!-- House outline -->
+    <polygon points="340,140 500,250 500,470 180,470 180,250" fill="none" stroke="#B5D4F4" stroke-width="12" stroke-linejoin="round"/>
+    <!-- Roof -->
+    <polygon points="340,108 524,248 156,248" fill="#378ADD"/>
+    <!-- Door -->
+    <rect x="276" y="350" width="128" height="120" rx="16" fill="#042C53"/>
+
+    <!-- WiFi arcs -->
+    <path d="M 224,414 A 116,116 0 0,1 456,414" fill="none" stroke="#85B7EB" stroke-width="8" opacity="0.35"/>
+    <path d="M 258,452 A 82,82 0 0,1 422,452" fill="none" stroke="#85B7EB" stroke-width="8" opacity="0.6"/>
+    <path d="M 292,490 A 48,48 0 0,1 388,490" fill="none" stroke="#85B7EB" stroke-width="8" opacity="0.9"/>
+    <circle cx="340" cy="502" r="22" fill="#378ADD"/>
+  </g>
+</svg>
