@@ -268,7 +268,7 @@ especificos* pueden lograr *objetivos especificos* en *contextos especificos*
 - Se trata de una representacion interna de la realidad externa, es decir, una forma
   de representar la realidad dentro de la mente
 
-- Tienen un papel importante en la congnicion, el razonamiento y la toma de decisiones
+- Tienen un papel importante en la cognicion, el razonamiento y la toma de decisiones
 
 - Representa lo que el usuario cree sobre el sistema en cuestion
 
@@ -1082,26 +1082,4 @@ por ejemplo tasa de error, tiempo, eficiencia, etc.
   No esta mal tirarle una ayuda para ver si lo puede terminar de 
   resolver
 ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
