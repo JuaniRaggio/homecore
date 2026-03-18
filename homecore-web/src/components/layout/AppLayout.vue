@@ -8,6 +8,7 @@
       </main>
     </div>
     <HcToast ref="toast" />
+    <VimOverlay />
   </div>
 </template>
 
@@ -16,11 +17,16 @@ import { ref, provide } from 'vue'
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
 import HcToast from '../ui/HcToast.vue'
+import VimOverlay from '../vim/VimOverlay.vue'
+import { useVimMode } from '../../composables/useVimMode'
 
 const sidebarCollapsed = ref(false)
 const toast = ref(null)
 
+const vim = useVimMode()
+
 provide('toast', toast)
+provide('vim', vim)
 </script>
 
 <style scoped>
@@ -36,6 +42,7 @@ provide('toast', toast)
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-bottom: 26px;
 }
 
 .app-layout__main--expanded {
