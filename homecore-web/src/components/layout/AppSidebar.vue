@@ -82,6 +82,21 @@ function isActive(path) {
   width: var(--hc-sidebar-collapsed);
 }
 
+.sidebar--collapsed .sidebar__nav,
+.sidebar--collapsed .sidebar__footer {
+  padding: 0.5rem;
+}
+
+.sidebar--collapsed .sidebar__link {
+  justify-content: center;
+  padding: 0.625rem;
+}
+
+.sidebar--collapsed .sidebar__brand {
+  justify-content: center;
+  padding: 0.5rem;
+}
+
 .sidebar__brand {
   display: flex;
   align-items: center;
