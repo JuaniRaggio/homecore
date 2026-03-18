@@ -3,8 +3,8 @@ import * as THREE from 'three'
 export function createFloorMaterial() {
   return new THREE.MeshStandardMaterial({
     color: 0x1a1a24,
-    roughness: 0.9,
-    metalness: 0.0
+    roughness: 0.7,
+    metalness: 0.05
   })
 }
 
@@ -43,10 +43,31 @@ export function createLampOffMaterial() {
 
 export function createLampOnMaterial(hexColor) {
   const color = new THREE.Color(hexColor)
+  return new THREE.MeshStandardMaterial({
+    color: color,
+    emissive: color,
+    emissiveIntensity: 1.5,
+    transparent: true,
+    opacity: 0.9,
+    roughness: 0.3,
+    metalness: 0.0
+  })
+}
+
+/**
+ * Semi-transparent glow sphere material for lamp halos.
+ * Uses additive blending for a bloom-like effect.
+ */
+export function createLampGlowMaterial(hexColor, brightness) {
+  const color = new THREE.Color(hexColor)
+  const opacity = 0.15 + (brightness / 100) * 0.15
   return new THREE.MeshBasicMaterial({
     color: color,
     transparent: true,
-    opacity: 0.9
+    opacity: opacity,
+    blending: THREE.AdditiveBlending,
+    side: THREE.BackSide,
+    depthWrite: false
   })
 }
 
@@ -61,6 +82,20 @@ export function createDoorMaterial() {
 export function createLockMaterial(locked) {
   return new THREE.MeshBasicMaterial({
     color: locked ? 0xef4444 : 0x22c55e
+  })
+}
+
+/**
+ * Glow ring material for lock indicator.
+ */
+export function createLockGlowMaterial(locked) {
+  return new THREE.MeshBasicMaterial({
+    color: locked ? 0xef4444 : 0x22c55e,
+    transparent: true,
+    opacity: 0.12,
+    blending: THREE.AdditiveBlending,
+    side: THREE.BackSide,
+    depthWrite: false
   })
 }
 
@@ -82,11 +117,18 @@ export function createWindowMaterial() {
   })
 }
 
-export function createAlarmLineMaterial() {
-  return new THREE.LineBasicMaterial({
+/**
+ * Alarm tube material with emissive glow for pulsing effect.
+ */
+export function createAlarmTubeMaterial() {
+  return new THREE.MeshStandardMaterial({
     color: 0xef4444,
+    emissive: new THREE.Color(0xef4444),
+    emissiveIntensity: 1.0,
     transparent: true,
-    opacity: 1.0
+    opacity: 1.0,
+    roughness: 0.4,
+    metalness: 0.1
   })
 }
 

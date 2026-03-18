@@ -13,29 +13,30 @@ export function useHomeScene(containerRef) {
   let animationId = null
   let isDisposed = false
 
-  const frustumSize = 14
+  let currentFrustumSize = 14
   let aspect = 1
+  let cameraTarget = new THREE.Vector3(0, 0, 0)
 
   function createCamera(width, height) {
     aspect = width / height
     const cam = new THREE.OrthographicCamera(
-      -frustumSize * aspect / 2,
-      frustumSize * aspect / 2,
-      frustumSize / 2,
-      -frustumSize / 2,
+      -currentFrustumSize * aspect / 2,
+      currentFrustumSize * aspect / 2,
+      currentFrustumSize / 2,
+      -currentFrustumSize / 2,
       0.1,
       100
     )
-    cam.position.set(10, 12, 10)
-    cam.lookAt(0, 0, 0)
+    cam.position.set(cameraTarget.x + 10, 12, cameraTarget.z + 10)
+    cam.lookAt(cameraTarget)
     return cam
   }
 
   function createLighting() {
-    const ambient = new THREE.AmbientLight(0x6366f1, 0.15)
+    const ambient = new THREE.AmbientLight(0x6366f1, 0.06)
     scene.add(ambient)
 
-    const directional = new THREE.DirectionalLight(0xc8c8d8, 0.4)
+    const directional = new THREE.DirectionalLight(0xc8c8d8, 0.18)
     directional.position.set(5, 10, 5)
     directional.castShadow = true
     directional.shadow.mapSize.width = 1024
@@ -110,14 +111,64 @@ export function useHomeScene(containerRef) {
     const height = container.clientHeight
     aspect = width / height
 
-    camera.left = -frustumSize * aspect / 2
-    camera.right = frustumSize * aspect / 2
-    camera.top = frustumSize / 2
-    camera.bottom = -frustumSize / 2
+    camera.left = -currentFrustumSize * aspect / 2
+    camera.right = currentFrustumSize * aspect / 2
+    camera.top = currentFrustumSize / 2
+    camera.bottom = -currentFrustumSize / 2
     camera.updateProjectionMatrix()
 
     renderer.setSize(width, height)
     labelRenderer.setSize(width, height)
+  }
+
+  /**
+   * Auto-adjust camera frustum and position to fit the given rooms.
+   * @param {Array} rooms - array of { x, z, width, depth }
+   */
+  function fitToContent(rooms) {
+    if (!rooms || rooms.length === 0) return
+
+    let minX = Infinity, maxX = -Infinity
+    let minZ = Infinity, maxZ = -Infinity
+
+    for (const r of rooms) {
+      const left = r.x - r.width / 2
+      const right = r.x + r.width / 2
+      const front = r.z - r.depth / 2
+      const back = r.z + r.depth / 2
+      if (left < minX) minX = left
+      if (right > maxX) maxX = right
+      if (front < minZ) minZ = front
+      if (back > maxZ) maxZ = back
+    }
+
+    const padding = 3
+    const cx = (minX + maxX) / 2
+    const cz = (minZ + maxZ) / 2
+    const sizeX = (maxX - minX) + padding * 2
+    const sizeZ = (maxZ - minZ) + padding * 2
+
+    // Frustum needs to fit the larger of the two dimensions
+    // accounting for aspect ratio
+    const needed = Math.max(sizeZ, sizeX / (aspect || 1))
+    currentFrustumSize = Math.max(8, needed)
+
+    cameraTarget = new THREE.Vector3(cx, 0, cz)
+
+    if (camera) {
+      camera.left = -currentFrustumSize * aspect / 2
+      camera.right = currentFrustumSize * aspect / 2
+      camera.top = currentFrustumSize / 2
+      camera.bottom = -currentFrustumSize / 2
+      camera.updateProjectionMatrix()
+
+      camera.position.set(cameraTarget.x + 10, 12, cameraTarget.z + 10)
+      camera.lookAt(cameraTarget)
+    }
+  }
+
+  function getCameraTarget() {
+    return cameraTarget
   }
 
   function dispose() {
@@ -174,6 +225,8 @@ export function useHomeScene(containerRef) {
     dispose,
     onResize,
     getCamera,
-    getRenderer
+    getRenderer,
+    fitToContent,
+    getCameraTarget
   }
 }

@@ -3,26 +3,25 @@
     <!-- Vista 3D del hogar -->
     <div class="dashboard__home3d">
       <HomeModelSelector class="dashboard__home3d-selector" />
+      <RoomLayoutOverlay class="dashboard__home3d-room-overlay" />
       <HomeScene />
-    </div>
-
-    <!-- Resumen -->
-    <div class="dashboard__summary">
-      <div class="summary-card">
-        <span class="summary-card__value">{{ activeDevices }}</span>
-        <span class="summary-card__label">Dispositivos activos</span>
-      </div>
-      <div class="summary-card">
-        <span class="summary-card__value">{{ totalDevices }}</span>
-        <span class="summary-card__label">Total dispositivos</span>
-      </div>
-      <div class="summary-card">
-        <span class="summary-card__value">{{ roomsStore.rooms.length }}</span>
-        <span class="summary-card__label">Habitaciones</span>
-      </div>
-      <div class="summary-card">
-        <span class="summary-card__value">{{ totalConsumption }}W</span>
-        <span class="summary-card__label">Consumo actual</span>
+      <!-- Inline summary strip -->
+      <div class="dashboard__home3d-stats">
+        <span class="home3d-stat">
+          <span class="home3d-stat__value">{{ activeDevices }}</span> activos
+        </span>
+        <span class="home3d-stat__sep"></span>
+        <span class="home3d-stat">
+          <span class="home3d-stat__value">{{ totalDevices }}</span> dispositivos
+        </span>
+        <span class="home3d-stat__sep"></span>
+        <span class="home3d-stat">
+          <span class="home3d-stat__value">{{ roomsStore.rooms.length }}</span> habitaciones
+        </span>
+        <span class="home3d-stat__sep"></span>
+        <span class="home3d-stat">
+          <span class="home3d-stat__value">{{ totalConsumption }}W</span> consumo
+        </span>
       </div>
     </div>
 
@@ -109,6 +108,7 @@ import HcButton from '../components/ui/HcButton.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
 import HomeScene from '../components/home3d/HomeScene.vue'
 import HomeModelSelector from '../components/home3d/HomeModelSelector.vue'
+import RoomLayoutOverlay from '../components/home3d/RoomLayoutOverlay.vue'
 
 const router = useRouter()
 const devicesStore = useDevicesStore()
@@ -180,31 +180,43 @@ function formatDate(dateStr) {
   z-index: 5;
 }
 
-.dashboard__summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--hc-space-md);
+.dashboard__home3d-room-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 5;
 }
 
-.summary-card {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-lg);
+.dashboard__home3d-stats {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
   display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-xs);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: rgba(15, 15, 20, 0.7);
+  border: 1px solid var(--hc-border, #2e2e3e);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
 }
 
-.summary-card__value {
-  font-size: var(--hc-font-size-2xl);
-  font-weight: 700;
-  color: var(--hc-accent);
+.home3d-stat {
+  font-size: 11px;
+  color: var(--hc-text-muted, #64748b);
+  white-space: nowrap;
 }
 
-.summary-card__label {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
+.home3d-stat__value {
+  font-weight: 600;
+  color: var(--hc-text-secondary, #94a3b8);
+}
+
+.home3d-stat__sep {
+  width: 1px;
+  height: 10px;
+  background: var(--hc-border, #2e2e3e);
 }
 
 .dashboard__section {

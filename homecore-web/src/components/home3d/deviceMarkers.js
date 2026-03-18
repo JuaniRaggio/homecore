@@ -3,11 +3,13 @@ import TWEEN from '@tweenjs/tween.js'
 import {
   createLampOffMaterial,
   createLampOnMaterial,
+  createLampGlowMaterial,
   createDoorMaterial,
   createLockMaterial,
+  createLockGlowMaterial,
   createBlindsMaterial,
   createWindowMaterial,
-  createAlarmLineMaterial,
+  createAlarmTubeMaterial,
   createFaucetMaterial,
   createWaterDropMaterial
 } from './materials.js'
@@ -20,19 +22,25 @@ export function createLampMarker(device, anchor) {
   group.userData.deviceId = device.id
   group.userData.deviceType = 'lamp'
 
-  const sphereGeo = new THREE.SphereGeometry(0.15, 16, 12)
+  const sphereGeo = new THREE.SphereGeometry(0.22, 16, 12)
   const mat = device.on ? createLampOnMaterial(device.color) : createLampOffMaterial()
   const sphere = new THREE.Mesh(sphereGeo, mat)
   sphere.userData.deviceId = device.id
   group.add(sphere)
 
-  // PointLight when on
   if (device.on) {
     const color = new THREE.Color(device.color)
-    const intensity = (device.brightness / 100) * 3
-    const light = new THREE.PointLight(color, intensity, 8, 1.5)
+    const intensity = (device.brightness / 100) * 7
+    const light = new THREE.PointLight(color, intensity, 12, 1.2)
     light.castShadow = false
     group.add(light)
+
+    // Glow halo
+    const glowGeo = new THREE.SphereGeometry(0.5, 16, 12)
+    const glowMat = createLampGlowMaterial(device.color, device.brightness)
+    const glow = new THREE.Mesh(glowGeo, glowMat)
+    glow.userData.isGlow = true
+    group.add(glow)
   }
 
   group.position.set(anchor.x, anchor.y, anchor.z)
@@ -40,25 +48,40 @@ export function createLampMarker(device, anchor) {
 }
 
 export function updateLampMarker(group, device) {
-  const sphere = group.children.find(c => c.isMesh)
+  const sphere = group.children.find(c => c.isMesh && !c.userData.isGlow)
   if (!sphere) return
 
-  // Remove old material and light
+  // Remove old material
   sphere.material.dispose()
 
-  // Remove old PointLight if any
+  // Remove old PointLight
   const oldLight = group.children.find(c => c.isPointLight)
   if (oldLight) {
     group.remove(oldLight)
   }
 
+  // Remove old glow
+  const oldGlow = group.children.find(c => c.isMesh && c.userData.isGlow)
+  if (oldGlow) {
+    oldGlow.geometry.dispose()
+    oldGlow.material.dispose()
+    group.remove(oldGlow)
+  }
+
   if (device.on) {
     sphere.material = createLampOnMaterial(device.color)
     const color = new THREE.Color(device.color)
-    const intensity = (device.brightness / 100) * 3
-    const light = new THREE.PointLight(color, intensity, 8, 1.5)
+    const intensity = (device.brightness / 100) * 7
+    const light = new THREE.PointLight(color, intensity, 12, 1.2)
     light.castShadow = false
     group.add(light)
+
+    // New glow halo
+    const glowGeo = new THREE.SphereGeometry(0.5, 16, 12)
+    const glowMat = createLampGlowMaterial(device.color, device.brightness)
+    const glow = new THREE.Mesh(glowGeo, glowMat)
+    glow.userData.isGlow = true
+    group.add(glow)
   } else {
     sphere.material = createLampOffMaterial()
   }
@@ -80,21 +103,27 @@ export function createDoorMarker(device, anchor) {
   door.userData.isDoorPanel = true
   group.add(door)
 
-  // Pivot point for door rotation is at left edge (x=0)
-  // If door is open, rotate it
   if (device.on) {
     door.position.set(0.4, 1.0, -0.4)
     door.rotation.y = -80 * (Math.PI / 180)
   }
 
-  // Lock indicator
-  const lockGeo = new THREE.SphereGeometry(0.08, 8, 8)
+  // Lock indicator (larger)
+  const lockGeo = new THREE.SphereGeometry(0.12, 8, 8)
   const lockMat = createLockMaterial(device.locked)
   const lock = new THREE.Mesh(lockGeo, lockMat)
   lock.position.set(0.4, 2.2, 0)
   lock.userData.deviceId = device.id
   lock.userData.isLockIndicator = true
   group.add(lock)
+
+  // Lock glow ring
+  const lockGlowGeo = new THREE.SphereGeometry(0.22, 12, 12)
+  const lockGlowMat = createLockGlowMaterial(device.locked)
+  const lockGlow = new THREE.Mesh(lockGlowGeo, lockGlowMat)
+  lockGlow.position.set(0.4, 2.2, 0)
+  lockGlow.userData.isLockGlow = true
+  group.add(lockGlow)
 
   group.position.set(anchor.x, anchor.y, anchor.z)
   return group
@@ -103,6 +132,7 @@ export function createDoorMarker(device, anchor) {
 export function updateDoorMarker(group, device) {
   const door = group.children.find(c => c.userData && c.userData.isDoorPanel)
   const lock = group.children.find(c => c.userData && c.userData.isLockIndicator)
+  const lockGlow = group.children.find(c => c.userData && c.userData.isLockGlow)
 
   if (door) {
     const targetRotY = device.on ? -80 * (Math.PI / 180) : 0
@@ -123,6 +153,11 @@ export function updateDoorMarker(group, device) {
     lock.material.dispose()
     lock.material = createLockMaterial(device.locked)
   }
+
+  if (lockGlow) {
+    lockGlow.material.dispose()
+    lockGlow.material = createLockGlowMaterial(device.locked)
+  }
 }
 
 // ---- BLINDS ----
@@ -135,21 +170,18 @@ export function createBlindsMarker(device, anchor) {
   const windowWidth = 1.2
   const windowHeight = 1.4
 
-  // Window background
   const windowGeo = new THREE.PlaneGeometry(windowWidth, windowHeight)
   const windowMat = createWindowMaterial()
   const windowMesh = new THREE.Mesh(windowGeo, windowMat)
   windowMesh.userData.deviceId = device.id
   group.add(windowMesh)
 
-  // Curtain overlay
   const curtainCoverage = (100 - device.position) / 100
   const curtainHeight = windowHeight * curtainCoverage
   if (curtainHeight > 0.01) {
     const curtainGeo = new THREE.PlaneGeometry(windowWidth, curtainHeight)
     const curtainMat = createBlindsMaterial()
     const curtain = new THREE.Mesh(curtainGeo, curtainMat)
-    // Position from top of window
     curtain.position.set(0, (windowHeight - curtainHeight) / 2, 0.01)
     curtain.userData.isCurtain = true
     group.add(curtain)
@@ -160,7 +192,6 @@ export function createBlindsMarker(device, anchor) {
 }
 
 export function updateBlindsMarker(group, device) {
-  // Remove old curtain
   const oldCurtain = group.children.find(c => c.userData && c.userData.isCurtain)
   if (oldCurtain) {
     oldCurtain.geometry.dispose()
@@ -190,11 +221,16 @@ export function createAlarmMarker(device, plan) {
   group.userData.deviceId = device.id
   group.userData.deviceType = 'alarm'
 
-  const bounds = getPlanBounds(plan)
+  // Use _allRooms for bounds if available (covers all floors)
+  const boundsSource = plan._allRooms && plan._allRooms.length > 0
+    ? { rooms: plan._allRooms }
+    : plan
+  const bounds = getPlanBounds(boundsSource)
   const pad = plan.exterior.perimeterPadding
   const y = 0.1
 
-  const points = [
+  // Build a closed path for TubeGeometry
+  const corners = [
     new THREE.Vector3(bounds.minX - pad, y, bounds.minZ - pad),
     new THREE.Vector3(bounds.maxX + pad, y, bounds.minZ - pad),
     new THREE.Vector3(bounds.maxX + pad, y, bounds.maxZ + pad),
@@ -202,43 +238,50 @@ export function createAlarmMarker(device, plan) {
     new THREE.Vector3(bounds.minX - pad, y, bounds.minZ - pad)
   ]
 
-  const geo = new THREE.BufferGeometry().setFromPoints(points)
-  const mat = createAlarmLineMaterial()
-  const line = new THREE.Line(geo, mat)
-  line.userData.deviceId = device.id
-  line.userData.isAlarmLine = true
+  const curve = new THREE.CatmullRomCurve3(corners, false, 'catmullrom', 0)
+  const tubeGeo = new THREE.TubeGeometry(curve, 64, 0.04, 8, false)
+  const tubeMat = createAlarmTubeMaterial()
 
   if (!device.armed) {
-    mat.opacity = 0
+    tubeMat.opacity = 0
+    tubeMat.emissiveIntensity = 0
   }
 
-  group.add(line)
+  const tube = new THREE.Mesh(tubeGeo, tubeMat)
+  tube.userData.deviceId = device.id
+  tube.userData.isAlarmTube = true
+  tube.userData.armed = device.armed
+
+  group.add(tube)
   return group
 }
 
 export function updateAlarmMarker(group, device) {
-  const line = group.children.find(c => c.userData && c.userData.isAlarmLine)
-  if (!line) return
+  const tube = group.children.find(c => c.userData && c.userData.isAlarmTube)
+  if (!tube) return
 
   if (device.armed) {
-    // Start pulsing animation - handled in animation loop
-    line.material.opacity = 1.0
-    line.userData.armed = true
+    tube.material.opacity = 1.0
+    tube.material.emissiveIntensity = 1.0
+    tube.userData.armed = true
   } else {
-    line.material.opacity = 0
-    line.userData.armed = false
+    tube.material.opacity = 0
+    tube.material.emissiveIntensity = 0
+    tube.userData.armed = false
   }
 }
 
 /**
- * Call this in the animation loop to pulse armed alarm lines.
+ * Pulse armed alarm tubes in the animation loop.
+ * Animates both opacity and emissiveIntensity.
  */
 export function animateAlarmPulse(group, time) {
-  const line = group.children.find(c => c.userData && c.userData.isAlarmLine)
-  if (!line || !line.userData.armed) return
-  // Pulse between 0.3 and 1.0 over 2 seconds
+  const tube = group.children.find(c => c.userData && c.userData.isAlarmTube)
+  if (!tube || !tube.userData.armed) return
+
   const t = (Math.sin(time * 0.002 * Math.PI) + 1) / 2
-  line.material.opacity = 0.3 + t * 0.7
+  tube.material.opacity = 0.3 + t * 0.7
+  tube.material.emissiveIntensity = 0.5 + t * 1.5
 }
 
 // ---- FAUCET ----
@@ -248,7 +291,6 @@ export function createFaucetMarker(device, anchor) {
   group.userData.deviceId = device.id
   group.userData.deviceType = 'faucet'
 
-  // Faucet body (cylinder)
   const bodyGeo = new THREE.CylinderGeometry(0.06, 0.08, 0.4, 8)
   const bodyMat = createFaucetMaterial()
   const body = new THREE.Mesh(bodyGeo, bodyMat)
@@ -256,7 +298,6 @@ export function createFaucetMarker(device, anchor) {
   body.userData.deviceId = device.id
   group.add(body)
 
-  // Spout (horizontal cylinder)
   const spoutGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.3, 8)
   const spoutMat = createFaucetMaterial()
   const spout = new THREE.Mesh(spoutGeo, spoutMat)
@@ -264,7 +305,6 @@ export function createFaucetMarker(device, anchor) {
   spout.position.set(0.15, 0.35, 0)
   group.add(spout)
 
-  // Water drops (only when on)
   if (device.on) {
     addWaterDrops(group, device.flow)
   }
