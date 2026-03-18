@@ -1,5 +1,11 @@
 <template>
   <div class="dashboard">
+    <!-- Vista 3D del hogar -->
+    <div class="dashboard__home3d">
+      <HomeModelSelector class="dashboard__home3d-selector" />
+      <HomeScene />
+    </div>
+
     <!-- Resumen -->
     <div class="dashboard__summary">
       <div class="summary-card">
@@ -101,6 +107,8 @@ import { useNotificationsStore } from '../stores/notifications'
 import DeviceCard from '../components/devices/DeviceCard.vue'
 import HcButton from '../components/ui/HcButton.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
+import HomeScene from '../components/home3d/HomeScene.vue'
+import HomeModelSelector from '../components/home3d/HomeModelSelector.vue'
 
 const router = useRouter()
 const devicesStore = useDevicesStore()
@@ -153,6 +161,23 @@ function formatDate(dateStr) {
   display: flex;
   flex-direction: column;
   gap: var(--hc-space-xl);
+}
+
+.dashboard__home3d {
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+  background: var(--hc-bg-secondary);
+  border: 1px solid var(--hc-border);
+  border-radius: var(--hc-radius-lg);
+  padding: 0;
+}
+
+.dashboard__home3d-selector {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
 }
 
 .dashboard__summary {
