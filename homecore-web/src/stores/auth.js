@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
+const RESTRICTED_DEVICE_TYPES = {
+  teen: ['alarm', 'door']
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const defaultUser = {
     id: 1,
@@ -15,6 +19,25 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref({ ...defaultUser })
   const isAuthenticated = computed(() => !!user.value)
   const pin = ref('1234')
+
+  const familyProfiles = ref([
+    { id: 'admin-1', name: 'Juani Raggio', role: 'admin', avatar: null },
+    { id: 'teen-1', name: 'Tomi Raggio', role: 'teen', avatar: null }
+  ])
+  const activeProfile = ref(familyProfiles.value[0])
+  const isAdmin = computed(() => activeProfile.value.role === 'admin')
+
+  function switchProfile(profileId) {
+    const profile = familyProfiles.value.find(p => p.id === profileId)
+    if (profile) {
+      activeProfile.value = profile
+    }
+  }
+
+  function isRestricted(deviceType) {
+    const restricted = RESTRICTED_DEVICE_TYPES[activeProfile.value.role]
+    return restricted ? restricted.includes(deviceType) : false
+  }
 
   const registeredUsers = ref([
     {
@@ -110,6 +133,11 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isAuthenticated,
     pin,
+    familyProfiles,
+    activeProfile,
+    isAdmin,
+    switchProfile,
+    isRestricted,
     login,
     register,
     verifyAccount,

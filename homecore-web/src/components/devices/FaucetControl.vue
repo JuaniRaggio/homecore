@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import HcToggle from '../ui/HcToggle.vue'
 import HcSlider from '../ui/HcSlider.vue'
@@ -33,15 +33,18 @@ const props = defineProps({
 })
 
 const devicesStore = useDevicesStore()
+const toast = inject('toast')
 const flow = ref(props.device.flow)
 
 function toggle() {
   devicesStore.toggleDevice(props.device.id)
+  toast.value?.show(`${props.device.name} ${!props.device.on ? 'abierto' : 'cerrado'}`, 'success')
 }
 
 function updateFlow(val) {
   flow.value = val
   devicesStore.updateDevice(props.device.id, { flow: val })
+  toast.value?.show(`Caudal de ${props.device.name}: ${val}%`, 'info')
 }
 </script>
 

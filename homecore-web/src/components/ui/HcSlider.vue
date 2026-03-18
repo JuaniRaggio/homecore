@@ -73,7 +73,7 @@ const sliderStyle = computed(() => {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 6px;
+  height: 10px;
   border-radius: var(--hc-radius-full);
   outline: none;
   cursor: pointer;
@@ -88,8 +88,8 @@ const sliderStyle = computed(() => {
 .hc-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: white;
   box-shadow: 0 1px 4px rgba(0,0,0,0.4);
@@ -102,8 +102,8 @@ const sliderStyle = computed(() => {
 }
 
 .hc-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border: none;
   border-radius: 50%;
   background: white;

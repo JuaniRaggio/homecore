@@ -5,7 +5,7 @@
         <h4 class="routine-card__name">{{ routine.name }}</h4>
         <p class="routine-card__desc">{{ routine.description }}</p>
       </div>
-      <HcToggle :modelValue="routine.enabled" @update:modelValue="routinesStore.toggleRoutine(routine.id)" />
+      <HcToggle :modelValue="routine.enabled" @update:modelValue="routinesStore.toggleRoutine(routine.id)" :disabled="restrictExecute" />
     </div>
 
     <div class="routine-card__schedule" v-if="routine.schedule">
@@ -18,10 +18,10 @@
     </div>
 
     <div class="routine-card__footer">
-      <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="!routine.enabled">
+      <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="!routine.enabled || restrictExecute">
         Ejecutar
       </HcButton>
-      <HcButton size="sm" variant="ghost" @click="$emit('delete', routine.id)">
+      <HcButton v-if="!restrictExecute" size="sm" variant="ghost" @click="$emit('delete', routine.id)">
         Eliminar
       </HcButton>
     </div>
@@ -34,8 +34,9 @@ import HcButton from '../ui/HcButton.vue'
 import HcToggle from '../ui/HcToggle.vue'
 import HcIcon from '../ui/HcIcon.vue'
 
-defineProps({
-  routine: { type: Object, required: true }
+const props = defineProps({
+  routine: { type: Object, required: true },
+  restrictExecute: { type: Boolean, default: false }
 })
 
 defineEmits(['execute', 'delete'])

@@ -110,10 +110,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, inject } from 'vue'
+import { ref, reactive, watch, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoutinesStore } from '../stores/routines'
+import { useAuthStore } from '../stores/auth'
 import HcButton from '../components/ui/HcButton.vue'
 import HcInput from '../components/ui/HcInput.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
@@ -121,7 +122,14 @@ import HcIcon from '../components/ui/HcIcon.vue'
 const router = useRouter()
 const devicesStore = useDevicesStore()
 const routinesStore = useRoutinesStore()
+const authStore = useAuthStore()
 const toast = inject('toast')
+
+onMounted(() => {
+  if (!authStore.isAdmin) {
+    router.replace('/rutinas')
+  }
+})
 
 const steps = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
 const step = ref(0)

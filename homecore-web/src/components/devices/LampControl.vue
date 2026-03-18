@@ -30,10 +30,13 @@
             @click="setColor(c.value)"
             :aria-label="c.name"
           ></button>
-          <label class="lamp-control__color-custom">
-            <input type="color" :value="device.color" @input="setColor($event.target.value)" />
-            <span>+</span>
-          </label>
+          <div class="lamp-control__color-custom-wrapper">
+            <label class="lamp-control__color-custom" aria-label="Personalizado">
+              <input type="color" :value="device.color" @input="setColor($event.target.value)" />
+              <span>+</span>
+            </label>
+            <span class="lamp-control__color-custom-label">Personalizado</span>
+          </div>
         </div>
       </div>
     </div>
@@ -41,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import HcToggle from '../ui/HcToggle.vue'
 import HcSlider from '../ui/HcSlider.vue'
@@ -52,16 +55,14 @@ const props = defineProps({
 })
 
 const devicesStore = useDevicesStore()
+const toast = inject('toast')
 const brightness = ref(props.device.brightness)
 
 const presetColors = [
   { name: 'Blanco frio', value: '#ffffff' },
   { name: 'Blanco calido', value: '#f59e0b' },
-  { name: 'Naranja', value: '#fb923c' },
   { name: 'Azul', value: '#3b82f6' },
-  { name: 'Verde', value: '#22c55e' },
-  { name: 'Rojo', value: '#ef4444' },
-  { name: 'Violeta', value: '#a855f7' }
+  { name: 'Naranja', value: '#fb923c' }
 ]
 
 const bulbStyle = computed(() => ({
@@ -70,15 +71,18 @@ const bulbStyle = computed(() => ({
 
 function toggle(val) {
   devicesStore.toggleDevice(props.device.id)
+  toast.value?.show(`${props.device.name} ${val ? 'encendida' : 'apagada'}`, 'success')
 }
 
 function updateBrightness(val) {
   brightness.value = val
   devicesStore.updateDevice(props.device.id, { brightness: val })
+  toast.value?.show(`Brillo de ${props.device.name}: ${val}%`, 'info')
 }
 
 function setColor(color) {
   devicesStore.updateDevice(props.device.id, { color })
+  toast.value?.show(`Color de ${props.device.name} actualizado`, 'info')
 }
 </script>
 
@@ -140,8 +144,8 @@ function setColor(color) {
 }
 
 .lamp-control__color-btn {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
@@ -158,8 +162,8 @@ function setColor(color) {
 }
 
 .lamp-control__color-custom {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--hc-bg-tertiary);
   border: 1px dashed var(--hc-border);
@@ -183,5 +187,17 @@ function setColor(color) {
   color: var(--hc-text-muted);
   font-size: 1rem;
   pointer-events: none;
+}
+
+.lamp-control__color-custom-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lamp-control__color-custom-label {
+  font-size: var(--hc-font-size-xs);
+  color: var(--hc-text-muted);
 }
 </style>

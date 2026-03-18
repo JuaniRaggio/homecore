@@ -38,6 +38,31 @@
         </div>
       </div>
 
+      <!-- Selector de perfil -->
+      <div class="header__profile-selector">
+        <button class="header__profile-btn" @click="showProfileMenu = !showProfileMenu">
+          <span class="header__profile-name">{{ authStore.activeProfile.name }}</span>
+          <HcIcon name="chevronDown" size="sm" />
+        </button>
+        <div v-if="showProfileMenu" class="header__dropdown header__dropdown--profiles">
+          <div class="header__dropdown-header">
+            <span class="header__dropdown-title">Perfiles de familia</span>
+          </div>
+          <button
+            v-for="profile in authStore.familyProfiles"
+            :key="profile.id"
+            class="header__dropdown-item header__profile-item"
+            :class="{ 'header__dropdown-item--active': profile.id === authStore.activeProfile.id }"
+            @click="handleProfileSwitch(profile.id)"
+          >
+            <span>{{ profile.name }}</span>
+            <span class="header__profile-badge" :class="`header__profile-badge--${profile.role}`">
+              {{ profile.role === 'admin' ? 'Admin' : 'Adolescente' }}
+            </span>
+          </button>
+        </div>
+      </div>
+
       <!-- Menu usuario -->
       <div class="header__user">
         <button class="header__avatar" @click="showUserMenu = !showUserMenu">
@@ -59,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useNotificationsStore } from '../../stores/notifications'
@@ -70,8 +95,10 @@ const router = useRouter()
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
 
+const toast = inject('toast')
 const showNotifications = ref(false)
 const showUserMenu = ref(false)
+const showProfileMenu = ref(false)
 
 const user = computed(() => authStore.user)
 const unreadCount = computed(() => notificationsStore.unreadCount)
@@ -108,6 +135,12 @@ function formatDate(dateStr) {
   const diffHours = Math.floor(diffMins / 60)
   if (diffHours < 24) return `Hace ${diffHours}h`
   return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
+}
+
+function handleProfileSwitch(profileId) {
+  authStore.switchProfile(profileId)
+  showProfileMenu.value = false
+  toast.value?.show(`Perfil cambiado a ${authStore.activeProfile.name}`, 'info')
 }
 
 function handleLogout() {
@@ -343,5 +376,58 @@ function handleLogout() {
   font-size: var(--hc-font-size-xs);
   color: var(--hc-text-muted);
   margin-top: 0.25rem;
+}
+
+/* Profile selector */
+.header__profile-selector {
+  position: relative;
+}
+
+.header__profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--hc-bg-tertiary);
+  border: 1px solid var(--hc-border);
+  border-radius: var(--hc-radius-md);
+  padding: 0.375rem 0.75rem;
+  color: var(--hc-text-primary);
+  font-size: var(--hc-font-size-sm);
+  cursor: pointer;
+  transition: all var(--hc-transition-fast);
+  white-space: nowrap;
+}
+
+.header__profile-btn:hover {
+  border-color: var(--hc-accent);
+}
+
+.header__dropdown--profiles {
+  min-width: 220px;
+}
+
+.header__profile-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__profile-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--hc-radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.header__profile-badge--admin {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--hc-accent);
+}
+
+.header__profile-badge--teen {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--hc-accent-warm);
 }
 </style>
