@@ -32,3 +32,21 @@ La gestion de hogares (puntos 18-20) agrega una capa jerarquica completa (hogar 
 
 ### 6. Criterio de evaluacion para la primera entrega
 En la primera entrega, se evalua que las features opcionales esten disenadas en los prototipos, o solo se evaluan las obligatorias? Queremos saber si debemos incluir las opcionales en los wireframes/mockups desde ahora.
+
+### 7. Personalizacion
+Estamos pensando en hacer que el usuario administrador pueda crear
+distintos roles completamente personalizados por el mismo como si
+fuese una "paradigma orientado a objetos", de esta forma podria
+definir reglas para ciertos tipos de usuarios y en caso de querer
+agregar integrantes, ya sea "empleada de limpieza", "hijo menor",
+"electricista", se pueda personalizar detalladamente a que
+dispositivos tiene acceso cada tipo de usuario, ej:
+
+    - Familiar adulto: Seria un tipo de usuario personalizado, 
+      (podriamos mostrarlo como default) que tiene acceso a todas
+      las cerraduras y luces
+
+    - Empleada de limpieza: Tipo de usuario personalizado, que tiene
+      acceso a lavarropas, cortinas y luces.
+
+
