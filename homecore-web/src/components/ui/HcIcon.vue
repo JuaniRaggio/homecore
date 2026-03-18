@@ -43,6 +43,7 @@ const paths = {
   collapseLeft: '<polyline points="15 18 9 12 15 6"/>',
   collapseRight: '<polyline points="9 18 15 12 9 6"/>',
   unlink: '<line x1="18" y1="6" x2="6" y2="18"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   default: '<circle cx="12" cy="12" r="10"/>'
 }
 </script>

@@ -21,7 +21,7 @@
     </nav>
 
     <div class="sidebar__footer">
-      <router-link to="/configuracion" class="sidebar__link" :class="{ 'sidebar__link--active': isActive('/configuracion') }">
+      <router-link v-if="authStore.isAdmin" to="/configuracion" class="sidebar__link" :class="{ 'sidebar__link--active': isActive('/configuracion') }">
         <HcIcon name="settings" size="md" />
         <span v-if="!collapsed" class="sidebar__link-text">Configuracion</span>
       </router-link>
@@ -34,6 +34,7 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '../../stores/auth'
 import HcIcon from '../ui/HcIcon.vue'
 import HcLogo from '../ui/HcLogo.vue'
 
@@ -44,6 +45,7 @@ defineProps({
 defineEmits(['toggle'])
 
 const route = useRoute()
+const authStore = useAuthStore()
 
 const navItems = [
   { to: '/', label: 'Inicio', icon: 'home' },

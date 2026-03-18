@@ -76,9 +76,12 @@
             class="dashboard__notif-item"
             :class="{ 'dashboard__notif-item--unread': !notif.read }"
           >
-            <div class="dashboard__notif-dot" :class="`dashboard__notif-dot--${notif.type}`"></div>
+            <HcIcon :name="notifIcon(notif.type)" size="sm" :class="`dashboard__notif-icon--${notif.type}`" />
             <div>
-              <p class="dashboard__notif-title">{{ notif.title }}</p>
+              <p class="dashboard__notif-title">
+                <span class="dashboard__notif-type-label">{{ notifLabel(notif.type) }}</span>
+                {{ notif.title }}
+              </p>
               <p class="dashboard__notif-time">{{ formatDate(notif.date) }}</p>
             </div>
           </div>
@@ -97,6 +100,7 @@ import { useRoutinesStore } from '../stores/routines'
 import { useNotificationsStore } from '../stores/notifications'
 import DeviceCard from '../components/devices/DeviceCard.vue'
 import HcButton from '../components/ui/HcButton.vue'
+import HcIcon from '../components/ui/HcIcon.vue'
 
 const router = useRouter()
 const devicesStore = useDevicesStore()
@@ -119,6 +123,16 @@ function goToDevice(id) {
 function executeRoutine(id) {
   routinesStore.executeRoutine(id)
   toast.value?.show('Rutina ejecutada correctamente', 'success')
+}
+
+function notifIcon(type) {
+  const icons = { info: 'info', warning: 'warning', alert: 'warning', error: 'close' }
+  return icons[type] || 'info'
+}
+
+function notifLabel(type) {
+  const labels = { info: '[Info]', warning: '[Aviso]', alert: '[Alerta]', error: '[Error]' }
+  return labels[type] || '[Info]'
 }
 
 function formatDate(dateStr) {
@@ -247,18 +261,16 @@ function formatDate(dateStr) {
   background: rgba(99, 102, 241, 0.05);
 }
 
-.dashboard__notif-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-top: 6px;
-  flex-shrink: 0;
-}
+.dashboard__notif-icon--info { color: var(--hc-accent); }
+.dashboard__notif-icon--warning { color: var(--hc-accent-warm); }
+.dashboard__notif-icon--alert { color: var(--hc-danger); }
+.dashboard__notif-icon--error { color: var(--hc-danger); }
 
-.dashboard__notif-dot--info { background: var(--hc-accent); }
-.dashboard__notif-dot--warning { background: var(--hc-accent-warm); }
-.dashboard__notif-dot--alert { background: var(--hc-danger); }
-.dashboard__notif-dot--error { background: var(--hc-danger); }
+.dashboard__notif-type-label {
+  font-weight: 600;
+  margin-right: 0.25rem;
+  font-size: var(--hc-font-size-xs);
+}
 
 .dashboard__notif-title {
   font-size: var(--hc-font-size-sm);

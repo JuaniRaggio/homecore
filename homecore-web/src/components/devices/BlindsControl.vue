@@ -22,18 +22,18 @@
       />
 
       <div class="blinds-control__presets">
-        <HcButton variant="secondary" size="sm" @click="setPreset(0)">Cerrar</HcButton>
-        <HcButton variant="secondary" size="sm" @click="setPreset(25)">25%</HcButton>
-        <HcButton variant="secondary" size="sm" @click="setPreset(50)">50%</HcButton>
-        <HcButton variant="secondary" size="sm" @click="setPreset(75)">75%</HcButton>
-        <HcButton variant="secondary" size="sm" @click="setPreset(100)">Abrir</HcButton>
+        <HcButton variant="secondary" size="md" @click="setPreset(0)">Cerrar</HcButton>
+        <HcButton variant="secondary" size="md" @click="setPreset(25)">25%</HcButton>
+        <HcButton variant="secondary" size="md" @click="setPreset(50)">50%</HcButton>
+        <HcButton variant="secondary" size="md" @click="setPreset(75)">75%</HcButton>
+        <HcButton variant="secondary" size="md" @click="setPreset(100)">Abrir</HcButton>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import HcSlider from '../ui/HcSlider.vue'
 import HcButton from '../ui/HcButton.vue'
@@ -43,16 +43,20 @@ const props = defineProps({
 })
 
 const devicesStore = useDevicesStore()
+const toast = inject('toast')
 const position = ref(props.device.position)
 
 function updatePosition(val) {
   position.value = val
   devicesStore.updateDevice(props.device.id, { position: val, on: val > 0 })
+  toast.value?.show(`${props.device.name}: posicion ${val}%`, 'info')
 }
 
 function setPreset(val) {
   position.value = val
   devicesStore.updateDevice(props.device.id, { position: val, on: val > 0 })
+  const label = val === 0 ? 'cerrada' : val === 100 ? 'abierta' : `posicion ${val}%`
+  toast.value?.show(`${props.device.name} ${label}`, 'success')
 }
 </script>
 

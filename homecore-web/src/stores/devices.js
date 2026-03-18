@@ -6,7 +6,7 @@ export const useDevicesStore = defineStore('devices', () => {
   const devices = ref([
     {
       id: 'lamp-1',
-      name: 'Luz principal',
+      name: 'Lampara principal',
       type: 'lamp',
       roomId: 'room-1',
       on: true,
@@ -28,7 +28,7 @@ export const useDevicesStore = defineStore('devices', () => {
     },
     {
       id: 'lamp-3',
-      name: 'Luz cocina',
+      name: 'Lampara cocina',
       type: 'lamp',
       roomId: 'room-3',
       on: true,
@@ -75,7 +75,7 @@ export const useDevicesStore = defineStore('devices', () => {
     },
     {
       id: 'faucet-1',
-      name: 'Aspersor jardin',
+      name: 'Grifo jardin',
       type: 'faucet',
       roomId: null,
       on: false,
@@ -95,7 +95,7 @@ export const useDevicesStore = defineStore('devices', () => {
     },
     {
       id: 'blinds-1',
-      name: 'Persiana living',
+      name: 'Cortina living',
       type: 'blinds',
       roomId: 'room-1',
       on: false,

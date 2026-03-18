@@ -26,9 +26,10 @@
     <div class="device-card__status">
       <span class="device-card__state" :class="device.on ? 'text-success' : 'text-muted'">
         {{ statusText }}
+        <HcIcon v-if="restricted" name="lock" size="xs" class="device-card__lock" />
       </span>
       <div @click.stop>
-        <HcToggle :modelValue="device.on" @update:modelValue="devicesStore.toggleDevice(device.id)" />
+        <HcToggle :modelValue="device.on" @update:modelValue="devicesStore.toggleDevice(device.id)" :disabled="restricted" />
       </div>
     </div>
   </div>
@@ -38,6 +39,7 @@
 import { computed } from 'vue'
 import { useDevicesStore } from '../../stores/devices'
 import { useRoomsStore } from '../../stores/rooms'
+import { useAuthStore } from '../../stores/auth'
 import HcToggle from '../ui/HcToggle.vue'
 import HcIcon from '../ui/HcIcon.vue'
 
@@ -49,6 +51,9 @@ defineEmits(['select'])
 
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
+const authStore = useAuthStore()
+
+const restricted = computed(() => authStore.isRestricted(props.device.type))
 
 const roomName = computed(() => {
   if (!props.device.roomId) return 'Sin habitacion'
@@ -166,5 +171,12 @@ const statusText = computed(() => {
 .device-card__state {
   font-size: var(--hc-font-size-xs);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.device-card__lock {
+  color: var(--hc-accent-warm);
 }
 </style>

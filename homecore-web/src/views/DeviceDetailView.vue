@@ -159,7 +159,7 @@ function formatDate(dateStr) {
   border-radius: var(--hc-radius-md);
   color: var(--hc-text-secondary);
   cursor: pointer;
-  padding: 0.375rem 0.75rem;
+  padding: 0.625rem 1rem;
   font-size: var(--hc-font-size-sm);
   transition: all var(--hc-transition-fast);
 }

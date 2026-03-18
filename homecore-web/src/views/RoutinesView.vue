@@ -2,7 +2,7 @@
   <div class="routines-page">
     <div class="routines-page__header">
       <h2>Rutinas</h2>
-      <router-link to="/rutinas/nueva">
+      <router-link v-if="authStore.isAdmin" to="/rutinas/nueva">
         <HcButton>+ Nueva rutina</HcButton>
       </router-link>
     </div>
@@ -12,6 +12,7 @@
         v-for="routine in routinesStore.routines"
         :key="routine.id"
         :routine="routine"
+        :restrict-execute="!authStore.isAdmin"
         @execute="handleExecute"
         @delete="handleDelete"
       />
@@ -34,11 +35,13 @@
 <script setup>
 import { ref, inject } from 'vue'
 import { useRoutinesStore } from '../stores/routines'
+import { useAuthStore } from '../stores/auth'
 import RoutineCard from '../components/routines/RoutineCard.vue'
 import HcButton from '../components/ui/HcButton.vue'
 import HcModal from '../components/ui/HcModal.vue'
 
 const routinesStore = useRoutinesStore()
+const authStore = useAuthStore()
 const toast = inject('toast')
 
 const showDeleteModal = ref(false)

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import AppLayout from '../components/layout/AppLayout.vue'
 
 const routes = [
@@ -58,7 +59,8 @@ const routes = [
       {
         path: 'rutinas/nueva',
         name: 'new-routine',
-        component: () => import('../views/NewRoutineView.vue')
+        component: () => import('../views/NewRoutineView.vue'),
+        meta: { adminOnly: true }
       },
       {
         path: 'historial',
@@ -73,7 +75,8 @@ const routes = [
       {
         path: 'configuracion',
         name: 'settings',
-        component: () => import('../views/SettingsView.vue')
+        component: () => import('../views/SettingsView.vue'),
+        meta: { adminOnly: true }
       }
     ]
   }
@@ -84,12 +87,11 @@ const router = createRouter({
   routes
 })
 
-// Auth guard disabled - auto-login enabled for prototype
-// router.beforeEach((to) => {
-//   const authStore = useAuthStore()
-//   if (!to.meta.public && !authStore.isAuthenticated) {
-//     return { name: 'login' }
-//   }
-// })
+router.beforeEach((to) => {
+  const authStore = useAuthStore()
+  if (to.meta.adminOnly && !authStore.isAdmin) {
+    return { name: 'dashboard' }
+  }
+})
 
 export default router
