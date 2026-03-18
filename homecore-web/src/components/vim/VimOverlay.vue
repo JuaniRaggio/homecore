@@ -267,21 +267,21 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
 .vim-help-window {
   background: #0d0d12;
   border: 1px solid #6366f1;
-  border-radius: 4px;
-  box-shadow: 0 0 40px rgba(99, 102, 241, 0.2), 0 0 80px rgba(99, 102, 241, 0.05);
-  max-width: 720px;
-  width: 90vw;
-  max-height: 85vh;
+  border-radius: 6px;
+  box-shadow: 0 0 60px rgba(99, 102, 241, 0.25), 0 0 120px rgba(99, 102, 241, 0.08);
+  max-width: 920px;
+  width: 94vw;
+  max-height: 88vh;
   overflow-y: auto;
   padding: 0;
 }
 
 .vim-help-text {
   font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   color: #c8c8d8;
-  padding: 24px;
+  padding: 32px 40px;
   margin: 0;
   white-space: pre;
   overflow-x: auto;
