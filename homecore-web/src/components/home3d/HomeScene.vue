@@ -28,10 +28,12 @@ import { ref, watch, onMounted, onBeforeUnmount, reactive, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import * as THREE from 'three'
 import { useDevicesStore } from '../../stores/devices'
+import { useRoomsStore } from '../../stores/rooms'
 import { useHomeModelStore } from '../../stores/homeModel'
 import { useHomeScene } from './useHomeScene.js'
-import { floorPlans, getPlanBounds } from './floorPlans.js'
+import { getPlanBounds } from './floorPlans.js'
 import { buildAllRooms, setRoomHighlight } from './roomMeshBuilder.js'
+import { computeDeviceAnchor, computeExteriorAnchor } from './deviceAnchorComputer.js'
 import {
   createDeviceMarker,
   updateDeviceMarkerState,
@@ -41,6 +43,7 @@ import {
 
 const router = useRouter()
 const devicesStore = useDevicesStore()
+const roomsStore = useRoomsStore()
 const homeModelStore = useHomeModelStore()
 
 const containerRef = ref(null)
@@ -78,10 +81,9 @@ function clearScene() {
   deviceGroups = []
 }
 
-function buildFloorPlan(modelName) {
+function buildFloorPlanFromPlan(plan) {
   clearScene()
-  const plan = floorPlans[modelName]
-  if (!plan) return
+  if (!plan || !plan.rooms || plan.rooms.length === 0) return
 
   // Build rooms
   const rooms = buildAllRooms(plan)
@@ -101,14 +103,22 @@ function buildDeviceMarkers(plan) {
   }
   deviceGroups = []
 
-  const devices = devicesStore.devices
-
   // Room device anchors
   for (const roomDef of plan.rooms) {
-    if (!roomDef.deviceAnchors) continue
-    for (const [deviceId, anchor] of Object.entries(roomDef.deviceAnchors)) {
-      const device = devicesStore.getById(deviceId)
-      if (!device) continue
+    const roomDevices = devicesStore.getByRoom(roomDef.roomId)
+
+    for (const device of roomDevices) {
+      // Use curated anchor if available, otherwise auto-compute
+      let anchor = null
+      if (roomDef.deviceAnchors && roomDef.deviceAnchors[device.id]) {
+        anchor = roomDef.deviceAnchors[device.id]
+      } else {
+        anchor = computeDeviceAnchor(device, roomDef)
+      }
+
+      // Skip alarm devices in rooms (they are exterior)
+      if (device.type === 'alarm') continue
+
       const marker = createDeviceMarker(device, anchor, plan)
       if (marker) {
         scene.add(marker)
@@ -119,19 +129,31 @@ function buildDeviceMarkers(plan) {
 
   // Exterior device anchors
   if (plan.exterior && plan.exterior.deviceAnchors) {
+    const bounds = getPlanBounds(plan)
+    const pad = plan.exterior.perimeterPadding || 1.5
+
     for (const [deviceId, anchor] of Object.entries(plan.exterior.deviceAnchors)) {
-      if (!anchor) continue
       const device = devicesStore.getById(deviceId)
       if (!device) continue
 
-      if (anchor.type === 'perimeter') {
+      if (anchor && anchor.type === 'perimeter') {
+        // Perimeter device (alarm)
+        const marker = createDeviceMarker(device, anchor, plan)
+        if (marker) {
+          scene.add(marker)
+          deviceGroups.push(marker)
+        }
+      } else if (anchor) {
+        // Exterior device with explicit position
         const marker = createDeviceMarker(device, anchor, plan)
         if (marker) {
           scene.add(marker)
           deviceGroups.push(marker)
         }
       } else {
-        const marker = createDeviceMarker(device, anchor, plan)
+        // Exterior device without preset position -- auto-compute
+        const autoAnchor = computeExteriorAnchor(device, bounds, pad)
+        const marker = createDeviceMarker(device, autoAnchor, plan)
         if (marker) {
           scene.add(marker)
           deviceGroups.push(marker)
@@ -320,9 +342,19 @@ watch(() => devicesStore.devices, () => {
   updateDeviceMarkers()
 }, { deep: true })
 
-watch(() => homeModelStore.selectedModel, (newModel) => {
-  buildFloorPlan(newModel)
-})
+// Watch currentPlan for rebuilds (preset changes, room additions/removals)
+watch(() => homeModelStore.currentPlan, (newPlan) => {
+  buildFloorPlanFromPlan(newPlan)
+}, { deep: true })
+
+// When rooms are deleted from the rooms store, remove them from the layout
+watch(() => roomsStore.rooms, (newRooms) => {
+  const roomIds = new Set(newRooms.map(r => r.id))
+  const toRemove = homeModelStore.roomLayouts.filter(rl => !roomIds.has(rl.roomId))
+  for (const layout of toRemove) {
+    homeModelStore.removeRoomFromLayout(layout.roomId)
+  }
+}, { deep: true })
 
 // ---- Lifecycle ----
 
@@ -331,7 +363,8 @@ let resizeObserver = null
 onMounted(async () => {
   await nextTick()
   init()
-  buildFloorPlan(homeModelStore.selectedModel)
+  homeModelStore.initialize()
+  buildFloorPlanFromPlan(homeModelStore.currentPlan)
   startDeviceAnimations()
   loading.value = false
 

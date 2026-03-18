@@ -3,6 +3,7 @@
     <!-- Vista 3D del hogar -->
     <div class="dashboard__home3d">
       <HomeModelSelector class="dashboard__home3d-selector" />
+      <RoomLayoutOverlay class="dashboard__home3d-room-overlay" />
       <HomeScene />
     </div>
 
@@ -109,6 +110,7 @@ import HcButton from '../components/ui/HcButton.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
 import HomeScene from '../components/home3d/HomeScene.vue'
 import HomeModelSelector from '../components/home3d/HomeModelSelector.vue'
+import RoomLayoutOverlay from '../components/home3d/RoomLayoutOverlay.vue'
 
 const router = useRouter()
 const devicesStore = useDevicesStore()
@@ -177,6 +179,13 @@ function formatDate(dateStr) {
   position: absolute;
   top: 12px;
   right: 12px;
+  z-index: 5;
+}
+
+.dashboard__home3d-room-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
   z-index: 5;
 }
 

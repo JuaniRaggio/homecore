@@ -32,10 +32,10 @@ export function useHomeScene(containerRef) {
   }
 
   function createLighting() {
-    const ambient = new THREE.AmbientLight(0x6366f1, 0.15)
+    const ambient = new THREE.AmbientLight(0x6366f1, 0.06)
     scene.add(ambient)
 
-    const directional = new THREE.DirectionalLight(0xc8c8d8, 0.4)
+    const directional = new THREE.DirectionalLight(0xc8c8d8, 0.18)
     directional.position.set(5, 10, 5)
     directional.castShadow = true
     directional.shadow.mapSize.width = 1024
