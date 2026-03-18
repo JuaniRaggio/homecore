@@ -56,7 +56,7 @@ const tooltip = reactive({
   status: ''
 })
 
-const { scene, init, dispose, onResize, getCamera, getRenderer } = useHomeScene(containerRef)
+const { scene, init, dispose, onResize, getCamera, getRenderer, fitToContent, getCameraTarget } = useHomeScene(containerRef)
 
 const raycaster = new THREE.Raycaster()
 const mouse = new THREE.Vector2()
@@ -83,7 +83,10 @@ function clearScene() {
 
 function buildFloorPlanFromPlan(plan) {
   clearScene()
-  if (!plan || !plan.rooms || plan.rooms.length === 0) return
+  if (!plan || !plan.rooms || plan.rooms.length === 0) {
+    fitToContent([])
+    return
+  }
 
   // Build rooms
   const rooms = buildAllRooms(plan)
@@ -94,6 +97,9 @@ function buildFloorPlanFromPlan(plan) {
 
   // Build device markers
   buildDeviceMarkers(plan)
+
+  // Auto-adjust camera to fit current floor's content
+  fitToContent(plan.rooms)
 }
 
 function buildDeviceMarkers(plan) {
@@ -129,7 +135,11 @@ function buildDeviceMarkers(plan) {
 
   // Exterior device anchors
   if (plan.exterior && plan.exterior.deviceAnchors) {
-    const bounds = getPlanBounds(plan)
+    // Use _allRooms (all floors) for perimeter bounds so alarm covers entire house
+    const boundsSource = plan._allRooms && plan._allRooms.length > 0
+      ? { rooms: plan._allRooms }
+      : plan
+    const bounds = getPlanBounds(boundsSource)
     const pad = plan.exterior.perimeterPadding || 1.5
 
     for (const [deviceId, anchor] of Object.entries(plan.exterior.deviceAnchors)) {
@@ -328,9 +338,10 @@ function startDeviceAnimations() {
     // Subtle parallax on camera
     const camera = getCamera()
     if (camera) {
-      camera.position.x = 10 + baseMouseX * 0.3
-      camera.position.z = 10 + baseMouseY * 0.3
-      camera.lookAt(0, 0, 0)
+      const target = getCameraTarget()
+      camera.position.x = target.x + 10 + baseMouseX * 0.3
+      camera.position.z = target.z + 10 + baseMouseY * 0.3
+      camera.lookAt(target)
     }
   }
   animationFrameId = requestAnimationFrame(tick)

@@ -10,6 +10,10 @@ export const useHomeModelStore = defineStore('homeModel', () => {
   // Array of room layouts currently placed in the 3D scene
   const roomLayouts = ref([])
 
+  // Multi-floor state
+  const activeFloor = ref(0)
+  const floorCount = ref(1)
+
   // Exterior configuration (perimeter padding + exterior device anchors)
   const exteriorConfig = ref({
     perimeterPadding: 1.5,
@@ -17,14 +21,22 @@ export const useHomeModelStore = defineStore('homeModel', () => {
   })
 
   /**
+   * Rooms on the currently active floor.
+   */
+  const activeFloorLayouts = computed(() =>
+    roomLayouts.value.filter(r => r.floor === activeFloor.value)
+  )
+
+  /**
    * Computed plan object with the same shape as the hardcoded presets.
-   * Only depends on roomLayouts and exteriorConfig (not device state),
-   * so it won't trigger unnecessary rebuilds.
+   * rooms = only the active floor's rooms (for rendering).
+   * _allRooms = every room across all floors (for alarm perimeter bounds).
    */
   const currentPlan = computed(() => {
     return {
-      rooms: roomLayouts.value,
-      exterior: exteriorConfig.value
+      rooms: activeFloorLayouts.value,
+      exterior: exteriorConfig.value,
+      _allRooms: roomLayouts.value
     }
   })
 
@@ -35,7 +47,7 @@ export const useHomeModelStore = defineStore('homeModel', () => {
     const preset = floorPlans[modelName]
     if (!preset) return
 
-    // Deep copy rooms from preset
+    // Deep copy rooms from preset (backwards-compatible: default floor 0)
     roomLayouts.value = preset.rooms.map(r => ({
       roomId: r.roomId,
       label: r.label,
@@ -45,7 +57,8 @@ export const useHomeModelStore = defineStore('homeModel', () => {
       depth: r.depth,
       wallHeight: r.wallHeight,
       walls: { ...r.walls },
-      deviceAnchors: r.deviceAnchors ? { ...r.deviceAnchors } : undefined
+      deviceAnchors: r.deviceAnchors ? { ...r.deviceAnchors } : undefined,
+      floor: r.floor ?? 0
     }))
 
     // Deep copy exterior
@@ -53,6 +66,11 @@ export const useHomeModelStore = defineStore('homeModel', () => {
       perimeterPadding: preset.exterior.perimeterPadding,
       deviceAnchors: { ...preset.exterior.deviceAnchors }
     }
+
+    // Reset floor state
+    activeFloor.value = 0
+    const maxFloor = roomLayouts.value.reduce((max, r) => Math.max(max, r.floor), 0)
+    floorCount.value = maxFloor + 1
   }
 
   /**
@@ -81,7 +99,9 @@ export const useHomeModelStore = defineStore('homeModel', () => {
     const defaultWidth = 3.5
     const defaultDepth = 3
 
-    const pos = computeAutoPosition(roomLayouts.value, defaultWidth, defaultDepth)
+    // Only consider rooms on the same floor for auto-positioning
+    const sameFloorLayouts = roomLayouts.value.filter(r => r.floor === activeFloor.value)
+    const pos = computeAutoPosition(sameFloorLayouts, defaultWidth, defaultDepth)
 
     roomLayouts.value.push({
       roomId: room.id,
@@ -91,8 +111,8 @@ export const useHomeModelStore = defineStore('homeModel', () => {
       width: defaultWidth,
       depth: defaultDepth,
       wallHeight: 2.8,
-      walls: { north: true, south: true, east: true, west: true }
-      // No deviceAnchors -- HomeScene will auto-compute them
+      walls: { north: true, south: true, east: true, west: true },
+      floor: activeFloor.value
     })
   }
 
@@ -101,6 +121,49 @@ export const useHomeModelStore = defineStore('homeModel', () => {
    */
   function removeRoomFromLayout(roomId) {
     roomLayouts.value = roomLayouts.value.filter(r => r.roomId !== roomId)
+  }
+
+  /**
+   * Switch to a specific floor.
+   */
+  function setActiveFloor(index) {
+    if (index >= 0 && index < floorCount.value) {
+      activeFloor.value = index
+    }
+  }
+
+  /**
+   * Add a new floor and switch to it.
+   */
+  function addFloor() {
+    floorCount.value++
+    activeFloor.value = floorCount.value - 1
+  }
+
+  /**
+   * Remove a floor only if it has no rooms.
+   * Adjusts floor indices for rooms on higher floors.
+   */
+  function removeFloor(index) {
+    const roomsOnFloor = roomLayouts.value.filter(r => r.floor === index)
+    if (roomsOnFloor.length > 0) return
+    if (floorCount.value <= 1) return
+
+    // Adjust floor indices for rooms above the removed floor
+    for (const r of roomLayouts.value) {
+      if (r.floor > index) {
+        r.floor--
+      }
+    }
+
+    floorCount.value--
+
+    // Adjust active floor if needed
+    if (activeFloor.value >= floorCount.value) {
+      activeFloor.value = floorCount.value - 1
+    } else if (activeFloor.value > index) {
+      activeFloor.value--
+    }
   }
 
   /**
@@ -113,12 +176,18 @@ export const useHomeModelStore = defineStore('homeModel', () => {
   return {
     selectedModel,
     roomLayouts,
+    activeFloor,
+    floorCount,
+    activeFloorLayouts,
     exteriorConfig,
     currentPlan,
     setModel,
     loadPreset,
     addRoomToLayout,
     removeRoomFromLayout,
+    setActiveFloor,
+    addFloor,
+    removeFloor,
     initialize
   }
 })

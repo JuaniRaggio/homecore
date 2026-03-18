@@ -4,7 +4,7 @@
  * when the total width would exceed a maximum threshold.
  */
 
-const MAX_ROW_WIDTH = 16
+const DEFAULT_MAX_ROW_WIDTH = 40
 const GAP = 0.3
 
 /**
@@ -12,9 +12,11 @@ const GAP = 0.3
  * @param {Array} existingLayouts - array of { x, z, width, depth }
  * @param {number} newWidth - width of the new room
  * @param {number} newDepth - depth of the new room
+ * @param {number} [maxRowWidth] - optional max row width override
  * @returns {{ x: number, z: number }}
  */
-export function computeAutoPosition(existingLayouts, newWidth, newDepth) {
+export function computeAutoPosition(existingLayouts, newWidth, newDepth, maxRowWidth) {
+  const limit = maxRowWidth || DEFAULT_MAX_ROW_WIDTH
   if (existingLayouts.length === 0) {
     return { x: 0, z: 0 }
   }
@@ -44,7 +46,7 @@ export function computeAutoPosition(existingLayouts, newWidth, newDepth) {
   }
 
   const totalWidth = (candidateX + newWidth / 2) - minLeft
-  if (totalWidth <= MAX_ROW_WIDTH) {
+  if (totalWidth <= limit) {
     // Place on the same row, aligned to the average z
     const avgZ = (rowMinZ + rowMaxZ) / 2
     return { x: candidateX, z: avgZ }

@@ -221,7 +221,11 @@ export function createAlarmMarker(device, plan) {
   group.userData.deviceId = device.id
   group.userData.deviceType = 'alarm'
 
-  const bounds = getPlanBounds(plan)
+  // Use _allRooms for bounds if available (covers all floors)
+  const boundsSource = plan._allRooms && plan._allRooms.length > 0
+    ? { rooms: plan._allRooms }
+    : plan
+  const bounds = getPlanBounds(boundsSource)
   const pad = plan.exterior.perimeterPadding
   const y = 0.1
 
