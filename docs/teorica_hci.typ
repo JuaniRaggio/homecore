@@ -1083,3 +1083,281 @@ por ejemplo tasa de error, tiempo, eficiencia, etc.
   resolver
 ]
 
+
+= Usabilidad
+
+#importante[
+  Los usuarios tienen que pensar lo menos posible, si se tienen
+  que hacer una pregunta tipo "como hago X accion?", la respuesta
+  deberia ser inmediata. Si lo es, quiere decir que no tenemos
+  ninguna carga cognitiva para con el usuario
+]
+
+== Cosas que hacen pensar a los usuarios
+
+- Terminologia poco familiar para *todos los usuarios*
+
+- Elementos de una pagina sobre los cuales no se puede hacer click
+
+- Criterios que deben de utilizarse en las busquedas, el usuario:
+  - Conoce de antemano como se quiere realizar la busqueda?
+  - Por que debe comprender la implementacion interna del 
+    mecanismo de busqueda?
+
+
+= Checklist para pulir design
+
+== Crear una jerarquia visual clara
+
+- Las cosas importantes tienen que ser prominentes 
+  (*mas destacados*).
+
+- Aquellos elementos que estan relacionados semanticamente, tiene
+  que estarlo tambien visualmente
+
+- Los elementos que son parte de otro elemento deben anidarse 
+  visualmente para mostrar dicha relacion
+
+#importante[
+  Este ultimo item esta bueno para organizar electrodomesticos con
+  habitaciones y habitaciones con casas
+]
+
+#nota[
+  Todo esto permite encontrar rapidamente lo que quiero, sin tener
+  que pensar mucho. Esto soluciona muchos problemas que pueden
+  tener los usuarios a la hora de UX
+]
+
+== Hacer uso de convenciones existentes
+
+- Son utiles porque esta probado que funcionan. Evitan que los
+  usuarios tengan que realizar un esfuerzo cognitivo al pasar
+  de un sitio a otro
+
+- Los designers con frecuencia son reacios a utilizarlas. Siempre
+  existe la tentacion de reinventar la rueda al tratar de design
+  algo nuevo y diferente
+
+
+#importante[
+  Si se desea hacer algo disruptivo, la eficiencia del usuario al
+  aprender a usar la app tiene que aumentar significativamente
+]
+
+
+== Minimizar ruido visual
+
+- Abarrotamiento: cuando todo en la pagina llama la atencion, el
+  efecto producido puede ser abrumador
+
+- Ruido de fondo: Algunas paginas si bien no tienen un gran 
+  abarrotamiento, presentan algunos ruidos visuales que terminan
+  agotando al usuario
+
+
+
+== Permitar tomar decisiones de manera ciega y mecanica
+
+- Cantidad de clicks que puede realizar un usuario para obtener lo
+  que desea sin verse frustrado?
+
+
+
+#error[
+  Obsesionarse con la cantidad de clicks no tiene sentido, nadie
+  se pone a contar los clicks que fue haciendo. *Si hay que 
+  hacerle sentir al usuario que esta avanzando en su tarea*
+]
+
+
+== Evitar palabras innecesarias
+
+
+En muchas paginas, gran parte de las palabras estan solo para
+ocupar espacio. El resultado final es que nunca nadie las va a
+leer.
+
+*Deshacerse de las palabras que el usuario no va a leer* tiene
+numerosos beneficios:
+
+- Reduce el ruido de la pagina
+- Hace que el contenido mas util se destaque
+- Hace que las paginas sean mas cortas, permitiendo que el
+  usuario vea mas sin tener que desplazarse verticalmente
+
+
+= Navegation design
+
+#importante[
+  El proposito primario de la navegacion es que el usuario pueda
+  encontrar lo que esta buscando e indicarle donde se encuentra
+]
+
+La navegacion tiene otros propositos:
+
+- Proporcionar un sentido de orientacion
+- Permitirle al usr. conocer de antemano los contenidos del sitio
+
+
+== Persisten navigation
+
+La mayoria de sitios que navegamos, tienen elementos que estan 
+dispuestos en el mismo lugar a lo largo de todas las pantallas.
+Esto es asi para que el usuario siempre sepa que en cierto lugar 
+es donde siempre va a estar eso que desea hacer. Ej: Si queres
+cerrar algo, en general esta o arriba a la derecha o arriba a la
+izq
+
+- *Site ID o logo:* Permite saber que uno se encuentra todavia en 
+  el mismo sitio. Generalmente se encuentra en la parte superior 
+  de la pantalla
+
+- *Secciones:* Navegacion primaria o de primer nivel, son los 
+  links a las secciones principales del sitio.
+
+
+== Elementos de la navegacion
+
+- Herramientas: Cambiar el idioma, Log in, etc.
+
+- Mecanismo para volver a la paginal principal: Generalmente se
+  trata de un boton que permite volver a la pagina principal
+
+- Mecanismo de busqueda: A menos que el sitio sea demasiado chico
+  o este bien organizado, debe tener un cuadro de busqueda o un
+  link a la pagina de busqueda. La mejor forma es una leyenda que
+  diga *search* (no complicarlo)
+
+
+== Orientacion
+
+Es muy comun que un usuario se pierda, por lo que tenemos que
+*contrarrestar el sentimiento de "estar perdido"* con un indicador
+de lugar
+
+#nota[
+  En sitios con estructura jerarquica, esta bueno tener abajo
+  *breadcrumbs* que muestran jerarquicamente como llegaste al
+  sitio desde la pagina principal hasta la pagina actual
+]
+
+#importante[
+  // TODO
+  *Implementar breadcrumbs en la app de domotica*, tiene 
+  claramente una estructura jerarquica tipo:
+
+  $ "Casa Pilar" >> "Habitacion Juani" >> "Iluminacion" $
+]
+
+#doubt[
+  Que tanta anidacion tiene sentido?
+
+  Tiene sentido agregar una asbtraccion de tipos "iluminacion",
+  "cerraduras", "alertas", "calefaccion", etc.?
+
+  Siento que al usuario le puede dar "fiaca" tener que estar 
+  ingresando en tantas capas de abstraccion pero a la vez 
+  cuando/si es que el usuario tiene muchos dispositivos puede
+  ser util.
+][
+
+  3 o 4 opciones de breadcrumbs tiene sentido, ya mas de 5 es
+  muchisimo.
+
+  Podriamos hacer que lo personalice el usuario
+
+]
+
+
+
+== Pagina principal
+
+*Los siguientes items tienen que poder identificarse facilmente
+desde la pagina principal*
+
+- Identidad y mision del sitio
+
+- Jerarquia del sitio
+
+- Adelantos
+
+- Contenido actualizado
+
+- Registracion
+
+- Atajos
+
+- Mostrar al usuario lo que esta buscando
+
+
+
+= Aplicaciones Moviles
+
+
+== Que es un dispositivo Movil
+
+- Dispositivo facil de transportar
+- Conectable a internet
+- Tactil
+
+_Generalmente hablamos de telefonos inteligentes y tablets_
+
+
+#importante[
+  No hay que considerar una compu chiquita, es importante pensar
+  primero en la version chiquita y despues pasar a la grande.
+]
+
+
+== Uso de dispositivos moviles
+
+- 6 de cada 10 argentinos aseguro estar usando mas sus smartphones
+
+- 1 de cada 3 argentinos reconocio usar mas apps como zoom, 
+  tiktok, instagram
+
+- *Hay mas gente usando celulares que computadoras*
+  - 90.5% usa el celular
+  - 37.1% usa computadoras
+  - 89.7% usa internet
+
+  _Datos del indec_
+
+
+== Escritorio versus movil
+
+- Escritorio: Generalmente se usa para hacer tareas lentas y 
+  complejas
+
+- Movil: Generalmente se usa para hacer tareas rapidas y simples
+
+
+== Limite de dispositivos moviles
+
+- Pantallas chiquitas
+- Tactil (dificil de escribir)
+- Bateria limitada
+- Acceso a internet inconsistente
+
+#importante[
+  Este link muestra como agarramos los dispositivos moviles:
+
+  #align(center)[#link("https://alistapart.com/article/how-we-hold-our-gadgets/")[#text(fill: blue)[How we hold our gadgets]]]
+
+]
+
+#importante[
+  - Mantener la persistencia de sesiones
+  - En caso de que sea una app con datos sensibles, podes si pedir
+    datos biometricos para que no tenga que poner la pass 500 
+    veces
+]
+
+
+= Apps vs. Sitios web responsive
+
+
+
+
+
