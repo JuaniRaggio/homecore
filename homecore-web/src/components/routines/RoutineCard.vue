@@ -5,7 +5,17 @@
         <h4 class="routine-card__name">{{ routine.name }}</h4>
         <p class="routine-card__desc">{{ routine.description }}</p>
       </div>
-      <HcToggle :modelValue="routine.enabled" @update:modelValue="routinesStore.toggleRoutine(routine.id)" :disabled="restrictExecute" />
+      <div class="routine-card__header-actions">
+        <button 
+          class="routine-card__favorite-btn"
+          @click="toggleFavorite"
+          :class="{ 'routine-card__favorite-btn--active': routine.favorite }"
+          title="Agregar a favoritos"
+        >
+          ★
+        </button>
+        <HcToggle :modelValue="routine.enabled" @update:modelValue="routinesStore.toggleRoutine(routine.id)" :disabled="restrictExecute" />
+      </div>
     </div>
 
     <div class="routine-card__schedule" v-if="routine.schedule">
@@ -42,6 +52,10 @@ const props = defineProps({
 defineEmits(['execute', 'delete'])
 
 const routinesStore = useRoutinesStore()
+
+function toggleFavorite() {
+  routinesStore.toggleFavorite(props.routine.id)
+}
 </script>
 
 <style scoped>
@@ -69,6 +83,35 @@ const routinesStore = useRoutinesStore()
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--hc-space-md);
+}
+
+.routine-card__header-actions {
+  display: flex;
+  gap: var(--hc-space-sm);
+  align-items: center;
+}
+
+.routine-card__favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  color: var(--hc-text-muted);
+  border-radius: var(--hc-radius-sm);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.routine-card__favorite-btn:hover {
+  background: var(--hc-bg-tertiary);
+  color: var(--hc-text-secondary);
+}
+
+.routine-card__favorite-btn--active {
+  color: #fbbf24;
 }
 
 .routine-card__name {

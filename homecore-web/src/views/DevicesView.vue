@@ -1,22 +1,27 @@
 <template>
   <div class="devices-page">
     <div class="devices-page__header">
-      <h2>Dispositivos</h2>
-      <div class="devices-page__filters">
-        <select v-model="filterType" class="devices-page__select">
-          <option value="">Todos los tipos</option>
-          <option v-for="type in deviceTypes" :key="type" :value="type">
-            {{ devicesStore.typeLabels[type] }}
-          </option>
-        </select>
-        <select v-model="filterRoom" class="devices-page__select">
-          <option value="">Todas las habitaciones</option>
-          <option value="none">Sin habitacion</option>
-          <option v-for="room in roomsStore.rooms" :key="room.id" :value="room.id">
-            {{ room.name }}
-          </option>
-        </select>
+      <div class="devices-page__title-section">
+        <h2>Dispositivos</h2>
+        <div class="devices-page__filters">
+          <select v-model="filterType" class="devices-page__select">
+            <option value="">Todos los tipos</option>
+            <option v-for="type in deviceTypes" :key="type" :value="type">
+              {{ devicesStore.typeLabels[type] }}
+            </option>
+          </select>
+          <select v-model="filterRoom" class="devices-page__select">
+            <option value="">Todas las habitaciones</option>
+            <option value="none">Sin habitacion</option>
+            <option v-for="room in roomsStore.rooms" :key="room.id" :value="room.id">
+              {{ room.name }}
+            </option>
+          </select>
+        </div>
       </div>
+      <router-link v-if="authStore.isAdmin" to="/dispositivos/nuevo">
+        <HcButton>+ Nuevo dispositivo</HcButton>
+      </router-link>
     </div>
 
     <div class="devices-page__grid">
@@ -39,11 +44,14 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoomsStore } from '../stores/rooms'
+import { useAuthStore } from '../stores/auth'
 import DeviceCard from '../components/devices/DeviceCard.vue'
+import HcButton from '../components/ui/HcButton.vue'
 
 const router = useRouter()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
+const authStore = useAuthStore()
 
 const filterType = ref('')
 const filterRoom = ref('')
@@ -81,6 +89,12 @@ function goToDevice(id) {
   align-items: center;
   flex-wrap: wrap;
   gap: var(--hc-space-md);
+}
+
+.devices-page__title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--hc-space-lg);
 }
 
 .devices-page__filters {

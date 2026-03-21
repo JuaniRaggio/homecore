@@ -161,13 +161,13 @@ const statusText = computed(() => {
   color: var(--hc-text-muted);
   margin-top: 0.125rem;
 }
-
-.device-card__status {
+us {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.device-card__stat
 .device-card__state {
   font-size: var(--hc-font-size-xs);
   font-weight: 500;

@@ -23,9 +23,14 @@
             >
               <span class="room-card__device-name">{{ device.name }}</span>
               <div class="room-card__device-actions">
-                <HcBadge :variant="device.on ? 'success' : 'default'" size="sm">
-                  {{ device.on ? 'On' : 'Off' }}
-                </HcBadge>
+                <button
+                  class="room-card__device-toggle"
+                  :class="{ 'room-card__device-toggle--on': device.on }"
+                  @click="devicesStore.toggleDevice(device.id)"
+                  :aria-label="device.on ? 'Apagar' : 'Encender'"
+                >
+                  <span class="room-card__device-toggle-knob"></span>
+                </button>
                 <button class="room-card__unlink" @click="roomsStore.unassignDevice(device.id)" title="Desvincular"><HcIcon name="unlink" size="xs" /></button>
               </div>
             </div>
@@ -80,7 +85,6 @@ import { ref, computed, inject } from 'vue'
 import { useRoomsStore } from '../stores/rooms'
 import { useDevicesStore } from '../stores/devices'
 import HcButton from '../components/ui/HcButton.vue'
-import HcBadge from '../components/ui/HcBadge.vue'
 import HcInput from '../components/ui/HcInput.vue'
 import HcModal from '../components/ui/HcModal.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
@@ -237,6 +241,48 @@ function assignDevice(roomId, event) {
   display: flex;
   align-items: center;
   gap: var(--hc-space-sm);
+}
+
+.room-card__device-toggle {
+  position: relative;
+  width: 36px;
+  height: 22px;
+  border: none;
+  border-radius: 11px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--hc-bg-tertiary);
+  transition: background var(--hc-transition-fast);
+  flex-shrink: 0;
+}
+
+.room-card__device-toggle:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.room-card__device-toggle--on {
+  background: var(--hc-accent);
+}
+
+.room-card__device-toggle--on:hover {
+  background: var(--hc-accent);
+  filter: brightness(1.1);
+}
+
+.room-card__device-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: left var(--hc-transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.room-card__device-toggle--on .room-card__device-toggle-knob {
+  left: 16px;
 }
 
 .room-card__unlink {
