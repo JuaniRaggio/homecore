@@ -77,9 +77,13 @@ export const useHomeModelStore = defineStore('homeModel', () => {
    * Switch to a different model and load its preset.
    */
   function setModel(model) {
-    if (model === 'casa' || model === 'departamento') {
-      selectedModel.value = model
+    selectedModel.value = model
+    // Load preset if available, otherwise use casa as fallback
+    const preset = floorPlans[model]
+    if (preset) {
       loadPreset(model)
+    } else {
+      loadPreset('casa')
     }
   }
 
