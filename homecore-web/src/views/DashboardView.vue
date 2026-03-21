@@ -25,26 +25,26 @@
       </div>
     </div>
 
-    <!-- Favoritos -->
-    <section class="dashboard__section">
-      <div class="dashboard__section-header">
-        <h3>Dispositivos favoritos</h3>
-        <router-link to="/dispositivos" class="dashboard__see-all">Ver todos</router-link>
-      </div>
-      <div class="dashboard__devices-grid">
-        <DeviceCard
-          v-for="device in favorites"
-          :key="device.id"
-          :device="device"
-          @select="goToDevice"
-        />
-        <div v-if="favorites.length === 0" class="dashboard__empty">
-          No hay dispositivos favoritos. Marca alguno con la estrella.
-        </div>
-      </div>
-    </section>
-
     <div class="dashboard__two-col">
+      <!-- Dispositivos Favoritos -->
+      <section class="dashboard__section">
+        <div class="dashboard__section-header">
+          <h3>Dispositivos favoritos</h3>
+          <router-link to="/dispositivos" class="dashboard__see-all">Ver todos</router-link>
+        </div>
+        <div class="dashboard__devices-grid">
+          <DeviceCard
+            v-for="device in favorites"
+            :key="device.id"
+            :device="device"
+            @select="goToDevice"
+          />
+          <div v-if="favorites.length === 0" class="dashboard__empty">
+            No hay dispositivos favoritos. Marca alguno con la estrella.
+          </div>
+        </div>
+      </section>
+
       <!-- Rutinas rapidas -->
       <section class="dashboard__section">
         <div class="dashboard__section-header">
@@ -53,7 +53,7 @@
         </div>
         <div class="dashboard__routines">
           <div
-            v-for="routine in enabledRoutines"
+            v-for="routine in favoriteRoutines"
             :key="routine.id"
             class="dashboard__routine-item"
           >
@@ -61,34 +61,20 @@
               <p class="dashboard__routine-name">{{ routine.name }}</p>
               <p class="dashboard__routine-schedule">{{ routine.schedule?.time }} - {{ routine.schedule?.days?.join(', ') }}</p>
             </div>
-            <HcButton size="sm" @click="executeRoutine(routine.id)">Ejecutar</HcButton>
-          </div>
-          <div v-if="enabledRoutines.length === 0" class="dashboard__empty">
-            No hay rutinas activas.
-          </div>
-        </div>
-      </section>
-
-      <!-- Notificaciones recientes -->
-      <section class="dashboard__section">
-        <div class="dashboard__section-header">
-          <h3>Notificaciones</h3>
-        </div>
-        <div class="dashboard__notifications">
-          <div
-            v-for="notif in recentNotifications"
-            :key="notif.id"
-            class="dashboard__notif-item"
-            :class="{ 'dashboard__notif-item--unread': !notif.read }"
-          >
-            <HcIcon :name="notifIcon(notif.type)" size="sm" :class="`dashboard__notif-icon--${notif.type}`" />
-            <div>
-              <p class="dashboard__notif-title">
-                <span class="dashboard__notif-type-label">{{ notifLabel(notif.type) }}</span>
-                {{ notif.title }}
-              </p>
-              <p class="dashboard__notif-time">{{ formatDate(notif.date) }}</p>
+            <div class="dashboard__routine-actions">
+              <button 
+                class="dashboard__favorite-btn"
+                @click="toggleFavorite(routine.id)"
+                :class="{ 'dashboard__favorite-btn--active': routine.favorite }"
+                title="Agregar a favoritos"
+              >
+                ★
+              </button>
+              <HcButton size="sm" @click="executeRoutine(routine.id)">Ejecutar</HcButton>
             </div>
+          </div>
+          <div v-if="favoriteRoutines.length === 0" class="dashboard__empty">
+            No hay rutinas favoritas. Marca alguna con la estrella.
           </div>
         </div>
       </section>
@@ -102,10 +88,8 @@ import { useRouter } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoomsStore } from '../stores/rooms'
 import { useRoutinesStore } from '../stores/routines'
-import { useNotificationsStore } from '../stores/notifications'
 import DeviceCard from '../components/devices/DeviceCard.vue'
 import HcButton from '../components/ui/HcButton.vue'
-import HcIcon from '../components/ui/HcIcon.vue'
 import HomeScene from '../components/home3d/HomeScene.vue'
 import HomeModelSelector from '../components/home3d/HomeModelSelector.vue'
 import RoomLayoutOverlay from '../components/home3d/RoomLayoutOverlay.vue'
@@ -114,7 +98,6 @@ const router = useRouter()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
-const notificationsStore = useNotificationsStore()
 const toast = inject('toast')
 
 const favorites = computed(() => devicesStore.favorites)
@@ -122,7 +105,7 @@ const totalDevices = computed(() => devicesStore.devices.length)
 const activeDevices = computed(() => devicesStore.devices.filter(d => d.on).length)
 const totalConsumption = computed(() => devicesStore.getTotalConsumption())
 const enabledRoutines = computed(() => routinesStore.routines.filter(r => r.enabled))
-const recentNotifications = computed(() => notificationsStore.recent.slice(0, 4))
+const favoriteRoutines = computed(() => routinesStore.routines.filter(r => r.favorite))
 
 function goToDevice(id) {
   router.push(`/dispositivos/${id}`)
@@ -133,26 +116,8 @@ function executeRoutine(id) {
   toast.value?.show('Rutina ejecutada correctamente', 'success')
 }
 
-function notifIcon(type) {
-  const icons = { info: 'info', warning: 'warning', alert: 'warning', error: 'close' }
-  return icons[type] || 'info'
-}
-
-function notifLabel(type) {
-  const labels = { info: '[Info]', warning: '[Aviso]', alert: '[Alerta]', error: '[Error]' }
-  return labels[type] || '[Info]'
-}
-
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now - date
-  const diffMins = Math.floor(diffMs / 60000)
-  if (diffMins < 1) return 'Ahora'
-  if (diffMins < 60) return `Hace ${diffMins} min`
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `Hace ${diffHours}h`
-  return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
+function toggleFavorite(id) {
+  routinesStore.toggleFavorite(id)
 }
 </script>
 
@@ -278,6 +243,35 @@ function formatDate(dateStr) {
   font-size: var(--hc-font-size-xs);
   color: var(--hc-text-muted);
   margin-top: 0.125rem;
+}
+
+.dashboard__routine-actions {
+  display: flex;
+  gap: var(--hc-space-sm);
+  align-items: center;
+}
+
+.dashboard__favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  color: var(--hc-text-muted);
+  border-radius: var(--hc-radius-sm);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard__favorite-btn:hover {
+  background: var(--hc-bg-secondary);
+  color: var(--hc-text-secondary);
+}
+
+.dashboard__favorite-btn--active {
+  color: #fbbf24;
 }
 
 .dashboard__notifications {
