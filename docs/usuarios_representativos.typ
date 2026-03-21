@@ -174,7 +174,7 @@ Se seleccionaron los siguientes atributos por ser factores que influyen directam
   gutter: 20pt,
   stack(
     dir: ttb,
-    image("assets/personas/santiago.png", width: 4cm),
+    image("assets/personas/santiago.jpg", width: 4cm),
     v(0.5em),
     align(center)[#text(style: "italic", size: 9pt)["Si puedo automatizarlo, lo hare. Si no, lo programo."]]
   ),
@@ -226,7 +226,7 @@ Santiago vive solo y trabaja de forma remota. Su casa es su laboratorio. Disfrut
   gutter: 20pt,
   stack(
     dir: ttb,
-    image("assets/personas/carolina.png", width: 4cm),
+    image("assets/personas/carolina.jpg", width: 4cm),
     v(0.5em),
     align(center)[#text(style: "italic", size: 9pt)["Necesito que la casa se cuide sola mientras no estoy."]]
   ),
@@ -278,7 +278,7 @@ Madre de dos hijos y profesional ocupada. Para ella, la domotica no es un hobby,
   gutter: 20pt,
   stack(
     dir: ttb,
-    image("assets/personas/roberto.png", width: 4cm),
+    image("assets/personas/roberto.jpg", width: 4cm),
     v(0.5em),
     align(center)[#text(style: "italic", size: 9pt)["Solo quiero apagar la luz sin tener que levantarme."]]
   ),
