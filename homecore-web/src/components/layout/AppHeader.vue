@@ -1,7 +1,17 @@
 <template>
   <header class="header">
     <div class="header__left">
-      <h2 class="header__title">{{ pageTitle }}</h2>
+      <nav class="header__breadcrumbs">
+        <template v-for="(crumb, index) in breadcrumbs" :key="index">
+          <span v-if="index > 0" class="header__breadcrumb-sep">/</span>
+          <router-link
+            v-if="crumb.to && index < breadcrumbs.length - 1"
+            :to="crumb.to"
+            class="header__breadcrumb-link"
+          >{{ crumb.label }}</router-link>
+          <span v-else class="header__breadcrumb-current">{{ crumb.label }}</span>
+        </template>
+      </nav>
     </div>
 
     <div class="header__right">
@@ -73,7 +83,7 @@
             <strong>{{ user?.name }}</strong>
             <span>{{ user?.email }}</span>
           </div>
-          <router-link to="/configuracion" class="header__dropdown-item">Configuracion</router-link>
+          <router-link :to="`/${homesStore.selectedHomeId}/configuracion`" class="header__dropdown-item">Configuracion</router-link>
           <button class="header__dropdown-item header__dropdown-item--danger" @click="handleLogout">
             Cerrar sesion
           </button>
@@ -88,12 +98,16 @@ import { ref, computed, inject } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useNotificationsStore } from '../../stores/notifications'
+import { useHomesStore } from '../../stores/homes'
+import { useDevicesStore } from '../../stores/devices'
 import HcIcon from '../ui/HcIcon.vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
+const homesStore = useHomesStore()
+const devicesStore = useDevicesStore()
 
 const toast = inject('toast')
 const showNotifications = ref(false)
@@ -104,20 +118,54 @@ const user = computed(() => authStore.user)
 const unreadCount = computed(() => notificationsStore.unreadCount)
 const recentNotifications = computed(() => notificationsStore.recent)
 
-const pageTitles = {
-  '/': 'Inicio',
-  '/dispositivos': 'Dispositivos',
-  '/habitaciones': 'Habitaciones',
-  '/rutinas': 'Rutinas',
-  '/rutinas/nueva': 'Nueva rutina',
-  '/historial': 'Historial',
-  '/consumo': 'Consumo electrico',
-  '/configuracion': 'Configuracion'
+const sectionLabels = {
+  'dashboard': 'Inicio',
+  'devices': 'Dispositivos',
+  'device-detail': 'Dispositivos',
+  'rooms': 'Habitaciones',
+  'routines': 'Rutinas',
+  'new-routine': 'Rutinas',
+  'history': 'Historial',
+  'consumption': 'Consumo electrico',
+  'settings': 'Configuracion'
 }
 
-const pageTitle = computed(() => {
-  if (route.path.startsWith('/dispositivos/')) return 'Detalle de dispositivo'
-  return pageTitles[route.path] || 'HomeCore'
+const sectionRoutes = {
+  'device-detail': 'devices',
+  'new-routine': 'routines'
+}
+
+const breadcrumbs = computed(() => {
+  const crumbs = []
+  const houseId = route.params.houseId
+  const routeName = route.name
+
+  if (!houseId || !routeName) return crumbs
+
+  const homeName = homesStore.selectedHome?.name || houseId
+  crumbs.push({ label: homeName, to: `/${houseId}` })
+
+  if (routeName === 'dashboard') return crumbs
+
+  const sectionLabel = sectionLabels[routeName]
+  if (!sectionLabel) return crumbs
+
+  const parentRoute = sectionRoutes[routeName]
+  if (parentRoute) {
+    const parentLabel = sectionLabels[parentRoute]
+    crumbs.push({ label: parentLabel, to: { name: parentRoute, params: { houseId } } })
+
+    if (routeName === 'device-detail') {
+      const device = devicesStore.getById(route.params.id)
+      crumbs.push({ label: device ? device.name : route.params.id })
+    } else if (routeName === 'new-routine') {
+      crumbs.push({ label: 'Nueva rutina' })
+    }
+  } else {
+    crumbs.push({ label: sectionLabel })
+  }
+
+  return crumbs
 })
 
 const userInitials = computed(() => {
@@ -163,8 +211,30 @@ function handleLogout() {
   z-index: 50;
 }
 
-.header__title {
-  font-size: var(--hc-font-size-xl);
+.header__breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--hc-font-size-sm);
+}
+
+.header__breadcrumb-link {
+  color: var(--hc-accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--hc-transition-fast);
+}
+
+.header__breadcrumb-link:hover {
+  color: var(--hc-accent-hover);
+}
+
+.header__breadcrumb-sep {
+  color: var(--hc-text-muted);
+}
+
+.header__breadcrumb-current {
+  color: var(--hc-text-primary);
   font-weight: 600;
 }
 

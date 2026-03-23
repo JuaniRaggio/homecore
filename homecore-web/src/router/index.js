@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useHomesStore } from '../stores/homes'
 import AppLayout from '../components/layout/AppLayout.vue'
 
 const routes = [
@@ -28,7 +29,7 @@ const routes = [
     meta: { public: true }
   },
   {
-    path: '/',
+    path: '/:houseId',
     component: AppLayout,
     children: [
       {
@@ -79,6 +80,13 @@ const routes = [
         meta: { adminOnly: true }
       }
     ]
+  },
+  {
+    path: '/',
+    redirect: () => {
+      const homesStore = useHomesStore()
+      return `/${homesStore.defaultHomeId}`
+    }
   }
 ]
 
@@ -89,8 +97,18 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
+
   if (to.meta.adminOnly && !authStore.isAdmin) {
-    return { name: 'dashboard' }
+    return { name: 'dashboard', params: { houseId: to.params.houseId } }
+  }
+
+  if (to.params.houseId) {
+    const homesStore = useHomesStore()
+    homesStore.syncFromRoute(to.params.houseId)
+
+    if (!homesStore.homeExists(to.params.houseId)) {
+      return `/${homesStore.defaultHomeId}`
+    }
   }
 })
 
