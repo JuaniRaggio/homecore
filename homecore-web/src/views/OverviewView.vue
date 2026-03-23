@@ -26,17 +26,32 @@
       </div>
     </div>
 
-    <!-- Graficos -->
-    <div class="overview__charts">
-      <div class="overview__chart-card">
-        <h3>Consumo por propiedad</h3>
-        <canvas ref="houseChartEl"></canvas>
+    <!-- Tus propiedades -->
+    <section class="overview__homes">
+      <div class="overview__section-header">
+        <h3>Tus propiedades</h3>
+        <router-link to="/nueva-propiedad">
+          <HcButton>+ Nueva propiedad</HcButton>
+        </router-link>
       </div>
-      <div class="overview__chart-card">
-        <h3>Distribucion por tipo</h3>
-        <canvas ref="typeChartEl"></canvas>
+      <div class="overview__homes-grid">
+        <router-link
+          v-for="home in homeSummaries"
+          :key="home.id"
+          :to="`/${home.id}`"
+          class="overview__home-card"
+        >
+          <div class="overview__home-card-header">
+            <HcIcon name="home" size="md" />
+            <span class="overview__home-card-name">{{ home.name }}</span>
+          </div>
+          <div class="overview__home-card-stats">
+            <span>{{ home.activeDevices }} / {{ home.totalDevices }} activos</span>
+            <span>{{ home.consumption }}W</span>
+          </div>
+        </router-link>
       </div>
-    </div>
+    </section>
 
     <!-- Dispositivos criticos + Rutinas favoritas -->
     <div class="overview__two-col">
@@ -102,25 +117,15 @@
       </section>
     </div>
 
-    <!-- Cards de propiedades -->
-    <div class="overview__homes">
-      <h3 class="overview__homes-title">Tus propiedades</h3>
-      <div class="overview__homes-grid">
-        <router-link
-          v-for="home in homeSummaries"
-          :key="home.id"
-          :to="`/${home.id}`"
-          class="overview__home-card"
-        >
-          <div class="overview__home-card-header">
-            <HcIcon name="home" size="md" />
-            <span class="overview__home-card-name">{{ home.name }}</span>
-          </div>
-          <div class="overview__home-card-stats">
-            <span>{{ home.activeDevices }} / {{ home.totalDevices }} activos</span>
-            <span>{{ home.consumption }}W</span>
-          </div>
-        </router-link>
+    <!-- Graficos -->
+    <div class="overview__charts">
+      <div class="overview__chart-card">
+        <h3>Consumo por propiedad</h3>
+        <canvas ref="houseChartEl"></canvas>
+      </div>
+      <div class="overview__chart-card">
+        <h3>Distribucion por tipo</h3>
+        <canvas ref="typeChartEl"></canvas>
       </div>
     </div>
   </div>
@@ -200,7 +205,6 @@ const criticalDevicesData = computed(() => {
 const favoriteRoutinesData = computed(() => {
   const result = []
   const favRoutines = routinesStore.favorites
-  // Distribute routines across homes for mock display
   const homes = homesStore.homes
   favRoutines.forEach((routine, i) => {
     const home = homes[i % homes.length]
@@ -229,7 +233,6 @@ const typeColors = {
 }
 
 function createCharts() {
-  // Consumption by house
   if (houseChartEl.value) {
     new Chart(houseChartEl.value, {
       type: 'bar',
@@ -261,7 +264,6 @@ function createCharts() {
     })
   }
 
-  // Consumption by type (doughnut)
   if (typeChartEl.value) {
     const consumptionByType = devicesStore.getConsumptionByType()
     new Chart(typeChartEl.value, {
@@ -294,11 +296,13 @@ onMounted(createCharts)
   display: flex;
   flex-direction: column;
   gap: var(--hc-space-xl);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Welcome */
 .overview__welcome {
-  padding: var(--hc-space-lg) 0;
+  padding: var(--hc-space-lg) 0 0;
 }
 
 .overview__greeting {
@@ -340,23 +344,58 @@ onMounted(createCharts)
   color: var(--hc-text-secondary);
 }
 
-/* Charts */
-.overview__charts {
+/* Section header (shared) */
+.overview__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--hc-space-lg);
+}
+
+.overview__section-header h3 {
+  font-size: var(--hc-font-size-lg);
+}
+
+/* Homes grid */
+.overview__homes-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--hc-space-md);
 }
 
-.overview__chart-card {
+.overview__home-card {
   background: var(--hc-bg-secondary);
   border: 1px solid var(--hc-border);
   border-radius: var(--hc-radius-lg);
   padding: var(--hc-space-lg);
+  text-decoration: none;
+  color: var(--hc-text-primary);
+  transition: all var(--hc-transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-md);
 }
 
-.overview__chart-card h3 {
+.overview__home-card:hover {
+  border-color: var(--hc-accent);
+}
+
+.overview__home-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--hc-space-sm);
+}
+
+.overview__home-card-name {
+  font-weight: 600;
   font-size: var(--hc-font-size-base);
-  margin-bottom: var(--hc-space-lg);
+}
+
+.overview__home-card-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--hc-font-size-sm);
+  color: var(--hc-text-secondary);
 }
 
 /* Two column layout */
@@ -371,14 +410,6 @@ onMounted(createCharts)
   border: 1px solid var(--hc-border);
   border-radius: var(--hc-radius-lg);
   padding: var(--hc-space-lg);
-}
-
-.overview__section-header {
-  margin-bottom: var(--hc-space-lg);
-}
-
-.overview__section-header h3 {
-  font-size: var(--hc-font-size-lg);
 }
 
 /* List items */
@@ -431,51 +462,23 @@ onMounted(createCharts)
   padding: var(--hc-space-xl);
 }
 
-/* Homes grid */
-.overview__homes-title {
-  font-size: var(--hc-font-size-lg);
-  margin-bottom: var(--hc-space-md);
-}
-
-.overview__homes-grid {
+/* Charts */
+.overview__charts {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: var(--hc-space-md);
 }
 
-.overview__home-card {
+.overview__chart-card {
   background: var(--hc-bg-secondary);
   border: 1px solid var(--hc-border);
   border-radius: var(--hc-radius-lg);
   padding: var(--hc-space-lg);
-  text-decoration: none;
-  color: var(--hc-text-primary);
-  transition: all var(--hc-transition-fast);
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-md);
 }
 
-.overview__home-card:hover {
-  border-color: var(--hc-accent);
-}
-
-.overview__home-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--hc-space-sm);
-}
-
-.overview__home-card-name {
-  font-weight: 600;
+.overview__chart-card h3 {
   font-size: var(--hc-font-size-base);
-}
-
-.overview__home-card-stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
+  margin-bottom: var(--hc-space-lg);
 }
 
 /* Utility text colors */

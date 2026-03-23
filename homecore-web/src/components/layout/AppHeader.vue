@@ -145,6 +145,12 @@ const breadcrumbs = computed(() => {
     return crumbs
   }
 
+  if (routeName === 'new-property') {
+    crumbs.push({ label: 'Inicio', to: '/overview' })
+    crumbs.push({ label: 'Nueva propiedad' })
+    return crumbs
+  }
+
   if (!houseId || !routeName) return crumbs
 
   const homeName = homesStore.selectedHome?.name || houseId
