@@ -69,7 +69,7 @@
   </div>
   <div v-else class="device-detail__not-found">
     <p>Dispositivo no encontrado.</p>
-    <router-link to="/dispositivos">Volver a dispositivos</router-link>
+    <router-link :to="`/${route.params.houseId}/dispositivos`">Volver a dispositivos</router-link>
   </div>
 </template>
 
