@@ -161,7 +161,7 @@ function handleSelectHome(homeId) {
 <style scoped>
 .sidebar {
   width: var(--hc-sidebar-width);
-  height: 100vh;
+  height: calc(100vh - var(--hc-statusline-height));
   background: var(--hc-bg-secondary);
   border-right: 1px solid var(--hc-border);
   display: flex;
@@ -355,6 +355,7 @@ function handleSelectHome(homeId) {
 }
 
 .sidebar__footer {
+  margin-top: auto;
   padding: var(--hc-space-md);
   border-top: 1px solid var(--hc-border);
   display: flex;

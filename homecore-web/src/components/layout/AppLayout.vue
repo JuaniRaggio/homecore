@@ -40,7 +40,7 @@ provide('vim', vim)
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-bottom: 26px;
+  padding-bottom: var(--hc-statusline-height);
 }
 
 .app-layout__main--expanded {
