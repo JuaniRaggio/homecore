@@ -29,6 +29,17 @@ const routes = [
     meta: { public: true }
   },
   {
+    path: '/overview',
+    component: AppLayout,
+    children: [
+      {
+        path: '',
+        name: 'overview',
+        component: () => import('../views/OverviewView.vue')
+      }
+    ]
+  },
+  {
     path: '/:houseId',
     component: AppLayout,
     children: [
@@ -83,10 +94,7 @@ const routes = [
   },
   {
     path: '/',
-    redirect: () => {
-      const homesStore = useHomesStore()
-      return `/${homesStore.defaultHomeId}`
-    }
+    redirect: '/overview'
   }
 ]
 
@@ -107,7 +115,7 @@ router.beforeEach((to) => {
     homesStore.syncFromRoute(to.params.houseId)
 
     if (!homesStore.homeExists(to.params.houseId)) {
-      return `/${homesStore.defaultHomeId}`
+      return '/overview'
     }
   }
 })
