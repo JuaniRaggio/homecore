@@ -31,12 +31,10 @@ provide('vim', vim)
 
 <style scoped>
 .app-layout {
-  display: flex;
   min-height: 100vh;
 }
 
 .app-layout__main {
-  flex: 1;
   margin-left: var(--hc-sidebar-width);
   transition: margin-left var(--hc-transition-base);
   display: flex;

@@ -52,10 +52,11 @@
   --hc-transition-base: 250ms ease;
   --hc-transition-slow: 350ms ease;
 
-  /* Sidebar */
+  /* Layout */
   --hc-sidebar-width: 240px;
   --hc-sidebar-collapsed: 64px;
   --hc-header-height: 64px;
+  --hc-brand-inset: 1.5rem;
 }
 
 /* ============================================

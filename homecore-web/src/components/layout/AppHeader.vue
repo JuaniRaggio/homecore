@@ -1,7 +1,11 @@
 <template>
   <header class="header">
     <div class="header__left">
-      <nav class="header__breadcrumbs">
+      <router-link v-if="isOverviewLayout" to="/overview" class="header__brand">
+        <div class="header__brand-logo"><HcLogo size="md" /></div>
+        <span class="header__brand-text">HomeCore</span>
+      </router-link>
+      <nav v-else class="header__breadcrumbs">
         <template v-for="(crumb, index) in breadcrumbs" :key="index">
           <span v-if="index > 0" class="header__breadcrumb-sep">/</span>
           <router-link
@@ -101,6 +105,7 @@ import { useNotificationsStore } from '../../stores/notifications'
 import { useHomesStore } from '../../stores/homes'
 import { useDevicesStore } from '../../stores/devices'
 import HcIcon from '../ui/HcIcon.vue'
+import HcLogo from '../ui/HcLogo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -113,6 +118,8 @@ const toast = inject('toast')
 const showNotifications = ref(false)
 const showUserMenu = ref(false)
 const showProfileMenu = ref(false)
+
+const isOverviewLayout = computed(() => route.name === 'overview' || route.name === 'new-property')
 
 const user = computed(() => authStore.user)
 const unreadCount = computed(() => notificationsStore.unreadCount)
@@ -216,10 +223,35 @@ function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--hc-space-xl);
+  padding: 0 var(--hc-space-xl) 0 var(--hc-brand-inset);
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--hc-text-primary);
+}
+
+.header__brand-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.header__brand-logo :deep(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.header__brand-text {
+  font-weight: 700;
+  font-size: var(--hc-font-size-lg);
+  white-space: nowrap;
 }
 
 .header__breadcrumbs {

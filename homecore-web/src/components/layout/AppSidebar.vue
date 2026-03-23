@@ -1,11 +1,11 @@
 <template>
   <aside :class="['sidebar', { 'sidebar--collapsed': collapsed }]">
-    <div class="sidebar__brand">
+    <router-link to="/overview" class="sidebar__brand">
       <div class="sidebar__logo">
         <HcLogo :size="collapsed ? 'sm' : 'md'" />
       </div>
       <span v-if="!collapsed" class="sidebar__brand-text">HomeCore</span>
-    </div>
+    </router-link>
 
     <!-- Selector de casas -->
     <div class="sidebar__home-selector">
@@ -15,14 +15,14 @@
         @click="showHomeMenu = !showHomeMenu"
         title="Seleccionar casa"
       >
-        <HcIcon name="home" size="md" />
+        <HcIcon name="swap" size="md" />
       </button>
       <button
         v-else
         class="sidebar__home-btn"
         @click="showHomeMenu = !showHomeMenu"
       >
-        <HcIcon name="home" size="sm" />
+        <HcIcon name="swap" size="sm" />
         <span class="sidebar__home-name">{{ currentLabel }}</span>
         <HcIcon name="chevronDown" size="sm" />
       </button>
@@ -197,9 +197,11 @@ function handleSelectHome(homeId) {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: var(--hc-space-lg);
+  padding: var(--hc-brand-inset);
   height: var(--hc-header-height);
   border-bottom: 1px solid var(--hc-border);
+  text-decoration: none;
+  color: inherit;
 }
 
 .sidebar__logo {
