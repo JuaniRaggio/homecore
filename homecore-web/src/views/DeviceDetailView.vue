@@ -14,13 +14,22 @@
             <span class="device-detail__room">{{ roomName }}</span>
           </p>
         </div>
-        <button
-          class="device-detail__fav"
-          :class="{ 'device-detail__fav--active': device.favorite }"
-          @click="devicesStore.toggleFavorite(device.id)"
-        >
-          <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="sm" /> {{ device.favorite ? 'Favorito' : 'Agregar a favoritos' }}
-        </button>
+        <div class="device-detail__actions">
+          <button
+            class="device-detail__fav"
+            :class="{ 'device-detail__fav--active': device.favorite }"
+            @click="devicesStore.toggleFavorite(device.id)"
+          >
+            <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="sm" /> {{ device.favorite ? 'Favorito' : 'Agregar a favoritos' }}
+          </button>
+          <button
+            class="device-detail__critical"
+            :class="{ 'device-detail__critical--active': device.critical }"
+            @click="devicesStore.toggleCritical(device.id)"
+          >
+            <HcIcon name="warning" size="sm" /> {{ device.critical ? 'Critico' : 'Marcar critico' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -153,6 +162,12 @@ function formatDate(dateStr) {
   color: var(--hc-text-muted);
 }
 
+.device-detail__actions {
+  display: flex;
+  gap: var(--hc-space-sm);
+  align-items: flex-start;
+}
+
 .device-detail__fav {
   background: none;
   border: 1px solid var(--hc-border);
@@ -162,6 +177,9 @@ function formatDate(dateStr) {
   padding: 0.625rem 1rem;
   font-size: var(--hc-font-size-sm);
   transition: all var(--hc-transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
 }
 
 .device-detail__fav:hover {
@@ -171,6 +189,29 @@ function formatDate(dateStr) {
 .device-detail__fav--active {
   color: var(--hc-accent-warm);
   border-color: var(--hc-accent-warm);
+}
+
+.device-detail__critical {
+  background: none;
+  border: 1px solid var(--hc-border);
+  border-radius: var(--hc-radius-md);
+  color: var(--hc-text-secondary);
+  cursor: pointer;
+  padding: 0.625rem 1rem;
+  font-size: var(--hc-font-size-sm);
+  transition: all var(--hc-transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.device-detail__critical:hover {
+  border-color: var(--hc-danger);
+}
+
+.device-detail__critical--active {
+  color: var(--hc-danger);
+  border-color: var(--hc-danger);
 }
 
 .device-detail__content {

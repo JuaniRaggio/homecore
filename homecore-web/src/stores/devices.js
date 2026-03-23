@@ -13,7 +13,8 @@ export const useDevicesStore = defineStore('devices', () => {
       brightness: 80,
       color: '#f59e0b',
       consumption: 12,
-      favorite: true
+      favorite: true,
+      critical: false
     },
     {
       id: 'lamp-2',
@@ -24,7 +25,8 @@ export const useDevicesStore = defineStore('devices', () => {
       brightness: 50,
       color: '#ffffff',
       consumption: 8,
-      favorite: false
+      favorite: false,
+      critical: false
     },
     {
       id: 'lamp-3',
@@ -35,7 +37,8 @@ export const useDevicesStore = defineStore('devices', () => {
       brightness: 100,
       color: '#ffffff',
       consumption: 15,
-      favorite: false
+      favorite: false,
+      critical: false
     },
     {
       id: 'door-1',
@@ -45,7 +48,8 @@ export const useDevicesStore = defineStore('devices', () => {
       on: false,
       locked: true,
       consumption: 2,
-      favorite: true
+      favorite: true,
+      critical: true
     },
     {
       id: 'door-2',
@@ -55,7 +59,8 @@ export const useDevicesStore = defineStore('devices', () => {
       on: false,
       locked: true,
       consumption: 3,
-      favorite: false
+      favorite: false,
+      critical: false
     },
     {
       id: 'alarm-1',
@@ -71,7 +76,8 @@ export const useDevicesStore = defineStore('devices', () => {
         { date: '2026-03-13 23:45', zone: 'Fondo', type: 'Sensor activado' }
       ],
       consumption: 5,
-      favorite: true
+      favorite: true,
+      critical: true
     },
     {
       id: 'faucet-1',
@@ -81,7 +87,8 @@ export const useDevicesStore = defineStore('devices', () => {
       on: false,
       flow: 60,
       consumption: 4,
-      favorite: false
+      favorite: false,
+      critical: false
     },
     {
       id: 'faucet-2',
@@ -91,7 +98,8 @@ export const useDevicesStore = defineStore('devices', () => {
       on: false,
       flow: 40,
       consumption: 3,
-      favorite: false
+      favorite: false,
+      critical: false
     },
     {
       id: 'blinds-1',
@@ -101,7 +109,8 @@ export const useDevicesStore = defineStore('devices', () => {
       on: false,
       position: 75,
       consumption: 6,
-      favorite: false
+      favorite: false,
+      critical: false
     },
     {
       id: 'blinds-2',
@@ -111,7 +120,8 @@ export const useDevicesStore = defineStore('devices', () => {
       on: false,
       position: 0,
       consumption: 6,
-      favorite: true
+      favorite: true,
+      critical: false
     }
   ])
 
@@ -132,6 +142,8 @@ export const useDevicesStore = defineStore('devices', () => {
   }
 
   const favorites = computed(() => devices.value.filter(d => d.favorite))
+
+  const criticalDevices = computed(() => devices.value.filter(d => d.critical))
 
   const deviceTypes = computed(() => [...new Set(devices.value.map(d => d.type))])
 
@@ -191,6 +203,13 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
+  function toggleCritical(id) {
+    const device = getById(id)
+    if (device) {
+      device.critical = !device.critical
+    }
+  }
+
   function getTotalConsumption() {
     return devices.value
       .filter(d => d.on)
@@ -211,6 +230,7 @@ export const useDevicesStore = defineStore('devices', () => {
     typeLabels,
     typeIcons,
     favorites,
+    criticalDevices,
     deviceTypes,
     getById,
     getByRoom,
@@ -218,6 +238,7 @@ export const useDevicesStore = defineStore('devices', () => {
     toggleDevice,
     updateDevice,
     toggleFavorite,
+    toggleCritical,
     getTotalConsumption,
     getConsumptionByType
   }

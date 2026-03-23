@@ -23,15 +23,23 @@
         @click="showHomeMenu = !showHomeMenu"
       >
         <HcIcon name="home" size="sm" />
-        <span class="sidebar__home-name">{{ homesStore.selectedHome?.name }}</span>
+        <span class="sidebar__home-name">{{ currentLabel }}</span>
         <HcIcon name="chevronDown" size="sm" />
       </button>
       <div v-if="showHomeMenu" class="sidebar__home-dropdown">
         <button
+          class="sidebar__home-option"
+          :class="{ 'sidebar__home-option--active': isOverview }"
+          @click="handleSelectOverview"
+        >
+          Todas las casas
+        </button>
+        <div class="sidebar__home-divider"></div>
+        <button
           v-for="home in homesStore.homes"
           :key="home.id"
           class="sidebar__home-option"
-          :class="{ 'sidebar__home-option--active': homesStore.selectedHomeId === home.id }"
+          :class="{ 'sidebar__home-option--active': !isOverview && homesStore.selectedHomeId === home.id }"
           @click="handleSelectHome(home.id)"
         >
           {{ home.name }}
@@ -54,7 +62,7 @@
 
     <div class="sidebar__footer">
       <router-link
-        v-if="authStore.isAdmin"
+        v-if="authStore.isAdmin && !isOverview"
         :to="`/${homesStore.selectedHomeId}/configuracion`"
         class="sidebar__link"
         :class="{ 'sidebar__link--active': isActive('configuracion') }"
@@ -90,6 +98,13 @@ const homesStore = useHomesStore()
 
 const showHomeMenu = ref(false)
 
+const isOverview = computed(() => route.name === 'overview')
+
+const currentLabel = computed(() => {
+  if (isOverview.value) return 'Todas las casas'
+  return homesStore.selectedHome?.name || 'Seleccionar casa'
+})
+
 const navItems = [
   { section: '', label: 'Inicio', icon: 'home' },
   { section: 'dispositivos', label: 'Dispositivos', icon: 'devices' },
@@ -99,16 +114,23 @@ const navItems = [
   { section: 'consumo', label: 'Consumo', icon: 'consumption' }
 ]
 
-const dynamicNavItems = computed(() =>
-  navItems.map(item => ({
+const dynamicNavItems = computed(() => {
+  if (isOverview.value) {
+    // On overview, only show "Inicio" pointing to /overview
+    return [{ section: '', label: 'Inicio', icon: 'home', to: '/overview' }]
+  }
+  return navItems.map(item => ({
     ...item,
     to: item.section
       ? `/${homesStore.selectedHomeId}/${item.section}`
       : `/${homesStore.selectedHomeId}`
   }))
-)
+})
 
 function isActive(section) {
+  if (isOverview.value) {
+    return section === '' && route.path === '/overview'
+  }
   const houseId = route.params.houseId
   if (!houseId) return false
   const basePath = `/${houseId}`
@@ -116,14 +138,18 @@ function isActive(section) {
   return route.path.startsWith(`${basePath}/${section}`)
 }
 
+function handleSelectOverview() {
+  showHomeMenu.value = false
+  router.push('/overview')
+}
+
 function handleSelectHome(homeId) {
   showHomeMenu.value = false
-  if (homeId === homesStore.selectedHomeId) return
+  if (!isOverview.value && homeId === homesStore.selectedHomeId) return
 
-  const currentRoute = route.name
   homesStore.selectHome(homeId)
 
-  if (currentRoute && route.params.houseId) {
+  if (!isOverview.value && route.params.houseId) {
     const newPath = route.path.replace(`/${route.params.houseId}`, `/${homeId}`)
     router.push(newPath)
   } else {
@@ -282,6 +308,12 @@ function handleSelectHome(homeId) {
 
 .sidebar__home-option--active {
   color: var(--hc-accent);
+}
+
+.sidebar__home-divider {
+  height: 1px;
+  background: var(--hc-border);
+  margin: 0.25rem 0;
 }
 
 .sidebar__nav {

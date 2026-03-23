@@ -140,6 +140,11 @@ const breadcrumbs = computed(() => {
   const houseId = route.params.houseId
   const routeName = route.name
 
+  if (routeName === 'overview') {
+    crumbs.push({ label: 'Inicio' })
+    return crumbs
+  }
+
   if (!houseId || !routeName) return crumbs
 
   const homeName = homesStore.selectedHome?.name || houseId

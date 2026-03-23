@@ -215,7 +215,7 @@ export function useVimMode() {
           }
           break
         case '/': e.preventDefault(); showStatus('/ search -- not implemented yet', 'warning'); break
-        case '0': e.preventDefault(); router.push(`/${homesStore.selectedHomeId}`); showStatus('[0] Dashboard', 'success'); break
+        case '0': e.preventDefault(); router.push('/overview'); showStatus('[0] Overview', 'success'); break
         case '1': case '2': case '3': case '4': case '5': case '6':
           e.preventDefault()
           if (NAV_ROUTES.value[parseInt(e.key) - 1]) {
