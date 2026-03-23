@@ -6,34 +6,8 @@
       <p class="overview__subtitle">Resumen de tus propiedades</p>
     </div>
 
-    <!-- Metricas globales -->
-    <div class="overview__metrics">
-      <div class="overview__metric-card">
-        <span class="overview__metric-value">{{ totalConsumption }}W</span>
-        <span class="overview__metric-label">Consumo total</span>
-      </div>
-      <div class="overview__metric-card">
-        <span class="overview__metric-value">{{ activeDevices }} / {{ totalDevices }}</span>
-        <span class="overview__metric-label">Dispositivos activos</span>
-      </div>
-      <div class="overview__metric-card">
-        <span class="overview__metric-value">{{ homesStore.homes.length }}</span>
-        <span class="overview__metric-label">Propiedades</span>
-      </div>
-      <div class="overview__metric-card">
-        <span class="overview__metric-value">{{ criticalCount }}</span>
-        <span class="overview__metric-label">Dispositivos criticos</span>
-      </div>
-    </div>
-
-    <!-- Tus propiedades -->
+    <!-- Propiedades -->
     <section class="overview__homes">
-      <div class="overview__section-header">
-        <h3>Tus propiedades</h3>
-        <router-link to="/nueva-propiedad">
-          <HcButton>+ Nueva propiedad</HcButton>
-        </router-link>
-      </div>
       <div class="overview__homes-grid">
         <router-link
           v-for="home in homeSummaries"
@@ -48,6 +22,12 @@
           <div class="overview__home-card-stats">
             <span>{{ home.activeDevices }} / {{ home.totalDevices }} activos</span>
             <span>{{ home.consumption }}W</span>
+          </div>
+        </router-link>
+        <router-link to="/nueva-propiedad" class="overview__home-card overview__home-card--add">
+          <div class="overview__home-card-add-content">
+            <span class="overview__home-card-add-icon">+</span>
+            <span class="overview__home-card-add-label">Nueva propiedad</span>
           </div>
         </router-link>
       </div>
@@ -117,17 +97,40 @@
       </section>
     </div>
 
-    <!-- Graficos -->
-    <div class="overview__charts">
-      <div class="overview__chart-card">
-        <h3>Consumo por propiedad</h3>
-        <canvas ref="houseChartEl"></canvas>
+    <!-- Resumen energetico -->
+    <section class="overview__energy">
+      <div class="overview__section-header">
+        <h3>Resumen energetico</h3>
       </div>
-      <div class="overview__chart-card">
-        <h3>Distribucion por tipo</h3>
-        <canvas ref="typeChartEl"></canvas>
+      <div class="overview__metrics">
+        <div class="overview__metric-card">
+          <span class="overview__metric-value">{{ totalConsumption }}W</span>
+          <span class="overview__metric-label">Consumo total</span>
+        </div>
+        <div class="overview__metric-card">
+          <span class="overview__metric-value">{{ activeDevices }} / {{ totalDevices }}</span>
+          <span class="overview__metric-label">Dispositivos activos</span>
+        </div>
+        <div class="overview__metric-card">
+          <span class="overview__metric-value">{{ homesStore.homes.length }}</span>
+          <span class="overview__metric-label">Propiedades</span>
+        </div>
+        <div class="overview__metric-card">
+          <span class="overview__metric-value">{{ criticalCount }}</span>
+          <span class="overview__metric-label">Dispositivos criticos</span>
+        </div>
       </div>
-    </div>
+      <div class="overview__charts">
+        <div class="overview__chart-card">
+          <h3>Consumo por propiedad</h3>
+          <canvas ref="houseChartEl"></canvas>
+        </div>
+        <div class="overview__chart-card">
+          <h3>Distribucion por tipo</h3>
+          <canvas ref="typeChartEl"></canvas>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -316,6 +319,13 @@ onMounted(createCharts)
   margin-top: var(--hc-space-xs);
 }
 
+/* Energy section */
+.overview__energy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-md);
+}
+
 /* Metrics */
 .overview__metrics {
   display: grid;
@@ -378,6 +388,31 @@ onMounted(createCharts)
 
 .overview__home-card:hover {
   border-color: var(--hc-accent);
+}
+
+.overview__home-card--add {
+  border-style: dashed;
+  justify-content: center;
+  align-items: center;
+}
+
+.overview__home-card-add-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hc-space-sm);
+  color: var(--hc-accent);
+}
+
+.overview__home-card-add-icon {
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.overview__home-card-add-label {
+  font-size: var(--hc-font-size-sm);
+  font-weight: 500;
 }
 
 .overview__home-card-header {
