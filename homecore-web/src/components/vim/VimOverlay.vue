@@ -295,7 +295,7 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
   bottom: 0;
   left: 0;
   right: 0;
-  height: 26px;
+  height: var(--hc-statusline-height);
   background: #111118;
   border-top: 1px solid #2e2e3e;
   display: flex;

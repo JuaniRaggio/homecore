@@ -111,7 +111,7 @@
 
 <script setup>
 import { ref, reactive, watch, inject, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoutinesStore } from '../stores/routines'
 import { useAuthStore } from '../stores/auth'
@@ -120,6 +120,7 @@ import HcInput from '../components/ui/HcInput.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
 
 const router = useRouter()
+const route = useRoute()
 const devicesStore = useDevicesStore()
 const routinesStore = useRoutinesStore()
 const authStore = useAuthStore()
@@ -216,7 +217,7 @@ function createRoutine() {
   })
 
   toast.value?.show('Rutina creada correctamente', 'success')
-  router.push('/rutinas')
+  router.push(`/${route.params.houseId}/rutinas`)
 }
 </script>
 

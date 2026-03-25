@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useHomesStore } from '../stores/homes'
 import AppLayout from '../components/layout/AppLayout.vue'
+import OverviewLayout from '../components/layout/OverviewLayout.vue'
 
 const routes = [
   {
@@ -28,7 +30,29 @@ const routes = [
     meta: { public: true }
   },
   {
-    path: '/',
+    path: '/overview',
+    component: OverviewLayout,
+    children: [
+      {
+        path: '',
+        name: 'overview',
+        component: () => import('../views/OverviewView.vue')
+      }
+    ]
+  },
+  {
+    path: '/nueva-propiedad',
+    component: OverviewLayout,
+    children: [
+      {
+        path: '',
+        name: 'new-property',
+        component: () => import('../views/NewPropertyView.vue')
+      }
+    ]
+  },
+  {
+    path: '/:houseId',
     component: AppLayout,
     children: [
       {
@@ -79,6 +103,10 @@ const routes = [
         meta: { adminOnly: true }
       }
     ]
+  },
+  {
+    path: '/',
+    redirect: '/overview'
   }
 ]
 
@@ -89,8 +117,18 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
+
   if (to.meta.adminOnly && !authStore.isAdmin) {
-    return { name: 'dashboard' }
+    return { name: 'dashboard', params: { houseId: to.params.houseId } }
+  }
+
+  if (to.params.houseId) {
+    const homesStore = useHomesStore()
+    homesStore.syncFromRoute(to.params.houseId)
+
+    if (!homesStore.homeExists(to.params.houseId)) {
+      return '/overview'
+    }
   }
 })
 

@@ -25,7 +25,7 @@
 
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, reactive, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import * as THREE from 'three'
 import { useDevicesStore } from '../../stores/devices'
 import { useRoomsStore } from '../../stores/rooms'
@@ -42,6 +42,7 @@ import {
 } from './deviceMarkers.js'
 
 const router = useRouter()
+const route = useRoute()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const homeModelStore = useHomeModelStore()
@@ -295,7 +296,7 @@ function onMouseMove(event) {
 function onClick(event) {
   const hit = raycast(event)
   if (hit && hit.type === 'device') {
-    router.push(`/dispositivos/${hit.deviceId}`)
+    router.push(`/${route.params.houseId}/dispositivos/${hit.deviceId}`)
   }
 }
 

@@ -5,7 +5,7 @@
       :key="home.id"
       class="homes-selector__btn"
       :class="{ 'homes-selector__btn--active': homesStore.selectedHomeId === home.id }"
-      @click="homesStore.selectHome(home.id)"
+      @click="handleSelect(home.id)"
     >
       {{ home.name }}
     </button>
@@ -13,9 +13,23 @@
 </template>
 
 <script setup>
+import { useRouter, useRoute } from 'vue-router'
 import { useHomesStore } from '../../stores/homes'
 
+const router = useRouter()
+const route = useRoute()
 const homesStore = useHomesStore()
+
+function handleSelect(homeId) {
+  if (homeId === homesStore.selectedHomeId) return
+  homesStore.selectHome(homeId)
+  if (route.params.houseId) {
+    const newPath = route.path.replace(`/${route.params.houseId}`, `/${homeId}`)
+    router.push(newPath)
+  } else {
+    router.push(`/${homeId}`)
+  }
+}
 </script>
 
 <style scoped>

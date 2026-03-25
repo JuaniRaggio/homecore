@@ -19,7 +19,7 @@
           </select>
         </div>
       </div>
-      <router-link v-if="authStore.isAdmin" to="/dispositivos/nuevo">
+      <router-link v-if="authStore.isAdmin" :to="`/${route.params.houseId}/dispositivos/nuevo`">
         <HcButton>+ Nuevo dispositivo</HcButton>
       </router-link>
     </div>
@@ -41,7 +41,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoomsStore } from '../stores/rooms'
 import { useAuthStore } from '../stores/auth'
@@ -49,6 +49,7 @@ import DeviceCard from '../components/devices/DeviceCard.vue'
 import HcButton from '../components/ui/HcButton.vue'
 
 const router = useRouter()
+const route = useRoute()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const authStore = useAuthStore()
@@ -72,7 +73,7 @@ const filteredDevices = computed(() => {
 })
 
 function goToDevice(id) {
-  router.push(`/dispositivos/${id}`)
+  router.push(`/${route.params.houseId}/dispositivos/${id}`)
 }
 </script>
 

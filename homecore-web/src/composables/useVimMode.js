@@ -1,35 +1,50 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useHomesStore } from '../stores/homes'
 
 const FOCUSABLE = '.device-card, .routine-card, .sidebar__link, .header__icon-btn, .header__profile-btn, [data-vim]'
 
-const ROUTE_FILES = {
-  '/': 'dashboard.vue',
-  '/dispositivos': 'devices.vue',
-  '/habitaciones': 'rooms.vue',
-  '/rutinas': 'routines.vue',
-  '/historial': 'history.vue',
-  '/consumo': 'consumption.vue',
-  '/configuracion': 'settings.vue',
+function getRouteFiles(houseId) {
+  const base = `/${houseId}`
+  return {
+    [base]: 'dashboard.vue',
+    [`${base}/dispositivos`]: 'devices.vue',
+    [`${base}/habitaciones`]: 'rooms.vue',
+    [`${base}/rutinas`]: 'routines.vue',
+    [`${base}/historial`]: 'history.vue',
+    [`${base}/consumo`]: 'consumption.vue',
+    [`${base}/configuracion`]: 'settings.vue',
+  }
 }
 
-const NAV_ROUTES = ['/', '/dispositivos', '/habitaciones', '/rutinas', '/historial', '/consumo']
+function getNavRoutes(houseId) {
+  const base = `/${houseId}`
+  return [base, `${base}/dispositivos`, `${base}/habitaciones`, `${base}/rutinas`, `${base}/historial`, `${base}/consumo`]
+}
 
-const GOTO_MAP = {
-  h: '/',
-  d: '/dispositivos',
-  r: '/habitaciones',
-  t: '/rutinas',
-  i: '/historial',
-  c: '/consumo',
-  s: '/configuracion',
+function getGotoMap(houseId) {
+  const base = `/${houseId}`
+  return {
+    h: base,
+    d: `${base}/dispositivos`,
+    r: `${base}/habitaciones`,
+    t: `${base}/rutinas`,
+    i: `${base}/historial`,
+    c: `${base}/consumo`,
+    s: `${base}/configuracion`,
+  }
 }
 
 export function useVimMode() {
   const router = useRouter()
   const route = useRoute()
   const authStore = useAuthStore()
+  const homesStore = useHomesStore()
+
+  const ROUTE_FILES = computed(() => getRouteFiles(homesStore.selectedHomeId))
+  const NAV_ROUTES = computed(() => getNavRoutes(homesStore.selectedHomeId))
+  const GOTO_MAP = computed(() => getGotoMap(homesStore.selectedHomeId))
 
   // --- State ---
   const mode = ref('NORMAL')
@@ -51,7 +66,7 @@ export function useVimMode() {
 
   const routeFile = computed(() => {
     if (route.path.startsWith('/dispositivos/')) return '~/hc/device-detail.vue'
-    return '~/hc/' + (ROUTE_FILES[route.path] || route.path.slice(1) + '.vue')
+    return '~/hc/' + (ROUTE_FILES.value[route.path] || route.path.slice(1) + '.vue')
   })
 
   // --- Helpers ---
@@ -100,7 +115,7 @@ export function useVimMode() {
     pendingKey.value = null
     mode.value = 'NORMAL'
     if (key === 'g') { setFocus(0); showStatus('gg -- top', 'info'); return }
-    if (GOTO_MAP[key]) { router.push(GOTO_MAP[key]); showStatus('go ' + GOTO_MAP[key], 'success'); return }
+    if (GOTO_MAP.value[key]) { router.push(GOTO_MAP.value[key]); showStatus('go ' + GOTO_MAP.value[key], 'success'); return }
     showStatus('E: Unknown goto g' + key, 'error')
   }
 
@@ -200,12 +215,12 @@ export function useVimMode() {
           }
           break
         case '/': e.preventDefault(); showStatus('/ search -- not implemented yet', 'warning'); break
-        case '0': e.preventDefault(); router.push('/'); showStatus('[0] Dashboard', 'success'); break
+        case '0': e.preventDefault(); router.push('/overview'); showStatus('[0] Overview', 'success'); break
         case '1': case '2': case '3': case '4': case '5': case '6':
           e.preventDefault()
-          if (NAV_ROUTES[parseInt(e.key) - 1]) {
-            router.push(NAV_ROUTES[parseInt(e.key) - 1])
-            showStatus('[' + e.key + '] ' + NAV_ROUTES[parseInt(e.key) - 1], 'success')
+          if (NAV_ROUTES.value[parseInt(e.key) - 1]) {
+            router.push(NAV_ROUTES.value[parseInt(e.key) - 1])
+            showStatus('[' + e.key + '] ' + NAV_ROUTES.value[parseInt(e.key) - 1], 'success')
           }
           break
         default: break

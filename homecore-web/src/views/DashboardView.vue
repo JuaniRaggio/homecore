@@ -30,7 +30,7 @@
       <section class="dashboard__section">
         <div class="dashboard__section-header">
           <h3>Dispositivos favoritos</h3>
-          <router-link to="/dispositivos" class="dashboard__see-all">Ver todos</router-link>
+          <router-link :to="`/${route.params.houseId}/dispositivos`" class="dashboard__see-all">Ver todos</router-link>
         </div>
         <div class="dashboard__devices-grid">
           <DeviceCard
@@ -49,7 +49,7 @@
       <section class="dashboard__section">
         <div class="dashboard__section-header">
           <h3>Rutinas</h3>
-          <router-link to="/rutinas" class="dashboard__see-all">Ver todas</router-link>
+          <router-link :to="`/${route.params.houseId}/rutinas`" class="dashboard__see-all">Ver todas</router-link>
         </div>
         <div class="dashboard__routines">
           <div
@@ -84,7 +84,7 @@
 
 <script setup>
 import { computed, inject } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoomsStore } from '../stores/rooms'
 import { useRoutinesStore } from '../stores/routines'
@@ -95,6 +95,7 @@ import HomeModelSelector from '../components/home3d/HomeModelSelector.vue'
 import RoomLayoutOverlay from '../components/home3d/RoomLayoutOverlay.vue'
 
 const router = useRouter()
+const route = useRoute()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
@@ -108,7 +109,7 @@ const enabledRoutines = computed(() => routinesStore.routines.filter(r => r.enab
 const favoriteRoutines = computed(() => routinesStore.routines.filter(r => r.favorite))
 
 function goToDevice(id) {
-  router.push(`/dispositivos/${id}`)
+  router.push(`/${route.params.houseId}/dispositivos/${id}`)
 }
 
 function executeRoutine(id) {
