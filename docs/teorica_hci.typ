@@ -1358,6 +1358,55 @@ _Generalmente hablamos de telefonos inteligentes y tablets_
 = Apps vs. Sitios web responsive
 
 
+= Programacion Web
+
+- *Estructura*: Establece la semantica y la relacion que existe entre los mismos. _En parte de la estructura tambien
+  hay un poco de presentacion_
+
+- *Presentacion*: Formato del contenido
+
+- *Comportamiento*: Como debe reaccionar el contenido a partir de la interaccion del usuario
+
+
+
+== Techs
+
+- HTML $->$ estructura
+
+- CSS $->$ Presentacion
+
+- JavaScript $->$ Comportamiento
+
+
+== Mejora prograsiva
+
+Existe un beneficio adicional denominado *progressive Enhancement* (no confundir con *Gracefull Degradation*)
+
+Este termino se puede resumir con la siguiente frase:
+
+_Una escalera mecanica no se puede romper, solo puede convertirse en una escalera_ - Miguel el Hambriento
+
+
+#importante[
+  Construir interfaces Web utilizando estas buenas practicas, garantiza que las mismas puedan ser utilizadas a pesar
+  de que el soporte para JS de nuestro visistante se encuentre desactivado o el css se despliegue de forma lenta
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
