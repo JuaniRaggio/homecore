@@ -28,7 +28,7 @@
     </div>
 
     <div class="routine-card__footer">
-      <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="!routine.enabled || restrictExecute">
+      <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="restrictExecute">
         Ejecutar
       </HcButton>
       <HcButton v-if="!restrictExecute" size="sm" variant="ghost" @click="$emit('delete', routine.id)">
@@ -68,6 +68,7 @@ function toggleFavorite() {
   flex-direction: column;
   gap: var(--hc-space-md);
   transition: all var(--hc-transition-fast);
+  height: 100%;
 }
 
 .routine-card:hover {
@@ -147,5 +148,6 @@ function toggleFavorite() {
   gap: var(--hc-space-sm);
   padding-top: var(--hc-space-sm);
   border-top: 1px solid var(--hc-border);
+  margin-top: auto;
 }
 </style>
