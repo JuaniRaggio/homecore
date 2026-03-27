@@ -1393,20 +1393,34 @@ _Una escalera mecanica no se puede romper, solo puede convertirse en una escaler
 ]
 
 
+= Web Tools
+
+_Herramientas que se usan en la materia_
+
+- WAVE $=>$ Hay plugins
+- vue.js devtools
+- vuetify
+- router
+- pinia
 
 
+_No se puede usar_
+
+- nuxt $=>$ empaqueta todo y funciona todo "magicamente"
 
 
+== View source code (con boton izq)
+
+Te muestra una foto del html que se envio en el segundo cero. Osea que todavia no cargaron muchismas cosas como
+el css o js eventualmente
 
 
+== Inspect
 
+Esto si te carga todo (creo)
 
-
-
-
-
-
-
-
+#importante[
+  Tenemos que analizar que pasa si perdemos conexion a internet
+]
 
 
