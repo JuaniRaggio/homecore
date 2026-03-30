@@ -28,12 +28,15 @@
     </div>
 
     <div class="routine-card__footer">
-      <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="restrictExecute">
-        Ejecutar
-      </HcButton>
-      <HcButton v-if="!restrictExecute" size="sm" variant="ghost" @click="$emit('delete', routine.id)">
-        Eliminar
-      </HcButton>
+      <div class="routine-card__buttons">
+        <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="restrictExecute">
+          Ejecutar
+        </HcButton>
+        <HcButton v-if="!restrictExecute" size="sm" variant="ghost" @click="$emit('delete', routine.id)">
+          Eliminar
+        </HcButton>
+      </div>
+      <span class="routine-card__status">{{ routine.enabled ? 'Activado' : 'Desactivado' }}</span>
     </div>
   </div>
 </template>
@@ -149,5 +152,18 @@ function toggleFavorite() {
   padding-top: var(--hc-space-sm);
   border-top: 1px solid var(--hc-border);
   margin-top: auto;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.routine-card__buttons {
+  display: flex;
+  gap: var(--hc-space-sm);
+}
+
+.routine-card__status {
+  color: rgb(199, 199, 199);
+  font-size: var(--hc-font-size-sm);
+  font-weight: 500;
 }
 </style>

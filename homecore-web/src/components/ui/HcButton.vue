@@ -103,12 +103,14 @@ defineEmits(['click'])
 
 .hc-btn--ghost {
   background: transparent;
-  color: var(--hc-text-secondary);
+  color: white;
+  font-weight: 700;
 }
 
 .hc-btn--ghost:hover:not(:disabled) {
   background: var(--hc-bg-tertiary);
-  color: var(--hc-text-primary);
+  color: white;
+  font-weight: 700;
 }
 
 .hc-btn--block {

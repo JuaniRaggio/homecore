@@ -170,7 +170,7 @@ export const useDevicesStore = defineStore('devices', () => {
       if ('brightness' in updates) actionParts.push(`Brillo: ${updates.brightness}%`)
       if ('color' in updates) actionParts.push(`Color: ${updates.color}`)
       if ('locked' in updates) actionParts.push(updates.locked ? 'Bloqueado' : 'Desbloqueado')
-      if ('armed' in updates) actionParts.push(updates.armed ? 'Armada' : 'Desarmada')
+      if ('armed' in updates) actionParts.push(updates.armed ? 'Encendida' : 'Apagada')
       if ('flow' in updates) actionParts.push(`Caudal: ${updates.flow}%`)
       if ('position' in updates) actionParts.push(`Posicion: ${updates.position}%`)
       if (actionParts.length > 0) {

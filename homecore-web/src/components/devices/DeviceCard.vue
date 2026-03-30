@@ -66,7 +66,7 @@ const statusText = computed(() => {
   if (!d.on) return 'Apagado'
   if (d.type === 'lamp') return `Encendido - ${d.brightness}%`
   if (d.type === 'door') return d.locked ? 'Cerrada - Bloqueada' : 'Cerrada - Desbloqueada'
-  if (d.type === 'alarm') return d.armed ? 'Armada' : 'Desarmada'
+  if (d.type === 'alarm') return d.armed ? 'Encendida' : 'Apagada'
   if (d.type === 'faucet') return `Abierto - ${d.flow}%`
   if (d.type === 'blinds') return `Abierta - ${d.position}%`
   return 'Encendido'

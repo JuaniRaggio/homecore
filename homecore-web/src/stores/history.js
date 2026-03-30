@@ -39,7 +39,7 @@ export const useHistoryStore = defineStore('history', () => {
       id: 5,
       deviceId: 'alarm-1',
       deviceName: 'Alarma perimetral',
-      action: 'Armada',
+      action: 'Encendida',
       type: 'alarm',
       date: '2026-03-13T23:00:00'
     },

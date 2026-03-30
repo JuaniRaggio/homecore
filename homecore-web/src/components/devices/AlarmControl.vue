@@ -10,7 +10,7 @@
         <HcIcon name="alarm" size="2xl" />
       </div>
       <span class="alarm-control__status" :class="device.armed ? 'text-danger' : 'text-muted'">
-        {{ device.armed ? 'Armada' : 'Desarmada' }}
+        {{ device.armed ? 'Encendida' : 'Apagada' }}
       </span>
     </div>
 
@@ -42,11 +42,11 @@
       </div>
     </div>
 
-    <HcModal v-model="showDisarmConfirm" title="Desarmar alarma" size="sm">
-      <p>Esta a punto de desarmar la alarma. Esta es una accion de seguridad. Desea continuar?</p>
+    <HcModal v-model="showDisarmConfirm" title="Apagar alarma" size="sm">
+      <p>Esta a punto de apagar la alarma. Esta es una accion de seguridad. Desea continuar?</p>
       <template #footer>
         <HcButton variant="secondary" @click="showDisarmConfirm = false">Cancelar</HcButton>
-        <HcButton variant="danger" @click="confirmDisarm">Desarmar</HcButton>
+        <HcButton variant="danger" @click="confirmDisarm">Apagar</HcButton>
       </template>
     </HcModal>
   </div>
@@ -77,13 +77,13 @@ function toggleArm(val) {
     return
   }
   devicesStore.updateDevice(props.device.id, { armed: val })
-  toast.value?.show(`${props.device.name} armada`, 'success')
+  toast.value?.show(`${props.device.name} encendida`, 'success')
 }
 
 function confirmDisarm() {
   devicesStore.updateDevice(props.device.id, { armed: false })
   showDisarmConfirm.value = false
-  toast.value?.show(`${props.device.name} desarmada`, 'warning')
+  toast.value?.show(`${props.device.name} apagada`, 'warning')
 }
 
 function toggleZone(zone, active) {
