@@ -10,7 +10,7 @@
         <HcIcon name="alarm" size="2xl" />
       </div>
       <span class="alarm-control__status" :class="device.armed ? 'text-danger' : 'text-muted'">
-        {{ device.armed ? 'Armada' : 'Desarmada' }}
+        {{ device.armed ? 'Activada' : 'Desactivada' }}
       </span>
     </div>
 
@@ -77,13 +77,13 @@ function toggleArm(val) {
     return
   }
   devicesStore.updateDevice(props.device.id, { armed: val })
-  toast.value?.show(`${props.device.name} armada`, 'success')
+  toast.value?.show(`${props.device.name} activada`, 'success')
 }
 
 function confirmDisarm() {
   devicesStore.updateDevice(props.device.id, { armed: false })
   showDisarmConfirm.value = false
-  toast.value?.show(`${props.device.name} desarmada`, 'warning')
+  toast.value?.show(`${props.device.name} desactivada`, 'warning')
 }
 
 function toggleZone(zone, active) {

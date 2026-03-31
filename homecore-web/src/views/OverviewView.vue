@@ -217,7 +217,7 @@ const favoriteRoutinesData = computed(() => {
 })
 
 function getDeviceStatus(device) {
-  if (device.type === 'alarm') return device.armed ? 'Armada' : 'Desarmada'
+  if (device.type === 'alarm') return device.armed ? 'Activada' : 'Desactivada'
   if (device.type === 'door') return device.locked ? 'Bloqueada' : 'Desbloqueada'
   return device.on ? 'Encendido' : 'Apagado'
 }

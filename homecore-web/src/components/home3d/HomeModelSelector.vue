@@ -9,10 +9,7 @@
     >
       {{ model.name }}
     </button>
-    <button class="home-selector__add" @click="showAddModal = true">
-      + Agregar casa
-    </button>
-
+  
     <!-- Modal para agregar casa -->
     <div v-if="showAddModal" class="home-selector__modal-overlay" @click="showAddModal = false">
       <div class="home-selector__modal" @click.stop>
@@ -41,12 +38,6 @@ const homeModelStore = useHomeModelStore()
 const showAddModal = ref(false)
 const newHomeName = ref('')
 
-const models = ref([
-  { id: 'casa', name: 'Casa' },
-  { id: 'departamento', name: 'Departamento' },
-  { id: 'casa-playa', name: 'Casa de playa' },
-  { id: 'oficinas', name: 'Oficinas' }
-])
 
 function addHome() {
   if (!newHomeName.value.trim()) return

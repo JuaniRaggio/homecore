@@ -309,7 +309,7 @@ function getDeviceStatusText(device) {
     case 'blinds':
       return `Posicion: ${device.position}%`
     case 'alarm':
-      return device.armed ? 'Armada' : 'Desarmada'
+      return device.armed ? 'Activada' : 'Desactivada'
     case 'faucet':
       return device.on ? `Abierto (${device.flow}%)` : 'Cerrado'
     default:

@@ -18,18 +18,20 @@
       </div>
     </div>
 
-    <div class="routine-card__schedule" v-if="routine.schedule">
-      <span class="routine-card__time"><HcIcon name="routines" size="sm" /> {{ routine.schedule.time }}</span>
-      <span class="routine-card__days">{{ routine.schedule.days.join(', ') }}</span>
-    </div>
+    <div class="routine-card__meta">
+      <div class="routine-card__schedule" v-if="routine.schedule">
+        <span class="routine-card__time"><HcIcon name="routines" size="sm" /> {{ routine.schedule.time }}</span>
+        <span class="routine-card__days">{{ routine.schedule.days.join(', ') }}</span>
+      </div>
 
-    <div class="routine-card__actions-count">
-      {{ routine.actions.length }} {{ routine.actions.length === 1 ? 'accion' : 'acciones' }}
+      <div class="routine-card__actions-count">
+        {{ routine.actions.length }} {{ routine.actions.length === 1 ? 'accion' : 'acciones' }}
+      </div>
     </div>
 
     <div class="routine-card__footer">
       <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="restrictExecute">
-        Ejecutar
+        Ejecutar Ahora
       </HcButton>
       <HcButton v-if="!restrictExecute" size="sm" variant="ghost" @click="$emit('delete', routine.id)">
         Eliminar
@@ -126,6 +128,13 @@ function toggleFavorite() {
   margin-top: 0.125rem;
 }
 
+.routine-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-sm);
+  margin-top: auto;
+}
+
 .routine-card__schedule {
   display: flex;
   gap: var(--hc-space-md);
@@ -148,6 +157,5 @@ function toggleFavorite() {
   gap: var(--hc-space-sm);
   padding-top: var(--hc-space-sm);
   border-top: 1px solid var(--hc-border);
-  margin-top: auto;
 }
 </style>
