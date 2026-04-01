@@ -1358,6 +1358,69 @@ _Generalmente hablamos de telefonos inteligentes y tablets_
 = Apps vs. Sitios web responsive
 
 
+= Programacion Web
 
+- *Estructura*: Establece la semantica y la relacion que existe entre los mismos. _En parte de la estructura tambien
+  hay un poco de presentacion_
+
+- *Presentacion*: Formato del contenido
+
+- *Comportamiento*: Como debe reaccionar el contenido a partir de la interaccion del usuario
+
+
+
+== Techs
+
+- HTML $->$ estructura
+
+- CSS $->$ Presentacion
+
+- JavaScript $->$ Comportamiento
+
+
+== Mejora prograsiva
+
+Existe un beneficio adicional denominado *progressive Enhancement* (no confundir con *Gracefull Degradation*)
+
+Este termino se puede resumir con la siguiente frase:
+
+_Una escalera mecanica no se puede romper, solo puede convertirse en una escalera_ - Miguel el Hambriento
+
+
+#importante[
+  Construir interfaces Web utilizando estas buenas practicas, garantiza que las mismas puedan ser utilizadas a pesar
+  de que el soporte para JS de nuestro visistante se encuentre desactivado o el css se despliegue de forma lenta
+]
+
+
+= Web Tools
+
+_Herramientas que se usan en la materia_
+
+- WAVE $=>$ Hay plugins
+- vue.js devtools
+- vuetify
+- router
+- pinia
+
+
+_No se puede usar_
+
+- nuxt $=>$ empaqueta todo y funciona todo "magicamente"
+
+
+== View source code (con boton izq)
+
+Te muestra una foto del html que se envio en el segundo cero. Osea que todavia no cargaron muchismas cosas como
+el css o js eventualmente
+
+
+== Inspect
+
+Esto si te carga todo (creo)
+
+#importante[
+  Tenemos que analizar que pasa si perdemos conexion a internet
+]
 
 
