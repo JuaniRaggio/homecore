@@ -104,6 +104,7 @@ import { useAuthStore } from '../../stores/auth'
 import { useNotificationsStore } from '../../stores/notifications'
 import { useHomesStore } from '../../stores/homes'
 import { useDevicesStore } from '../../stores/devices'
+import { useRoutinesStore } from '../../stores/routines'
 import HcIcon from '../ui/HcIcon.vue'
 import HcLogo from '../ui/HcLogo.vue'
 
@@ -113,6 +114,7 @@ const authStore = useAuthStore()
 const notificationsStore = useNotificationsStore()
 const homesStore = useHomesStore()
 const devicesStore = useDevicesStore()
+const routinesStore = useRoutinesStore()
 
 const toast = inject('toast')
 const showNotifications = ref(false)
@@ -131,6 +133,7 @@ const sectionLabels = {
   'device-detail': 'Dispositivos',
   'rooms': 'Habitaciones',
   'routines': 'Rutinas',
+  'routine-detail': 'Rutinas',
   'new-routine': 'Rutinas',
   'history': 'Historial',
   'consumption': 'Consumo electrico',
@@ -139,6 +142,7 @@ const sectionLabels = {
 
 const sectionRoutes = {
   'device-detail': 'devices',
+  'routine-detail': 'routines',
   'new-routine': 'routines'
 }
 
@@ -176,6 +180,9 @@ const breadcrumbs = computed(() => {
     if (routeName === 'device-detail') {
       const device = devicesStore.getById(route.params.id)
       crumbs.push({ label: device ? device.name : route.params.id })
+    } else if (routeName === 'routine-detail') {
+      const routine = routinesStore.getById(route.params.id)
+      crumbs.push({ label: routine ? routine.name : route.params.id })
     } else if (routeName === 'new-routine') {
       crumbs.push({ label: 'Nueva rutina' })
     }
