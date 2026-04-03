@@ -7,15 +7,15 @@
   --hc-bg-primary: #0f0f14;
   --hc-bg-secondary: #1a1a24;
   --hc-bg-tertiary: #252532;
-  --hc-accent: #6366f1;
-  --hc-accent-hover: #818cf8;
-  --hc-accent-warm: #f59e0b;
-  --hc-success: #22c55e;
-  --hc-danger: #ef4444;
+  --hc-accent: #818cf8;
+  --hc-accent-hover: #a5b4fc;
+  --hc-accent-warm: #fbbf24;
+  --hc-success: #34d399;
+  --hc-danger: #f87171;
   --hc-text-primary: #f1f5f9;
-  --hc-text-secondary: #94a3b8;
-  --hc-text-muted: #64748b;
-  --hc-border: #2e2e3e;
+  --hc-text-secondary: #b0bdd0;
+  --hc-text-muted: #8494a7;
+  --hc-border: #3a3a4a;
 
   /* Tipografia */
   --hc-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

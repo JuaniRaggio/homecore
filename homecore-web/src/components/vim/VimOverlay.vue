@@ -110,7 +110,7 @@ function startMatrix() {
     for (let i = 0; i < drops.length; i++) {
       const char = chars[Math.floor(Math.random() * chars.length)]
       // Alternate between indigo and amber for HomeCore palette
-      ctx.fillStyle = Math.random() > 0.85 ? '#f59e0b' : '#6366f1'
+      ctx.fillStyle = Math.random() > 0.85 ? '#f59e0b' : '#818cf8'
       ctx.fillText(char, i * fontSize, drops[i] * fontSize)
 
       if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
@@ -266,7 +266,7 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
 
 .vim-help-window {
   background: #0d0d12;
-  border: 1px solid #6366f1;
+  border: 1px solid #818cf8;
   border-radius: 6px;
   box-shadow: 0 0 60px rgba(99, 102, 241, 0.25), 0 0 120px rgba(99, 102, 241, 0.08);
   max-width: 920px;
@@ -297,14 +297,14 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
   right: 0;
   height: var(--hc-statusline-height);
   background: #111118;
-  border-top: 1px solid #2e2e3e;
+  border-top: 1px solid #3a3a4a;
   display: flex;
   align-items: center;
   gap: 0;
   font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 12px;
   z-index: 10000;
-  color: #64748b;
+  color: #8494a7;
   user-select: none;
 }
 
@@ -337,8 +337,8 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
 
 .vim-sl__file {
   padding: 0 12px;
-  color: #94a3b8;
-  border-right: 1px solid #2e2e3e;
+  color: #b0bdd0;
+  border-right: 1px solid #3a3a4a;
   height: 100%;
   display: flex;
   align-items: center;
@@ -355,7 +355,7 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
 .vim-sl__msg--success { color: #4ade80; }
 .vim-sl__msg--warning { color: #fbbf24; }
 .vim-sl__msg--error { color: #f87171; }
-.vim-sl__msg--info { color: #94a3b8; }
+.vim-sl__msg--info { color: #b0bdd0; }
 
 .vim-sl__right {
   display: flex;
@@ -366,20 +366,20 @@ onUnmounted(() => { window.removeEventListener('resize', handleResize); stopMatr
 
 .vim-sl__profile {
   padding: 0 12px;
-  border-left: 1px solid #2e2e3e;
+  border-left: 1px solid #3a3a4a;
   height: 100%;
   display: flex;
   align-items: center;
-  color: #94a3b8;
+  color: #b0bdd0;
 }
 
 .vim-sl__pos {
   padding: 0 12px;
-  border-left: 1px solid #2e2e3e;
+  border-left: 1px solid #3a3a4a;
   height: 100%;
   display: flex;
   align-items: center;
-  color: #64748b;
+  color: #8494a7;
   min-width: 60px;
   justify-content: flex-end;
 }
