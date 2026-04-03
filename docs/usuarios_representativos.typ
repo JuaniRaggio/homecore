@@ -84,12 +84,96 @@
 #line(length: 100%, stroke: 1pt)
 #v(1em)
 
+// ====================================
+// FUNCIONES UTILES
+// ====================================
+
+// Funcion para crear una caja de nota/observacion
+#let nota(contenido) = {
+  block(
+    fill: rgb("#E3F2FD"),
+    stroke: rgb("#1976D2") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#1976D2"))[Nota:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de advertencia
+#let importante(contenido) = {
+  block(
+    fill: rgb("#FFF3E0"),
+    stroke: rgb("#F57C00") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#F57C00"))[Importante:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de error comun
+#let error(contenido) = {
+  block(
+    fill: rgb("#FFEBEE"),
+    stroke: rgb("#D32F2F") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#D32F2F"))[Error Comun:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de tip
+#let tip(contenido) = {
+  block(
+    fill: rgb("#E8F5E9"),
+    stroke: rgb("#388E3C") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#388E3C"))[Tip:] #contenido
+  ]
+}
+
+// Funcion para crear una caja de duda con pregunta y respuesta
+#let doubt(pregunta, respuesta) = {
+  block(
+    fill: rgb("#F3E5F5"),
+    stroke: rgb("#7B1FA2") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#7B1FA2"), size: 11pt)[Pregunta:]
+    #v(0.3em)
+    #pregunta
+    #v(0.5em)
+    #line(length: 100%, stroke: 0.5pt + rgb("#7B1FA2"))
+    #v(0.5em)
+    #text(weight: "bold", fill: rgb("#7B1FA2"), size: 11pt)[Respuesta:]
+    #v(0.3em)
+    #respuesta
+  ]
+}
 
 = Usuarios Representativos
 
 == Definicion de atributos
 
 Se seleccionaron los siguientes atributos por ser factores que influyen directamente en como un usuario interactua con una aplicacion de domotica:
+
+#error[
+  Esta mal lo de subdividir los rangos de edades en los usuarios representativos.
+]
+
+#importante[
+  Usar esta data para crear combinaciones distintas de *modelos de persona*
+]
 
 #table(
   columns: 3,
