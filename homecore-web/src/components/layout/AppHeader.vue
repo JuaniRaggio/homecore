@@ -131,6 +131,7 @@ const sectionLabels = {
   'dashboard': 'Inicio',
   'devices': 'Dispositivos',
   'device-detail': 'Dispositivos',
+  'new-device': 'Dispositivos',
   'rooms': 'Habitaciones',
   'routines': 'Rutinas',
   'routine-detail': 'Rutinas',
@@ -142,6 +143,7 @@ const sectionLabels = {
 
 const sectionRoutes = {
   'device-detail': 'devices',
+  'new-device': 'devices',
   'routine-detail': 'routines',
   'new-routine': 'routines'
 }
@@ -185,6 +187,8 @@ const breadcrumbs = computed(() => {
       crumbs.push({ label: routine ? routine.name : route.params.id })
     } else if (routeName === 'new-routine') {
       crumbs.push({ label: 'Nueva rutina' })
+    } else if (routeName === 'new-device') {
+      crumbs.push({ label: 'Nuevo dispositivo' })
     }
   } else {
     crumbs.push({ label: sectionLabel })

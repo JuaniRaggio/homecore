@@ -36,11 +36,29 @@
     <div class="device-detail__content">
       <div class="device-detail__control">
         <HcCard title="Control">
-          <LampControl v-if="device.type === 'lamp'" :device="device" />
-          <DoorControl v-else-if="device.type === 'door'" :device="device" />
-          <AlarmControl v-else-if="device.type === 'alarm'" :device="device" />
-          <FaucetControl v-else-if="device.type === 'faucet'" :device="device" />
-          <BlindsControl v-else-if="device.type === 'blinds'" :device="device" />
+          <div v-if="needsPassword && !isUnlocked" class="device-detail__locked">
+            <div class="device-detail__locked-icon">
+              <HcIcon name="lock" size="2xl" />
+            </div>
+            <p class="device-detail__locked-text">Este dispositivo esta protegido con contrasena</p>
+            <div class="device-detail__locked-form">
+              <HcInput
+                v-model="passwordInput"
+                type="password"
+                placeholder="Ingresar contrasena"
+                :error="passwordError"
+                @blur="passwordError = null"
+              />
+              <HcButton @click="attemptUnlock">Desbloquear</HcButton>
+            </div>
+          </div>
+          <template v-else>
+            <LampControl v-if="device.type === 'lamp'" :device="device" />
+            <DoorControl v-else-if="device.type === 'door'" :device="device" />
+            <AlarmControl v-else-if="device.type === 'alarm'" :device="device" />
+            <FaucetControl v-else-if="device.type === 'faucet'" :device="device" />
+            <BlindsControl v-else-if="device.type === 'blinds'" :device="device" />
+          </template>
         </HcCard>
       </div>
 
@@ -83,7 +101,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDevicesStore } from '../stores/devices'
 import { useRoomsStore } from '../stores/rooms'
@@ -91,6 +109,8 @@ import { useHistoryStore } from '../stores/history'
 import HcCard from '../components/ui/HcCard.vue'
 import HcBadge from '../components/ui/HcBadge.vue'
 import HcIcon from '../components/ui/HcIcon.vue'
+import HcInput from '../components/ui/HcInput.vue'
+import HcButton from '../components/ui/HcButton.vue'
 import LampControl from '../components/devices/LampControl.vue'
 import DoorControl from '../components/devices/DoorControl.vue'
 import AlarmControl from '../components/devices/AlarmControl.vue'
@@ -103,6 +123,20 @@ const roomsStore = useRoomsStore()
 const historyStore = useHistoryStore()
 
 const device = computed(() => devicesStore.getById(route.params.id))
+
+const isUnlocked = ref(false)
+const passwordInput = ref('')
+const passwordError = ref(null)
+const needsPassword = computed(() => device.value && devicesStore.hasPassword(device.value.id))
+
+function attemptUnlock() {
+  if (devicesStore.verifyPassword(device.value.id, passwordInput.value)) {
+    isUnlocked.value = true
+    passwordError.value = null
+  } else {
+    passwordError.value = 'Contrasena incorrecta'
+  }
+}
 
 const roomName = computed(() => {
   if (!device.value?.roomId) return 'Sin habitacion'
@@ -282,5 +316,32 @@ function formatDate(dateStr) {
   text-align: center;
   padding: var(--hc-space-2xl);
   color: var(--hc-text-secondary);
+}
+
+.device-detail__locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hc-space-lg);
+  padding: var(--hc-space-xl) 0;
+}
+
+.device-detail__locked-icon {
+  color: var(--hc-text-muted);
+  opacity: 0.6;
+}
+
+.device-detail__locked-text {
+  font-size: var(--hc-font-size-sm);
+  color: var(--hc-text-secondary);
+  text-align: center;
+}
+
+.device-detail__locked-form {
+  display: flex;
+  gap: var(--hc-space-sm);
+  align-items: flex-start;
+  width: 100%;
+  max-width: 320px;
 }
 </style>

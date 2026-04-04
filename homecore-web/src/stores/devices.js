@@ -14,7 +14,8 @@ export const useDevicesStore = defineStore('devices', () => {
       color: '#f59e0b',
       consumption: 12,
       favorite: true,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'lamp-2',
@@ -26,7 +27,8 @@ export const useDevicesStore = defineStore('devices', () => {
       color: '#ffffff',
       consumption: 8,
       favorite: false,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'lamp-3',
@@ -38,7 +40,8 @@ export const useDevicesStore = defineStore('devices', () => {
       color: '#ffffff',
       consumption: 15,
       favorite: false,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'door-1',
@@ -49,7 +52,8 @@ export const useDevicesStore = defineStore('devices', () => {
       locked: true,
       consumption: 2,
       favorite: true,
-      critical: true
+      critical: true,
+      password: '1234'
     },
     {
       id: 'door-2',
@@ -60,7 +64,8 @@ export const useDevicesStore = defineStore('devices', () => {
       locked: true,
       consumption: 3,
       favorite: false,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'alarm-1',
@@ -77,7 +82,8 @@ export const useDevicesStore = defineStore('devices', () => {
       ],
       consumption: 5,
       favorite: true,
-      critical: true
+      critical: true,
+      password: '1234'
     },
     {
       id: 'faucet-1',
@@ -88,7 +94,8 @@ export const useDevicesStore = defineStore('devices', () => {
       flow: 60,
       consumption: 4,
       favorite: false,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'faucet-2',
@@ -99,7 +106,8 @@ export const useDevicesStore = defineStore('devices', () => {
       flow: 40,
       consumption: 3,
       favorite: false,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'blinds-1',
@@ -110,7 +118,8 @@ export const useDevicesStore = defineStore('devices', () => {
       position: 75,
       consumption: 6,
       favorite: false,
-      critical: false
+      critical: false,
+      password: null
     },
     {
       id: 'blinds-2',
@@ -121,7 +130,8 @@ export const useDevicesStore = defineStore('devices', () => {
       position: 0,
       consumption: 6,
       favorite: true,
-      critical: false
+      critical: false,
+      password: null
     }
   ])
 
@@ -225,6 +235,48 @@ export const useDevicesStore = defineStore('devices', () => {
     return result
   }
 
+  function addDevice(data) {
+    const id = `${data.type}-${Date.now()}`
+    const defaults = { on: false, favorite: false, critical: false, password: null }
+
+    if (data.type === 'lamp') {
+      Object.assign(defaults, { brightness: 80, color: '#ffffff' })
+    } else if (data.type === 'door') {
+      Object.assign(defaults, { locked: true })
+    } else if (data.type === 'alarm') {
+      Object.assign(defaults, { armed: false, zones: [], activeZones: [], alerts: [] })
+    } else if (data.type === 'faucet') {
+      Object.assign(defaults, { flow: 50 })
+    } else if (data.type === 'blinds') {
+      Object.assign(defaults, { position: 0 })
+    }
+
+    const device = {
+      id,
+      name: data.name,
+      type: data.type,
+      roomId: data.roomId || null,
+      consumption: data.consumption || 0,
+      ...defaults,
+      favorite: data.favorite || false,
+      critical: data.critical || false,
+      password: data.password || null
+    }
+    devices.value.push(device)
+    return id
+  }
+
+  function hasPassword(id) {
+    const device = getById(id)
+    return !!(device && device.password)
+  }
+
+  function verifyPassword(id, password) {
+    const device = getById(id)
+    if (!device || !device.password) return true
+    return device.password === password
+  }
+
   return {
     devices,
     typeLabels,
@@ -240,6 +292,9 @@ export const useDevicesStore = defineStore('devices', () => {
     toggleFavorite,
     toggleCritical,
     getTotalConsumption,
-    getConsumptionByType
+    getConsumptionByType,
+    addDevice,
+    hasPassword,
+    verifyPassword
   }
 })
