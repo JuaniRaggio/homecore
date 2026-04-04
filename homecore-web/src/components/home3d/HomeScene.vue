@@ -411,7 +411,7 @@ onBeforeUnmount(() => {
   position: absolute;
   pointer-events: none;
   background: rgba(15, 15, 20, 0.92);
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 6px;
   padding: 6px 10px;
   display: flex;
@@ -430,7 +430,7 @@ onBeforeUnmount(() => {
 
 .home-scene__tooltip-status {
   font-size: 11px;
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
 }
 
 .home-scene__loading {
@@ -439,7 +439,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--hc-text-muted, #64748b);
+  color: var(--hc-text-muted, #8494a7);
   font-size: 14px;
 }
 </style>

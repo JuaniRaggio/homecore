@@ -38,7 +38,7 @@ function handleSelect(homeId) {
   gap: 4px;
   align-items: center;
   background: rgba(15, 15, 20, 0.85);
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 9999px;
   padding: 3px;
 }
@@ -48,7 +48,7 @@ function handleSelect(homeId) {
   background: transparent;
   border: none;
   border-radius: 9999px;
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -61,8 +61,8 @@ function handleSelect(homeId) {
 }
 
 .homes-selector__btn--active {
-  background: var(--hc-accent, #6366f1);
-  border-color: var(--hc-accent, #6366f1);
+  background: var(--hc-accent, #818cf8);
+  border-color: var(--hc-accent, #818cf8);
   color: white;
 }
 

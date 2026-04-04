@@ -228,10 +228,10 @@ function executeRoutine(id) {
 }
 
 const typeColors = {
-  lamp: '#f59e0b',
-  door: '#6366f1',
+  lamp: '#fbbf24',
+  door: '#818cf8',
   alarm: '#ef4444',
-  faucet: '#22c55e',
+  faucet: '#34d399',
   blinds: '#3b82f6'
 }
 
@@ -244,7 +244,7 @@ function createCharts() {
         datasets: [{
           label: 'Consumo (W)',
           data: homeSummaries.value.map(h => h.consumption),
-          backgroundColor: ['#6366f1', '#f59e0b', '#22c55e'],
+          backgroundColor: ['#818cf8', '#fbbf24', '#34d399'],
           borderRadius: 6
         }]
       },
@@ -252,12 +252,12 @@ function createCharts() {
         responsive: true,
         scales: {
           x: {
-            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } },
-            grid: { color: '#2e2e3e' }
+            ticks: { color: '#b0bdd0', font: { family: 'Inter', size: 11 } },
+            grid: { color: '#3a3a4a' }
           },
           y: {
-            ticks: { color: '#94a3b8', font: { family: 'Inter' } },
-            grid: { color: '#2e2e3e' }
+            ticks: { color: '#b0bdd0', font: { family: 'Inter' } },
+            grid: { color: '#3a3a4a' }
           }
         },
         plugins: {
@@ -275,7 +275,7 @@ function createCharts() {
         labels: Object.keys(consumptionByType).map(t => devicesStore.typeLabels[t]),
         datasets: [{
           data: Object.values(consumptionByType),
-          backgroundColor: Object.keys(consumptionByType).map(t => typeColors[t] || '#6366f1')
+          backgroundColor: Object.keys(consumptionByType).map(t => typeColors[t] || '#818cf8')
         }]
       },
       options: {
@@ -283,7 +283,7 @@ function createCharts() {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#94a3b8', font: { family: 'Inter' } }
+            labels: { color: '#b0bdd0', font: { family: 'Inter' } }
           }
         }
       }

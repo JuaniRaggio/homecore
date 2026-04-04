@@ -163,20 +163,20 @@ function toggleFavorite(id) {
   gap: 8px;
   padding: 4px 10px;
   background: rgba(15, 15, 20, 0.7);
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 6px;
   backdrop-filter: blur(4px);
 }
 
 .home3d-stat {
   font-size: 11px;
-  color: var(--hc-text-muted, #64748b);
+  color: var(--hc-text-muted, #8494a7);
   white-space: nowrap;
 }
 
 .home3d-stat__value {
   font-weight: 600;
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
 }
 
 .home3d-stat__sep {
