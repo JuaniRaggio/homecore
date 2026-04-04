@@ -1,301 +1,218 @@
-# HomeCore - Decisiones de Diseno
+# HomeCore - Decisiones de Diseño
 
-Documento de decisiones de diseno de la interfaz de HomeCore. Cada decision se fundamenta en teoria de Interaccion Persona-Computadora (HCI), referenciando los principios vistos en la materia: heuristicas de Nielsen, principios de Gestalt, Ley de Fitts, Ley de Hick, niveles emocionales de Norman, carga cognitiva (Sweller) y el proceso de Diseno Centrado en el Usuario (UCD, ISO 13407).
+Este documento detalla las decisiones de diseño de la interfaz de HomeCore, fundamentadas en los principios de Interacción Persona-Computadora (HCI) vistos en la materia: heurísticas de Nielsen, principios de Gestalt, Ley de Fitts, Ley de Hick, niveles emocionales de Norman, carga cognitiva y el proceso de Diseño Centrado en el Usuario (UCD).
 
 ---
 
 ## 1. Paleta de colores
 
-**Decision**: Tema oscuro con acento principal indigo (`#818cf8`) y acento secundario ambar (`#fbbf24`). Todos los colores de texto cumplen WCAG AA (ratio minimo 4.5:1) sobre sus fondos esperados.
+**Decisión**: Tema oscuro con un tono índigo (`#818cf8`) para acciones principales y ámbar (`#fbbf24`) para estados activos o destacados. Todos los textos cumplen con el estándar WCAG AA (ratio mínimo 4.5:1) para asegurar que se lean bien.
 
-| Token | Hex | Funcion |
+| Token | Hex | Función |
 |-------|-----|---------|
 | `bg-primary` | `#0f0f14` | Fondo principal |
 | `bg-secondary` | `#1a1a24` | Cards, sidebar, header |
-| `bg-tertiary` | `#252532` | Inputs, items nested |
-| `text-primary` | `#f1f5f9` | Titulos, texto principal (~14:1 sobre bg-secondary) |
-| `text-secondary` | `#b0bdd0` | Descripciones, metadata (~8:1 sobre bg-secondary) |
-| `text-muted` | `#8494a7` | Labels terciarios, timestamps (~5:1 sobre bg-secondary) |
-| `accent` | `#818cf8` | Links, botones, indicadores activos |
-| `accent-hover` | `#a5b4fc` | Hover de links y botones |
-| `accent-warm` | `#fbbf24` | Favoritos, alertas suaves |
-| `success` | `#34d399` | Estados activos, confirmaciones |
-| `danger` | `#f87171` | Errores, acciones destructivas |
-| `border` | `#3a3a4a` | Separadores, bordes de cards |
+| `bg-tertiary` | `#252532` | Inputs, elementos anidados |
+| `text-primary` | `#f1f5f9` | Títulos y texto principal |
+| `text-secondary` | `#b0bdd0` | Descripciones y metadatos |
+| `text-muted` | `#8494a7` | Etiquetas y marcas de tiempo |
+| `accent` | `#818cf8` | Botones y elementos activos |
+| `accent-hover` | `#a5b4fc` | Hover de botones y links |
+| `accent-warm` | `#fbbf24` | Favoritos y alertas suaves |
+| `success` | `#34d399` | Confirmaciones y estados activos |
+| `danger` | `#f87171` | Errores y acciones destructivas |
+| `border` | `#3a3a4a` | Bordes de cards y divisores |
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Nivel visceral (Norman)**: Los temas oscuros comunican sofisticacion y modernidad, alineandose con las expectativas del usuario para un producto de tecnologia del hogar. El alto contraste entre fondo oscuro y texto claro (`#f1f5f9` sobre `#0f0f14`) supera el ratio 7:1 recomendado por WCAG AAA, maximizando la legibilidad.
-- **Peso visual (Gestalt - Similitud)**: El indigo como color de accion primaria crea un punto focal claro en botones y elementos interactivos, guiando la atencion del usuario hacia las acciones principales. El ambar se reserva para estados activos y favoritos, estableciendo una jerarquia visual a traves del color.
-- **Carga cognitiva (Sweller)**: La paleta se limita a 4-5 colores funcionales para reducir la carga cognitiva extrinseca y mantener coherencia. Cada color tiene un rol semantico definido: indigo = accion, ambar = alerta/activo, verde = exito, rojo = peligro. Esto respeta el limite de la memoria de trabajo (Miller, 1956): el usuario no necesita aprender significados arbitrarios porque los colores siguen convenciones culturales establecidas (rojo = peligro, verde = exito).
-- **Iteracion UCD (ISO 13407)**: La paleta fue ajustada en la fase de evaluacion tras detectar que los colores originales (`#6366f1` para accent, `#94a3b8` para text-secondary, `#64748b` para text-muted) no cumplian WCAG AA, generando una critica recurrente en las evaluaciones de usabilidad: "el texto gris sobre fondo oscuro es dificil de leer". Se incremento la luminosidad de todos los tokens de texto y acentos para cumplir con los ratios minimos de contraste.
-
----
-
-## 2. Tipografia y jerarquia
-
-**Decision**: Familia tipografica unica Inter, con pesos de 400 (cuerpo) a 700 (titulos). Escala de tamanos definida en variables CSS (0.75rem a 1.875rem).
-
-**Fundamentacion teorica**:
-
-- **Carga cognitiva (Sweller)**: Una unica familia tipografica reduce la carga extrinseca. La diferenciacion se logra a traves del peso y el tamano, no mediante variedad de fuentes. Esto evita que el usuario tenga que procesar multiples estilos visuales, liberando recursos cognitivos para la tarea.
-- **Gestalt - Similitud**: Los elementos con la misma funcion comparten el mismo estilo tipografico (todos los labels en font-size-sm/weight-500, todos los titulos en font-size-lg/weight-600). Esto permite al usuario identificar rapidamente la funcion de cada elemento textual sin esfuerzo consciente.
-- **Legibilidad**: Inter esta optimizada para pantallas, con apertura de caracteres amplia y soporte nativo de ligaduras. El line-height de 1.6 para texto de cuerpo cumple las recomendaciones de accesibilidad. Esto contribuye directamente a la eficiencia (ISO 9241-11): el usuario puede leer mas rapido con menor fatiga visual.
+- **Nivel visceral (Norman)**: El tema oscuro da una sensación de modernidad y sofisticación que los usuarios suelen esperar de un sistema de domótica. Usamos un contraste alto (superando el ratio 7:1 en textos principales) para que la interfaz no solo se vea bien, sino que sea cómoda de leer.
+- **Peso visual (Gestalt - Similitud)**: Usamos el color índigo exclusivamente para elementos interactivos. Así, el usuario identifica rápido qué es un botón o un link por pura similitud visual. El ámbar lo reservamos para lo que ya está "encendido" o es "favorito", marcando una jerarquía clara.
+- **Carga cognitiva (Sweller)**: No quisimos abrumar con mil colores. Nos mantuvimos en 4 o 5 tonos funcionales que respetan las convenciones culturales (rojo para error, verde para éxito). Esto ayuda a la memoria de trabajo porque el usuario no tiene que "aprender" qué significa cada color; ya lo sabe de antemano.
+- **Iteración UCD**: Durante las pruebas notamos que los grises originales eran muy oscuros y costaba leerlos. Siguiendo el proceso de diseño centrado en el usuario, ajustamos la luminosidad de los textos para cumplir con los estándares de accesibilidad y mejorar la experiencia real.
 
 ---
 
-## 3. Estructura de navegacion
+## 2. Tipografía y jerarquía
 
-**Decision**: Sidebar izquierda con 6 items de navegacion primaria (Inicio, Dispositivos, Habitaciones, Rutinas, Historial, Consumo) + 1 item secundario (Configuracion). La sidebar es colapsable y mantiene iconos visibles en estado colapsado.
+**Decisión**: Usamos la familia tipográfica Inter para todo, variando los pesos entre 400 (cuerpo) y 700 (títulos). La escala de tamaños está estandarizada para mantener la consistencia.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Ley de Hick**: Las opciones de navegacion se limitan a 6 items primarios. La Ley de Hick establece que el tiempo de decision es proporcional a `log2(N)`, donde N es el numero de opciones. Con 6 items, el tiempo de decision se mantiene bajo. Ademas, esto coincide con el rango de 5-7 elementos que la memoria de trabajo puede procesar simultaneamente (Miller, 1956), lo que se refuerza desde la teoria vista en clase: "Un menu de interfaz web no puede tener mas de 7 opciones".
-- **Consistencia y estandares (Nielsen #4)**: La sidebar permanece fija en todas las vistas autenticadas, proporcionando un marco de referencia espacial constante. La posicion activa se resalta con un fondo indigo semitransparente, cumpliendo el principio de navegacion persistente: "la mayoria de sitios tienen elementos dispuestos en el mismo lugar a lo largo de todas las pantallas".
-- **Reconocimiento en lugar de recuerdo (Nielsen #6)**: La sidebar colapsable permite expandir el area de contenido cuando se necesita mas espacio, manteniendo los iconos SVG visibles como referencia. El usuario puede reconocer secciones por sus iconos sin necesidad de memorizar significados. En estado expandido, se muestran iconos + texto, eliminando toda ambiguedad.
-- **Control y libertad del usuario (Nielsen #3)**: El colapso/expansion de la sidebar es una accion del usuario, no del sistema. El usuario decide cuando quiere mas espacio para contenido y cuando quiere las etiquetas de navegacion visibles.
+- **Carga cognitiva (Sweller)**: Usar una sola fuente ayuda a que la interfaz se sienta más limpia y fácil de procesar. En lugar de mezclar estilos, diferenciamos la importancia de los textos con el tamaño y el grosor, lo que cansa menos visualmente.
+- **Gestalt - Similitud**: Los elementos que cumplen la misma función (como todas las etiquetas de los dispositivos) comparten el mismo estilo. Esto permite que el usuario escanee la pantalla y entienda la estructura de la información casi sin pensar.
+- **Legibilidad**: Inter es una fuente pensada para pantallas pequeñas y paneles digitales. Al tener un buen espaciado entre letras y una altura de línea generosa, logramos que la lectura sea eficiente y rápida, algo clave para una app de control rápido.
 
 ---
 
-## 4. Breadcrumbs y orientacion
+## 3. Estructura de navegación
 
-**Decision**: Sistema de breadcrumbs clickeables en el header que muestra la jerarquia: `Casa > Seccion > Detalle`. Cada segmento excepto el ultimo es un link navegable.
+**Decisión**: Implementamos una sidebar izquierda con 6 secciones principales (Inicio, Dispositivos, Habitaciones, Rutinas, Historial, Consumo) y una de Configuración. La barra se puede colapsar para ganar espacio, pero mantiene los íconos visibles.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Orientacion (navegacion)**: Como se establece en la teoria de la materia: "Es muy comun que un usuario se pierda, por lo que tenemos que contrarrestar el sentimiento de estar perdido con un indicador de lugar". Los breadcrumbs cumplen exactamente esta funcion, mostrando jerarquicamente como se llego a la pagina actual desde la raiz.
-- **Visibilidad del estado del sistema (Nielsen #1)**: Los breadcrumbs comunican en todo momento en que contexto (casa, seccion, sub-pagina) se encuentra el usuario. Por ejemplo, `Casa Martinez > Dispositivos > Lampara principal` le indica al usuario simultaneamente la propiedad activa, la seccion y el dispositivo especifico.
-- **Control y libertad del usuario (Nielsen #3)**: Cada segmento es clickeable, lo que permite al usuario "saltar" a cualquier nivel de la jerarquia sin necesidad de usar el boton atras repetidamente. Esto funciona como las "salidas de emergencia" que menciona Nielsen.
-- **Profundidad controlada**: Siguiendo la recomendacion de la materia de limitar los breadcrumbs a 3-4 niveles (mas de 5 es excesivo), la profundidad maxima es de 3 segmentos: Casa > Seccion > Detalle.
+- **Ley de Hick**: Limitamos las opciones del menú a 6 ítems principales para que elegir a dónde ir sea casi instantáneo. Como vimos en clase, tener más de 7 opciones aumenta mucho el tiempo que el usuario tarda en decidir.
+- **Consistencia (Nielsen #4)**: La sidebar está siempre en el mismo lugar. Esto genera un marco de referencia constante: el usuario siempre sabe que para moverse de sección tiene que mirar a la izquierda, lo que le da seguridad en la navegación.
+- **Reconocimiento en lugar de recuerdo (Nielsen #6)**: Al colapsar la barra, dejamos los íconos a la vista. No hace falta que el usuario "recuerde" qué hay en cada sección; los íconos sirven como pistas visuales para reconocer el camino.
+- **Control y libertad (Nielsen #3)**: El usuario tiene el control de expandir o colapsar la barra según prefiera más espacio de trabajo o más claridad en los nombres de las secciones.
+
+---
+
+## 4. Breadcrumbs (Migas de pan)
+
+**Decisión**: Agregamos breadcrumbs en el header para mostrar la ubicación actual (ej: `Casa > Dispositivos > Lámpara`). Todos los niveles son clickeables excepto el último.
+
+**Fundamentación**:
+
+- **Orientación**: Como se mencionó en la teoría, es muy común que un usuario se sienta perdido en aplicaciones con mucha profundidad. Los breadcrumbs actúan como un indicador de lugar constante que contrarresta esa sensación.
+- **Visibilidad del estado del sistema (Nielsen #1)**: El sistema te dice todo el tiempo dónde estás parado (el contexto). Si estás viendo una lámpara, sabés a qué casa y a qué sección pertenece solo con mirar arriba.
+- **Control y libertad (Nielsen #3)**: Funcionan como una "salida de emergencia". Si el usuario quiere volver dos niveles atrás, no tiene que apretar el botón de "atrás" del navegador varias veces; simplemente hace un click en el nivel deseado.
 
 ---
 
 ## 5. Arquitectura multi-casa
 
-**Decision**: Soporte para multiples propiedades. La casa seleccionada forma parte de la URL (`/:houseId/dispositivos`), con un selector de casas en la sidebar. La vista Overview (`/overview`) muestra un resumen de todas las propiedades.
+**Decisión**: La aplicación permite gestionar varias propiedades. La casa seleccionada se refleja en la URL y se puede cambiar desde un selector en la sidebar.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Modelo mental**: Los usuarios de domotica pueden tener multiples propiedades (casa principal, departamento, casa de playa). La arquitectura refleja este modelo mental real, donde el usuario piensa en terminos de "mis propiedades" y luego "los dispositivos de esta propiedad".
-- **Correspondencia sistema-mundo real (Nielsen #2)**: La estructura jerarquica (Propiedad > Seccion > Dispositivo) mapea directamente la organizacion fisica del mundo real. El usuario selecciona primero donde (la casa), luego que (la seccion), siguiendo su modelo mental natural.
-- **Consistencia y estandares (Nielsen #4)**: La casa activa se refleja consistentemente en tres lugares: el selector de la sidebar, la URL del navegador y el primer segmento del breadcrumb. Esta redundancia refuerza la orientacion del usuario.
-- **Prevencion de errores (Nielsen #5)**: Si el usuario navega a una URL con un `houseId` inexistente, el router lo redirige automaticamente a la casa por defecto en lugar de mostrar un estado vacio o un error.
-
----
-
-## 6. Vista Overview
-
-**Decision**: Vista resumen (`/overview`) sin sidebar, que muestra todas las propiedades con sus estadisticas, dispositivos criticos, rutinas favoritas y metricas energeticas.
-
-**Fundamentacion teorica**:
-
-- **Pagina principal**: Segun la teoria de navegacion: "Los siguientes items tienen que poder identificarse facilmente desde la pagina principal: identidad y mision del sitio, jerarquia del sitio, contenido actualizado, atajos". El Overview cumple todos estos criterios: muestra la identidad (logo + nombre), la jerarquia (cards de propiedades), contenido actualizado (metricas en tiempo real) y atajos (dispositivos criticos, rutinas favoritas).
-- **Reconocimiento en lugar de recuerdo (Nielsen #6)**: Los dispositivos criticos y las rutinas favoritas se muestran directamente, sin que el usuario tenga que recordar en que casa o seccion encontrarlos. Cada item incluye el nombre de la propiedad de origen (`Casa Martinez::Alarma principal`), proporcionando contexto completo.
-- **Estetica y minimalismo (Nielsen #8)**: La vista usa una jerarquia clara: cards de propiedades arriba, dos columnas (criticos + favoritos) en el medio, metricas abajo. Solo se muestra informacion accionable, sin datos decorativos.
-- **Sin sidebar**: Al ser una vista "meta" que abarca todas las propiedades, la sidebar de navegacion por secciones no aplica. Eliminarla reduce la carga visual y comunica que esta vista tiene un proposito diferente al de las vistas de una propiedad individual.
+- **Modelo mental**: Diseñamos esto pensando en cómo un usuario organiza su vida: primero piensa en "la casa de la playa" o "el departamento" y luego entra a ver qué pasa ahí. La estructura de la app mapea ese modelo mental de forma natural.
+- **Correspondencia con el mundo real (Nielsen #2)**: El flujo (Elegir casa -> Elegir habitación -> Actuar sobre dispositivo) sigue la lógica física de cómo nos movemos en el mundo real.
+- **Prevención de errores (Nielsen #5)**: Si alguien intenta entrar a una URL de una casa que no existe (por un error al escribir o un link viejo), el sistema lo redirige automáticamente a su casa principal en lugar de mostrar una pantalla vacía o un error feo.
 
 ---
 
-## 7. Dimensionamiento de elementos interactivos
+## 6. Vista Overview (Resumen)
 
-**Decision**: Botones con altura minima de 40px (md), 48px (lg). Areas de toque de toggles de 44px. Targets de click nunca menores a 32px.
+**Decisión**: Creamos una vista de "Vistazo General" que resume lo más importante de todas las casas: dispositivos críticos encendidos, rutinas favoritas y consumo energético.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Ley de Fitts**: El tiempo para alcanzar un objetivo es funcion de la distancia y el tamano: `MT = a + b * log2(2D/W)`. Los controles de dispositivos (toggles, sliders) tienen areas de interaccion generosas (minimo 44px) para reducir el indice de dificultad. Como se senala en la teoria: "Los movimientos rapidos y los objetivos chiquitos resultan en mayores tasas de error, debido al equilibrio entre velocidad y precision".
-- **Convenciones de plataforma**: Se respetan los tamanos minimos recomendados por las guias de plataforma (44pt Apple HIG, 48dp Material Design), anticipando una posible adaptacion movil.
-- **Frecuencia de uso**: Los botones "Ejecutar" en rutinas y los toggles de dispositivos son los elementos mas frecuentemente usados, por lo que su tamano es proporcionalmente mayor. Esto aplica el principio de Fitts: los elementos usados con mayor frecuencia deben ser mas faciles de alcanzar.
+- **Página principal**: Siguiendo los principios de navegación, el Overview muestra la "misión" de la app: dar control total. Concentra la jerarquía del sitio y los atajos más usados en un solo lugar.
+- **Reconocimiento (Nielsen #6)**: No hace falta que el usuario entre casa por casa para ver si dejó la alarma apagada. El sistema le muestra lo "crítico" de entrada, facilitando el reconocimiento de problemas sin esfuerzo.
+- **Estética y minimalismo (Nielsen #8)**: Eliminamos la sidebar en esta vista para que el usuario se enfoque 100% en los datos. Solo mostramos información accionable, quitando cualquier ruido visual innecesario.
+
+---
+
+## 7. Tamaño de elementos interactivos
+
+**Decisión**: Los botones y controles tienen un tamaño mínimo de 40px o 48px, y las áreas de toque de los switches son generosas (44px).
+
+**Fundamentación**:
+
+- **Ley de Fitts**: Cuanto más grande y cerca esté un objetivo, más fácil es clickearlo. Diseñamos los controles de luz y alarmas con áreas grandes para que, incluso si el usuario está apurado o usa una pantalla táctil, no le "pifie" al botón.
+- **Convenciones de plataforma**: Respetamos los estándares de Apple y Google (44-48px) para que la app se sienta profesional y esté lista para usarse en dispositivos móviles en el futuro.
 
 ---
 
 ## 8. Agrupamiento de contenido
 
-**Decision**: Cards como unidad de agrupamiento, con bordes sutiles y separacion basada en espaciado. Padding interno de 24px (`--hc-space-lg`), gap entre cards de 16px (`--hc-space-md`), gap entre secciones de 32px (`--hc-space-xl`).
+**Decisión**: Usamos cards para agrupar elementos relacionados, con espacios (paddings y gaps) consistentes de 16px, 24px y 32px.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Gestalt - Proximidad**: Los elementos relacionados (nombre del dispositivo, estado, toggle) se agrupan dentro de la misma card. El gap entre cards (16px) es menor que el gap entre secciones (32px), creando una jerarquia clara de agrupamiento que el usuario percibe sin esfuerzo consciente. Como se vio en teoria: "La separacion es mas relevante que el color" para comunicar agrupamiento.
-- **Gestalt - Region comun**: El fondo ligeramente diferenciado de la card (`#1a1a24` sobre `#0f0f14`) crea una region comun que refuerza la percepcion de grupo sin necesidad de bordes pesados. Esto reduce el ruido visual mientras mantiene la organizacion.
-- **Gestalt - Conectividad uniforme**: En la vista de habitaciones, los dispositivos vinculados a una habitacion se listan dentro de la misma card, creando una conexion visual entre la habitacion y sus dispositivos. Este principio es "mucho mas fuerte que el de proximidad y similitud" segun la teoria vista.
-- **Jerarquia visual**: Los elementos importantes son mas prominentes y los elementos relacionados semanticamente lo estan tambien visualmente. Esto permite encontrar rapidamente lo buscado "sin tener que pensar mucho".
+- **Gestalt - Proximidad**: Al poner el nombre, el ícono y el switch de un dispositivo cerca entre sí y dentro de una caja (card), el usuario entiende al instante que pertenecen a la misma unidad. Como vimos en clase, la separación por espacios es mucho más efectiva que usar colores distintos.
+- **Gestalt - Región común**: El fondo sutilmente distinto de las cards crea un límite visual claro. Esto ayuda a organizar la pantalla sin necesidad de poner bordes gruesos que ensucien la vista.
+- **Jerarquía visual**: Los elementos más importantes están más arriba o son más grandes, permitiendo que el usuario encuentre lo que busca sin tener que pensar demasiado.
 
 ---
 
 ## 9. Feedback y estado del sistema
 
-**Decision**: Sistema de feedback multi-nivel: toasts para confirmaciones, estados visuales en tiempo real para dispositivos, badges numericos para notificaciones, indicadores de carga en botones.
+**Decisión**: Implementamos notificaciones (toasts), estados visuales en tiempo real (íconos que brillan cuando algo se enciende) y spinners de carga en los botones.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Visibilidad del estado del sistema (Nielsen #1)**: Cada accion del usuario recibe feedback inmediato. Es critico en domotica ya que el usuario necesita saber si la alarma esta armada, si la puerta esta bloqueada, si una rutina se ejecuto:
-  - Toggle de dispositivo: cambio visual instantaneo (color, texto de estado).
-  - Ejecucion de rutina: toast de confirmacion ("Rutina ejecutada correctamente").
-  - Envio de formulario: boton con spinner de carga.
-  - Notificaciones pendientes: badge numerico en el icono de campana del header.
-- **Tiempos de respuesta**: Las transiciones CSS (150ms-250ms) estan calibradas para sentirse instantaneas pero visibles, dentro del umbral de 100-300ms recomendado por Nielsen para feedback de manipulacion directa.
-- **Modelo mental**: Los estados de dispositivos usan metaforas visuales coherentes (icono SVG de lampara con brillo = lampara encendida, icono de candado = puerta bloqueada, animacion de pulso = alarma armada). Estas metaforas aprovechan los modelos mentales existentes del usuario sobre dispositivos fisicos reales (Nielsen #2: correspondencia sistema-mundo real).
-- **Nivel conductual (Norman)**: Un feedback deficiente generaria emociones negativas ("furia, abatimiento") si el usuario no puede confirmar que su accion tuvo efecto. El feedback inmediato previene esta situacion.
+- **Visibilidad del estado del sistema (Nielsen #1)**: En domótica esto es vital. Si tocás un botón para cerrar una puerta, necesitás saber YA si se cerró. Por eso usamos cambios de color inmediatos y mensajes de confirmación.
+- **Tiempos de respuesta**: Las animaciones duran entre 150ms y 250ms. Es el tiempo justo para que se note el cambio pero se sienta instantáneo, cumpliendo con los umbrales de percepción que recomienda Nielsen.
+- **Nivel conductual (Norman)**: Un feedback claro evita la frustración. Si el usuario hace algo y no pasa nada, se siente inseguro. El feedback constante le da la tranquilidad de que el sistema está respondiendo a sus órdenes.
 
 ---
 
-## 10. Prevencion de errores
+## 10. Prevención de errores
 
-**Decision**: Validacion inline en tiempo real, modales de confirmacion para acciones destructivas, valores por defecto sensibles.
+**Decisión**: Validación de formularios mientras escribís, carteles de confirmación para borrar cosas y valores sugeridos por defecto.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Prevencion de errores (Nielsen #5)**: Como se establece en la teoria: "Mejor si podemos evitar que el usuario cometa el error" que tener que mostrarle un mensaje despues.
-  - Los formularios de login y registro validan el formato del email en `onBlur`, no en submit, proporcionando feedback temprano.
-  - El campo de contrasena muestra los requisitos ("Minimo 8 caracteres") antes de que el usuario cometa el error.
-  - La eliminacion de habitaciones y rutinas requiere confirmacion modal con descripcion del impacto ("Los dispositivos vinculados no se eliminaran, solo se desvincularan").
-- **Valores por defecto**: Los sliders de brillo comienzan en 80%, los dias de rutina pre-seleccionan Lun-Vie. Esto reduce la cantidad de decisiones requeridas, aplicando el principio de "deshacerse de tareas" (reducir la carga del usuario haciendo que la UI realice las tareas no necesarias).
-- **Restricciones**: Los inputs numericos en el wizard de rutinas estan acotados (min 0, max 100), previniendo valores invalidos por construccion. Esto es analogo al ejemplo de la materia: "en un calendario para reservar no deberiamos dejarle al usuario reservar en el pasado".
-- **Perfiles de familia**: El perfil adolescente no puede desarmar la alarma ni desbloquear puertas. Los controles se deshabilitan visualmente en lugar de desaparecer, para mantener el modelo mental del usuario sobre que existe en el sistema, y un banner explica la restriccion.
+- **Prevención de errores (Nielsen #5)**: Como se dice en la teoría: "es mejor evitar que el usuario se equivoque a tener que avisarle después". Por eso, si estás borrando una rutina, te preguntamos antes para evitar un click accidental.
+- **Valores por defecto**: Los sliders de brillo aparecen en 80% y las rutinas pre-seleccionan los días laborales. Esto ahorra trabajo al usuario y evita que tenga que configurar todo desde cero cada vez.
+- **Restricciones**: No dejamos que pongas valores imposibles (como un brillo de 200%). El sistema te limita físicamente para que no puedas cometer ese error, igual que el ejemplo del calendario que no deja elegir fechas pasadas.
 
 ---
 
-## 11. Terminologia consistente
+## 11. Terminología consistente
 
-**Decision**: Glosario fijo aplicado en toda la interfaz: "Hogar" (propiedad), "Habitacion" (ambiente), "Dispositivo" (equipo), "Rutina" (automatizacion).
+**Decisión**: Usamos siempre las mismas palabras: "Hogar", "Habitación", "Dispositivo" y "Rutina". Evitamos términos técnicos o sinónimos confusos.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Consistencia y estandares (Nielsen #4)**: Se evitan sinonimos que podrian causar confusion. El usuario siempre ve "Habitacion" (nunca "cuarto", "sala", "ambiente") y "Dispositivo" (nunca "aparato", "equipo", "sensor"). Como se enfatiza en la teoria: "Es importante que todos usemos la misma terminologia porque sino le generamos confusion al usuario".
-- **Modelo mental**: La terminologia refleja la estructura jerarquica del sistema: Hogar contiene Habitaciones, Habitaciones contienen Dispositivos, Rutinas operan sobre Dispositivos. Esta coherencia lexica facilita la construccion de un modelo mental correcto.
-- **Correspondencia sistema-mundo real (Nielsen #2)**: Se utiliza espanol rioplatense cotidiano ("Olvide mi contrasena", "Repeti tu contrasena") para acercar la interfaz al contexto cultural del usuario objetivo. Se evita toda jerga tecnica: el usuario nunca vera "endpoint", "toggle state" ni codigos de error internos.
+- **Consistencia (Nielsen #4)**: Como se enfatiza en clase, usar distintos nombres para lo mismo (como decir "cuarto" y después "ambiente") confunde. Mantener un glosario fijo ayuda a que el usuario aprenda a usar la app más rápido.
+- **Correspondencia con el mundo real (Nielsen #2)**: Usamos un lenguaje cotidiano y cercano (español rioplatense como "Olvidé mi contraseña"). Evitamos palabras de programador como "endpoint" o "toggle" para que cualquier persona pueda entender qué está pasando.
 
 ---
 
 ## 12. Control y libertad del usuario
 
-**Decision**: Acciones reversibles, sidebar colapsable, filtros en listados, navegacion "Volver", vista detalle con pagina completa.
+**Decisión**: Todas las acciones importantes se pueden deshacer o cancelar. Hay botones de "Volver" claros y las rutinas se pueden apagar sin tener que borrarlas.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Control y libertad del usuario (Nielsen #3)**: De la misma forma que un cartel de "EXIT" funciona como salida de emergencia, el usuario necesita acceso claro a operaciones de reversion:
-  - Los toggles de dispositivos son bidireccionales: encender/apagar con un solo click.
-  - Las rutinas pueden habilitarse/deshabilitarse sin eliminarlas.
-  - El boton "Volver" en vistas de detalle permite salir sin compromiso.
-  - Los filtros de dispositivos e historial permiten controlar que informacion se muestra.
-- **Undo conceptual**: Desvincular dispositivos de habitaciones no elimina el dispositivo, solo rompe la asociacion. Eliminar habitaciones preserva los dispositivos. Esto protege al usuario de perdidas accidentales de datos.
-- **Interfaz no-modal**: Se evitan estados modales excesivos. Los modales solo se usan para confirmacion de acciones destructivas (eliminar rutina, eliminar habitacion), no para flujos primarios. Esto respeta el principio de que "no queremos que la aplicacion controle al usuario sino que el usuario sienta que tiene el control".
+- **Control y libertad (Nielsen #3)**: El usuario debe sentir que él manda, no la aplicación. Los botones de retroceso y las opciones de "cancelar" funcionan como las salidas de emergencia de los edificios: te dan la tranquilidad de que podés explorar sin romper nada.
+- **Interfaz no-modal**: Tratamos de no usar ventanas que bloqueen toda la pantalla a menos que sea estrictamente necesario (como una confirmación de borrado). Queremos que el usuario se mueva libremente por la app.
 
 ---
 
-## 13. Reconocimiento en lugar de recuerdo
+## 13. Reconocimiento antes que recuerdo
 
-**Decision**: Iconos junto a texto en la sidebar, badges de estado en dispositivos, wizard paso-a-paso para rutinas, breadcrumbs de navegacion.
+**Decisión**: Ponemos íconos al lado de los nombres, mostramos el estado de las luces directamente en la lista y usamos un asistente paso a paso para crear rutinas.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Reconocimiento en lugar de recuerdo (Nielsen #6)**: Como se establece en la teoria: "Minimizar la carga en la memoria del usuario":
-  - La sidebar muestra iconos + texto (no solo iconos) para que el usuario reconozca la seccion sin memorizar significados.
-  - Los dispositivos muestran su estado actual en la card (no es necesario navegar al detalle para saber si estan encendidos).
-  - El wizard de rutinas presenta las opciones disponibles en cada paso (tipo de accion, dispositivos, dias) en lugar de requerir que el usuario recuerde formatos o comandos.
-- **Breadcrumbs visuales**: Los pasos del wizard muestran progreso con numeros y checkmarks, permitiendo saber en que paso se esta y cuales se completaron.
-- **Filtros visibles**: Los selectores de filtro en Dispositivos e Historial despliegan las opciones disponibles en dropdowns, no ocultas detras de menus.
-- **Carga cognitiva**: Cada decision de diseno busca que "los usuarios tengan que pensar lo menos posible". Si el usuario se pregunta "como hago X accion?", la respuesta deberia ser inmediata. Si lo es, la carga cognitiva es minima.
+- **Reconocimiento en lugar de recuerdo (Nielsen #6)**: Es mucho más fácil reconocer un ícono de una lámpara encendida que tener que recordar si la habías dejado prendida. Al mostrar toda la info relevante a simple vista, liberamos la carga mental del usuario.
+- **Asistentes (Wizards)**: Al crear una rutina, te vamos guiando paso a paso. No tenés que "recordar" qué dispositivos tenés o qué pueden hacer; el sistema te los muestra para que elijas.
 
 ---
 
-## 14. Sistema de iconografia
+## 14. Sistema de iconografía
 
-**Decision**: Componente SVG personalizado (`HcIcon`) con iconos inline basados en stroke, reemplazando todos los emojis y caracteres unicode de la interfaz.
+**Decisión**: Diseñamos un conjunto de íconos SVG propios (`HcIcon`) que son consistentes en toda la app, reemplazando a los emojis.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Consistencia visual (Nielsen #4)**: Los emojis y entidades HTML se renderizan de forma diferente segun sistema operativo, navegador y dispositivo. Un conjunto de iconos SVG unificado garantiza que cada usuario vea iconos identicos independientemente de la plataforma, manteniendo coherencia visual. Como se menciona en la teoria: "Cada plataforma tiene sus reglas de design... el objetivo primario es que si un usuario esta acostumbrado a cierta plataforma, la experiencia sea natural".
-- **Gestalt - Similitud**: Todos los iconos comparten el mismo lenguaje visual: viewBox 24x24, basados en stroke (no relleno), joins redondeados, ancho de stroke consistente de 2px. Esta uniformidad permite al usuario parsear rapidamente los iconos como una categoria de elemento (affordance interactivo) distinta del contenido textual.
-- **Escalabilidad y tematizacion**: Los iconos SVG heredan `currentColor`, adaptandose automaticamente al color del texto circundante y respondiendo a cambios de estado (activo, hover, deshabilitado) sin necesidad de variantes separadas.
-- **Claridad semantica**: Cada icono esta disenado para su contexto especifico (lampara, puerta, alarma, grifo, persianas, rutinas, etc.) en lugar de depender de aproximaciones con emojis. Esto reduce ambiguedad y refuerza el modelo mental del usuario sobre cada tipo de dispositivo.
+- **Consistencia visual (Nielsen #4)**: Los emojis se ven distintos en un iPhone que en una PC con Windows. Usar nuestros propios íconos garantiza que todos los usuarios vean la misma interfaz, sin sorpresas visuales.
+- **Gestalt - Similitud**: Todos los íconos tienen el mismo grosor de línea y estilo. Esto ayuda a que el ojo los identifique rápido como "elementos de control" y no como simple decoración.
 
 ---
 
-## 15. Identidad de marca y logo
+## 15. Identidad y Logo
 
-**Decision**: Logo hexagonal personalizado con silueta de casa y arcos WiFi, usado consistentemente en splash screen, sidebar expandida y sidebar colapsada.
+**Decisión**: El logo es una casa dentro de un hexágono con ondas de WiFi. Se usa en la pantalla de carga y en la barra lateral.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Nivel visceral (Norman)**: La forma hexagonal comunica tecnologia y precision, mientras que la silueta de la casa establece inmediatamente el dominio del producto (hogar inteligente). Los arcos WiFi refuerzan el aspecto "conectado". La paleta de azules del logo (`#0C447C` base, `#378ADD` acentos) transmite confianza y fiabilidad.
-- **Consistencia (Nielsen #4)**: El mismo logo aparece en el splash screen, el header de la sidebar y el estado colapsado de la sidebar. Esta repeticion construye reconocimiento de marca y proporciona un ancla espacial para el usuario.
-- **Gestalt - Cierre**: El borde hexagonal crea una region contenida que agrupa la casa y los elementos WiFi en una unica unidad percibida, haciendo el logo reconocible incluso en tamanos pequenos (32px en sidebar colapsada). Esto aplica el principio de cierre: "Podes dejar cosas incompletas y el usuario percibe la intencion de forma natural".
-- **Navegacion - Site ID**: El logo funciona como "Site ID" segun los principios de navegacion: "Permite saber que uno se encuentra todavia en el mismo sitio. Generalmente se encuentra en la parte superior de la pantalla". Al ser clickeable, tambien sirve como "mecanismo para volver a la pagina principal".
+- **Nivel visceral (Norman)**: La forma geométrica da una imagen de tecnología y confianza. El color azul refuerza esa sensación de seguridad, algo fundamental cuando estás controlando las puertas de tu casa.
+- **Gestalt - Cierre**: Aunque el dibujo de la casa es simple, el cerebro completa la forma gracias al hexágono que la contiene. Esto hace que el logo se reconozca incluso cuando es muy chiquito, como en la barra lateral colapsada.
 
 ---
 
-## 16. Splash screen y animacion de entrada
+## 16. Splash Screen (Pantalla de inicio)
 
-**Decision**: Splash a pantalla completa con el logo HomeCore centrado, seguido de una animacion de zoom-in que transiciona al dashboard. Skipeable via scroll, touch o click.
+**Decisión**: Agregamos una animación de bienvenida con el logo que se puede saltear haciendo click o scroll.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Nivel visceral (Norman)**: El splash establece una primera impresion emocional. El logo aparece con una animacion de entrada scale-up (1s ease-out), seguida de un fade-in escalonado del titulo y tagline. Esta secuencia coreografiada crea una sensacion de calidad e intencionalidad antes de cualquier interaccion.
-- **Metafora espacial**: La animacion de salida zoom-in (el logo escala 9x mientras se desvanece) crea la percepcion de "entrar" a la casa, una metafora espacial que mapea el acto de abrir la app al acto de caminar por la puerta. Esto aprovecha el modelo mental del usuario sobre llegar a casa.
-- **Control y libertad del usuario (Nielsen #3)**: La animacion es completamente skipeable. Un hint ("Scroll o click para continuar") aparece despues de 1.5 segundos para usuarios que no intuyan la interaccion. Se soportan multiples metodos de input (wheel, click, touch swipe) para acomodar diferentes dispositivos y preferencias. Ningun usuario esta obligado a esperar.
-- **Revelacion progresiva**: El splash funciona como una pausa breve que separa la fase de "carga" de la fase de "uso", dando tiempo a la aplicacion para inicializar stores y renderizar el layout detras del splash. Esta optimizacion de rendimiento percibido enmascara cualquier delay de renderizado.
-
----
-
-## 17. Vista de detalle de rutina
-
-**Decision**: Las rutinas se muestran como cards en la vista de listado y al hacer click se navega a una vista de detalle a pagina completa (`/:houseId/rutinas/:id`) con layout de dos columnas: dispositivos afectados (izquierda) y programacion/informacion/acciones (derecha).
-
-**Fundamentacion teorica**:
-
-- **Jerarquia visual**: La expansion inline de las cards rompia el grid del listado y generaba una experiencia incoherente. La vista de detalle a pagina completa ofrece espacio suficiente para mostrar toda la informacion sin comprometer la legibilidad ni la estructura visual.
-- **Consistencia (Nielsen #4)**: El patron de navegacion replica el usado en dispositivos (listado con cards > detalle a pagina completa), manteniendo una experiencia predecible. El usuario que ya aprendio a navegar dispositivos no necesita aprender un patron nuevo para rutinas.
-- **Reconocimiento (Nielsen #6)**: Cada dispositivo afectado por la rutina se muestra con su icono, nombre, habitacion y las acciones especificas (ej: "Encender", "Brillo 40%") como badges visibles. El usuario puede comprender el alcance completo de la rutina sin ejecutarla.
-- **Gestalt - Region comun**: La programacion (hora + dias de la semana) y la informacion (estado, cantidad de acciones, cantidad de dispositivos) se agrupan en el sidebar derecho como cards separadas, facilitando el escaneo rapido de la configuracion.
-- **Control y libertad (Nielsen #3)**: Las acciones destructivas (eliminar rutina) requieren confirmacion modal. El toggle de habilitar/deshabilitar es reversible. El boton "Volver" permite regresar al listado sin compromiso.
+- **Nivel visceral y reflexivo (Norman)**: Una buena animación de entrada da una sensación de calidad y "terminación" del producto. Genera una respuesta emocional positiva antes de empezar a usar la app.
+- **Metáfora espacial**: La animación de "zoom" hacia el logo da la sensación de estar entrando a la casa. Es una forma visual de preparar al usuario para la tarea que va a realizar.
+- **Control y libertad (Nielsen #3)**: Sabemos que las animaciones pueden cansar si las ves mil veces. Por eso, dejamos que el usuario la salteé con un simple click, priorizando su tiempo si tiene apuro por apagar una luz.
 
 ---
 
-## 18. Selector de casas
+## 17. Modo Vim (Para usuarios avanzados)
 
-**Decision**: Dropdown de seleccion de casa integrado en la sidebar, entre el logo y la navegacion. En estado expandido muestra nombre completo + icono; en estado colapsado muestra solo un icono diferenciado (`swap`).
+**Decisión**: Incluimos un modo opcional para navegar con el teclado (usando teclas como J, K, H, L), pensado para quienes prefieren no usar el mouse.
 
-**Fundamentacion teorica**:
+**Fundamentación**:
 
-- **Modelo mental**: El selector refleja la jerarquia conceptual del sistema: primero se elige la propiedad, luego se navega dentro de ella. Ubicarlo en la parte superior de la sidebar, antes de la navegacion, refuerza este orden mental.
-- **Gestalt - Proximidad**: El selector esta espacialmente proximo a la navegacion pero visualmente separado por un borde, comunicando que es un control de contexto (elige donde) distinto de la navegacion (elige que).
-- **Diferenciacion iconografica**: Se utiliza el icono `swap` (dos flechas) en lugar de `home` para evitar confusion con el item de navegacion "Inicio" cuando la sidebar esta colapsada. Esto previene errores (Nielsen #5) al garantizar que dos controles con funciones distintas no compartan la misma representacion visual.
-- **Flexibilidad (Nielsen #7)**: Al cambiar de casa, la URL se actualiza automaticamente, permitiendo que usuarios avanzados naveguen directamente mediante URL (ej: `/casa-palermo/dispositivos`).
-
----
-
-## 19. Estrategia de autenticacion del prototipo
-
-**Decision**: Auto-login con usuario pre-autenticado para la fase de prototipo. Las vistas de login, registro, verificacion y recuperacion se preservan en el codebase pero el guard de autenticacion se bypasea.
-
-**Fundamentacion teorica**:
-
-- **Eficiencia en evaluacion**: Durante las pruebas de usabilidad (evaluacion empirica), requerir credenciales en cada sesion agrega friccion no relacionada con los flujos de interaccion que se estan evaluando. El auto-login permite que los evaluadores accedan inmediatamente al dashboard y prueben controles de dispositivos, rutinas y navegacion sin overhead de gestion de credenciales.
-- **Completitud preservada**: Las vistas de autenticacion (Login, Registro, Verificar, Recuperar) permanecen en el router y son accesibles via navegacion directa por URL. Esto permite demostrar el flujo completo cuando es necesario sin mantener dos codebases separados.
-- **Validez ecologica**: El usuario pre-autenticado ("Juani Raggio") tiene datos realistas: dos propiedades, preferencias de notificacion y configuracion de PIN. Esto mantiene la validez ecologica durante las pruebas: los evaluadores interactuan con un perfil de usuario creible en lugar de un estado vacio.
-- **Iteracion UCD**: Esta decision se enmarca en la fase de "Evaluacion" del ciclo UCD (ISO 13407), donde el objetivo es "comprobar si las soluciones cumplen con el contexto de uso y satisfacen las necesidades del usuario". Eliminar barreras irrelevantes para esta comprobacion es una decision de eficiencia metodologica.
-
----
-
-## 20. Variables CSS como fuente unica de verdad
-
-**Decision**: Todos los tokens de diseno (colores, tipografia, espaciado, dimensiones de layout) se definen como variables CSS en `design-system.css`. Las dimensiones compartidas entre componentes (`--hc-brand-inset`, `--hc-statusline-height`, `--hc-sidebar-width`) se centralizan para evitar desincronizacion.
-
-**Fundamentacion teorica**:
-
-- **Consistencia (Nielsen #4)**: Las variables CSS garantizan que los mismos valores se usen en toda la aplicacion. Cuando el sidebar expandido usa `padding-left: var(--hc-brand-inset)` y el header usa la misma variable, se garantiza alineacion visual perfecta. Esto evita inconsistencias sutiles que rompen la percepcion de calidad.
-- **Mantenibilidad y UCD**: La centralizacion facilita las iteraciones del ciclo UCD (ISO 13407). Cuando la evaluacion indica que un color no cumple WCAG AA, se cambia en un unico lugar y el cambio se propaga a toda la aplicacion. Esto reduce el costo de cada iteracion de "Producir soluciones de diseno > Evaluacion".
-- **Reduccion de errores**: Al evitar valores hardcodeados dispersos en multiples archivos, se previenen bugs visuales causados por valores desincronizados (ej: un componente con el color viejo y otro con el nuevo).
-
----
-
-## 21. Modo Vim (flexibilidad y eficiencia)
-
-**Decision**: Modo de interaccion opcional inspirado en Vim, con navegacion por teclado (j/k/h/l), comandos (`:q`, `:help`), cambio de perfiles, y efectos visuales opcionales (CRT, matrix rain). Barra de estado siempre visible en la parte inferior.
-
-**Fundamentacion teorica**:
-
-- **Flexibilidad y eficiencia de uso (Nielsen #7)**: Como establece la teoria: "Darle experiencia adecuada a todos los usuarios para que los power users puedan ser eficientes en la aplicacion. Tiene que poder ser adaptable a las necesidades del usuario". El modo Vim permite a usuarios avanzados navegar toda la interfaz sin usar el mouse, usando atajos como `gh` (ir al dashboard), `gd` (ir a dispositivos), `t` (toggle del dispositivo enfocado).
-- **Nivel reflexivo (Norman)**: Los efectos visuales opcionales (scanlines CRT, matrix rain) y la estetica de terminal generan una experiencia reflexiva positiva para usuarios tecnicos: el placer de usar una herramienta que reconoce su expertise. Esto contribuye a la satisfaccion (ISO 9241-11) de un segmento especifico de usuarios.
-- **No intrusivo**: El modo Vim es completamente opcional. La barra de estado ocupa solo 26px de altura y los atajos de teclado no interfieren con el uso normal de la interfaz. Los usuarios que no conocen Vim nunca se ven afectados.
-- **Ayuda y documentacion (Nielsen #10)**: El shortcut `?` despliega una referencia completa de todos los comandos disponibles, permitiendo que incluso usuarios curiosos puedan explorar el modo sin memorizacion previa.
+- **Flexibilidad y eficiencia (Nielsen #7)**: Una buena interfaz debe servir tanto al novato como al experto. Los "power users" pueden ser mucho más rápidos usando atajos de teclado, y este modo les da esa flexibilidad sin molestar a los demás.
+- **Nivel reflexivo (Norman)**: Para un usuario técnico, usar comandos de teclado y ver efectos visuales estilo "terminal" genera satisfacción y una conexión especial con la herramienta, ya que siente que la app "habla su idioma".
+- **Ayuda y documentación (Nielsen #10)**: Si alguien activa el modo por error o tiene curiosidad, apretando la tecla `?` aparece una guía completa de cómo usarlo. Siempre hay ayuda disponible para no dejar al usuario trabado.
