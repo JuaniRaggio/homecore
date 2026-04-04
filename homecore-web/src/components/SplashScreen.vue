@@ -138,7 +138,7 @@ onUnmounted(() => {
 
 .splash__tagline {
   font-size: 1rem;
-  color: #94a3b8;
+  color: #b0bdd0;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   animation: textAppear 1s ease-out 0.6s both;
@@ -147,7 +147,7 @@ onUnmounted(() => {
 .splash__hint {
   position: absolute;
   bottom: 2.5rem;
-  color: #64748b;
+  color: #8494a7;
   font-size: 0.8rem;
   letter-spacing: 0.05em;
   opacity: 0;

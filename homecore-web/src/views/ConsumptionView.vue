@@ -107,7 +107,7 @@ function createCharts() {
 
   const typeColors = {
     lamp: '#f59e0b',
-    door: '#6366f1',
+    door: '#818cf8',
     alarm: '#ef4444',
     faucet: '#22c55e',
     blinds: '#3b82f6'
@@ -121,7 +121,7 @@ function createCharts() {
         labels: Object.keys(consumptionByType).map(t => devicesStore.typeLabels[t]),
         datasets: [{
           data: Object.values(consumptionByType),
-          backgroundColor: Object.keys(consumptionByType).map(t => typeColors[t] || '#6366f1')
+          backgroundColor: Object.keys(consumptionByType).map(t => typeColors[t] || '#818cf8')
         }]
       },
       options: {
@@ -129,7 +129,7 @@ function createCharts() {
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#94a3b8', font: { family: 'Inter' } }
+            labels: { color: '#b0bdd0', font: { family: 'Inter' } }
           }
         }
       }
@@ -147,7 +147,7 @@ function createCharts() {
         datasets: [{
           label: `Consumo (Wh/${period.value === 'day' ? 'dia' : period.value === 'week' ? 'semana' : 'mes'})`,
           data: activeDevices.map(d => d.consumption * 24 * multiplier),
-          backgroundColor: activeDevices.map(d => typeColors[d.type] || '#6366f1'),
+          backgroundColor: activeDevices.map(d => typeColors[d.type] || '#818cf8'),
           borderRadius: 6
         }]
       },
@@ -155,17 +155,17 @@ function createCharts() {
         responsive: true,
         scales: {
           x: {
-            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } },
-            grid: { color: '#2e2e3e' }
+            ticks: { color: '#b0bdd0', font: { family: 'Inter', size: 11 } },
+            grid: { color: '#3a3a4a' }
           },
           y: {
-            ticks: { color: '#94a3b8', font: { family: 'Inter' } },
-            grid: { color: '#2e2e3e' }
+            ticks: { color: '#b0bdd0', font: { family: 'Inter' } },
+            grid: { color: '#3a3a4a' }
           }
         },
         plugins: {
           legend: {
-            labels: { color: '#94a3b8', font: { family: 'Inter' } }
+            labels: { color: '#b0bdd0', font: { family: 'Inter' } }
           }
         }
       }

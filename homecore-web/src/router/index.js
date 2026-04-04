@@ -81,6 +81,11 @@ const routes = [
         component: () => import('../views/RoutinesView.vue')
       },
       {
+        path: 'rutinas/:id',
+        name: 'routine-detail',
+        component: () => import('../views/RoutineDetailView.vue')
+      },
+      {
         path: 'rutinas/nueva',
         name: 'new-routine',
         component: () => import('../views/NewRoutineView.vue'),

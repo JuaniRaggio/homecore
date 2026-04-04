@@ -65,10 +65,10 @@ function addHome() {
 .home-selector__option {
   padding: 8px 12px;
   font-size: 12px;
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 4px;
   background: rgba(15, 15, 20, 0.85);
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
@@ -86,7 +86,7 @@ function addHome() {
   padding: 12px 12px;
   min-height: 40px;
   background: rgba(99, 102, 241, 0.2);
-  border-color: var(--hc-accent, #6366f1);
+  border-color: var(--hc-accent, #818cf8);
   color: var(--hc-text-primary, #f1f5f9);
   font-size: 13px;
   font-weight: 600;
@@ -95,10 +95,10 @@ function addHome() {
 .home-selector__add {
   padding: 8px 12px;
   font-size: 12px;
-  border: 1px solid var(--hc-accent, #6366f1);
+  border: 1px solid var(--hc-accent, #818cf8);
   border-radius: 4px;
   background: rgba(99, 102, 241, 0.15);
-  color: var(--hc-accent, #6366f1);
+  color: var(--hc-accent, #818cf8);
   cursor: pointer;
   transition: all 0.15s;
   text-align: left;

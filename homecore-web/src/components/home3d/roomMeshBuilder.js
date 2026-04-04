@@ -95,7 +95,7 @@ export function buildRoom(roomDef) {
   // Room label (CSS2D)
   const labelDiv = document.createElement('div')
   labelDiv.textContent = roomDef.label
-  labelDiv.style.color = '#94a3b8'
+  labelDiv.style.color = '#b0bdd0'
   labelDiv.style.fontSize = '11px'
   labelDiv.style.fontFamily = 'Inter, system-ui, sans-serif'
   labelDiv.style.fontWeight = '500'

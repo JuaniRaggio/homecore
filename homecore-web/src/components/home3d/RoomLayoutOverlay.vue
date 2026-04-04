@@ -193,10 +193,10 @@ function createNewRoom() {
 .room-overlay__floor-tab {
   padding: 3px 10px;
   font-size: 11px;
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 4px;
   background: rgba(15, 15, 20, 0.85);
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
@@ -207,15 +207,15 @@ function createNewRoom() {
 
 .room-overlay__floor-tab--active {
   background: rgba(99, 102, 241, 0.2);
-  border-color: var(--hc-accent, #6366f1);
+  border-color: var(--hc-accent, #818cf8);
   color: var(--hc-text-primary, #f1f5f9);
 }
 
 .room-overlay__remove-floor-btn {
   background: none;
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 4px;
-  color: var(--hc-text-muted, #64748b);
+  color: var(--hc-text-muted, #8494a7);
   cursor: pointer;
   font-size: 11px;
   padding: 3px 8px;
@@ -226,7 +226,7 @@ function createNewRoom() {
   flex-direction: column;
   gap: 0;
   background: rgba(15, 15, 20, 0.85);
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -239,13 +239,13 @@ function createNewRoom() {
   padding: 4px 8px;
   background: rgba(15, 15, 20, 0.85);
   font-size: 11px;
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
 }
 
 .room-overlay__expand-btn {
   background: none;
   border: none;
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
   cursor: pointer;
   font-size: 8px;
   padding: 2px 4px;
@@ -289,7 +289,7 @@ function createNewRoom() {
   gap: 6px;
   padding: 4px 4px;
   font-size: 10px;
-  color: var(--hc-text-secondary, #94a3b8);
+  color: var(--hc-text-secondary, #b0bdd0);
   border-radius: 3px;
   background: rgba(99, 102, 241, 0.05);
 }
@@ -347,14 +347,14 @@ function createNewRoom() {
   padding: 4px;
   text-align: center;
   font-size: 9px;
-  color: var(--hc-text-muted, #64748b);
+  color: var(--hc-text-muted, #8494a7);
   font-style: italic;
 }
 
 .room-overlay__remove-btn {
   background: none;
   border: none;
-  color: var(--hc-text-muted, #64748b);
+  color: var(--hc-text-muted, #8494a7);
   cursor: pointer;
   font-size: 12px;
   line-height: 1;
@@ -364,7 +364,7 @@ function createNewRoom() {
 }
 
 .room-overlay__remove-btn:hover {
-  color: var(--hc-danger, #ef4444);
+  color: var(--hc-danger, #f87171);
   background: rgba(239, 68, 68, 0.1);
 }
 
@@ -378,7 +378,7 @@ function createNewRoom() {
   left: 0;
   margin-bottom: 4px;
   background: rgba(15, 15, 20, 0.95);
-  border: 1px solid var(--hc-border, #2e2e3e);
+  border: 1px solid var(--hc-border, #3a3a4a);
   border-radius: 6px;
   overflow: hidden;
   min-width: 180px;
