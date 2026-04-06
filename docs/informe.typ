@@ -1290,7 +1290,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 
 == Evaluación empírica: resultados por perfil
 
-=== Power User - Participante: Luis
+=== Valentina / Power User (Participante: Luis)
 
 #table(
   columns: (auto, 1fr, 1fr),
@@ -1300,7 +1300,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
   table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Lo hizo sencillamente y mucho más rápido de lo estimado. Mencionó: "Qué copado esto!" al ver el esquema de los cuartos.],
+  [Lo hizo sencillamente y mucho más rápido de lo estimado. Mencionó: "Qué copado esto!" al ver el esquema de los cuartos en la página web. Mientras que en el móvil también logró completar la tarea con facilidad.],
   [2], [Crear una rutina "Buenos días"],
   [Hizo la rutina fácilmente dentro de los 4 pasos. Se pregunto: "Cuál es la del pasillo?" pero eligio la que pensaba que era.],
   [3], [Verificar la seguridad del hogar],
@@ -1325,11 +1325,11 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
   table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Encontró la lámpara en el esquema de la casa dentro de los 30 segundos.],
+  [Encontró la lámpara en el esquema de la casa dentro de los 30 segundos en la web. Mientras que en el móvil lo hizo accediendo desde el menú, la parte de "Dispositivos".],
   [2], [Crear una rutina "Buenos días"],
   [Creo la rutina sin retroceder. Solo busco un poco la lámpara del pasillo.],
   [3], [Verificar la seguridad del hogar],
-  [Encontró alarma y puerta en menos de 1 minuto usando el menú lateral.],
+  [Encontró alarma y puerta en menos de 1 minuto usando el menú lateral en la web, y el menú de abajo en el móvil.],
   [4], [Cambiar al perfil adolescente],
   [Lo hizo velozmente. Opino: "El adolescente debería poder cambiar la alarma ante una emergencia."],
   [5], [Consultar el consumo eléctrico],
@@ -1350,7 +1350,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
   table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Se hizo sin problema. Dedujo que lo que brillaba era la lámpara.],
+  [Se hizo sin problema. Dedujo que lo que brillaba era la lámpara. Mientras que en el móvil fue a favoritos.],
   [2], [Crear una rutina "Buenos días"],
   [Lo hizo velozmente pero retrocedio porque clickeo dos veces un dispositivo y lo desagrego.],
   [3], [Verificar la seguridad del hogar],
@@ -1375,7 +1375,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
   table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Lo hizo rápidamente. Accedió a la lámpara desde el esquema del cuarto.],
+  [Lo hizo rápidamente. Accedió a la lámpara desde el esquema del cuarto. Mientras que en el móvil también logró cumplir la tarea con agilidad.],
   [2], [Crear una rutina "Buenos días"],
   [Lo hizo velozmente, sin errores y sin retroceder.],
   [3], [Verificar la seguridad del hogar],
