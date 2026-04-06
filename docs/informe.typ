@@ -681,6 +681,94 @@ La evaluación participativa se llevó a cabo inmediatamente después de la emp�
 
 Las respuestas completas se encuentran en el Anexo.
 
+=== Bloque 1: Navegación y estructura
+
+#table(
+  columns: (auto, 1fr, 1fr),
+  align: (left, left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+
+  table.header([* \# *], [*Pregunta*], [*Justificación*]),
+
+  [1.],
+  [Cuando necesitaste encontrar un dispositivo específico, ¿cuál fue tu primer instinto: ir al dashboard, a "Dispositivos" o a "Habitaciones"?],
+  [Revela el modelo mental del usuario sobre la organización de la información y valida la arquitectura del sistema.],
+
+  [2.],
+  [¿Hubo algún momento en el que no supieras en qué sección de la aplicación estabas? Si es así, ¿qué te generó esa confusión?],
+  [Evalúa la visibilidad del estado de navegación y la orientación del usuario.],
+
+  [3.],
+  [¿La cantidad de opciones en el menú lateral te pareció adecuada, o sentiste que faltaba o sobraba algo?],
+  [Analiza si hay sobrecarga cognitiva o ausencia de funcionalidades esperadas.]
+)
+
+=== Bloque 2: Control de dispositivos
+
+#table(
+  columns: (auto, 1fr, 1fr),
+  align: (left, left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+
+  table.header([* \# *], [*Pregunta*], [*Justificación*]),
+
+  [4.],
+  [Cuando cambiaste el estado de un dispositivo, ¿el sistema te dio suficiente información para saber que el cambio se aplicó?],
+  [Evalúa el feedback visual del sistema.],
+
+  [5.],
+  [¿Alguno de los íconos o controles te resultó confuso o no supiste qué hacía sin probarlo?],
+  [Detecta problemas de affordance y comprensión.],
+
+  [6.],
+  [Si pudieras controlar un solo dispositivo desde la pantalla de inicio, ¿cuál sería y por qué?],
+  [Identifica prioridades de uso del usuario.]
+)
+
+=== Bloque 3: Perfiles de familia y restricciones
+
+#table(
+  columns: (auto, 1fr, 1fr),
+  align: (left, left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+
+  table.header([* \# *], [*Pregunta*], [*Justificación*]),
+
+  [7.],
+  [¿Te pareció lógico que el adolescente pueda ver el estado de la alarma pero no controlarla?],
+  [Evalúa la comprensión del modelo de permisos.],
+
+  [8.],
+  [¿El selector de perfil en la parte superior te resultó fácil de encontrar y usar?],
+  [Verifica visibilidad y accesibilidad del componente.]
+)
+
+=== Bloque 4: Experiencia General
+
+#table(
+  columns: (auto, 1fr, 1fr),
+  align: (left, left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+
+  table.header([* \# *], [*Pregunta*], [*Justificación*]),
+
+  [9.],
+  [Si tuvieras que describir esta aplicación a alguien que nunca la usó, ¿qué le dirías en una frase?],
+  [Evalúa la propuesta de valor percibida.],
+
+  [10.],
+  [¿Hubo algo que te generara frustración, inseguridad o incomodidad durante el uso?],
+  [Detecta fricciones no relevadas previamente.]
+)
+
 // ====================================
 // 6. PROTOTIPOS SITIO WEB
 // ====================================
