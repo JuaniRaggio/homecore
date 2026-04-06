@@ -92,7 +92,7 @@
       [Matias Bernasconi], [64188],
       [Juan Ignacio Garcia Vautrin Raggio], [63319],
       [Victoria Helena Park], [64498],
-      [Maria Del Pilar Resek], [],
+      [Maria Del Pilar Resek], [65528],
       // Agregar más integrantes aqui
     )
     #v(2em)
