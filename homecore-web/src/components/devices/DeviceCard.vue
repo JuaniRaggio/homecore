@@ -8,14 +8,19 @@
       <div class="device-card__icon" :class="`device-card__icon--${device.type}`">
         <HcIcon :name="device.type" size="lg" />
       </div>
-      <button
-        class="device-card__favorite"
-        :class="{ 'device-card__favorite--active': device.favorite }"
-        @click.stop="devicesStore.toggleFavorite(device.id)"
-        :aria-label="device.favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'"
-      >
-        <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="md" />
-      </button>
+      <div class="device-card__header-actions">
+        <span v-if="device.password" class="device-card__password-lock" title="Protegido con contrasena">
+          <HcIcon name="lock" size="sm" />
+        </span>
+        <button
+          class="device-card__favorite"
+          :class="{ 'device-card__favorite--active': device.favorite }"
+          @click.stop="devicesStore.toggleFavorite(device.id)"
+          :aria-label="device.favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+        >
+          <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="md" />
+        </button>
+      </div>
     </div>
 
     <div class="device-card__info">
@@ -131,6 +136,19 @@ const statusText = computed(() => {
 
 .device-card--on .device-card__icon--blinds {
   background: rgba(99, 102, 241, 0.15);
+}
+
+.device-card__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.device-card__password-lock {
+  color: var(--hc-text-muted);
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
 }
 
 .device-card__favorite {

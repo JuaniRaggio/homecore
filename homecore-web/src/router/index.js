@@ -66,6 +66,12 @@ const routes = [
         component: () => import('../views/DevicesView.vue')
       },
       {
+        path: 'dispositivos/nuevo',
+        name: 'new-device',
+        component: () => import('../views/NewDeviceView.vue'),
+        meta: { adminOnly: true }
+      },
+      {
         path: 'dispositivos/:id',
         name: 'device-detail',
         component: () => import('../views/DeviceDetailView.vue')
