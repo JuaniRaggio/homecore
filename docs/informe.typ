@@ -367,11 +367,11 @@ Se seleccionaron los siguientes atributos por ser factores que influyen directam
 
 *Justificación de la selección:*
 
-- *UR1 (La Entusiasta):* Usuaria que busca eficiencia extrema y personalización. Validará funciones avanzadas.
+- *UR1 (La Entusiasta):* Usuario que busca eficiencia extrema y personalización. Validará funciones avanzadas.
 
 - *UR2 (La Administradora):* Usuario tipico del mercado que busca seguridad familiar. Validará control parental y robustez.
 
-- *UR3 (La Recién Llegada):* Usuaria con alta fricción potencial. Validará la accesibilidad y claridad de la interfaz.
+- *UR3 (La Recién Llegada):* Usuario con alta fricción potencial. Validará la accesibilidad y claridad de la interfaz.
 
 == Persona 1: Valentina "La Power User"
 
@@ -473,11 +473,11 @@ Madre de dos hijos y profesional ocupada. Para ella, la domótica no es un hobby
 === Escenarios de uso
 - *Escenario 1 (Seguridad):* Carolina esta en una reunión y recibe un aviso: "Hijo 1 ingresó a las 16:15". Verifica en la app que la alarma se desactivó correctamente.
 - *Escenario 2 (Mantenimiento):* El pronóstico anuncia lluvia. Carolina abre la app para desactivar la rutina de riego automático de esa tarde con un simple toggle.
-- *Escenario 3 (Control Parental):* Configura la tablet de su hijo menor para que solo pueda controlar las luces de su cuarto, restringiendo el acceso a la alarma y la cerradura principal.
+- *Escenario 3 (Control Parental):* Configura la tablet de su hijo menor para que solo pueda controlar las luces de su cuarto, restringiendo el acceso a la alarma y la cerradura principal mediante una password.
 
 #pagebreak()
 
-== Persona 3: Marta "La Usuaria Tradicional"
+== Persona 3: Marta "La Usuario Tradicional"
 
 #grid(
   columns: (auto, 1fr),
@@ -662,15 +662,15 @@ El registro completo de los resultados se encuentra en el Anexo. Las fricciones 
 
   [(3) Verificar seguridad],
   [El participante trató de buscar los dispositivos en el gráfico del hogar y no los encontró. Luego los encontró en favoritos.],
-  [Mejorar/agrandar la vista del hogar para identificar más fácilmente qué dispositivos se encuentran activos.],
+  [Aumentamos el tamaño del grafico para que se vean mejor los detalles. Seguimos trabajando para mejorar la interacción con el mismo ya que a pesar de no ser de gran utilidad, a primera vista le genera a los usuarios un sentimiento],
 
   [(5) Consultar consumo],
   [Algunos participantes de edad media primero fueron a "Historial" y no a "Consumo".],
-  [Reflexionar si ambas opciones, aunque diferentes, pueden generar confusión y extra carga cognitiva.],
+  [No consideramos que esto sea un problema de diseño sino que es una interpretacion vaga del usuario],
 
   [(7) Acceder a configuración],
-  [Todos los participantes no pudieron completar esta tarea. Al cambiarse al perfil adolescente, la opción desaparecía, generando frustración.],
-  [Mostrar la opción deshabilitada con un mensaje explicativo en lugar de ocultarla completamente.],
+  [Ningun participante pudo completar esta tarea. Al cambiarse al perfil adolescente, la opción desaparecía, generando frustración.],
+  [La API no permite configurar tipos de usuarios por lo que tambien seria correcto darle acceso a la configuracion a todos los usuarios, en caso de querer cambiar una contraseña desde configuracion, que te pida la antigua],
 )
 
 == Evaluación participativa
@@ -855,8 +855,8 @@ Como respuesta, se renombró la sección de "Espacios" a "Dispositivos", se inco
     grid(
       columns: 2,
       gutter: 16pt,
-      image("assets/image17.png", width: 100%),
-      image("assets/image6.png", width: 100%),
+      image("assets/image17.png", width: 80%),
+      image("assets/image6.png", width: 80%),
     )
   ),
   caption: [Sección de dispositivos: primer prototipo (izquierda) y versión final (derecha)],
@@ -871,8 +871,8 @@ Tras las entrevistas, se determinó que la mayoría de los usuarios consultaba e
     grid(
       columns: 2,
       gutter: 16pt,
-      image("assets/image4.png", width: 100%),
-      image("assets/image38.png", width: 100%),
+      image("assets/image4.png", width: 80%),
+      image("assets/image38.png", width: 80%),
     )
   ),
   caption: [Sección de perfil: primer prototipo (izquierda) y versión final (derecha)],
@@ -887,8 +887,8 @@ El menú original era poco intuitivo para el cambio de propiedad, por lo que se 
     grid(
       columns: 2,
       gutter: 16pt,
-      image("assets/image23.png", width: 100%),
-      image("assets/image1.png", width: 100%),
+      image("assets/image23.png", width: 80%),
+      image("assets/image1.png", width: 80%),
     )
   ),
   caption: [Cambio y gestión de propiedad: prototipo inicial (izquierda) y versión final (derecha)],
@@ -1290,7 +1290,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 
 == Evaluación empírica: resultados por perfil
 
-=== Valentina / Power user (Participante: Luis)
+=== Power User - Participante: Luis
 
 #table(
   columns: (auto, 1fr, 1fr),
@@ -1340,7 +1340,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [Le genero mucha ansiedad. Dijo: "Dónde está? No lo puedo hacer."],
 )
 
-=== Marta / Usuaria tradicional (Participante: Hannah)
+=== Marta / Usuario tradicional (Participante: Hannah)
 
 #table(
   columns: (auto, 1fr, 1fr),
@@ -1365,7 +1365,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [Se rindió al segundo. Dijo: "No bueno, no puedo, no lo encuentro."],
 )
 
-=== Marta / Usuaria tradicional (Participante: Sofia)
+=== Marta / Usuario tradicional (Participante: Sofia)
 
 #table(
   columns: (auto, 1fr, 1fr),
@@ -1417,7 +1417,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [12], [Facilidad general de uso (1-5)], ["4."],
 )
 
-=== Carolina / Gestora del hogar (Participante: Cecilia)
+=== Gestor del hogar - Participante: Cecilia
 
 #table(
   columns: (auto, 1fr, 1fr),
@@ -1440,7 +1440,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [12], [Facilidad general de uso (1-5)], ["4."],
 )
 
-=== Marta / Usuaria tradicional (Participante: Hannah)
+=== Usuario tradicional - Participante: Hannah
 
 #table(
   columns: (auto, 1fr, 1fr),
@@ -1463,7 +1463,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [12], [Facilidad general de uso (1-5)], ["3,5."],
 )
 
-=== Marta / Usuaria tradicional (Participante: Sofia)
+=== Usuario tradicional - Participante: Sofia
 
 #table(
   columns: (auto, 1fr, 1fr),
