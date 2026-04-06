@@ -91,7 +91,7 @@
       table.header([*Nombre*], [*Legajo*]),
       [Matias Bernasconi], [64188],
       [Juan Ignacio Garcia Vautrin Raggio], [63319],
-      [Victoria Helena Park], [],
+      [Victoria Helena Park], [64498],
       [Maria Del Pilar Resek], [],
       // Agregar más integrantes aqui
     )
@@ -104,7 +104,7 @@
 ]
 
 // ====================================
-// INDICE
+// ÍNDICE
 // ====================================
 
 #page(numbering: none, header: none, footer: none)[
@@ -118,7 +118,7 @@
 #counter(page).update(1)
 
 // ====================================
-// INTRODUCCION
+// INTRODUCCIÓN
 // ====================================
 
 = Introducción
@@ -301,7 +301,7 @@ Se notó un gran desconocimiento sobre las aplicaciones de domótica por parte d
 
 Otra función que no es de uso cotidiano para la mayoría de los usuarios es la de consultar el consumo eléctrico. El 60% prefiere no recibir notificaciones de consumo eléctrico elevado, mientras que la mayoría ya sabe que electrodomésticos tienen un consumo elevado. Se estima que esto es algo que los usuarios solo revisarán sí reciben una factura muy elevada, por lo que se diseñaron las interfaces pensando que sería la funcionalidad menos utilizada.
 
-Al preguntar sobre las rutinas de las personas se noto que la mayoría tiene un dispositivo inteligente en particular que utiliza mucho, ya sea una alarma, cámaras o un instrumento de cocina. Esto llevó a agregar la posibilidad de marcar dispositivos o rutinas como favoritos, los cuales aparecen en el menú inicial de la casa.
+Al preguntar sobre las rutinas de las personas se notó que la mayoría tiene un dispositivo inteligente en particular que utiliza mucho, ya sea una alarma, cámaras o un instrumento de cocina. Esto llevó a agregar la posibilidad de marcar dispositivos o rutinas como favoritos, los cuales aparecen en el menú inicial de la casa.
 
 // ====================================
 // 4. MODELOS DE PERSONAS
@@ -351,7 +351,7 @@ Se seleccionaron los siguientes atributos por ser factores que influyen directam
 
 == Combinaciones representativas
 
-#table(
+#align(center)[#table(
   columns: (auto, auto, auto, auto, auto, auto, auto),
   align: center,
   stroke: 0.5pt,
@@ -363,13 +363,15 @@ Se seleccionaron los siguientes atributos por ser factores que influyen directam
   [UR1], [18-30], [Nivel 3], [Solo], [Depto], [Ecosistema], [4-8 SM],
   [UR2], [31-50], [Nivel 2], [Familia], [Casa], [Alguna app], [8+ SM],
   [UR3], [51-70], [Nivel 1], [Pareja], [Depto], [Nunca], [4-8 SM],
-)
+)]
 
 *Justificación de la selección:*
 
--- *UR1 (La Entusiasta):* Usuaria que busca eficiencia extrema y personalización. Validará funciones avanzadas.
--- *UR2 (La Administradora):* Usuario tipico del mercado que busca seguridad familiar. Validará control parental y robustez.
--- *UR3 (La Recién Llegada):* Usuaria con alta fricción potencial. Validará la accesibilidad y claridad de la interfaz.
+- *UR1 (La Entusiasta):* Usuaria que busca eficiencia extrema y personalización. Validará funciones avanzadas.
+
+- *UR2 (La Administradora):* Usuario tipico del mercado que busca seguridad familiar. Validará control parental y robustez.
+
+- *UR3 (La Recién Llegada):* Usuaria con alta fricción potencial. Validará la accesibilidad y claridad de la interfaz.
 
 == Persona 1: Valentina "La Power User"
 
@@ -544,14 +546,14 @@ Marta es una persona activa pero prefiere la simplicidad. Su hijo le instaló di
 )
 
 // ====================================
-// 5. EVALUACION DE USABILIDAD
+// 5. EVALUACIÓN DE USABILIDAD
 // ====================================
 
 = Evaluación de usabilidad
 
 == Evaluación predictiva
 
-=== Metodologia
+=== Metodología
 
 La metodología utilizada fue que cada integrante realice una inspección individual del prototipo web y móvil desarrollado por el otro grupo, utilizando las heuristicas seleccionadas. Luego se hizo una puesta en común donde se consolidaron los hallazgos, eliminaron los duplicados y priorizaron los problemas según la severidad (crítico, mayor, menor, cosmético).
 
@@ -598,52 +600,52 @@ La observación sobre el *gráfico/mapa de la casa* se incorpora parcialmente. S
 
 === Problemas que se descartan o se incorporan parcialmente
 
-La observación sobre *eliminar la organización por pisos y cuartos* se descarta como solución definitiva. La organización jerarquica del hogar es una funcionalidad central que responde a las necesidades identificadas en la investigacion con usuarios. El problema no es su existencia sino su implementación actual. La solución es simplificar su presentacion y hacer que el home muestre el estado de los dispositivos de forma directa.
+La observación sobre *eliminar la organización por pisos y cuartos* se descarta como solución definitiva. La organización jerárquica del hogar es una funcionalidad central que responde a las necesidades identificadas en la investigación con usuarios. El problema no es su existencia sino su implementación actual. La solución es simplificar su presentación y hacer que el home muestre el estado de los dispositivos de forma directa.
 
 La observación sobre el *historial que registra todos los eventos sin filtro* se incorpora como mejora de mediano plazo. No representa un problema crítico que bloquee el uso de la aplicación. Se priorizaran primero los problemas estructurales.
 
 == Evaluación empírica
 
-=== Metodologia
+=== Metodología
 
-La metodología fue presencial, con un integrante del grupo observando y tomando notas. Al participante se le dieron instrucciones verbales sobre el escenario, dejandolo interactuar sin guia adicional salvo que se bloquee. Los datos recolectados fueron la tasa de exito, el tiempo de completado, la cantidad de errores y otras observaciones cualitativas.
+La metodología fue presencial, con un integrante del grupo observando y tomando notas. Al participante se le dieron instrucciones verbales sobre el escenario, dejándolo interactuar sin guía adicional salvo que se bloquee. Los datos recolectados fueron la tasa de éxito, el tiempo de completado, la cantidad de errores y otras observaciones cualitativas.
 
 === Escenarios seleccionados
 
 #table(
-  columns: (auto, 1fr, 1fr),
+  columns: (1fr, 1.2fr, 1.2fr),
   align: (left, left, left),
   stroke: 0.5pt,
   inset: 8pt,
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*Escenario*], [*Objetivo*], [*Criterio de exito*]),
+  table.header([*Escenario*], [*Objetivo*], [*Criterio de éxito*]),
   [Controlar una lámpara desde el dashboard],
   [Validar la eficiencia de la navegación principal y la interacción con el slider de brillo.],
   [El usuario localiza la lámpara, accede al detalle y ajusta el brillo en menos de 30 segundos sin ayuda.],
 
-  [Crear una rutina "Buenos dias"],
+  [Crear una rutina "Buenos días"],
   [Validar la usabilidad del wizard de 4 pasos.],
   [El usuario completa los 4 pasos del wizard y crea la rutina sin errores y sin retroceder más de una vez.],
 
   [Verificar la seguridad del hogar antes de dormir],
-  [Validar sí la estructura de navegación permite encontrar dispositivos de seguridad rapidamente.],
+  [Validar sí la estructura de navegación permite encontrar dispositivos de seguridad rápidamente.],
   [El usuario encuentra y confirma el estado de alarma y puerta en menos de 1 minuto.],
 
   [Cambiar al perfil adolescente e intentar desarmar la alarma],
   [Validar la implementación de restricciones por rol.],
-  [El usuario cambia de perfil, ve que el control esta deshabilitado y comprende la restriccion sin confusión.],
+  [El usuario cambia de perfil, ve que el control está deshabilitado y comprende la restricción sin confusión.],
 
   [Consultar el consumo eléctrico de la última semana],
-  [Validar la encontrabilidad de la sección de consumo y la legibilidad de los graficos.],
+  [Validar la encontrabilidad de la sección de consumo y la legibilidad de los gráficos.],
   [El usuario navega a consumo e identifica el dispositivo de mayor consumo en menos de 45 segundos.],
 
   [Recuperarse de una navegación accidental],
-  [Validar la capacidad de recuperacion y orientación.],
+  [Validar la capacidad de recuperación y orientación.],
   [El usuario vuelve al dashboard en menos de 2 clics sin expresar confusión.],
 
   [Verificar que el perfil adolescente no puede acceder a configuración],
-  [Validar el guard del router y la coherencia de la restriccion visual.],
-  [El usuario nota que "Configuracion" no aparece. Si escribe la URL manualmente, es redirigido sin error confuso.],
+  [Validar el guard del router y la coherencia de la restricción visual.],
+  [El usuario nota que "Configuración" no aparece. Si escribe la URL manualmente, es redirigido sin error confuso.],
 )
 
 === Análisis de los resultados
@@ -656,26 +658,26 @@ El registro completo de los resultados se encuentra en el Anexo. Las fricciones 
   stroke: 0.5pt,
   inset: 8pt,
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*Escenario*], [*Friccion detectada*], [*Acción de mejora*]),
+  table.header([*Escenario*], [*Fricción detectada*], [*Acción de mejora*]),
 
   [(3) Verificar seguridad],
-  [El participante trato de buscar los dispositivos en el gráfico del hogar y no los encontró. Luego los encontró en favoritos.],
-  [Mejorar/agrandar la vista del hogar para identificar más facilmente qué dispositivos se encuentran activos.],
+  [El participante trató de buscar los dispositivos en el gráfico del hogar y no los encontró. Luego los encontró en favoritos.],
+  [Mejorar/agrandar la vista del hogar para identificar más fácilmente qué dispositivos se encuentran activos.],
 
   [(5) Consultar consumo],
   [Algunos participantes de edad media primero fueron a "Historial" y no a "Consumo".],
-  [Reflexionar sí ambas opciones, aunque diferentes, pueden generar confusión y extra carga cognitiva.],
+  [Reflexionar si ambas opciones, aunque diferentes, pueden generar confusión y extra carga cognitiva.],
 
   [(7) Acceder a configuración],
-  [Todos los participantes no pudieron completar esta tarea. Al cambiarse al perfil adolescente, la opción desaparecía, generando frustracion.],
+  [Todos los participantes no pudieron completar esta tarea. Al cambiarse al perfil adolescente, la opción desaparecía, generando frustración.],
   [Mostrar la opción deshabilitada con un mensaje explicativo en lugar de ocultarla completamente.],
 )
 
 == Evaluación participativa
 
-=== Metodologia
+=== Metodología
 
-La evaluación participativa se llevó a cabo inmediatamente despues de la empírica, por lo cual los participantes son los mismos. Fue un cuestionario semi-estructurado, registrandose las respuestas textuales del participante. Las preguntas están organizadas en 4 bloques tematicos.
+La evaluación participativa se llevó a cabo inmediatamente después de la empírica, por lo cual los participantes son los mismos. Fue un cuestionario semi-estructurado, registrándose las respuestas textuales del participante. Las preguntas están organizadas en 4 bloques temáticos.
 
 Las respuestas completas se encuentran en el Anexo.
 
@@ -685,25 +687,45 @@ Las respuestas completas se encuentran en el Anexo.
 
 = Prototipos sitio web
 
+== Overview -- Resumen de propiedades
+
+La pantalla de overview es la primera vista al iniciar sesión. Presenta un saludo personalizado y un resumen de todas las propiedades del usuario, mostrando para cada una la cantidad de dispositivos activos y el consumo energético. Debajo se listan los dispositivos críticos de todas las propiedades y las rutinas favoritas con acceso rápido para ejecutarlas. Al pie, un resumen energético general con métricas clave (consumo total, dispositivos activos, cantidad de propiedades y dispositivos críticos).
+
 #figure(
   image("assets/image31.png", width: 100%),
   caption: [Overview -- Resumen de propiedades],
 )
+
+== Inicio -- Dashboard de propiedad
+
+Al seleccionar una propiedad, se accede al dashboard principal. En la parte superior se muestra una vista isométrica 3D de la vivienda con las habitaciones etiquetadas y los dispositivos activos señalados mediante indicadores de color. A la izquierda se encuentra la barra de navegación lateral con acceso a Inicio, Dispositivos, Habitaciones, Rutinas, Historial, Consumo y Configuración. Debajo de la vista 3D se listan los dispositivos favoritos como tarjetas con su estado y toggle de encendido/apagado, junto a las rutinas configuradas con opción de ejecución inmediata.
 
 #figure(
   image("assets/image40.png", width: 100%),
   caption: [Inicio -- Dashboard de una propiedad (Casa Martinez)],
 )
 
+== Dispositivos
+
+La sección de dispositivos presenta una grilla de tarjetas, cada una con el icono del tipo de dispositivo, su nombre, la habitación a la que pertenece, el estado actual (encendido/apagado con detalle según tipo) y un toggle de control. Se incluyen filtros por tipo de dispositivo y por habitación, un botón de favorito en cada tarjeta y un botón prominente "+ Nuevo dispositivo" para agregar nuevos dispositivos a la propiedad.
+
 #figure(
   image("assets/image41.png", width: 100%),
   caption: [Dispositivos],
 )
 
+== Habitaciones
+
+La vista de habitaciones organiza los dispositivos por su ubicación física. Cada habitación se muestra como una tarjeta que lista los dispositivos vinculados con su toggle de encendido/apagado y un botón de edición. Las habitaciones sin dispositivos muestran el mensaje "Sin dispositivos vinculados". Cada tarjeta incluye un desplegable "+ Vincular dispositivo" para asociar dispositivos existentes, además de botones para editar o eliminar la habitación. En la esquina superior se ubica el botón "+ Nueva habitación".
+
 #figure(
   image("assets/image19.png", width: 100%),
   caption: [Habitaciones],
 )
+
+== Rutinas
+
+La página de rutinas muestra las automatizaciones configuradas como tarjetas horizontales. Cada rutina incluye su nombre, una descripción de las acciones que ejecuta, el horario programado, los días de la semana en que se activa y la cantidad de acciones. Se proporcionan botones de "Ejecutar Ahora" para activación manual y "Ver detalle" para inspeccionar o modificar la rutina. Un toggle permite habilitar o deshabilitar cada rutina, y el botón de favorito permite marcarlas para acceso rápido desde el dashboard.
 
 #figure(
   image("assets/image27.png", width: 100%),
@@ -711,83 +733,75 @@ Las respuestas completas se encuentran en el Anexo.
 )
 
 // ====================================
-// 7. PROTOTIPOS APLICACION MOVIL
+// 7. PROTOTIPOS APLICACIÓN MÓVIL
 // ====================================
 
 = Prototipos aplicación móvil
-
-== Rediseño de la pantalla de inicio de sesión
-
-La primera versión del prototipo presentaba dificultades de legibilidad debido al uso de colores llamativos en el fondo que restaban contraste a los textos, sumado a un tamaño de letra reducido. A esto se añadía una falta de claridad en el flujo de inicio de sesión y la inclusión de una opción de acceso con Google que, dado que la API no lo permite, resultaba inviable.
-
-Como solución, se adoptó un fondo oscuro que mejora el contraste general, se intensificaron los colores de los botones principales para destacar las acciones relevantes, y se reorganizó el espaciado entre títulos y subtitulos.
-
-#figure(
-  grid(
-    columns: 2,
-    gutter: 16pt,
-    image("assets/image11.png", width: 100%),
-    image("assets/image13.png", width: 100%),
-  ),
-  caption: [Inicio de sesión: primer prototipo (izquierda) y versión final (derecha)],
-)
 
 == Rediseño de la pantalla de inicio
 
 La versión inicial presentaba una distribución de elementos con igual relevancia visual entre todas las funciones, lo que dificultaba identificar las acciones prioritarias. El término "Home" generaba confusión con "habitación", el buscador era poco distinguible y el espacio disponible estaba mal aprovechado.
 
-Como solución, se rediseño la pantalla restringiendola a los dispositivos y rutinas favoritas, decisión respaldada por las entrevistas. Se incorporo una barra de menú superior que permite cambiar de propiedad facilmente.
+Como solución, se rediseñó la pantalla restringiéndola a los dispositivos y rutinas favoritas, decisión respaldada por las entrevistas. Se incorporó una barra de menú superior que permite cambiar de propiedad fácilmente.
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 16pt,
-    image("assets/image32.png", width: 100%),
-    image("assets/image2.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 16pt,
+      image("assets/image32.png", width: 100%),
+      image("assets/image2.png", width: 100%),
+    )
   ),
   caption: [Pantalla de inicio: primer prototipo (izquierda) y versión final (derecha)],
 )
 
 == Rediseño de la sección de dispositivos
 
-La versión inicial presentaba múltiples problemas de usabilidad. El término "Espacios" para referirse a las habitaciones resultaba poco representativo. No existia la posibilidad de editar dispositivos ni habitaciones una vez creados. El menú de propiedades era poco intuitivo y las acciones equivalentes presentaban botones de distintos colores.
+La versión inicial presentaba múltiples problemas de usabilidad. El término "Espacios" para referirse a las habitaciones resultaba poco representativo. No existía la posibilidad de editar dispositivos ni habitaciones una vez creados. El menú de propiedades era poco intuitivo y las acciones equivalentes presentaban botones de distintos colores.
 
-Como respuesta, se renombró la sección de "Espacios" a "Dispositivos", se incorporo un buscador de dispositivos y se habilitaron opciones para agregar, editar y eliminar tanto dispositivos como habitaciones.
+Como respuesta, se renombró la sección de "Espacios" a "Dispositivos", se incorporó un buscador de dispositivos y se habilitaron opciones para agregar, editar y eliminar tanto dispositivos como habitaciones.
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 16pt,
-    image("assets/image17.png", width: 100%),
-    image("assets/image6.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 16pt,
+      image("assets/image17.png", width: 100%),
+      image("assets/image6.png", width: 100%),
+    )
   ),
-  caption: [Seccion de dispositivos: primer prototipo (izquierda) y versión final (derecha)],
+  caption: [Sección de dispositivos: primer prototipo (izquierda) y versión final (derecha)],
 )
 
 == Rediseño de la sección de perfil
 
-Tras las entrevistas, se determino que la mayoría de los usuarios consultaba el historial y el consumo de forma esporadica. Se decidio agruparlas dentro de la sección de perfil, evitando que ocupen un lugar prominente en la navegación principal.
+Tras las entrevistas, se determinó que la mayoría de los usuarios consultaba el historial y el consumo de forma esporádica. Se decidió agruparlas dentro de la sección de perfil, evitando que ocupen un lugar prominente en la navegación principal.
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 16pt,
-    image("assets/image4.png", width: 100%),
-    image("assets/image38.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 16pt,
+      image("assets/image4.png", width: 100%),
+      image("assets/image38.png", width: 100%),
+    )
   ),
-  caption: [Seccion de perfil: primer prototipo (izquierda) y versión final (derecha)],
+  caption: [Sección de perfil: primer prototipo (izquierda) y versión final (derecha)],
 )
 
 == Rediseño del menú de gestión de propiedades
 
-El menú original era poco intuitivo para el cambio de propiedad, por lo que se opto por un selector más claro y accesible.
+El menú original era poco intuitivo para el cambio de propiedad, por lo que se optó por un selector más claro y accesible.
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 16pt,
-    image("assets/image23.png", width: 100%),
-    image("assets/image1.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 16pt,
+      image("assets/image23.png", width: 100%),
+      image("assets/image1.png", width: 100%),
+    )
   ),
   caption: [Cambio y gestión de propiedad: prototipo inicial (izquierda) y versión final (derecha)],
 )
@@ -806,14 +820,16 @@ El menú original era poco intuitivo para el cambio de propiedad, por lo que se 
   caption: [Vistas en orientación horizontal],
 )
 
-== Version tablet
+== Versión tablet
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 16pt,
-    image("assets/image14.png", width: 100%),
-    image("assets/image26.png", width: 100%),
+  box(width: 80%,
+    grid(
+      columns: 2,
+      gutter: 16pt,
+      image("assets/image14.png", width: 100%),
+      image("assets/image26.png", width: 100%),
+    )
   ),
   caption: [Adaptación para tablet],
 )
@@ -824,16 +840,16 @@ El menú original era poco intuitivo para el cambio de propiedad, por lo que se 
 
 = Flujos de interacción
 
-== Creacion de rutinas
+== Creación de rutinas
 
-Se decidio agrupar los pasos de crear una rutina en una sola ventana en la versión móvil, junto con agregar horarios default para reducir la cantidad de interacciones complejas.
+Se decidió agrupar los pasos de crear una rutina en una sola ventana en la versión móvil, junto con agregar horarios default para reducir la cantidad de interacciones complejas.
 
 #figure(
   image("assets/image22.png", width: 80%),
   caption: [Diagrama de flujo: creación de rutinas (web vs. móvil)],
 )
 
-=== Version web
+=== Versión web
 
 #figure(
   image("assets/image20.png", width: 100%),
@@ -852,47 +868,51 @@ Se decidio agrupar los pasos de crear una rutina en una sola ventana en la versi
   caption: [4 pasos del wizard de creación de rutinas],
 )
 
-=== Version móvil
+=== Versión móvil
 
 #figure(
-  image("assets/image36.png", width: 40%),
+  image("assets/image36.png", width: 25%),
   caption: [Página de rutinas -- móvil],
 )
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 12pt,
-    image("assets/image37.png", width: 100%),
-    image("assets/image28.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 12pt,
+      image("assets/image37.png", width: 100%),
+      image("assets/image28.png", width: 100%),
+    )
   ),
   caption: [Menu de creación de rutinas -- móvil],
 )
 
 == Desvincular un dispositivo de una habitación
 
-No habia suficiente espacio en la aplicación móvil para tener un boton de desvincular junto a cada dispositivo, o una página separada para las habitaciones, por lo que las habitaciones aparecen como grupos en dispositivos y la acción de desvincular es desde la configuración de las habitaciones.
+No había suficiente espacio en la aplicación móvil para tener un boton de desvincular junto a cada dispositivo, o una página separada para las habitaciones, por lo que las habitaciones aparecen como grupos en dispositivos y la acción de desvincular es desde la configuración de las habitaciones.
 
 #figure(
   image("assets/image18.png", width: 80%),
   caption: [Diagrama de flujo: desvincular dispositivo (web vs. móvil)],
 )
 
-=== Version web
+=== Versión web
 
 #figure(
-  image("assets/image10.png", width: 100%),
-  caption: [Boton de desvincular en página web],
+  image("assets/image10.png", width: 51%),
+  caption: [Botón de desvincular en página web],
 )
 
-=== Version móvil
+=== Versión móvil
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 12pt,
-    image("assets/image15.png", width: 100%),
-    image("assets/image30.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 12pt,
+      image("assets/image15.png", width: 100%),
+      image("assets/image30.png", width: 100%),
+    )
   ),
   caption: [Página de dispositivos y configuración de habitaciones -- móvil],
 )
@@ -905,17 +925,19 @@ No habia suficiente espacio en la aplicación móvil para tener un boton de desv
 )
 
 #figure(
-  grid(
-    columns: 2,
-    gutter: 12pt,
-    image("assets/image25.png", width: 100%),
-    image("assets/image12.png", width: 100%),
+  box(width: 65%,
+    grid(
+      columns: 2,
+      gutter: 12pt,
+      image("assets/image25.png", width: 100%),
+      image("assets/image12.png", width: 100%),
+    )
   ),
-  caption: [Configuracion del nuevo dispositivo -- móvil],
+  caption: [Configuración del nuevo dispositivo -- móvil],
 )
 
 // ====================================
-// 9. DECISIONES DE DISENO Y USABILIDAD
+// 9. DECISIONES DE DISEÑO Y USABILIDAD
 // ====================================
 
 = Decisiones de diseño y usabilidad
@@ -933,13 +955,13 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 
 === Identidad visual y logo
 
-*Decision:* Un logo hexagonal con una casa minimalista y ondas de WiFi. \
+*Decisión:* Un logo hexagonal con una casa minimalista y ondas de WiFi. \
 *Justificación:* Se busca transmitir tecnología y seguridad (nivel visceral). El hexágono da una sensación de estructura solida, y el uso de la ley de cierre de Gestalt permite que el logo sea reconocible incluso en tamaños reducidos.
 
 === Paleta de colores
 
-*Decision:* Tema oscuro profundo con indigo para acciones y ámbar para estados activos. \
-*Justificación:* El tema oscuro reduce la fatiga visual en entornos hogareños. El indigo permite identificar rapidamente que es interactivo (similitud) y el ámbar resalta lo que está encendido. Todos los colores cumplen con el estándar WCAG AA.
+*Decisión:* Tema oscuro profundo con indigo para acciones y ámbar para estados activos. \
+*Justificación:* El tema oscuro reduce la fatiga visual en entornos hogareños. El indigo permite identificar rápidamente que es interactivo (similitud) y el ámbar resalta lo que está encendido. Todos los colores cumplen con el estándar WCAG AA.
 
 #let swatch(color, nombre, hex) = {
   box(
@@ -1003,81 +1025,81 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   swatch("#8494a7", "Muted", "#8494a7"),
 )
 
-=== Tipografia y jerarquia
+=== Tipografia y jerarquía
 
-*Decision:* Familia tipográfica única (Inter) con pesos variables. \
-*Justificación:* Usar una sola fuente ayuda a no saturar al usuario (menor carga cognitiva). La jerarquia se marca con tamaño y grosor del texto de forma natural.
+*Decisión:* Familia tipográfica única (Inter) con pesos variables. \
+*Justificación:* Usar una sola fuente ayuda a no saturar al usuario (menor carga cognitiva). La jerarquía se marca con tamaño y grosor del texto de forma natural.
 
 === Sistema de iconografía
 
-*Decision:* Iconos SVG personalizados en lugar de emojis. \
+*Decisión:* Iconos SVG personalizados en lugar de emojis. \
 *Justificación:* Garantizan consistencia visual en todas las plataformas (Nielsen \#4). Al compartir el mismo grosor de línea y estilo, se facilita su reconocimiento rápido.
 
 === Agrupamiento visual (Cards)
 
-*Decision:* Uso de tarjetas con bordes suaves y espaciado consistente. \
+*Decisión:* Uso de tarjetas con bordes suaves y espaciado consistente. \
 *Justificación:* Aplicamos las leyes de proximidad y region común de Gestalt para que el usuario entienda que los controles de un dispositivo pertenecen a ese dispositivo especifico.
 
 === Variables CSS como fuente de verdad
 
-*Decision:* Centralización de tokens (colores, espacios, tamaños) en un sistema de variables CSS. \
+*Decisión:* Centralización de tokens (colores, espacios, tamaños) en un sistema de variables CSS. \
 *Justificación:* Garantiza que la consistencia (Nielsen \#4) se mantenga de forma técnica. Un cambio de tono tras una evaluación de usabilidad impacta en toda la app al instante.
 
 == Decisiones de usabilidad e interacción
 
 === Estructura de navegación (Sidebar)
 
-*Decision:* Barra lateral izquierda con 6 secciones principales, colapsable. \
+*Decisión:* Barra lateral izquierda con 6 secciones principales, colapsable. \
 *Justificación:* Al limitar las opciones aplicamos la Ley de Hick, acelerando la toma de decisiones. Mantener los iconos visibles al colapsar permite reconocer las secciones sin recordar sus nombres.
 
 === Orientacion (Breadcrumbs)
 
-*Decision:* Migas de pan clickeables en la parte superior. \
+*Decisión:* Migas de pan clickeables en la parte superior. \
 *Justificación:* Funcionan como un indicador de lugar constante para evitar que el usuario se sienta perdido. Ademas, ofrecen una "salida de emergencia" rápida (control y libertad).
 
 === Arquitectura multi-casa
 
-*Decision:* Jerarquia clara de Propiedad > Seccion > Dispositivo. \
+*Decisión:* Jerarquía clara de Propiedad > Sección > Dispositivo. \
 *Justificación:* Mapeamos la estructura física del mundo real al sistema (Nielsen \#2). El selector de casas en la parte superior refleja el modelo mental del usuario.
 
 === Vista Overview (Resumen general)
 
-*Decision:* Una pantalla principal que resume lo crítico de todas las propiedades. \
+*Decisión:* Una pantalla principal que resume lo crítico de todas las propiedades. \
 *Justificación:* El usuario puede ver estados de alerta o rutinas favoritas sin navegar casa por casa, reduciendo drasticamente la carga de trabajo y el tiempo de respuesta.
 
 === Interaccion directa con dispositivos
 
-*Decision:* Botones y controles de gran tamaño (minimo 44px). \
+*Decisión:* Botones y controles de gran tamaño (mínimo 44px). \
 *Justificación:* Aplicamos la Ley de Fitts: objetivos más grandes son más fáciles y rápidos de clickear, reduciendo errores accidentales.
 
 === Feedback y estado del sistema
 
-*Decision:* Notificaciones instantáneas (toasts) y animaciones de estado. \
+*Decisión:* Notificaciones instantáneas (toasts) y animaciones de estado. \
 *Justificación:* El sistema debe responder siempre (Nielsen \#1). Si una luz se enciende, el icono brilla de inmediato, previniendo la incertidumbre de no saber si el comando funcionó.
 
 === Prevención de errores y valores por defecto
 
-*Decision:* Mensajes de confirmación antes de borrar y sliders pre-seteados en valores comunes. \
+*Decisión:* Mensajes de confirmación antes de borrar y sliders pre-seteados en valores comunes. \
 *Justificación:* Es mejor prevenir el error que reportarlo. Los valores por defecto (como el brillo al 80%) ahorran pasos innecesarios.
 
 === Terminologia y lenguaje
 
-*Decision:* Uso de lenguaje cotidiano (español rioplatense) y consistencia léxica. \
+*Decisión:* Uso de lenguaje cotidiano (español rioplatense) y consistencia léxica. \
 *Justificación:* Evitamos la jerga técnica. Usar siempre "Hogar" o "Rutina" ayuda a que el usuario construya un modelo mental solido.
 
 === Libertad y control
 
-*Decision:* Todas las acciones son reversibles (Undos conceptuales). \
+*Decisión:* Todas las acciones son reversibles (Undos conceptuales). \
 *Justificación:* Poder apagar una rutina en lugar de borrarla, o desvincular un dispositivo sin eliminarlo, le da al usuario la confianza para explorar sin miedo.
 
 === Experiencia de entrada (Splash Screen)
 
-*Decision:* Animacion de bienvenida inmersiva pero skipeable. \
+*Decisión:* Animación de bienvenida inmersiva pero skipeable. \
 *Justificación:* Establece el tono de calidad de la app (nivel visceral) y usa la metáfora de "entrar" a la casa. Al permitir saltearla, respetamos el control del usuario.
 
 === Estrategia de prototipado (Auto-login)
 
-*Decision:* Bypass de la pantalla de login para las pruebas de usabilidad. \
+*Decisión:* Bypass de la pantalla de login para las pruebas de usabilidad. \
 *Justificación:* Durante las evaluaciones con usuarios (UCD), el foco esta en el control de la casa y no en la gestión de contraseñas. Esto reduce la fricción inicial.
 
 // ====================================
@@ -1102,17 +1124,17 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 
 === Crear una rutina/automatización (Google Home web y móvil, Amazon Alexa web)
 
-- *Luis (experto):* En Google Home encuentra "Rutinas" velozmente. Crea la rutina con facilidad pero destaca que hay demasiados pasos. En Alexa siente que la web esta desactualizada y que los menus están anidados de forma poco logica.
+- *Luis (experto):* En Google Home encuentra "Rutinas" velozmente. Crea la rutina con facilidad pero destaca que hay demasiados pasos. En Alexa siente que la web está desactualizada y que los menus están anidados de forma poco logica.
 
 - *Sofia (media):* Al principio no logra encontrar "Rutinas" en Google Home. Luego sigue el flujo pero se traba confundiendo el "que debe pasar" con el "que debe activar la rutina". En Alexa directamente se rindio.
 
 - *Laura (sin experiencia):* No logra completar el escenario en ninguna de las dos aplicaciones sin asistencia. Le confunde la cantidad de pantallas.
 
-- *Cecilia (baja-media):* Logra llevar a cabo el escenario en Google Home pero opina que sería más sencillo sí se le proveyera una plantilla. En Alexa le parece confuso que se llame "rutina" pero funcione diferente a Google.
+- *Cecilia (baja-media):* Logra llevar a cabo el escenario en Google Home pero opina que sería más sencillo si se le proveyera una plantilla. En Alexa le parece confuso que se llame "rutina" pero funcione diferente a Google.
 
 === Agrupar dispositivos por habitación (Amazon Alexa web, Home Assistant móvil)
 
-- *Luis (experto):* En Alexa encuentra "Grupos" rapidamente. En Home Assistant reconoce que es una app para perfiles tecnicos.
+- *Luis (experto):* En Alexa encuentra "Grupos" rápidamente. En Home Assistant reconoce que es una app para perfiles tecnicos.
 
 - *Sofia (media):* En Alexa logra crear un grupo pero no ve el sentido de tener "grupo" y "habitación" en una misma aplicación. En Home Assistant no logra completar la tarea.
 
@@ -1147,10 +1169,10 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 === Persona 1
 
 - Cerrar las cortinas a medias no es intuitivo ni directo.
-- Sin division por sala, sí hay muchos dispositivos con el mismo nombre habria un problema de identificacion.
+- Sin division por sala, si hay muchos dispositivos con el mismo nombre habria un problema de identificacion.
 - El término "ejecutar" no queda claro para el usuario.
 - La organización por pisos y cuartos marea más de lo que suma. Propone que directamente aparezca en el home que luces están prendidas.
-- Si una palabra/habitación es clickeable, el resto también deberia serlo (consistencia).
+- Si una palabra/habitación es clickeable, el resto también debería serlo (consistencia).
 - En algunos lugares la letra es muy chica y el contraste es insuficiente.
 - Poca consistencia visual en la sección de cuartos y rutinas.
 - Propone eliminar la sección de cuartos porque resta más de lo que suma.
@@ -1161,7 +1183,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 - Reaccion positiva al ver el gráfico de la casa.
 - Modificar el gráfico de la casa es poco intuitivo.
 - El boton para agregar dispositivos tiene texto muy pequeno.
-- Es muy dificil darse cuenta de como agregar un dispositivo: el color y la disposición son muy distintos a los de agregar habitación.
+- Es muy difícil darse cuenta de como agregar un dispositivo: el color y la disposición son muy distintos a los de agregar habitación.
 - No queda claro sí en una rutina algo se esta encendiendo o apagando.
 - Si algo aparece en gris dentro de una rutina parece deshabilitado en lugar de apagado.
 - Falta consistencia en las líneas de la interfaz.
@@ -1174,7 +1196,7 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
 - Agregar cosas es antiintuitivo (coincide con las otras personas).
 - El encender/apagar de ciertos dispositivos con "sí/no" es muy extraño.
 - Las rutinas no se pueden editar.
-- El historial registra absolutamente todo, lo cual satura la vista. Deberia poder filtrarse o agruparse.
+- El historial registra absolutamente todo, lo cual satura la vista. Debería poder filtrarse o agruparse.
 
 #pagebreak()
 
@@ -1188,11 +1210,11 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   stroke: 0.5pt,
   inset: 8pt,
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*\#*], [*Escenario*], [*Observacion*]),
+  table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Lo hizo sencillamente y mucho más rápido de lo estimado. Menciono: "Qué copado esto!" al ver el esquema de los cuartos.],
-  [2], [Crear una rutina "Buenos dias"],
-  [Hizo la rutina facilmente dentro de los 4 pasos. Se pregunto: "Cuál es la del pasillo?" pero eligio la que pensaba que era.],
+  [Lo hizo sencillamente y mucho más rápido de lo estimado. Mencionó: "Qué copado esto!" al ver el esquema de los cuartos.],
+  [2], [Crear una rutina "Buenos días"],
+  [Hizo la rutina fácilmente dentro de los 4 pasos. Se pregunto: "Cuál es la del pasillo?" pero eligio la que pensaba que era.],
   [3], [Verificar la seguridad del hogar],
   [Lo hizo velozmente desde la pantalla de inicio porque se acordaba de haberlos visto.],
   [4], [Cambiar al perfil adolescente],
@@ -1200,9 +1222,9 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [5], [Consultar el consumo eléctrico],
   [Lo hizo en menos de 30 segundos.],
   [6], [Recuperarse de navegación accidental],
-  [Se completo velozmente.],
-  [7], [Verificar restriccion de configuración],
-  [Se rindio a los 15 segundos. Se frustro.],
+  [Se completó velozmente.],
+  [7], [Verificar restricción de configuración],
+  [Se rindió a los 15 segundos. Se frustró.],
 )
 
 === Carolina / Gestora del hogar (Participante: Cecilia)
@@ -1213,21 +1235,21 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   stroke: 0.5pt,
   inset: 8pt,
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*\#*], [*Escenario*], [*Observacion*]),
+  table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Encontro la lámpara en el esquema de la casa dentro de los 30 segundos.],
-  [2], [Crear una rutina "Buenos dias"],
+  [Encontró la lámpara en el esquema de la casa dentro de los 30 segundos.],
+  [2], [Crear una rutina "Buenos días"],
   [Creo la rutina sin retroceder. Solo busco un poco la lámpara del pasillo.],
   [3], [Verificar la seguridad del hogar],
-  [Encontro alarma y puerta en menos de 1 minuto usando el menú lateral.],
+  [Encontró alarma y puerta en menos de 1 minuto usando el menú lateral.],
   [4], [Cambiar al perfil adolescente],
-  [Lo hizo velozmente. Opino: "El adolescente deberia poder cambiar la alarma ante una emergencia."],
+  [Lo hizo velozmente. Opino: "El adolescente debería poder cambiar la alarma ante una emergencia."],
   [5], [Consultar el consumo eléctrico],
   [Pudo completarlo pero al principio fue a "Historial".],
   [6], [Recuperarse de navegación accidental],
   [Lo hizo velozmente.],
-  [7], [Verificar restriccion de configuración],
-  [Le genero mucha ansiedad. Dijo: "Donde esta? No lo puedo hacer."],
+  [7], [Verificar restricción de configuración],
+  [Le genero mucha ansiedad. Dijo: "Dónde está? No lo puedo hacer."],
 )
 
 === Marta / Usuaria tradicional (Participante: Hannah)
@@ -1238,21 +1260,21 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   stroke: 0.5pt,
   inset: 8pt,
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*\#*], [*Escenario*], [*Observacion*]),
+  table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
   [Se hizo sin problema. Dedujo que lo que brillaba era la lámpara.],
-  [2], [Crear una rutina "Buenos dias"],
+  [2], [Crear una rutina "Buenos días"],
   [Lo hizo velozmente pero retrocedio porque clickeo dos veces un dispositivo y lo desagrego.],
   [3], [Verificar la seguridad del hogar],
-  [Logro la tarea en menos de 1 minuto. Penso brevemente que la barra estaba arriba.],
+  [Logró la tarea en menos de 1 minuto. Pensó brevemente que la barra estaba arriba.],
   [4], [Cambiar al perfil adolescente],
   [Se hizo exitosamente aunque le costo buscar donde cambiar el perfil.],
   [5], [Consultar el consumo eléctrico],
   [Lo hizo velozmente sin problema.],
   [6], [Recuperarse de navegación accidental],
   [Hecho velozmente.],
-  [7], [Verificar restriccion de configuración],
-  [Se rindio al segundo. Dijo: "No bueno, no puedo, no lo encuentro."],
+  [7], [Verificar restricción de configuración],
+  [Se rindió al segundo. Dijo: "No bueno, no puedo, no lo encuentro."],
 )
 
 === Marta / Usuaria tradicional (Participante: Sofia)
@@ -1263,21 +1285,21 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   stroke: 0.5pt,
   inset: 8pt,
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*\#*], [*Escenario*], [*Observacion*]),
+  table.header([*\#*], [*Escenario*], [*Observación*]),
   [1], [Controlar una lámpara desde el dashboard],
-  [Lo hizo rapidamente. Accedio a la lámpara desde el esquema del cuarto.],
-  [2], [Crear una rutina "Buenos dias"],
+  [Lo hizo rápidamente. Accedió a la lámpara desde el esquema del cuarto.],
+  [2], [Crear una rutina "Buenos días"],
   [Lo hizo velozmente, sin errores y sin retroceder.],
   [3], [Verificar la seguridad del hogar],
   [Recordaba haber visto los dispositivos en la pantalla principal.],
   [4], [Cambiar al perfil adolescente],
-  [Exitoso. Menciono: "El coso ese para cambiar de perfil tendría que ser más grande."],
+  [Exitoso. Mencionó: "El coso ese para cambiar de perfil tendría que ser más grande."],
   [5], [Consultar el consumo eléctrico],
-  [Lo hizo rápido. Menciono: "Me hace acordar al consumo del iPhone."],
+  [Lo hizo rápido. Mencionó: "Me hace acordar al consumo del iPhone."],
   [6], [Recuperarse de navegación accidental],
   [Lo hizo rápido usando el atajo del extremo superior izquierdo.],
-  [7], [Verificar restriccion de configuración],
-  [Se rindio al segundo. Dijo: "Deberia aparecer Configuracion, de última que no lo pueda acceder pero tiene que estar."],
+  [7], [Verificar restricción de configuración],
+  [Se rindió al segundo. Dijo: "Debería aparecer Configuración, de última que no lo pueda acceder pero tiene que estar."],
 )
 
 #pagebreak()
@@ -1295,15 +1317,15 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   table.header([*\#*], [*Pregunta*], [*Respuesta*]),
   [1], [Primer instinto para encontrar un dispositivo], ["Dispositivos."],
   [2], [Momento de confusión en la navegación], ["No."],
-  [3], [Opciones del menú lateral], ["Me parecio adecuada."],
-  [4], [Feedback al cambiar estado de dispositivo], ["Si."],
+  [3], [Opciones del menú lateral], ["Me pareció adecuada."],
+  [4], [Feedback al cambiar estado de dispositivo], ["Sí."],
   [5], [Iconos o controles confusos], ["No."],
   [6], [Dispositivo a controlar desde el inicio], ["Las luces ya que siempre todos las dejan prendidas."],
-  [7], [Comprension de restriccion del perfil adolescente], ["Si."],
-  [8], [Logica de ver pero no controlar la alarma], ["Si."],
-  [9], [Selector de perfil facil de encontrar], ["Si."],
-  [10], [Descripcion de la app en una frase], ["Gestionador de hogares."],
-  [11], [Frustracion durante el uso], ["Al intentar buscar Configuracion, que al final ni estaba."],
+  [7], [Comprensión de restricción del perfil adolescente], ["Sí."],
+  [8], [Lógica de ver pero no controlar la alarma], ["Sí."],
+  [9], [Selector de perfil fácil de encontrar], ["Sí."],
+  [10], [Descripción de la app en una frase], ["Gestionador de hogares."],
+  [11], [Frustración durante el uso], ["Al intentar buscar Configuración, que al final ni estaba."],
   [12], [Facilidad general de uso (1-5)], ["4."],
 )
 
@@ -1317,16 +1339,16 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   fill: (x, y) => if y == 0 { gray.lighten(80%) },
   table.header([*\#*], [*Pregunta*], [*Respuesta*]),
   [1], [Primer instinto para encontrar un dispositivo], ["Dashboard."],
-  [2], [Momento de confusión en la navegación], ["No. Solo me genero confusión que no encontre Configuracion."],
-  [3], [Opciones del menú lateral], ["En el de adolescente faltaba Configuracion."],
-  [4], [Feedback al cambiar estado de dispositivo], ["Si."],
+  [2], [Momento de confusión en la navegación], ["No. Solo me generó confusión que no encontre Configuración."],
+  [3], [Opciones del menú lateral], ["En el de adolescente faltaba Configuración."],
+  [4], [Feedback al cambiar estado de dispositivo], ["Sí."],
   [5], [Iconos o controles confusos], ["No."],
   [6], [Dispositivo a controlar desde el inicio], ["La luz y la alarma. La luz porque me la olvido de apagar y la alarma por seguridad."],
-  [7], [Comprension de restriccion del perfil adolescente], ["Si, porque es menor de edad."],
-  [8], [Logica de ver pero no controlar la alarma], ["Deberia poder controlarla porque ante un incendio deberia tener acceso."],
-  [9], [Selector de perfil facil de encontrar], ["Si."],
-  [10], [Descripcion de la app en una frase], ["Administrador de dispositivos."],
-  [11], [Frustracion durante el uso], ["No se podia ver bien la pantalla por el contraste de la luz."],
+  [7], [Comprensión de restricción del perfil adolescente], ["Sí, porque es menor de edad."],
+  [8], [Lógica de ver pero no controlar la alarma], ["Debería poder controlarla porque ante un incendio debería tener acceso."],
+  [9], [Selector de perfil fácil de encontrar], ["Sí."],
+  [10], [Descripción de la app en una frase], ["Administrador de dispositivos."],
+  [11], [Frustración durante el uso], ["No se podia ver bien la pantalla por el contraste de la luz."],
   [12], [Facilidad general de uso (1-5)], ["4."],
 )
 
@@ -1341,15 +1363,15 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   table.header([*\#*], [*Pregunta*], [*Respuesta*]),
   [1], [Primer instinto para encontrar un dispositivo], ["Dashboard."],
   [2], [Momento de confusión en la navegación], ["No."],
-  [3], [Opciones del menú lateral], ["Esta bien pero Configuracion deberia estar en el header o hacerse más visible."],
-  [4], [Feedback al cambiar estado de dispositivo], ["Si."],
+  [3], [Opciones del menú lateral], ["Esta bien pero Configuración debería estar en el header o hacerse más visible."],
+  [4], [Feedback al cambiar estado de dispositivo], ["Sí."],
   [5], [Iconos o controles confusos], ["No."],
   [6], [Dispositivo a controlar desde el inicio], ["La lámpara principal porque me la olvido de apagar."],
-  [7], [Comprension de restriccion del perfil adolescente], ["Si."],
-  [8], [Logica de ver pero no controlar la alarma], ["Esta bien."],
-  [9], [Selector de perfil facil de encontrar], ["No. Esperaba que estuviera en la barra lateral o cerca del nombre de la casa."],
-  [10], [Descripcion de la app en una frase], ["Seguridad."],
-  [11], [Frustracion durante el uso], ["Lo de la configuración."],
+  [7], [Comprensión de restricción del perfil adolescente], ["Sí."],
+  [8], [Lógica de ver pero no controlar la alarma], ["Esta bien."],
+  [9], [Selector de perfil fácil de encontrar], ["No. Esperaba que estuviera en la barra lateral o cerca del nombre de la casa."],
+  [10], [Descripción de la app en una frase], ["Seguridad."],
+  [11], [Frustración durante el uso], ["Lo de la configuración."],
   [12], [Facilidad general de uso (1-5)], ["3,5."],
 )
 
@@ -1365,13 +1387,13 @@ Para fundamentar cada decisión, nos basamos en los principios de Interaccion Pe
   [1], [Primer instinto para encontrar un dispositivo], ["Dashboard."],
   [2], [Momento de confusión en la navegación], ["No."],
   [3], [Opciones del menú lateral], ["Esta bien."],
-  [4], [Feedback al cambiar estado de dispositivo], ["Si."],
+  [4], [Feedback al cambiar estado de dispositivo], ["Sí."],
   [5], [Iconos o controles confusos], ["No."],
   [6], [Dispositivo a controlar desde el inicio], ["El aire acondicionado porque siempre lo dejo prendido."],
-  [7], [Comprension de restriccion del perfil adolescente], ["Si."],
-  [8], [Logica de ver pero no controlar la alarma], ["Si."],
-  [9], [Selector de perfil facil de encontrar], ["A mi sí pero seguramente que para todos no."],
-  [10], [Descripcion de la app en una frase], ["Control de dispositivos de hogares."],
-  [11], [Frustracion durante el uso], ["Cuándo no pude encontrar Configuracion."],
+  [7], [Comprensión de restricción del perfil adolescente], ["Sí."],
+  [8], [Lógica de ver pero no controlar la alarma], ["Sí."],
+  [9], [Selector de perfil fácil de encontrar], ["A mi sí pero seguramente que para todos no."],
+  [10], [Descripción de la app en una frase], ["Control de dispositivos de hogares."],
+  [11], [Frustración durante el uso], ["Cuando no pude encontrar Configuración."],
   [12], [Facilidad general de uso (1-5)], ["4,5."],
 )
