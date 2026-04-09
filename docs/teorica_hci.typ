@@ -1424,3 +1424,53 @@ Esto si te carga todo (creo)
 ]
 
 
+= Vue.js - Introduccion
+
+== Vite
+
+_Consta de dos cosas:_
+
+- Un servidor web que proporciona mejoras enriquecidas de 
+  funcionalidades sobre modulos ES nativos, 
+  ej: Hot Module Replacement (HMR) extremadamente rapido
+
+- Un comando de compilacion que empaqueta el codigo con *Rolldown*,
+  preconfigurado para generar recursos estaticos altamente optimizados
+  para produccion
+
+
+#importante[
+  Todo esto es para mejorar el tiempo de desarrollo y se usa el comando
+
+  ```sh
+  npm run dev
+  ```
+]
+
+=== Produccion
+
+Que pasa en produccion?
+
+Transformamos todo en HTML, CSS y JS para pasarselo al navegador todo junto.
+
+#importante[
+  Es mucho mas eficiente hacer esto porque le pasamos al navegador 
+  directamente lo que tiene que interpretar. Para esto se usa el comando:
+
+  ```sh
+  npm run build
+  npm run preview
+  ```
+]
+
+#tip[
+  Siempre vamos a estar trabajando con npm run dev, el problema es que 
+  *Dolagaratz prueba todo usando build + preview*.
+]
+
+#doubt[
+  Que pasa si tenemos la pagina deployeada?
+][
+
+]
+
