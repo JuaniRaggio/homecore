@@ -1521,3 +1521,7 @@ Transformamos todo en HTML, CSS y JS para pasarselo al navegador todo junto.
   Es un framework que te trae componentes y clases de utilidad.
 ]
 
+=== Librerias de iconos
+
+- Buscar ICON FONTS en vuetifyjs
+
