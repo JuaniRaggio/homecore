@@ -1547,4 +1547,10 @@ Vuetify te brinda una clase de utilidad spacing que te permite hacer padding de 
 tu pagina o de los limites de pantalla de tus usuarios
 
 
+#importante[
+  *Nueva tendencia*
+
+  - Librerias de componentes no estilados
+  - Agregar el estilo propio
+]
 
