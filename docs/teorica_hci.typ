@@ -1468,9 +1468,56 @@ Transformamos todo en HTML, CSS y JS para pasarselo al navegador todo junto.
   *Dolagaratz prueba todo usando build + preview*.
 ]
 
-#doubt[
-  Que pasa si tenemos la pagina deployeada?
-][
 
+= Vue
+
+== Ejemplo de componente
+
+```vue
+
+<template>
+
+  <h1 class="title" id="heading">Title</h1>
+  <p>Este es un parrafo</p>
+
+</template>
+
+<style scoped>
+  h1 {
+    color: red;
+  }
+  .title {
+    color: green;
+  }
+  #heading {
+    color: blue;
+  }
+</style>
+
+```
+
+#nota[
+  El atributo scoped hace que el estilo solo se aplique sobre el componente que creaste (template).
+
+  El .title pesa mas que el h1
+
+  El \#heading pesa mas que el .title
+
+  Recordar cajitas:
+  #table(columns: 6)[][!important][A][B][C][D][h1][0][0][0][0][1][.title (class)][0][0][0][1][0][\#heading][0][0][1][0][0]
+]
+
+
+=== Mapeo vue - web
+
+- template == html
+- style == css
+- script == js
+
+
+== Vuetify
+
+#nota[
+  Es un framework que te trae componentes y clases de utilidad.
 ]
 
