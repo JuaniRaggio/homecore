@@ -1476,7 +1476,6 @@ Transformamos todo en HTML, CSS y JS para pasarselo al navegador todo junto.
 == Ejemplo de componente
 
 ```vue
-
 <template>
 
   <h1 class="title" id="heading">Title</h1>
@@ -1495,7 +1494,6 @@ Transformamos todo en HTML, CSS y JS para pasarselo al navegador todo junto.
     color: blue;
   }
 </style>
-
 ```
 
 #nota[
@@ -1553,4 +1551,10 @@ tu pagina o de los limites de pantalla de tus usuarios
   - Librerias de componentes no estilados
   - Agregar el estilo propio
 ]
+
+
+=== Alineacion de elementos
+
+- Flex (Ver en vuetify)
+- Grid System (12 columnas) $=>$ Grilla construida usando flex. Te permite acomodar de forma ordenada y flexible los elementos en la interfaz
 
