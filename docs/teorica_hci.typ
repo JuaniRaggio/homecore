@@ -353,19 +353,19 @@ El usuario va a recibir lo que esperaba.
 #importante[
   Metodos y tecnicas:
 
-    - Observacion: decirle a un usuario que use una aplicacion,
-      dandole primero instrucciones; con esto tenemos que entender
-      que "problemas" tiene y como reacciona frente a nuestra
-      interfaz
-    - Eye tracking: Seria hacer un trackeo de los ojos mientras el
-      usuario utiliza la app, esto nos marca claramente en donde
-      esta la atencion del usuario en terminos visuales
-    - Entrevistas: Es presencial
-    - Encuestas: Es virtual o formularios genericos mas masivos
-    - Analitica Web: Con autorizacion del usuario podemos observar
-      cuanto tarda en hacer un click, diferencia de tiempo entre
-      clicks, que botones se usan mas, que zonas no se usan, se
-      desvian los usuarios de los flujos?
+  - Observacion: decirle a un usuario que use una aplicacion,
+    dandole primero instrucciones; con esto tenemos que entender
+    que "problemas" tiene y como reacciona frente a nuestra
+    interfaz
+  - Eye tracking: Seria hacer un trackeo de los ojos mientras el
+    usuario utiliza la app, esto nos marca claramente en donde
+    esta la atencion del usuario en terminos visuales
+  - Entrevistas: Es presencial
+  - Encuestas: Es virtual o formularios genericos mas masivos
+  - Analitica Web: Con autorizacion del usuario podemos observar
+    cuanto tarda en hacer un click, diferencia de tiempo entre
+    clicks, que botones se usan mas, que zonas no se usan, se
+    desvian los usuarios de los flujos?
 ]
 
 \
@@ -382,7 +382,7 @@ uso de la web
 
 - Objetivos: identificar y detallar los objetivos de los usuarios
 
-- Consideraciones: Satisfacer claramente los objetivos y el 
+- Consideraciones: Satisfacer claramente los objetivos y el
   alcance definido
 
 - Metodos y tecnicas: modelos de personas
@@ -404,7 +404,7 @@ un sistema que presentan similitudes en:
 === Producir soluciones de diseno - Ej.: Card sorting
 
 Le das a un usuario un grupo de cartas con palabras clave que van
-a estar en tu interfaz, le pedis que agrupe las cartas segun un 
+a estar en tu interfaz, le pedis que agrupe las cartas segun un
 criterio que considere y te guardas esa forma de agrupamiento para
 poder entender como piensa el usuario
 
@@ -433,17 +433,17 @@ poder entender como piensa el usuario
 == Usuarios representativos
 
 #error[
-  Si pensas en usuarios representativos para "pagina de 
+  Si pensas en usuarios representativos para "pagina de
   universidad", los usuarios representativos NO son alumnos y
-  docentes (esos son modelos de persona). Los UR es variando 
+  docentes (esos son modelos de persona). Los UR es variando
   caracteristicas mas particulares/atributos como "edad", "genero",
   "comfort tecnologico", "nivel socioeconomico", etc.
 ]
 
 #importante[
-  - *Si vos tomas siempre un rango de edad X, tiene que haber una 
+  - *Si vos tomas siempre un rango de edad X, tiene que haber una
     justificacion*
-  - *Cuando hablas de valores de los atributos, hay que ser 
+  - *Cuando hablas de valores de los atributos, hay que ser
     precisos, tenemos que usar rangos claros o sustento usando
     recursos como "2 veces el sueldo minimo"*
 ]
@@ -452,10 +452,10 @@ poder entender como piensa el usuario
 
 == Aspectos claves
 
-- Como se encuentran integradas las distintas actividades 
+- Como se encuentran integradas las distintas actividades
   particulares en una actividad mas grande de comportamiento?
 
-- Cuales son las similitudes y diferencias que presentan las 
+- Cuales son las similitudes y diferencias que presentan las
   personas?
 
   _Resumirlas mediante los modelos de persona_
@@ -466,7 +466,7 @@ poder entender como piensa el usuario
 
 === Que no preguntar
 
-- "Esto que es importante, que pensas..." $=>$ esto es una 
+- "Esto que es importante, que pensas..." $=>$ esto es una
   *pregunta guiada* y condiciona la respuesta que va a dar
 
 - "Como te gustaria que este implementado tal cosa" $=>$ esto no va
@@ -504,7 +504,7 @@ poder entender como piensa el usuario
     pregunta expliquen el proceso de pensamiento detras de cada
     respuesta
 
-- Realizar *pruebas de funcionamiento*: Validar que el 
+- Realizar *pruebas de funcionamiento*: Validar que el
   comportamiento de la encuesta sea adecuado
   - Reclutar a algunos colegas
   - Pedirle que pruebe la mecanica de la encuesta varias veces en
@@ -512,7 +512,7 @@ poder entender como piensa el usuario
 
 #importante[
   - Si tenes que controlar dispositivos y hay nenes en la casa, hay
-    que dar la opcion de restringir contenido para ciertos 
+    que dar la opcion de restringir contenido para ciertos
     dispositivos
 ]
 
@@ -549,12 +549,12 @@ Esto es agrupar usuarios personas en un grupos
 #error[
   Errores creando los modelos de personas:
 
-  - Nivel tecnologico: #text(fill: red)["Alto"] $=>$ es recontra 
+  - Nivel tecnologico: #text(fill: red)["Alto"] $=>$ es recontra
     ambiguo, hay que definir un criterio para decir quien es alto,
     medio o bajo
-    
-  - No agregar foto $=>$ #text(fill: green)[Es importante agregar 
-    foto]
+
+  - No agregar foto $=>$ #text(fill: green)[Es importante agregar
+      foto]
 
   - No tener en cuenta la informacion accesible por la API
 
@@ -593,7 +593,7 @@ _Es el esfuerzo mental que una persona necesita para realizar una tarea_
 
 - *Reducir abarrotamiento:* sacar todo lo que distraiga el ojo
 
-- *Construir usando los modelos mentales existentes:* los usuarios tienen 
+- *Construir usando los modelos mentales existentes:* los usuarios tienen
   mucha experiencia usando aplicaciones que respetan una gran cantidad de convenciones
 
 - *Deshacerse de tareas:* Tratar de quitarle carga al usuario, haciendo que la UI realice
@@ -632,7 +632,7 @@ que queremos nosotros
 
 
 #doubt[
-  Tiene sentido una interfaz complicada de usar pero que tu objetivo sea que el usuario 
+  Tiene sentido una interfaz complicada de usar pero que tu objetivo sea que el usuario
   aprenda y logre ser lo mas eficiente posible en el trabajo que desea realizar?
 ][
 
@@ -711,12 +711,12 @@ Si estuviesen uno al lado del otro y otros abajo, seria mas complicado
 = Percepcion motriz - Ley de Fitts
 
 #importante[
-  Los movimientos rapidos y los objetivos chiquitos resultan en mayores 
+  Los movimientos rapidos y los objetivos chiquitos resultan en mayores
   tasas de error, debido al equilibrio entre velocidad y precision
 ]
 
 #importante[
-  No tendria sentido hacer botones del sizeof *mi dedo (eventualmente)* porque necesita mucha precision el usuario, en conclusion 
+  No tendria sentido hacer botones del sizeof *mi dedo (eventualmente)* porque necesita mucha precision el usuario, en conclusion
 ]
 
 $ I D = log_2 ((2D)/W) $
@@ -739,20 +739,20 @@ Hay que usar lenguaje claro para que todos puedan entender y usar la aplicacion
 = Emociones
 
 #nota[
-  Las emociones proporcionan info. importante para ayudarnos a priorizar la atencion 
+  Las emociones proporcionan info. importante para ayudarnos a priorizar la atencion
   y ser mas eficientes a la hora de tomar decisiones
 ]
 
 
 == Nivel visceral
 
-Es una respuesta inconsciente, instintiva y efectiva a un estimulo externo no 
+Es una respuesta inconsciente, instintiva y efectiva a un estimulo externo no
 relacionada con la racionalidad o razonamiento
 
 
 == Nivel conductual
 
-Si la computadora tiene una falla y pierdo el trabajo de las ultimas horas 
+Si la computadora tiene una falla y pierdo el trabajo de las ultimas horas
 seguramente tendre una sensacion de furia, abatimiento, etc.
 
 
@@ -787,15 +787,15 @@ posibles usuarios y/o para efectuarle algun tipo de pruebas_
 Se pueden clasificar de diferentes formas:
 
 - Baja (papel): implementados en papel, constituyen una serie de
-  dibujos o impresiones, los cuales no permiten una interaccion 
+  dibujos o impresiones, los cuales no permiten una interaccion
   realista
 
 - Media (digital): Implementados con una design tool, constituyen
   una serie de pantallas que contienen un mayor nivel de detall visual
-  y permiten cierto nivel de interaccion sin la necesidad de 
+  y permiten cierto nivel de interaccion sin la necesidad de
   programacion
 
-- Alta (nativo): *Implementados en algun lenguaje de programacion*, 
+- Alta (nativo): *Implementados en algun lenguaje de programacion*,
   constituye una aplicacion con un nivel de detalle visual e
   interacciones completamente realistas. *Son reutilizables*
 
@@ -803,7 +803,7 @@ Se pueden clasificar de diferentes formas:
 
 == Baja o Alta fidelidad?
 
-El uso de los distintos tipos de prototipos no es excluyente, siendo 
+El uso de los distintos tipos de prototipos no es excluyente, siendo
 utiles en diferentes momentos del ciclo de vida de desarrollo del
 producto.
 
@@ -846,7 +846,7 @@ Es una tecnica utilizada para poder mostrar la manera en la que los
 usuarios podran interactuar
 
 #nota[
-  Esto se puede hacer tanto con prototipos de bajo nivel en papel como 
+  Esto se puede hacer tanto con prototipos de bajo nivel en papel como
   se mostro en clase como con prototipos de alto nivel
 ]
 
@@ -876,7 +876,7 @@ Solo disponible para mac
 
 = User story maps
 
-- Los equipos suelen basarse en documentos de requisitos y 
+- Los equipos suelen basarse en documentos de requisitos y
   especificaciones funcionales largos y poco eficaces para pasar
   de la vision de un producto a lo que debe incluir como debe funcionar
 
@@ -890,7 +890,7 @@ Solo disponible para mac
 #importante[
   - Actividades: ejemplo - "ejecutar una rutina", "encender la tele"
   - Pasos: ejemplo - "loguear", "seleccionar dispositivo"
-  - Detalles: ejemplo - "Introducir nombre de usuario", "correo", 
+  - Detalles: ejemplo - "Introducir nombre de usuario", "correo",
     "password", "presionar un boton"
 ]
 
@@ -902,7 +902,7 @@ Solo disponible para mac
 = User journey maps
 
 Mapa del punto de vista del usuario de la experiencia del usuario, es
-una representacion visual de los pasos que este sigue para alcanzar un 
+una representacion visual de los pasos que este sigue para alcanzar un
 objetivo, junto con sus pensamientos, sentimientos, etc.
 
 
@@ -935,7 +935,7 @@ Predecir potenciales problemas que potencialmente puede tener tu UI
   que *no interviene el usuario*
 ]
 
-Lo que busca es predecir problemas, tenemos 3 a 5 expertos en 
+Lo que busca es predecir problemas, tenemos 3 a 5 expertos en
 usabilidad y en base a su experiencia, utilizan heuristicas para
 ver si las cumple o no.
 
@@ -946,8 +946,8 @@ puede llegar a tener la app.
   La idea es practicar esta evaluacion a pesar de que no seamos
   expertos.
 
-  La evaluacion no tiene que ser grupal. Lo ideal es que cada 
-  integrante mire con sus propios ojos y escriba lo que piensa, 
+  La evaluacion no tiene que ser grupal. Lo ideal es que cada
+  integrante mire con sus propios ojos y escriba lo que piensa,
   finalmente se hace una puesta en comun y en base a eso se construye
   el informe.
 ]
@@ -970,10 +970,10 @@ puede llegar a tener la app.
 
 === Principios de Jakob Nielsen
 
-- *Visibilidad del estado del sistema:* El usuario en todo momento 
-  tiene que tener un feedback apropiado de lo que esta sucediendo en 
-  la aplicacion. Ej: "Si el usuario presiona agregar dispositivo, 
-  tiene que tener un feedback razonable como una notificacion de que 
+- *Visibilidad del estado del sistema:* El usuario en todo momento
+  tiene que tener un feedback apropiado de lo que esta sucediendo en
+  la aplicacion. Ej: "Si el usuario presiona agregar dispositivo,
+  tiene que tener un feedback razonable como una notificacion de que
   se agrego exitosamente"
 
 - *Correspondencia entre el sistema y el mundo real:* La app tiene que
@@ -1004,15 +1004,15 @@ puede llegar a tener la app.
 - *Reconocimiento en lugar de recuerdo:* Minimizar la carga en la
   memoria del usuario
 
-- *Flexibilidad y eficiencia de uso:* Darle experiencia adecuada a 
+- *Flexibilidad y eficiencia de uso:* Darle experiencia adecuada a
   todos los usuarios para que los power users puedan ser eficientes
   en la aplicacion. (Como en vim) Tiene que poder ser adaptable a las
   necesidades del usuario
 
-- *Estetica y minimalismo:* Como se menciono anteriormente, solo hay 
+- *Estetica y minimalismo:* Como se menciono anteriormente, solo hay
   que mostrar lo relevante y evitar el abarrotamiento.
 
-- *Ayudar a los usuarios a reconocer, diagnosticar y recuperarse de 
+- *Ayudar a los usuarios a reconocer, diagnosticar y recuperarse de
   errores:*  Si lo errores no se pueden prevenir, darle un feedback
   excelente al usuario para que entienda exactamente lo que tiene que
   hacer para resolverlo.
@@ -1079,7 +1079,7 @@ de lo que tiene que hacer. Pueden tomarse tambien datos cuantitativos
 por ejemplo tasa de error, tiempo, eficiencia, etc.
 
 #nota[
-  No esta mal tirarle una ayuda para ver si lo puede terminar de 
+  No esta mal tirarle una ayuda para ver si lo puede terminar de
   resolver
 ]
 
@@ -1101,7 +1101,7 @@ por ejemplo tasa de error, tiempo, eficiencia, etc.
 
 - Criterios que deben de utilizarse en las busquedas, el usuario:
   - Conoce de antemano como se quiere realizar la busqueda?
-  - Por que debe comprender la implementacion interna del 
+  - Por que debe comprender la implementacion interna del
     mecanismo de busqueda?
 
 
@@ -1109,13 +1109,13 @@ por ejemplo tasa de error, tiempo, eficiencia, etc.
 
 == Crear una jerarquia visual clara
 
-- Las cosas importantes tienen que ser prominentes 
+- Las cosas importantes tienen que ser prominentes
   (*mas destacados*).
 
 - Aquellos elementos que estan relacionados semanticamente, tiene
   que estarlo tambien visualmente
 
-- Los elementos que son parte de otro elemento deben anidarse 
+- Los elementos que son parte de otro elemento deben anidarse
   visualmente para mostrar dicha relacion
 
 #importante[
@@ -1151,7 +1151,7 @@ por ejemplo tasa de error, tiempo, eficiencia, etc.
 - Abarrotamiento: cuando todo en la pagina llama la atencion, el
   efecto producido puede ser abrumador
 
-- Ruido de fondo: Algunas paginas si bien no tienen un gran 
+- Ruido de fondo: Algunas paginas si bien no tienen un gran
   abarrotamiento, presentan algunos ruidos visuales que terminan
   agotando al usuario
 
@@ -1166,7 +1166,7 @@ por ejemplo tasa de error, tiempo, eficiencia, etc.
 
 #error[
   Obsesionarse con la cantidad de clicks no tiene sentido, nadie
-  se pone a contar los clicks que fue haciendo. *Si hay que 
+  se pone a contar los clicks que fue haciendo. *Si hay que
   hacerle sentir al usuario que esta avanzando en su tarea*
 ]
 
@@ -1202,18 +1202,18 @@ La navegacion tiene otros propositos:
 
 == Persisten navigation
 
-La mayoria de sitios que navegamos, tienen elementos que estan 
+La mayoria de sitios que navegamos, tienen elementos que estan
 dispuestos en el mismo lugar a lo largo de todas las pantallas.
-Esto es asi para que el usuario siempre sepa que en cierto lugar 
+Esto es asi para que el usuario siempre sepa que en cierto lugar
 es donde siempre va a estar eso que desea hacer. Ej: Si queres
 cerrar algo, en general esta o arriba a la derecha o arriba a la
 izq
 
-- *Site ID o logo:* Permite saber que uno se encuentra todavia en 
-  el mismo sitio. Generalmente se encuentra en la parte superior 
+- *Site ID o logo:* Permite saber que uno se encuentra todavia en
+  el mismo sitio. Generalmente se encuentra en la parte superior
   de la pantalla
 
-- *Secciones:* Navegacion primaria o de primer nivel, son los 
+- *Secciones:* Navegacion primaria o de primer nivel, son los
   links a las secciones principales del sitio.
 
 
@@ -1244,7 +1244,7 @@ de lugar
 
 #importante[
   // TODO
-  *Implementar breadcrumbs en la app de domotica*, tiene 
+  *Implementar breadcrumbs en la app de domotica*, tiene
   claramente una estructura jerarquica tipo:
 
   $ "Casa Pilar" >> "Habitacion Juani" >> "Iluminacion" $
@@ -1256,8 +1256,8 @@ de lugar
   Tiene sentido agregar una asbtraccion de tipos "iluminacion",
   "cerraduras", "alertas", "calefaccion", etc.?
 
-  Siento que al usuario le puede dar "fiaca" tener que estar 
-  ingresando en tantas capas de abstraccion pero a la vez 
+  Siento que al usuario le puede dar "fiaca" tener que estar
+  ingresando en tantas capas de abstraccion pero a la vez
   cuando/si es que el usuario tiene muchos dispositivos puede
   ser util.
 ][
@@ -1314,7 +1314,7 @@ _Generalmente hablamos de telefonos inteligentes y tablets_
 
 - 6 de cada 10 argentinos aseguro estar usando mas sus smartphones
 
-- 1 de cada 3 argentinos reconocio usar mas apps como zoom, 
+- 1 de cada 3 argentinos reconocio usar mas apps como zoom,
   tiktok, instagram
 
 - *Hay mas gente usando celulares que computadoras*
@@ -1327,7 +1327,7 @@ _Generalmente hablamos de telefonos inteligentes y tablets_
 
 == Escritorio versus movil
 
-- Escritorio: Generalmente se usa para hacer tareas lentas y 
+- Escritorio: Generalmente se usa para hacer tareas lentas y
   complejas
 
 - Movil: Generalmente se usa para hacer tareas rapidas y simples
@@ -1343,14 +1343,16 @@ _Generalmente hablamos de telefonos inteligentes y tablets_
 #importante[
   Este link muestra como agarramos los dispositivos moviles:
 
-  #align(center)[#link("https://alistapart.com/article/how-we-hold-our-gadgets/")[#text(fill: blue)[How we hold our gadgets]]]
+  #align(center)[#link("https://alistapart.com/article/how-we-hold-our-gadgets/")[#text(
+    fill: blue,
+  )[How we hold our gadgets]]]
 
 ]
 
 #importante[
   - Mantener la persistencia de sesiones
   - En caso de que sea una app con datos sensibles, podes si pedir
-    datos biometricos para que no tenga que poner la pass 500 
+    datos biometricos para que no tenga que poner la pass 500
     veces
 ]
 
@@ -1423,4 +1425,136 @@ Esto si te carga todo (creo)
   Tenemos que analizar que pasa si perdemos conexion a internet
 ]
 
+
+= Vue.js - Introduccion
+
+== Vite
+
+_Consta de dos cosas:_
+
+- Un servidor web que proporciona mejoras enriquecidas de
+  funcionalidades sobre modulos ES nativos,
+  ej: Hot Module Replacement (HMR) extremadamente rapido
+
+- Un comando de compilacion que empaqueta el codigo con *Rolldown*,
+  preconfigurado para generar recursos estaticos altamente optimizados
+  para produccion
+
+
+#importante[
+  Todo esto es para mejorar el tiempo de desarrollo y se usa el comando
+
+  ```sh
+  npm run dev
+  ```
+]
+
+=== Produccion
+
+Que pasa en produccion?
+
+Transformamos todo en HTML, CSS y JS para pasarselo al navegador todo junto.
+
+#importante[
+  Es mucho mas eficiente hacer esto porque le pasamos al navegador
+  directamente lo que tiene que interpretar. Para esto se usa el comando:
+
+  ```sh
+  npm run build
+  npm run preview
+  ```
+]
+
+#tip[
+  Siempre vamos a estar trabajando con npm run dev, el problema es que
+  *Dolagaratz prueba todo usando build + preview*.
+]
+
+
+= Vue
+
+== Ejemplo de componente
+
+```vue
+<template>
+
+  <h1 class="title" id="heading">Title</h1>
+  <p>Este es un parrafo</p>
+
+</template>
+
+<style scoped>
+  h1 {
+    color: red;
+  }
+  .title {
+    color: green;
+  }
+  #heading {
+    color: blue;
+  }
+</style>
+```
+
+#nota[
+  El atributo scoped hace que el estilo solo se aplique sobre el componente que creaste (template).
+
+  El .title pesa mas que el h1
+
+  El \#heading pesa mas que el .title
+
+  Recordar cajitas:
+  #table(columns: 6)[][!important][A][B][C][D][h1][0][0][0][0][1][.title (class)][0][0][0][1][0][\#heading][0][0][1][0][0]
+]
+
+
+=== Mapeo vue - web
+
+- template == html
+- style == css
+- script == js
+
+
+== Vuetify
+
+#nota[
+  Es un framework que te trae componentes y clases de utilidad.
+]
+
+=== Librerias de iconos
+
+- Buscar ICON FONTS en vuetifyjs
+
+
+=== Responsiveness
+
+#importante[
+  Vuetify define distintos displays con breakpoints que podes hacer que ciertos elementos aparezcan o desaparezcan segun el ancho de tu pantalla
+
+  *Nos va a interesar usar esto para el tema de la vista isometrica 3D de la casa*
+
+  #nota[
+    Por default vuetify es responsive pero nos da estas herramientas que ayudan a decirle exactamente como esperamos que se comporte
+  ]
+]
+
+
+=== Legibilidad
+
+Vuetify te brinda una clase de utilidad spacing que te permite hacer padding de forma sencilla para mejorar la legibilidad de componentes respecto de
+tu pagina o de los limites de pantalla de tus usuarios
+
+
+#importante[
+  *Nueva tendencia*
+
+  - Librerias de componentes no estilados
+  - Agregar el estilo propio
+]
+
+
+=== Alineacion de elementos
+
+- Flex (Ver en vuetify)
+- Grid System (12 columnas) $=>$ Grilla construida usando flex. Te permite acomodar de forma ordenada y flexible los elementos en la interfaz
 
