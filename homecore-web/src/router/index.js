@@ -11,6 +11,11 @@ const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
 
 const routes = [
+  // {
+  //   path: '/',
+  //   name: 'overview',
+  //   component: OverviewView
+  // },
   {
     path: '/',
     name: 'home',
