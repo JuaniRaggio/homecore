@@ -1,0 +1,259 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Variables de color (paleta oscura del prototipo) ── */
+:root {
+  --bg-main:      #0d0d1a;   /* fondo general */
+  --bg-sidebar:   #111127;   /* panel lateral */
+  --bg-topbar:    #111127;   /* barra superior */
+  --bg-card:      #1a1a30;   /* tarjetas */
+  --bg-card-alt:  #13132a;   /* tarjetas alternativas */
+  --accent:       #4f6ef7;   /* azul de resaltado activo */
+  --accent-hover: #3a56d4;
+  --text-primary: #e8e8f0;
+  --text-muted:   #7878a0;
+  --border:       #2a2a4a;
+  --toggle-on:    #4f6ef7;
+  --toggle-off:   #3a3a5a;
+  --sidebar-w:    220px;
+  --topbar-h:     60px;
+}
+
+
+
+
+/* Selector universal: aplica box-sizing a todos los elementos */
+*, *::before, *::after{
+    box-sizing: border-box;
+    margin: 0; /* Elimina márgenes por defecto */
+    padding: 0; /* Elimina relleno por defecto */
+}
+
+
+
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-h);
+  background-color: var(--bg-topbar);
+  border-bottom: 1px solid var(--border);
+  display: flex;  /*flexbox para alinear horizontalmente los elementos*/
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px; /*espacio interno horizontal*/
+  z-index: 100;   /* z-index: queda por encima del resto */
+}
+
+/* Selector descendiente: span dentro de .topbar__logo */
+.topbar__logo span:first-child {
+  font-size: 18px;
+  font-weight:700;
+  color: var(--accent);
+  margin-right: 10px;
+}
+
+.topbar_casa {
+  font-size: 15px;
+  font-weight:300;
+  color: var(--text-muted);
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+
+
+/* Selector de tipo + clase: botón con ícono */
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: var(--border);
+}
+
+
+.topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+
+/* Avatar circular: border-radius al 50% */
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+}
+
+
+/* ── SIDEBAR ── */
+/* position: fixed, desplazado hacia abajo el alto del topbar */
+.sidebar {
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  z-index: 90;
+  overflow-y: auto;
+}
+
+
+.property-selector {
+  padding: 8px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+/*AGREGAR BOTON DE LISTA A CASA MARTINEZ*/
+
+.property-selector span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background-color: var(--bg-card);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: block;
+  cursor: pointer;
+}
+
+/* Selector de lista: sin viñetas */
+.nav-list {
+  list-style: none;
+  padding: 0 10px;
+  flex: 1;
+}
+
+.nav-item > a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+
+.nav-item > a:hover {
+  background-color: rgba(79, 110, 247, 0.12);
+  color: var(--text-primary);
+}
+
+
+/* Selector de clase combinado: nav-item activo */
+.nav-item.active > a {
+  background-color: rgba(79, 110, 247, 0.2);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+
+/* Selector de lista: sin viñetas */
+.nav-list {
+  list-style: none;
+  padding: 0 10px;
+  flex: 1;
+}
+
+
+
+.sidebar__footer {
+  padding: 10px 20px 0;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.sidebar__footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  display: block;
+  padding: 8px 4px;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+
+
+/* ── CONTENIDO PRINCIPAL ── */
+/* margin-left = ancho del sidebar, margin-top = alto del topbar */
+.main-content {
+  margin-left: calc(var(--sidebar-w) + 20px);
+  margin-top: calc(var(--topbar-h) + 20px);
+  margin-right: 20px;
+  max-width: calc(vw );
+  max-height: 60vh; /* Ajuste el alto al 50% de la pantalla */
+
+  background-color: #211e3f; /* Color de fondo */
+  border: 1px solid #575757; /* Borde del rectángulo */
+  border-radius: 10px; /* Bordes redondeados (opcional) */
+  padding: 20px; /* Espacio interno */
+  color: #fff; /*Color del texto */
+  min-height: 50vh;
+}
+
+
+.top-list {
+ 
+  list-style: none;
+  display: block;
+
+  background-color: var(--bg-card);
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 4px 15px; 
+max-width: fit-content;
+
+}
+
+.top-item  {
+padding: 4px 4px ;
+color: var(--text-muted);
+display: inline-block;
+}
+
+
+
+
+
+
