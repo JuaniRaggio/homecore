@@ -17,7 +17,7 @@
       <!-- TODO: Al hacer click, abrir panel/dropdown de notificaciones -->
       <!-- TODO: El badge debe mostrar la cantidad real de notificaciones sin leer (del store) -->
       <div class="notif-wrap">
-        <button class="btn-notif" @click="/* TODO: togglear panel de notificaciones */">
+        <button class="btn-notif" @click="() => {}">
           <i class="fa-regular fa-bell"></i>
         </button>
         <span class="notif-badge">1</span>

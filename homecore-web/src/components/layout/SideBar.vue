@@ -26,7 +26,7 @@
       </router-link>
 
       <!-- TODO: Implementar colapso del sidebar (toggle una clase CSS que reduzca el ancho) -->
-      <button class="sidebar__btn" @click="/* TODO: togglear sidebar colapsado */">
+      <button class="sidebar__btn" @click="() => {}">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
     </div>
