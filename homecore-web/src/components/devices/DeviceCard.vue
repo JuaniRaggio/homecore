@@ -15,7 +15,7 @@
         :class="{ 'star--yellow': device.isFavorite }"
         @click="$emit('toggle-favorite', device.id)"
       >
-        <i class="fa-solid fa-star"></i>
+        <i :class="device.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
       </span>
     </div>
 
@@ -58,14 +58,17 @@ defineEmits(['toggle', 'toggle-favorite'])
 
 // Mapeo de tipo de dispositivo a icono de Font Awesome
 const iconMap = {
-  light: 'fa-regular fa-lightbulb',
-  door: 'fa-solid fa-door-open',
-  ac: 'fa-solid fa-temperature-half',
+  light:   'fa-regular fa-lightbulb',
+  door:    'fa-regular fa-square',
+  alarm:   'fa-regular fa-clock',
+  water:   'fa-solid fa-faucet',
+  curtain: 'fa-solid fa-table-list',
+  ac:      'fa-solid fa-temperature-half',
   speaker: 'fa-solid fa-volume-high',
-  vacuum: 'fa-solid fa-broom',
-  fridge: 'fa-solid fa-snowflake',
-  oven: 'fa-solid fa-fire-burner',
-  lock: 'fa-solid fa-lock',
+  vacuum:  'fa-solid fa-broom',
+  fridge:  'fa-solid fa-snowflake',
+  oven:    'fa-solid fa-fire-burner',
+  lock:    'fa-solid fa-lock',
 }
 
 const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plug')

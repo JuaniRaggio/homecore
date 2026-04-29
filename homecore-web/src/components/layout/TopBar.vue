@@ -1,29 +1,21 @@
 <template>
   <header class="topbar">
-<<<<<<< Updated upstream
+
     <!-- Logo de la app (clickeable, vuelve al overview) -->
     <router-link to="/" class="topbar__left">
-      <i class="fa-solid logo-icon"></i>
-=======
-    <!-- Logo de la app -->
-    <div class="topbar__left">
-      <img src="@/assets/homecore-icono.svg" alt="HomeCore" class="logo-icon">
->>>>>>> Stashed changes
+     <img src="@/assets/homecore-icono.svg" alt="HomeCore" class="logo-icon">
+
+  
       <span class="logo-text">HomeCore</span>
     </router-link>
 
-<<<<<<< Updated upstream
-    <!-- Nombre de la propiedad activa (solo visible cuando hay casa seleccionada) -->
-    <div v-if="isHomeRoute" class="topbar__center">
-      <!-- TODO: Bindear al nombre de la casa activa desde el store -->
-      Casa Martinez
-=======
+
     <!-- Nombre de la propiedad activa (viene del store de homes) -->
-    <div class="topbar__center_left">
+    <div  v-if="isHomeRoute" class="topbar__center_left">
       <span class="topbar__house-name">{{ houseName }}</span>
       <span class="topbar__separator">/</span>
       <span class="topbar__page-name">{{ currentPageLabel }}</span>
->>>>>>> Stashed changes
+
     </div>
     <div v-else class="topbar__center"></div>
 
@@ -52,38 +44,31 @@
 </template>
 
 <script setup>
-<<<<<<< Updated upstream
-=======
 
-
-
-
->>>>>>> Stashed changes
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-<<<<<<< Updated upstream
+
 // Mostrar nombre de casa solo cuando estamos dentro de una ruta /casa/:homeId
 const isHomeRoute = computed(() => !!route.params.homeId)
-=======
+
 // Mapeo de rutas a labels (debe coincidir con SideBar)
 const routeLabels = {
-  '/': 'Inicio',
-  '/dispositivos': 'Dispositivos',
-  '/habitaciones': 'Habitaciones',
-  '/rutinas': 'Rutinas',
-  '/historial': 'Historial',
-  '/consumo': 'Consumo',
-  '/configuracion': 'Configuracion'
+  'home': 'Inicio',
+  'devices': 'Dispositivos',
+  'rooms': 'Habitaciones',
+  'routines': 'Rutinas',
+  'history': 'Historial',
+  'consumption': 'Consumo',
+  'settings': 'Configuración'
 }
 const houseName = 'Casa Martinez' // TODO: Traer del store
-const currentPageLabel = computed(() => routeLabels[route.path] || 'Desconocido')
+const currentPageLabel = computed(() => routeLabels[route.name] || '')
 
 
 
->>>>>>> Stashed changes
 
 // TODO: Importar el store de notificaciones para el badge
 // TODO: Importar el store de usuario para nombre y avatar
