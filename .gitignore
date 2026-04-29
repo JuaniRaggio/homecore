@@ -1,5 +1,15 @@
 .DS_Store
 .env
 
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
 /docs/usuarios_representativos.pdf
 /docs/informe.pdf
