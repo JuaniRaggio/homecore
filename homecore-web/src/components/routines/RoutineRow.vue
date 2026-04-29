@@ -48,12 +48,18 @@ defineEmits(['execute', 'toggle-favorite'])
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: calc(100% - 0px);
+ 
+  margin-bottom: 12px;
+  transition: background-color 0.2s;
 }
 
-.routine-row:last-child {
-  border-bottom: none;
+.routine-row:hover {
+  background-color: rgba(79, 110, 247, 0.12);
 }
 
 .star {

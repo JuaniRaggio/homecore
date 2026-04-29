@@ -30,6 +30,8 @@
 <style scoped>
 .routines-view {
   padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .view-title {

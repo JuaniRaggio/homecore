@@ -158,11 +158,12 @@ const homeId = computed(() => route.params.homeId)
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 5px 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 5px;
   margin-bottom: 16px;
+  max-width: fit-content;
   font-size: 13px;
   color: var(--text-muted);
 }

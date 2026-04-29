@@ -72,21 +72,34 @@ const navItems = computed(() => [
 }
 
 .property-selector {
-  padding: 8px 20px 16px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between; /* texto a la izquierda, icono a la derecha */
+  align-items: center;            /* centra verticalmente */
+  background-color: var(--bg-card);
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin: 0 10px 12px 10px;
+  transition: background-color 0.2s;
+}
+
+.property-selector:hover {
+  background-color: rgba(79, 110, 247, 0.12);
 }
 
 .property-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
-  background-color: var(--bg-card);
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  display: block;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.property-selector i {
+  color: var(--text-primary);
+  font-size: 14px;
 }
 
 .nav-list {
@@ -99,6 +112,7 @@ const navItems = computed(() => [
   display: block;
   padding: 10px 14px;
   border-radius: 8px;
+
   color: var(--text-muted);
   text-decoration: none;
   font-size: 14px;
@@ -109,6 +123,10 @@ const navItems = computed(() => [
 .nav-item a:hover {
   background-color: rgba(79, 110, 247, 0.12);
   color: var(--text-primary);
+}
+
+.nav-item a i {
+  margin-right: 5px;
 }
 
 /* router-link agrega la clase "active" automaticamente cuando la ruta coincide */
