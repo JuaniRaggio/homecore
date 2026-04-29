@@ -1,16 +1,17 @@
 <template>
   <header class="topbar">
-    <!-- Logo de la app -->
-    <div class="topbar__left">
+    <!-- Logo de la app (clickeable, vuelve al overview) -->
+    <router-link to="/" class="topbar__left">
       <i class="fa-solid logo-icon"></i>
       <span class="logo-text">HomeCore</span>
-    </div>
+    </router-link>
 
-    <!-- Nombre de la propiedad activa (viene del store de homes) -->
-    <div class="topbar__center">
+    <!-- Nombre de la propiedad activa (solo visible cuando hay casa seleccionada) -->
+    <div v-if="isHomeRoute" class="topbar__center">
       <!-- TODO: Bindear al nombre de la casa activa desde el store -->
       Casa Martinez
     </div>
+    <div v-else class="topbar__center"></div>
 
     <div class="topbar__right">
       <!-- Boton de notificaciones -->
@@ -35,6 +36,14 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Mostrar nombre de casa solo cuando estamos dentro de una ruta /casa/:homeId
+const isHomeRoute = computed(() => !!route.params.homeId)
+
 // TODO: Importar el store de notificaciones para el badge
 // TODO: Importar el store de usuario para nombre y avatar
 // TODO: Importar el store de homes para el nombre de la casa activa
@@ -60,6 +69,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .logo-text {

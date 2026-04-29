@@ -57,7 +57,7 @@
     <section class="panel">
       <div class="panel-header">
         <h2 class="panel-title">Dispositivos favoritos</h2>
-        <router-link to="/dispositivos" class="panel-link">Ver todos</router-link>
+        <router-link :to="`/casa/${homeId}/dispositivos`" class="panel-link">Ver todos</router-link>
       </div>
 
       <div class="devices-flex">
@@ -96,7 +96,7 @@
     <section class="panel">
       <div class="panel-header">
         <h2 class="panel-title">Rutinas</h2>
-        <router-link to="/rutinas" class="panel-link">Ver todas</router-link>
+        <router-link :to="`/casa/${homeId}/rutinas`" class="panel-link">Ver todas</router-link>
       </div>
 
       <div class="routines-list">
@@ -125,8 +125,13 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
+
+const route = useRoute()
+const homeId = computed(() => route.params.homeId)
 
 // TODO: Importar stores de dispositivos, habitaciones y rutinas
 // TODO: En onMounted(), cargar datos desde la API:

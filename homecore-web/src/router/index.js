@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import OverviewView from '@/views/OverviewView.vue'
 import HomeView from '@/views/HomeView.vue'
+import HomeLayout from '@/components/layout/HomeLayout.vue'
 
 // Lazy-load de las vistas secundarias para no cargar todo junto
 const DevicesView = () => import('@/views/DevicesView.vue')
@@ -11,45 +13,51 @@ const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'overview',
-  //   component: OverviewView
-  // },
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'overview',
+    component: OverviewView
   },
   {
-    path: '/dispositivos',
-    name: 'devices',
-    component: DevicesView
-  },
-  {
-    path: '/habitaciones',
-    name: 'rooms',
-    component: RoomsView
-  },
-  {
-    path: '/rutinas',
-    name: 'routines',
-    component: RoutinesView
-  },
-  {
-    path: '/historial',
-    name: 'history',
-    component: HistoryView
-  },
-  {
-    path: '/consumo',
-    name: 'consumption',
-    component: ConsumptionView
-  },
-  {
-    path: '/configuracion',
-    name: 'settings',
-    component: SettingsView
+    path: '/casa/:homeId',
+    component: HomeLayout,
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: HomeView
+      },
+      {
+        path: 'dispositivos',
+        name: 'devices',
+        component: DevicesView
+      },
+      {
+        path: 'habitaciones',
+        name: 'rooms',
+        component: RoomsView
+      },
+      {
+        path: 'rutinas',
+        name: 'routines',
+        component: RoutinesView
+      },
+      {
+        path: 'historial',
+        name: 'history',
+        component: HistoryView
+      },
+      {
+        path: 'consumo',
+        name: 'consumption',
+        component: ConsumptionView
+      },
+      {
+        path: 'configuracion',
+        name: 'settings',
+        component: SettingsView
+      }
+    ]
   }
 ]
 

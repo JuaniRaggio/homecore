@@ -10,7 +10,7 @@
 
     <!-- Links de navegacion: cada uno apunta a una ruta del router -->
     <ul class="nav-list">
-      <li v-for="item in navItems" :key="item.route" class="nav-item">
+      <li v-for="item in navItems" :key="item.label" class="nav-item">
         <router-link :to="item.route" active-class="active">
           <i :class="item.icon"></i>
           {{ item.label }}
@@ -20,7 +20,7 @@
 
     <!-- Footer del sidebar -->
     <div class="sidebar__footer">
-      <router-link to="/configuracion" active-class="active" class="sidebar__config">
+      <router-link :to="`/casa/${homeId}/configuracion`" active-class="active" class="sidebar__config">
         <i class="fa-solid fa-gear"></i>
         Configuracion
       </router-link>
@@ -34,16 +34,22 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const homeId = computed(() => route.params.homeId)
+
 // Items de navegacion del sidebar
-// Cada uno tiene icono (Font Awesome), label visible y ruta del router
-const navItems = [
-  { icon: 'fa-solid fa-house',                  label: 'Inicio',        route: '/' },
-  { icon: 'fa-solid fa-mobile-screen-button',   label: 'Dispositivos',  route: '/dispositivos' },
-  { icon: 'fa-solid fa-door-open',              label: 'Habitaciones',  route: '/habitaciones' },
-  { icon: 'fa-solid fa-clock',                  label: 'Rutinas',       route: '/rutinas' },
-  { icon: 'fa-solid fa-chart-line',             label: 'Historial',     route: '/historial' },
-  { icon: 'fa-solid fa-bolt',                   label: 'Consumo',       route: '/consumo' },
-]
+// Las rutas se computan dinamicamente segun el homeId activo
+const navItems = computed(() => [
+  { icon: 'fa-solid fa-house',                  label: 'Inicio',        route: `/casa/${homeId.value}` },
+  { icon: 'fa-solid fa-mobile-screen-button',   label: 'Dispositivos',  route: `/casa/${homeId.value}/dispositivos` },
+  { icon: 'fa-solid fa-door-open',              label: 'Habitaciones',  route: `/casa/${homeId.value}/habitaciones` },
+  { icon: 'fa-solid fa-clock',                  label: 'Rutinas',       route: `/casa/${homeId.value}/rutinas` },
+  { icon: 'fa-solid fa-chart-line',             label: 'Historial',     route: `/casa/${homeId.value}/historial` },
+  { icon: 'fa-solid fa-bolt',                   label: 'Consumo',       route: `/casa/${homeId.value}/consumo` },
+])
 
 // TODO: Importar el store de homes para el nombre de la casa en el selector
 // TODO: Implementar logica de colapso del sidebar (ref booleana + clase condicional)

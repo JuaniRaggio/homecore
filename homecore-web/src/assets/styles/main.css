@@ -55,6 +55,14 @@ body {
   padding-bottom: 40px;
 }
 
+/* -- Layout full-width: para vistas sin sidebar (overview) -- */
+.page-content--full {
+  margin-left: 20px;
+  margin-top: calc(var(--topbar-h) + 20px);
+  margin-right: 20px;
+  padding-bottom: 40px;
+}
+
 /* -- Utilidades generales reutilizables -- */
 .btn-icon {
   background: none;
