@@ -1,15 +1,15 @@
 <template>
   <div class="devices-view">
-    <div class="diveces-header">
+    <div class="devices-header">
       <h1 class="view-title">Dispositivos</h1>
-      <div class="diveces-filters">
+      <div class="devices-filters">
         <select v-model="filterType" class="filter-select">
           <option value="">Todos los tipos</option>
           <option value="light">Luces</option>
           <option value="door">Puertas</option>
           <option value="alarm">Alarmas</option>
           <option value="curtain">Cortina</option>
-          <!-- poner todos los tipos de dispositivos-->
+          <option value="water">Grifo</option>
         </select>
 
         <select v-model="filterRoom" class="filter-select">
@@ -41,6 +41,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
+
+const filterType = ref('')
+const filterRoom = ref('')
 
 const devices = ref([
   { id: '1',  name: 'Lampara principal',       room: 'Living',               type: 'light',   isOn: true,  statusText: 'Encendido - 80%',  isFavorite: true  },
@@ -96,21 +99,49 @@ function handleToggleFavorite(id) {
   flex-wrap: wrap;
 }
 
-.devices-title {
-  font-size: 22px;
-  font-weight: 700;
+.devices-filters {
+  display: flex;
+  gap: 8px;
+}
+.filter-select {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 7px 28px 7px 12px;
+  cursor: pointer;
+  outline: none;
+  appearance: auto;
 }
 
 
-
-.view-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 20px;
+.filter-select:focus {
+  border-color: var(--accent);
 }
 
-.placeholder {
-  color: var(--text-muted);
-  font-style: italic;
+.btn-add {
+  margin-left: auto;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
 }
+
+.btn-add:hover {
+  opacity: 0.85;
+}
+
+.devices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
 </style>
