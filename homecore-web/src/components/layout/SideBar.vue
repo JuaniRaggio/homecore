@@ -1,8 +1,6 @@
 <template>
   <nav class="sidebar">
-    <!-- Selector de propiedad/casa -->
-    <!-- TODO: Al hacer click, abrir dropdown con lista de casas del usuario -->
-    <!-- TODO: Al seleccionar una casa, actualizar el store y recargar dispositivos/habitaciones -->
+    
     <div class="property-selector">
       <span class="property-name">Casa Martinez</span>
       <i class="fa-solid fa-chevron-down"></i>
@@ -11,7 +9,7 @@
     <!-- Links de navegacion: cada uno apunta a una ruta del router -->
     <ul class="nav-list">
       <li v-for="item in navItems" :key="item.label" class="nav-item">
-        <router-link :to="item.route" active-class="active">
+        <router-link :to="item.route" exact-active-class="active">
           <i :class="item.icon"></i>
           {{ item.label }}
         </router-link>
@@ -86,6 +84,7 @@ const navItems = computed(() => [
 
 .property-selector:hover {
   background-color: rgba(79, 110, 247, 0.12);
+
 }
 
 .property-name {
@@ -122,6 +121,7 @@ const navItems = computed(() => [
 
 .nav-item a:hover {
   background-color: rgba(79, 110, 247, 0.12);
+
   color: var(--text-primary);
 }
 

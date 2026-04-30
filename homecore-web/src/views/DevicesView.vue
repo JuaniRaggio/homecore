@@ -1,7 +1,8 @@
 <template>
   <div class="devices-view">
+    <h1 class="view-title">Dispositivos</h1>
+    
     <div class="devices-header">
-      <h1 class="view-title">Dispositivos</h1>
       <div class="devices-filters">
         <select v-model="filterType" class="filter-select">
           <option value="">Todos los tipos</option>
@@ -31,6 +32,7 @@
         @toggle-favorite="handleToggleFavorite"
       />
     </div>
+    
 
     
   </div>
@@ -89,6 +91,15 @@ function handleToggleFavorite(id) {
 <style scoped>
 .devices-view {
   padding: 0;
+}
+
+.view-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding: 0 5px;
+
 }
 
 .devices-header {

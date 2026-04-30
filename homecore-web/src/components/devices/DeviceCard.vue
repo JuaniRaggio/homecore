@@ -59,7 +59,7 @@ defineEmits(['toggle', 'toggle-favorite'])
 // Mapeo de tipo de dispositivo a icono de Font Awesome
 const iconMap = {
   light:   'fa-regular fa-lightbulb',
-  door:    'fa-regular fa-square',
+  door:    'fa-regular fa-door-open',
   alarm:   'fa-regular fa-clock',
   water:   'fa-solid fa-faucet',
   curtain: 'fa-solid fa-table-list',
