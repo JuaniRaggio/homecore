@@ -1,23 +1,38 @@
 <template>
   <div class="devices-view">
-    <h1 class="view-title">Dispositivos</h1>
+    <div class="diveces-header">
+      <h1 class="view-title">Dispositivos</h1>
+      <div class="diveces-filters">
+        <select v-model="filterType" class="filter-select">
+          <option value="">Todos los tipos</option>
+          <option value="light">Luces</option>
+          <option value="door">Puertas</option>
+          <option value="camera">Alarmas</option>
+          <option value="curtain">Cortina</option>
+          <!-- poner todos los tipos de dispositivos-->
+        </select>
 
-    <!-- TODO: Barra de filtros -->
-    <!-- Filtrar por: habitacion, tipo de dispositivo, estado (encendido/apagado), favoritos -->
-    <!-- Usar un <select> o chips clickeables para cada filtro -->
+        <select v-model="filterRoom" class="filter-select">
+          <option value="">Todas las habitaciones</option>
+          <option v-for=" room in rooms" :key="room" :value="room">{{ room }}</option>
 
-    <!-- TODO: Boton "Agregar dispositivo" -->
-    <!-- Al clickear, abrir modal para seleccionar tipo y configurar el dispositivo nuevo -->
-    <!-- Llamar a api.createDevice() al confirmar -->
+        </select>
+      </div>
+      <button class="btn-add">+ Nuevo dispositivo</button>
 
-    <!-- TODO: Grilla de dispositivos -->
-    <!-- Iterar con v-for sobre la lista filtrada de dispositivos del store -->
-    <!-- Usar el componente DeviceCard para cada uno -->
-    <!-- <DeviceCard v-for="device in filteredDevices" :key="device.id" :device="device" /> -->
+    </div>
 
-    <p class="placeholder">
-      Aca va la lista completa de dispositivos con filtros y acciones.
-    </p>
+    <div class="devices-grid">
+      <DeviceCard
+        v-for="device in filteredDevices"
+        :key="device.id"
+        :device="device"
+        @toggle="handleToggle"
+        @toggle-favorite="handleToggleFavorite"
+      />
+    </div>
+
+    
   </div>
 </template>
 
