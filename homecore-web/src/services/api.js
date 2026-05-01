@@ -1,9 +1,4 @@
-// Servicio centralizado para comunicarse con la API de HCI
-// Endpoint base: http://hci.it.itba.edu.ar/api
-// Autenticacion: header X-API-KEY con el valor de VITE_API_KEY
 
-// En Vite, las variables de entorno se acceden con import.meta.env.VITE_*
-// Por eso en .env hay que definir: VITE_API_BASE_URL=... y VITE_API_KEY=sk_...
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const API_KEY = import.meta.env.VITE_API_KEY
 
@@ -14,36 +9,53 @@ function headers() {
   }
 }
 
-// TODO: Implementar cada funcion con fetch() al endpoint correspondiente
-// Todas deben usar headers() para autenticacion
-// Todas retornan la respuesta parseada como JSON
+async function request(method, path, body=null) {
+  const options = {method, headers: getHeaders()}
+  if( body!== null) options.body = JSON.stringify(body)
+
+  const res = await fetch(`${BASE_URL}${path}`, options) //request a la API
+  if( !res.ok ) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.message || 'API request failed')
+  }
+  const json = await res.json()
+  return json.result !== undefined ? json.result : json
+
+}
+
+
+
 
 // -- Homes/Casas --
-// export async function getHomes() {}
-// export async function getHome(homeId) {}
-// export async function createHome(data) {}
-// export async function updateHome(homeId, data) {}
-// export async function deleteHome(homeId) {}
+export const getHomes = ()=> request('GET', '/homes' )
+export const getHome =(id) =>request('GET', `/homes/${id}`)
+export const createHome =(data) =>request( 'POST', '/homes', data )
+export const updateHome =(id, data) => request('PUT', `/homes/${id}`, data )
+export const deleteHome =(id) => request('DELETE', `/homes/${id}`)
 
 // -- Rooms/Habitaciones --
-// export async function getRooms(homeId) {}
-// export async function getRoom(roomId) {}
-// export async function createRoom(homeId, data) {}
-// export async function updateRoom(roomId, data) {}
-// export async function deleteRoom(roomId) {}
+export const getRooms = (homeId) => request('GET', `/homes/${homeId}/rooms`)
+export const getRoom =(id) => request('GET', `/rooms/${id}` ) 
+export const createRoom = (homeId, data) => request('POST', `/homes/${homeId}/rooms`, data)
+export const updateRoom  = (id, data) => request('PUT', `/rooms/${id}`, data)
+export const deleteRoom  = (id) => request( 'DELETE', `/rooms/${id}`)
+
+
 
 // -- Devices/Dispositivos --
-// export async function getDevices(roomId) {}
-// export async function getDevice(deviceId) {}
-// export async function createDevice(roomId, data) {}
-// export async function updateDevice(deviceId, data) {}
-// export async function deleteDevice(deviceId) {}
-// export async function executeAction(deviceId, actionName, params) {}
+export const getDevices =(roomId) => request('GET', `/rooms/${roomId}/devices`)
+export const getDevice =(id) => request('GET', `/devices/${id}`)
+export const createDevice =(roomId, data) => request('POST', `/rooms/${roomId}/devices`, data)
+export const updateDevice = (id, data) => request('PUT', `/devices/${id}`, data)
+export const deleteDevice = (id) => request('DELETE', `/devices/${id}`)
+export const executeAction = (id, actionName, params) =>
+  request('PUT', `/devices/${id}/execute/${actionName}`, params ?? {})
 
 // -- Routines/Rutinas --
-// export async function getRoutines() {}
-// export async function getRoutine(routineId) {}
-// export async function createRoutine(data) {}
-// export async function updateRoutine(routineId, data) {}
-// export async function deleteRoutine(routineId) {}
-// export async function executeRoutine(routineId) {}
+export const getRoutines = () => request('GET', '/routines')
+
+export const getRoutine = (id) => request('GET', `/routines/${id}`)
+export const createRoutine = (data) => request('POST', '/routines', data)
+export const updateRoutine = (id, data) => request('PUT', `/routines/${id}`, data)
+export const deleteRoutine = (id) => request('DELETE', `/routines/${id}`)
+export const executeRoutine = (id) => request('PUT', `/routines/${id}/execute`)

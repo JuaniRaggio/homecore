@@ -1,5 +1,4 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+
 
 // Store de dispositivos con Pinia (Composition API style)
 // Maneja el estado global de dispositivos para que cualquier componente pueda accederlos
@@ -24,5 +23,6 @@ export const useDevicesStore = defineStore('devices', () => {
     // devices, loading, error,
     // favoriteDevices, activeDevices, devicesByRoom,
     // fetchDevices, toggleDevice, toggleFavorite,
+Device, toggleFavorite,
   }
 })

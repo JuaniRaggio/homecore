@@ -1,5 +1,3 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 // Store de habitaciones
 
@@ -13,6 +11,8 @@ export const useRoomsStore = defineStore('rooms', () => {
   // async function fetchRooms(homeId) { /* api.getRooms(homeId) */ }
   // async function addRoom(homeId, data) { /* api.createRoom() y push a rooms */ }
   // async function removeRoom(roomId) { /* api.deleteRoom() y filtrar de rooms */ }
+
+  return {}
 
   return {}
 })
