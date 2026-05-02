@@ -74,7 +74,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 }
 
 .routine-card:hover {
-  background-color: rgba(79, 110, 247, 0.1);
+  background-color: var(--card-hover);
 }
 
 .routine-card--inactive {

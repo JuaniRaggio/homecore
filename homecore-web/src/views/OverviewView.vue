@@ -262,7 +262,7 @@ const homes = [
 }
 
 .fav-routine-btn:hover {
-  background-color: rgba(129, 140, 248, 0.12);
+  background-color: var(--card-hover);
   border-color: var(--accent);
 }
 

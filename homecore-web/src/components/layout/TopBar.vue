@@ -120,18 +120,18 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 .topbar__house-name {
   font-size: 15px;
   font-weight: 700;
-  color: #ffffffb1 ;
+  color: #6f8df8 ;
 }
 
 .topbar__separator {
   font-size: 15px;
-  color:  #ffffffb1;
+  color:  #d0d3db;
 }
 
 .topbar__page-name {
   font-size: 15px;
   font-weight: 400;
-  color:  #ffffffb1;
+  color:  #d0d3db;
 }
 
 .topbar__right {
@@ -185,6 +185,6 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 }
 
 .topbar__user:hover {
-  background-color: rgba(79, 110, 247, 0.12);
+  background-color: #181924;
 }
 </style>

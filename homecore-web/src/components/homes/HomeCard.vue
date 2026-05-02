@@ -35,7 +35,7 @@ defineProps({
 <style scoped>
 .home-card {
   display: block;
-  background-color: var(--bg-card);
+  background-color: var(--bg-main);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;

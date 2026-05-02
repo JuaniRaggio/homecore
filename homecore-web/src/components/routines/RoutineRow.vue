@@ -59,7 +59,7 @@ defineEmits(['execute', 'toggle-favorite'])
 }
 
 .routine-row:hover {
-  background-color: rgba(79, 110, 247, 0.12);
+  background-color: var(--card-hover);
 }
 
 .star {
@@ -69,7 +69,7 @@ defineEmits(['execute', 'toggle-favorite'])
 }
 
 .star--yellow {
-  color: #f1c40f;
+  color: var(--amber);
 }
 
 .routine-info {

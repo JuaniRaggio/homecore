@@ -83,7 +83,7 @@ const navItems = computed(() => [
 }
 
 .property-selector:hover {
-  background-color: rgba(79, 110, 247, 0.12);
+  background-color: #1d1e35; 
 
 }
 
@@ -120,7 +120,7 @@ const navItems = computed(() => [
 }
 
 .nav-item a:hover {
-  background-color: rgba(79, 110, 247, 0.12);
+  background-color: #1d1e35;
 
   color: var(--text-primary);
 }
@@ -131,7 +131,7 @@ const navItems = computed(() => [
 
 /* router-link agrega la clase "active" automaticamente cuando la ruta coincide */
 .nav-item a.active {
-  background-color: rgba(79, 110, 247, 0.2);
+  background-color: #1d1e35;
   color: var(--accent);
   font-weight: 600;
 }

@@ -199,9 +199,9 @@ const homeId = computed(() => route.params.homeId)
 }
 
 .floor-tab--active {
-  background-color: var(--accent);
+  background-color: var(--bg-main);
   color: #fff;
-  border-color: var(--accent);
+  border-color: var(--border);
 }
 
 .room-list {
