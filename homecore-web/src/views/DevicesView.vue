@@ -134,7 +134,7 @@ function handleToggleFavorite(id) {
 .btn-add {
   margin-left: auto;
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;

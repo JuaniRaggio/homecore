@@ -188,7 +188,7 @@ function linkDevice(room, event) {
 
 .btn-new-room {
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
@@ -198,7 +198,7 @@ function linkDevice(room, event) {
 }
 
 .btn-new-room:hover {
-  background-color: var(--accent-hover, #3a5bd9);
+  background-color: var(--accent-hover);
 }
 
 .rooms-grid {
@@ -246,11 +246,11 @@ function linkDevice(room, event) {
 }
 
 .icon-btn:hover {
-  color: var(--text-primary, #fff);
+  color: var(--text-primary);
 }
 
 .icon-btn--delete:hover {
-  color: #e74c3c;
+  color: var(--danger);
 }
 
 .icon-btn--sm {
@@ -331,10 +331,10 @@ function linkDevice(room, event) {
 }
 
 .modal-input {
-  background: var(--bg-secondary, #1e1e2e);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  color: var(--text-primary, #fff);
+  color: var(--text-primary);
   font-size: 14px;
   padding: 8px 12px;
   width: 100%;
@@ -366,7 +366,7 @@ function linkDevice(room, event) {
   background-color: var(--accent);
   border: none;
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-on-accent);
   padding: 7px 16px;
   font-size: 14px;
   cursor: pointer;

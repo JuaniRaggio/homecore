@@ -161,7 +161,7 @@ const breakdown = [
 
 .period-tab--active {
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
 }
 
 /* Summary cards */

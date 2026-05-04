@@ -55,7 +55,7 @@ defineEmits(['update:modelValue'])
   left: 3px;
   width: 16px;
   height: 16px;
-  background: #fff;
+  background: var(--text-on-accent);
   border-radius: 50%;
   transition: transform 0.2s;
 }

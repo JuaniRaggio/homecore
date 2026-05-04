@@ -167,7 +167,7 @@ const notifPrefs = ref([
   justify-content: center;
   font-weight: 700;
   font-size: 16px;
-  color: #fff;
+  color: var(--text-on-accent);
 }
 
 .profile-info {

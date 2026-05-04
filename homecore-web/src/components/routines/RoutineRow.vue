@@ -91,7 +91,7 @@ defineEmits(['execute', 'toggle-favorite'])
 
 .btn-exec {
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   padding: 6px 14px;
   border-radius: 8px;

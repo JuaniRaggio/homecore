@@ -200,7 +200,7 @@ const homeId = computed(() => route.params.homeId)
 
 .floor-tab--active {
   background-color: var(--bg-main);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: var(--border);
 }
 

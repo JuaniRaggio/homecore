@@ -78,7 +78,7 @@ function handleRegister() {
 <style scoped>
 .HomeCore-bg {
   min-height: 100vh;
-  background: radial-gradient(ellipse at center, #2c2f3e 0%, #1a1c26 50%, #0e0d13 100%);
+  background: radial-gradient(ellipse at center, var(--bg-auth-gradient-start) 0%, var(--bg-auth-gradient-end) 70%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,7 +105,7 @@ function handleRegister() {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background-color: #3b6fd4;
+  background-color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,13 +121,13 @@ function handleRegister() {
 .HomeCore-title {
   font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-on-accent);
   letter-spacing: 0.5px;
 }
 
 .HomeCore-group {
   width: 100%;
-  background-color: rgba(90, 95, 115, 0.45);
+  background-color: var(--bg-auth-card);
   border-radius: 14px;
   padding: 24px 28px 28px;
   display: flex;
@@ -145,13 +145,13 @@ function handleRegister() {
 
 .back-link {
   font-size: 13px;
-  color: #c8d0e8;
+  color: var(--text-secondary);
   text-decoration: underline;
   cursor: pointer;
 }
 
 .back-link:hover {
-  color: #ffffff;
+  color: var(--text-on-accent);
 }
 
 .form-group {
@@ -163,34 +163,34 @@ function handleRegister() {
 .form-label {
   font-size: 13px;
   font-weight: 500;
-  color: #d0d3db;
+  color: var(--text-primary);
 }
 
 .form-group input {
-  background-color: rgba(200, 210, 230, 0.18);
-  border: 1px solid rgba(200, 210, 230, 0.25);
+  background-color: var(--bg-auth-input);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 14px;
-  color: #ffffff;
+  color: var(--text-on-accent);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .form-group input::placeholder {
-  color: rgba(200, 210, 230, 0.55);
+  color: var(--text-muted);
 }
 
 .form-group input:focus {
-  border-color: var(--accent, #6f78da);
+  border-color: var(--accent);
 }
 
 .btn-creteAccount {
   margin-top: 6px;
   width: 100%;
   padding: 12px;
-  background-color: #3b4a8a;
-  color: #ffffff;
+  background-color: var(--bg-auth-btn);
+  color: var(--text-on-accent);
   font-size: 15px;
   font-weight: 600;
   border: none;
@@ -200,6 +200,6 @@ function handleRegister() {
 }
 
 .btn-creteAccount:hover {
-  background-color: #4f5fa8;
+  background-color: var(--bg-auth-btn-hover);
 }
 </style>
