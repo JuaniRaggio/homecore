@@ -103,29 +103,6 @@ function handleViewDetail(id) {
   margin-bottom: 24px;
 }
 
-.view-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
-  padding: 0 5px;
-}
-
-.btn-add {
-  background-color: var(--accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 8px 16px;
-  font-size: var(--font-base);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  white-space: nowrap;
-}
-
-.btn-add:hover {
-  opacity: 0.85;
-}
 
 .routines-grid {
   display: grid;

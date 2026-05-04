@@ -132,13 +132,6 @@ const breakdown = [
   gap: 12px;
 }
 
-.view-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
-  padding: 0 5px;
-}
-
 .period-tabs {
   display: flex;
   gap: 4px;

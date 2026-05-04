@@ -180,11 +180,6 @@ function linkDevice(room, event) {
   margin-bottom: 24px;
 }
 
-.view-title {
-  font-size: var(--font-4xl);
-  font-weight: 700;
-  margin: 0;
-}
 
 .btn-new-room {
   background-color: var(--accent);

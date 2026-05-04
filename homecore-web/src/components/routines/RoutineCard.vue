@@ -113,15 +113,6 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
   flex-shrink: 0;
 }
 
-.star {
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-md);
-}
-
-.star--yellow {
-  color: var(--amber);
-}
 
 .routine-card__schedule {
   display: flex;
@@ -162,33 +153,4 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
   gap: 10px;
 }
 
-.btn-exec {
-  background-color: var(--accent);
-  color: var(--text-on-accent);
-  border: none;
-  padding: 7px 14px;
-  border-radius: var(--radius-md);
-  font-size: var(--font-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.btn-exec:hover {
-  opacity: 0.85;
-}
-
-.btn-detail {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: var(--font-sm);
-  cursor: pointer;
-  padding: 7px 4px;
-  transition: color 0.2s;
-}
-
-.btn-detail:hover {
-  color: var(--text-primary);
-}
 </style>

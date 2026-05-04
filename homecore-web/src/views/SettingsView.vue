@@ -112,11 +112,7 @@ const notifPrefs = ref([
 }
 
 .view-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
   margin-bottom: 28px;
-  padding: 0 5px;
 }
 
 .settings-section {

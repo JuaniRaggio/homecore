@@ -105,15 +105,6 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
   color: var(--accent);
 }
 
-.star {
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-md);
-}
-
-.star--yellow {
-  color: var(--amber);
-}
 
 .device-name {
   font-weight: 600;

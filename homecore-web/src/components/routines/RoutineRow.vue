@@ -62,15 +62,6 @@ defineEmits(['execute', 'toggle-favorite'])
   background-color: var(--card-hover);
 }
 
-.star {
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-md);
-}
-
-.star--yellow {
-  color: var(--amber);
-}
 
 .routine-info {
   flex: 1;
@@ -89,19 +80,4 @@ defineEmits(['execute', 'toggle-favorite'])
   font-size: var(--font-sm);
 }
 
-.btn-exec {
-  background-color: var(--accent);
-  color: var(--text-on-accent);
-  border: none;
-  padding: 6px 14px;
-  border-radius: var(--radius-md);
-  font-size: var(--font-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-exec:hover {
-  background-color: var(--accent-hover);
-}
 </style>

@@ -94,12 +94,7 @@ function handleToggleFavorite(id) {
 }
 
 .view-title {
-  font-size: var(--font-3xl);
-  font-weight: 500;
-  color: var(--text-primary);
   margin-bottom: 20px;
-  padding: 0 5px;
-
 }
 
 .devices-header {
@@ -114,39 +109,8 @@ function handleToggleFavorite(id) {
   display: flex;
   gap: 8px;
 }
-.filter-select {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 7px 28px 7px 12px;
-  cursor: pointer;
-  outline: none;
-  appearance: auto;
-}
-
-
-.filter-select:focus {
-  border-color: var(--accent);
-}
-
 .btn-add {
   margin-left: auto;
-  background-color: var(--accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 8px 16px;
-  font-size: var(--font-base);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  white-space: nowrap;
-}
-
-.btn-add:hover {
-  opacity: 0.85;
 }
 
 .devices-grid {

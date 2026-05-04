@@ -73,33 +73,11 @@ const filteredEvents = computed(() =>
   gap: 12px;
 }
 
-.view-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
-  padding: 0 5px;
-}
-
 .history-filters {
   display: flex;
   gap: 8px;
 }
 
-.filter-select {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 7px 28px 7px 12px;
-  cursor: pointer;
-  outline: none;
-  appearance: auto;
-}
-
-.filter-select:focus {
-  border-color: var(--accent);
-}
 
 /* Timeline */
 .timeline {
