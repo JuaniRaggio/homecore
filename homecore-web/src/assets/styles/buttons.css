@@ -1,0 +1,160 @@
+/* Boton icono (topbar, acciones inline) */
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: var(--font-2xl);
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: var(--border);
+}
+
+/* Boton primario (auth submit) */
+.btn-primary {
+  width: 100%;
+  padding: var(--space-base);
+  background-color: var(--bg-auth-btn);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--bg-auth-btn-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Boton accent (crear cuenta, volver al login) */
+.btn-accent {
+  width: 100%;
+  padding: 13px;
+  background-color: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Boton agregar (headers de vista) */
+.btn-add {
+  background-color: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-xl);
+  font-size: var(--font-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add:hover {
+  opacity: 0.85;
+}
+
+/* Boton volver */
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--font-base);
+  cursor: pointer;
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-2xs) 0;
+  transition: color 0.2s;
+}
+
+.btn-back:hover {
+  color: var(--accent);
+}
+
+/* Boton cancelar (modales, formularios) */
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  padding: var(--space-sm) var(--space-2xl);
+  font-size: var(--font-md);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.btn-cancel:hover {
+  border-color: var(--text-secondary);
+}
+
+/* Boton confirmar (modales, formularios) */
+.btn-confirm {
+  background-color: var(--accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-on-accent);
+  padding: var(--space-sm) var(--space-2xl);
+  font-size: var(--font-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-confirm:hover {
+  opacity: 0.85;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Boton ejecutar (rutinas) */
+.btn-exec {
+  background-color: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-exec:hover {
+  opacity: 0.85;
+}
+
+/* Boton detalle (rutinas) */
+.btn-detail {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  padding: 7px 4px;
+  transition: color 0.2s;
+}
+
+.btn-detail:hover {
+  color: var(--text-primary);
+}

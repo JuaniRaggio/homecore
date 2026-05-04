@@ -1,0 +1,24 @@
+/* Estrella de favorito */
+.star {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: var(--font-md);
+}
+
+.star--yellow {
+  color: var(--amber);
+}
+
+/* Avatar circular */
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--font-sm);
+  color: var(--text-on-accent);
+}

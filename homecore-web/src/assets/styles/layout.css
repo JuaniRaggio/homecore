@@ -1,0 +1,31 @@
+/* Layout principal: contenido con sidebar */
+.page-content {
+  margin-left: calc(var(--sidebar-w) + 20px);
+  margin-top: calc(var(--topbar-h) + 20px);
+  margin-right: 20px;
+  padding-bottom: 40px;
+}
+
+/* Layout full-width: vistas sin sidebar (overview) */
+.page-content--full {
+  margin-left: 20px;
+  margin-top: calc(var(--topbar-h) + 20px);
+  margin-right: 20px;
+  padding-bottom: 40px;
+}
+
+/* Titulo de vista */
+.view-title {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 5px;
+}
+
+/* Titulo de seccion dentro de una vista */
+.section-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+}
