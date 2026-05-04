@@ -347,30 +347,7 @@ function linkDevice(room, event) {
   gap: 10px;
 }
 
-.btn-cancel {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  padding: 7px 16px;
-  font-size: var(--font-md);
-  cursor: pointer;
-}
 
-.btn-confirm {
-  background-color: var(--accent);
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-on-accent);
-  padding: 7px 16px;
-  font-size: var(--font-md);
-  cursor: pointer;
-}
-
-.btn-confirm:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 
 @media (max-width: 900px) {
   .rooms-grid {

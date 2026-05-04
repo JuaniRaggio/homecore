@@ -308,6 +308,42 @@ body {
   color: var(--accent);
 }
 
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  padding: var(--space-sm) var(--space-2xl);
+  font-size: var(--font-md);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.btn-cancel:hover {
+  border-color: var(--text-secondary);
+}
+
+.btn-confirm {
+  background-color: var(--accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-on-accent);
+  padding: var(--space-sm) var(--space-2xl);
+  font-size: var(--font-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-confirm:hover {
+  opacity: 0.85;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* -- Filtros/selects reutilizables -- */
 .filter-select {
   background-color: var(--bg-card);
