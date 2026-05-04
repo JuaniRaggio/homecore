@@ -51,7 +51,24 @@
           </div>
         </template>
 
-        <!-- CURTAIN/BLINDS: posicion -->
+        <template v-else-if="device.type === 'curtain'">
+          <div class="control-row">
+            <span class="control-label">Posicion</span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              v-model.number="position"
+              class="slider"
+            />
+            <span class="control-value">{{ position }}%</span>
+          </div>
+          <div class="control-row">
+            <button class="btn-control btn-control--sm" @click="position = 0">Cerrar</button>
+            <button class="btn-control btn-control--sm" @click="position = 50">Media</button>
+            <button class="btn-control btn-control--sm" @click="position = 100">Abrir</button>
+          </div>
+        </template>
 
         <!-- ALARM: zonas -->
         <!-- WATER/FAUCET: abrir/cerrar -->
