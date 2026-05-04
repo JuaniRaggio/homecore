@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import{ref, computed} from 'vue'
-import * as api from '@services/api'
+import { ref, computed } from 'vue'
+import * as api from '@/services/api'
 import pLimit from 'p-limit'
 
 export const useDevicesStore = defineStore('devices', () => {
@@ -20,25 +20,25 @@ const activeDevices = computed(() => devices.value.filter(d => d.isOn))
     loading.value = true
     error.value = null
     devices.value = []
-    const limit = pLimit(3)
 
-    //Itera por cada habitación y obtiene sus dispositivos, 
-    // agregando el nombre de la habitación a cada dispositivo
-    //  para facilitar su identificación en la UI
+    // Itera por cada habitacion y obtiene sus dispositivos,
+    // agregando el nombre de la habitacion a cada dispositivo.
+    // Limita a 3 requests concurrentes para no saturar la API.
+    const limit = pLimit(3)
     try {
       const roomList = await api.getRooms(homeId)
       const batches = await Promise.all(
         roomList.map(room => limit(async () => {
           try {
-        const roomDevices = await api.getDevices(room.id)
-        return roomDevices.map(d => ({
-          ...d,
-          room: d.room ?? room.name,
+            const roomDevices = await api.getDevices(room.id)
+            return roomDevices.map(d => ({
+              ...d,
+              room: d.room ?? room.name,
+            }))
+          } catch {
+            return []
+          }
         }))
-      } catch {
-        return []
-        }})
-      )
       )
 
       devices.value = batches.flat()
