@@ -24,10 +24,22 @@
   --text-primary:   #d0d3db;
   --text-secondary: #b0bdd0;
   --text-muted:     #8494a7;
+  --text-on-accent: #ffffff;
 
   /* Toggle (usa acentos del informe) */
   --toggle-on:    #6a78f5;   /* Indigo */
   --toggle-off:   #2e2e2e;   /* Border */
+
+  /* Superficies auth (login, register, verify, recover) */
+  --bg-auth-gradient-start: #1a1a3a;
+  --bg-auth-gradient-end:   #0d0d1a;
+  --bg-auth-card:           #2a2a4a;
+  --bg-auth-input:          #3a3a5e;
+  --bg-auth-btn:            #1a1a2e;
+  --bg-auth-btn-hover:      #0f0f20;
+
+  /* Sidebar/nav hover */
+  --bg-nav-hover:           #1d1e35;
 
   /* Layout */
   --sidebar-w:    220px;
