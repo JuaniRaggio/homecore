@@ -54,7 +54,7 @@ function handleRegister() {
 <style scoped>
 .login-bg {
   min-height: 100vh;
-  background: radial-gradient(ellipse at center, #1a1a3a 0%, #0d0d1a 70%);
+  background: radial-gradient(ellipse at center, var(--bg-auth-gradient-start) 0%, var(--bg-auth-gradient-end) 70%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,7 +103,7 @@ function handleRegister() {
 
 .login-card {
   width: 100%;
-  background-color: #2a2a4a;
+  background-color: var(--bg-auth-card);
   border-radius: 14px;
   padding: 24px 20px;
   display: flex;
@@ -128,7 +128,7 @@ function handleRegister() {
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  background-color: #3a3a5e;
+  background-color: var(--bg-auth-input);
   color: var(--text-primary);
   font-size: 14px;
   font-family: 'Inter', sans-serif;
@@ -147,7 +147,7 @@ function handleRegister() {
 .btn-login {
   width: 100%;
   padding: 12px;
-  background-color: #1a1a2e;
+  background-color: var(--bg-auth-btn);
   color: var(--text-primary);
   border: none;
   border-radius: 8px;
@@ -159,7 +159,7 @@ function handleRegister() {
 }
 
 .btn-login:hover {
-  background-color: #0f0f20;
+  background-color: var(--bg-auth-btn-hover);
 }
 
 .forgotlink {
