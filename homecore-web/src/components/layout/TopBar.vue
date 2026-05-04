@@ -107,7 +107,7 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 .logo-text {
   font-size: 18px;
   font-weight: 700;
-  color: whitesmoke;
+  color: var(--text-primary);
 }
 
 .topbar__center_left {

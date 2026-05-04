@@ -41,7 +41,15 @@
           </div>
         </template>
 
-        <!-- DOOR: lock/unlock -->
+        <template v-else-if="device.type === 'door'">
+          <div class="control-row">
+            <span class="control-label">Cerradura</span>
+            <button class="btn-control" :class="locked ? 'btn-control--danger' : 'btn-control--success'" @click="locked = !locked">
+              <i :class="locked ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open'"></i>
+              {{ locked ? 'Bloqueada' : 'Desbloqueada' }}
+            </button>
+          </div>
+        </template>
 
         <!-- CURTAIN/BLINDS: posicion -->
 

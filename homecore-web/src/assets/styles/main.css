@@ -103,5 +103,5 @@ body {
   justify-content: center;
   font-weight: 700;
   font-size: 12px;
-  color: #fff;
+  color: var(--text-on-accent);
 }
