@@ -70,8 +70,22 @@
           </div>
         </template>
 
-        <!-- ALARM: zonas -->
-        <!-- WATER/FAUCET: abrir/cerrar -->
+        <template v-else-if="device.type === 'alarm'">
+          <div class="control-row">
+            <span class="control-label">Estado</span>
+            <button class="btn-control" :class="device.isOn ? 'btn-control--danger' : 'btn-control--success'" @click="togglePower">
+              <i :class="device.isOn ? 'fa-solid fa-shield-halved' : 'fa-solid fa-shield'"></i>
+              {{ device.isOn ? 'Activada' : 'Desactivada' }}
+            </button>
+          </div>
+          <div class="zones">
+            <div v-for="zone in zones" :key="zone.name" class="zone-row">
+              <span class="zone-name">{{ zone.name }}</span>
+              <ToggleSwitch :model-value="zone.active" @update:model-value="zone.active = $event" />
+            </div>
+          </div>
+        </template>
+
         <template v-else-if="device.type === 'water'">
           <div class="control-row">
             <span class="control-label">Caudal</span>
@@ -136,4 +150,204 @@ function formatDate(dateStr) {
 </script>
 
 <style scoped>
+.device-detail {
+  padding: 0;
+}
+
+.detail-header {
+  margin-bottom: 24px;
+}
+
+
+.view-title {
+  margin-bottom: 4px;
+}
+
+.device-room {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+}
+
+/* Status card */
+.status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-label {
+  font-size: var(--font-md);
+  color: var(--text-muted);
+}
+
+.status-value {
+  font-size: var(--font-md);
+  font-weight: 600;
+}
+
+.status--on {
+  color: var(--success);
+}
+
+.status--off {
+  color: var(--text-muted);
+}
+
+/* Controls card */
+.controls-card,
+.history-card {
+  padding: 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.controls-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.control-label {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+  min-width: 70px;
+}
+
+.control-value {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  min-width: 50px;
+}
+
+.slider {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.color-picker {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: none;
+  padding: 2px;
+}
+
+.btn-control {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: var(--font-base);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-control:hover {
+  border-color: var(--accent);
+}
+
+.btn-control--success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.btn-control--danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.btn-control--sm {
+  padding: 6px 12px;
+  font-size: var(--font-sm);
+}
+
+.no-controls {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+}
+
+/* Zones */
+.zones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.zone-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--bg-main);
+  border-radius: var(--radius-md);
+}
+
+.zone-name {
+  font-size: var(--font-base);
+  color: var(--text-primary);
+}
+
+/* History */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-entry:last-child {
+  border-bottom: none;
+}
+
+.history-action {
+  font-size: var(--font-base);
+  color: var(--text-primary);
+}
+
+.history-date {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
 </style>
