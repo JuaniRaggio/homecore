@@ -5,7 +5,7 @@
 
             <div class="login-header">
                 <div class="icon-app">
-                    <img src="@/assets/icons/homecore-icon.png" alt="HomeCore Icon" class="icon-image">
+                    <img src="@/assets/homecore-icono.svg" alt="HomeCore Icon" class="icon-image">
                 </div>
                 <h1 class="login-title">HomeCore</h1>
             </div>
@@ -22,12 +22,12 @@
                     <input v-model="password" type="password" placeholder="Ingrese su contrasena"/>
                 </div>
 
-                <button class="btn-loggin" @click=" ">Iniciar Sesion</button>
+                <button class="btn-loggin" @click="handleLogin">Iniciar Sesion</button>
                 <a href="#" class="forgotlink">Perdiste tu contraseña</a>
 
              </div>
              <!--Boton crear cuenta-->
-             <button class="btn-register" @click="">Crear Cuenta</button>
+             <button class="btn-register" @click="handleRegister">Crear Cuenta</button>
         </div>
     </div>
 </template>
@@ -42,7 +42,7 @@ const password = ref('');
 
 function handleLogin() {
 //Aca deberiamos poner la logica de autenticacion, por ahora solo redirigimos a home
-    router.push('/home');
+    router.push('/casa/1');
 }
 
 function handleRegister() {
@@ -162,9 +162,9 @@ function handleRegister() {
   background-color: #0f0f20;
 }
 
-.forgot-link {
+.forgotlink {
   font-size: 13px;
-  color: var(--text-muted);
+  color: #fff;
   text-align: center;
   text-decoration: underline;
   cursor: pointer;

@@ -5,7 +5,7 @@
       <div class="HomeCore-header">
         <div class="icon-app">
           <img
-            src="@/assets/icons/homecore-icon.png" alt="HomeCore Icon" class="icon-image"/>
+            src="@/assets/homecore-icono.svg" alt="HomeCore Icon" class="icon-image"/>
          </div>
           <h1 class="HomeCore-title">HomeCore</h1>
        </div>
@@ -73,7 +73,7 @@ function handleRegister() {
   });
 }
 </script>
-</script>
+
 
 <style scoped>
 .HomeCore-bg {

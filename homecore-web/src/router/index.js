@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import OverviewView from '@/views/OverviewView.vue'
 import HomeView from '@/views/HomeView.vue'
 import HomeLayout from '@/components/layout/HomeLayout.vue'
+import LoginView from '../views/LoginView.vue'
+import RegisterView from '../views/RegisterView.vue'
 
 // Lazy-load de las vistas secundarias para no cargar todo junto
 const DevicesView = () => import('@/views/DevicesView.vue')
@@ -13,10 +15,20 @@ const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
 
 const routes = [
-  {
+ /* {
     path: '/',
     name: 'overview',
     component: OverviewView
+  },*/
+  {
+    path: '/',
+    name: 'Login',
+    component: LoginView
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView
   },
   {
     path: '/casa/:homeId',
