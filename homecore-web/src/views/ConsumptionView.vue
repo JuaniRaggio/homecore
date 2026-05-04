@@ -133,7 +133,7 @@ const breakdown = [
 }
 
 .view-title {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   font-weight: 700;
   color: var(--text-primary);
   padding: 0 5px;
@@ -144,16 +144,16 @@ const breakdown = [
   gap: 4px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 3px;
 }
 
 .period-tab {
   background: none;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-base);
   padding: 6px 14px;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
@@ -179,11 +179,11 @@ const breakdown = [
   padding: 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .summary-icon {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   color: var(--accent);
 }
 
@@ -201,13 +201,13 @@ const breakdown = [
 }
 
 .summary-value {
-  font-size: 18px;
+  font-size: var(--font-2xl);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .summary-label {
-  font-size: 11px;
+  font-size: var(--font-xs);
   color: var(--text-muted);
 }
 
@@ -217,7 +217,7 @@ const breakdown = [
 }
 
 .section-title {
-  font-size: 15px;
+  font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 14px;
@@ -226,7 +226,7 @@ const breakdown = [
 .chart-placeholder {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 20px;
   height: 200px;
   display: flex;
@@ -254,7 +254,7 @@ const breakdown = [
   width: 100%;
   max-width: 40px;
   background-color: var(--accent);
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
   opacity: 0.8;
   transition: opacity 0.2s;
 }
@@ -264,7 +264,7 @@ const breakdown = [
 }
 
 .chart-bar-label {
-  font-size: 11px;
+  font-size: var(--font-xs);
   color: var(--text-muted);
   margin-top: 6px;
 }
@@ -287,7 +287,7 @@ const breakdown = [
   padding: 10px 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .breakdown-info {
@@ -297,13 +297,13 @@ const breakdown = [
 }
 
 .breakdown-name {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .breakdown-room {
-  font-size: 11px;
+  font-size: var(--font-xs);
   color: var(--text-muted);
 }
 
@@ -311,18 +311,18 @@ const breakdown = [
   flex: 1;
   height: 6px;
   background-color: var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   overflow: hidden;
 }
 
 .breakdown-bar {
   height: 100%;
   background-color: var(--accent);
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
 }
 
 .breakdown-value {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--text-primary);
   min-width: 60px;

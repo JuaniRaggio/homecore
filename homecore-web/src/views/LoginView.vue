@@ -81,7 +81,7 @@ function handleRegister() {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background-color: #3b7fd4;
+  background-color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,7 +95,7 @@ function handleRegister() {
 }
 
 .app-title {
-  font-size: 28px;
+  font-size: var(--font-6xl);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: 0.5px;
@@ -104,7 +104,7 @@ function handleRegister() {
 .login-card {
   width: 100%;
   background-color: var(--bg-auth-card);
-  border-radius: 14px;
+  border-radius: var(--radius-2xl);
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
@@ -118,7 +118,7 @@ function handleRegister() {
 }
 
 .form-label {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -126,11 +126,11 @@ function handleRegister() {
 .form-input {
   width: 100%;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background-color: var(--bg-auth-input);
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-md);
   font-family: 'Inter', sans-serif;
   outline: none;
   transition: border-color 0.2s;
@@ -150,8 +150,8 @@ function handleRegister() {
   background-color: var(--bg-auth-btn);
   color: var(--text-primary);
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-lg);
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
@@ -163,8 +163,8 @@ function handleRegister() {
 }
 
 .forgotlink {
-  font-size: 13px;
-  color: #fff;
+  font-size: var(--font-base);
+  color: var(--text-on-accent);
   text-align: center;
   text-decoration: underline;
   cursor: pointer;
@@ -179,10 +179,10 @@ function handleRegister() {
   width: 100%;
   padding: 13px;
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
-  border-radius: 10px;
-  font-size: 15px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-lg);
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   cursor: pointer;

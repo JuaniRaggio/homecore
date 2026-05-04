@@ -104,7 +104,7 @@ function handleViewDetail(id) {
 }
 
 .view-title {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   font-weight: 700;
   color: var(--text-primary);
   padding: 0 5px;
@@ -114,9 +114,9 @@ function handleViewDetail(id) {
   background-color: var(--accent);
   color: var(--text-on-accent);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;

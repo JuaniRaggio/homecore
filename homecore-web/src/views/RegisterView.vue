@@ -119,7 +119,7 @@ function handleRegister() {
 }
 
 .HomeCore-title {
-  font-size: 22px;
+  font-size: var(--font-4xl);
   font-weight: 700;
   color: var(--text-on-accent);
   letter-spacing: 0.5px;
@@ -128,7 +128,7 @@ function handleRegister() {
 .HomeCore-group {
   width: 100%;
   background-color: var(--bg-auth-card);
-  border-radius: 14px;
+  border-radius: var(--radius-2xl);
   padding: 24px 28px 28px;
   display: flex;
   flex-direction: column;
@@ -144,7 +144,7 @@ function handleRegister() {
 }
 
 .back-link {
-  font-size: 13px;
+  font-size: var(--font-base);
   color: var(--text-secondary);
   text-decoration: underline;
   cursor: pointer;
@@ -161,7 +161,7 @@ function handleRegister() {
 }
 
 .form-label {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -169,9 +169,9 @@ function handleRegister() {
 .form-group input {
   background-color: var(--bg-auth-input);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 9px 12px;
-  font-size: 14px;
+  font-size: var(--font-md);
   color: var(--text-on-accent);
   outline: none;
   transition: border-color 0.2s;
@@ -191,10 +191,10 @@ function handleRegister() {
   padding: 12px;
   background-color: var(--bg-auth-btn);
   color: var(--text-on-accent);
-  font-size: 15px;
+  font-size: var(--font-lg);
   font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.2s;
 }

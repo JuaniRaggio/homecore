@@ -112,7 +112,7 @@ const notifPrefs = ref([
 }
 
 .view-title {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 28px;
@@ -124,7 +124,7 @@ const notifPrefs = ref([
 }
 
 .section-title {
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -139,7 +139,7 @@ const notifPrefs = ref([
 .settings-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -166,7 +166,7 @@ const notifPrefs = ref([
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--font-xl);
   color: var(--text-on-accent);
 }
 
@@ -177,13 +177,13 @@ const notifPrefs = ref([
 }
 
 .profile-name {
-  font-size: 15px;
+  font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .profile-email {
-  font-size: 13px;
+  font-size: var(--font-base);
   color: var(--text-muted);
 }
 
@@ -201,13 +201,13 @@ const notifPrefs = ref([
 }
 
 .setting-name {
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .setting-value {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
@@ -227,7 +227,7 @@ const notifPrefs = ref([
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-primary);
 }
 
@@ -238,21 +238,21 @@ const notifPrefs = ref([
 }
 
 .user-name {
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .user-email {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
 .user-role {
-  font-size: 12px;
+  font-size: var(--font-sm);
   font-weight: 600;
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius: var(--radius-full);
 }
 
 .role--admin {
@@ -274,9 +274,9 @@ const notifPrefs = ref([
   background: none;
   border: 1px dashed var(--border);
   color: var(--text-muted);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 10px;
-  font-size: 13px;
+  font-size: var(--font-base);
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 }
@@ -300,13 +300,13 @@ const notifPrefs = ref([
 }
 
 .notif-name {
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .notif-desc {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
@@ -315,9 +315,9 @@ const notifPrefs = ref([
   background: none;
   border: 1px solid var(--border);
   color: var(--text-primary);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--font-base);
   cursor: pointer;
   transition: border-color 0.2s;
   white-space: nowrap;
@@ -331,9 +331,9 @@ const notifPrefs = ref([
   background: none;
   border: 1px solid rgba(248, 113, 113, 0.4);
   color: var(--danger);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--font-base);
   cursor: pointer;
   transition: background-color 0.2s;
   white-space: nowrap;

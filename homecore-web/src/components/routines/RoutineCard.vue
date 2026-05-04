@@ -65,7 +65,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 .routine-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -96,12 +96,12 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 
 .routine-name {
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--font-lg);
   color: var(--text-primary);
 }
 
 .routine-desc {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
   line-height: 1.4;
 }
@@ -116,7 +116,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 .star {
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .star--yellow {
@@ -140,18 +140,18 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: var(--font-base);
   color: var(--accent);
   font-weight: 600;
 }
 
 .schedule-days {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
 .actions-count {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -167,8 +167,8 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
   color: var(--text-on-accent);
   border: none;
   padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -182,7 +182,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-sm);
   cursor: pointer;
   padding: 7px 4px;
   transition: color 0.2s;

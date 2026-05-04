@@ -94,7 +94,7 @@ function handleToggleFavorite(id) {
 }
 
 .view-title {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   font-weight: 500;
   color: var(--text-primary);
   margin-bottom: 20px;
@@ -117,9 +117,9 @@ function handleToggleFavorite(id) {
 .filter-select {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-base);
   padding: 7px 28px 7px 12px;
   cursor: pointer;
   outline: none;
@@ -136,9 +136,9 @@ function handleToggleFavorite(id) {
   background-color: var(--accent);
   color: var(--text-on-accent);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;

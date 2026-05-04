@@ -37,7 +37,7 @@ defineProps({
   display: block;
   background-color: var(--bg-main);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 20px;
   text-decoration: none;
   color: inherit;
@@ -58,12 +58,12 @@ defineProps({
 }
 
 .home-card__icon {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   color: var(--accent);
 }
 
 .home-card__name {
-  font-size: 16px;
+  font-size: var(--font-xl);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -80,13 +80,13 @@ defineProps({
 }
 
 .home-card__stat-value {
-  font-size: 18px;
+  font-size: var(--font-2xl);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .home-card__stat-label {
-  font-size: 11px;
+  font-size: var(--font-xs);
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;

@@ -40,7 +40,7 @@ defineEmits(['update:modelValue'])
   width: 40px;
   height: 22px;
   background-color: var(--toggle-off);
-  border-radius: 11px;
+  border-radius: var(--radius-lg);
   transition: background-color 0.2s;
   position: relative;
 }

@@ -76,7 +76,7 @@ const navItems = computed(() => [
   align-items: center;            /* centra verticalmente */
   background-color: var(--bg-card);
   padding: 12px 15px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   margin: 0 10px 12px 10px;
   transition: background-color 0.2s;
@@ -88,7 +88,7 @@ const navItems = computed(() => [
 }
 
 .property-name {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--text-primary);
   flex: 1;
@@ -98,7 +98,7 @@ const navItems = computed(() => [
 
 .property-selector i {
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .nav-list {
@@ -110,11 +110,11 @@ const navItems = computed(() => [
 .nav-item a {
   display: block;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 500;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -148,7 +148,7 @@ const navItems = computed(() => [
 .sidebar__config {
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 500;
 }
 
@@ -157,6 +157,6 @@ const navItems = computed(() => [
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 </style>

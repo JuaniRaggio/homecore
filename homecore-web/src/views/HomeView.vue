@@ -161,10 +161,10 @@ const homeId = computed(() => route.params.homeId)
   padding: 5px 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   margin-bottom: 16px;
   max-width: fit-content;
-  font-size: 13px;
+  font-size: var(--font-base);
   color: var(--text-muted);
 }
 
@@ -191,9 +191,9 @@ const homeId = computed(() => route.params.homeId)
   background-color: var(--bg-card);
   color: var(--text-muted);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--font-base);
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -214,8 +214,8 @@ const homeId = computed(() => route.params.homeId)
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
   color: var(--text-primary);
   cursor: pointer;
   transition: background-color 0.2s;
@@ -230,7 +230,7 @@ const homeId = computed(() => route.params.homeId)
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--font-sm);
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -243,9 +243,9 @@ const homeId = computed(() => route.params.homeId)
   background: none;
   border: 1px dashed var(--border);
   color: var(--text-muted);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 8px 14px;
-  font-size: 13px;
+  font-size: var(--font-base);
   cursor: pointer;
   width: 100%;
   transition: border-color 0.2s, color 0.2s;
@@ -266,7 +266,7 @@ const homeId = computed(() => route.params.homeId)
 .panel {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 20px;
 }
 
@@ -278,14 +278,14 @@ const homeId = computed(() => route.params.homeId)
 }
 
 .panel-title {
-  font-size: 16px;
+  font-size: var(--font-xl);
   font-weight: 600;
 }
 
 .panel-link {
   color: var(--accent);
   text-decoration: none;
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 500;
 }
 

@@ -51,7 +51,7 @@ defineEmits(['execute', 'toggle-favorite'])
   padding: 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   width: calc(100% - 0px);
  
   margin-bottom: 12px;
@@ -65,7 +65,7 @@ defineEmits(['execute', 'toggle-favorite'])
 .star {
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .star--yellow {
@@ -81,12 +81,12 @@ defineEmits(['execute', 'toggle-favorite'])
 
 .routine-name {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .routine-schedule {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-sm);
 }
 
 .btn-exec {
@@ -94,8 +94,8 @@ defineEmits(['execute', 'toggle-favorite'])
   color: var(--text-on-accent);
   border: none;
   padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;

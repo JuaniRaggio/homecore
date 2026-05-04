@@ -181,7 +181,7 @@ function linkDevice(room, event) {
 }
 
 .view-title {
-  font-size: 22px;
+  font-size: var(--font-4xl);
   font-weight: 700;
   margin: 0;
 }
@@ -190,9 +190,9 @@ function linkDevice(room, event) {
   background-color: var(--accent);
   color: var(--text-on-accent);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 8px 16px;
-  font-size: 14px;
+  font-size: var(--font-md);
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -211,7 +211,7 @@ function linkDevice(room, event) {
 .room-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -226,7 +226,7 @@ function linkDevice(room, event) {
 
 .room-name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--font-lg);
 }
 
 .room-actions {
@@ -241,7 +241,7 @@ function linkDevice(room, event) {
   color: var(--text-muted);
   cursor: pointer;
   padding: 2px 4px;
-  font-size: 14px;
+  font-size: var(--font-md);
   transition: color 0.15s;
 }
 
@@ -254,7 +254,7 @@ function linkDevice(room, event) {
 }
 
 .icon-btn--sm {
-  font-size: 12px;
+  font-size: var(--font-sm);
 }
 
 .room-card__body {
@@ -276,7 +276,7 @@ function linkDevice(room, event) {
 }
 
 .no-devices {
-  font-size: 13px;
+  font-size: var(--font-base);
   color: var(--text-muted);
   margin: 0;
 }
@@ -289,9 +289,9 @@ function linkDevice(room, event) {
   width: 100%;
   background-color: transparent;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-base);
   padding: 6px 10px;
   cursor: pointer;
   appearance: auto;
@@ -316,7 +316,7 @@ function linkDevice(room, event) {
 .modal {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 24px;
   width: 320px;
   display: flex;
@@ -333,9 +333,9 @@ function linkDevice(room, event) {
 .modal-input {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-md);
   padding: 8px 12px;
   width: 100%;
   box-sizing: border-box;
@@ -355,20 +355,20 @@ function linkDevice(room, event) {
 .btn-cancel {
   background: none;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-muted);
   padding: 7px 16px;
-  font-size: 14px;
+  font-size: var(--font-md);
   cursor: pointer;
 }
 
 .btn-confirm {
   background-color: var(--accent);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-on-accent);
   padding: 7px 16px;
-  font-size: 14px;
+  font-size: var(--font-md);
   cursor: pointer;
 }
 

@@ -105,7 +105,7 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 }
 
 .logo-text {
-  font-size: 18px;
+  font-size: var(--font-2xl);
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -118,18 +118,18 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 }
 
 .topbar__house-name {
-  font-size: 15px;
+  font-size: var(--font-lg);
   font-weight: 700;
   color: var(--accent);
 }
 
 .topbar__separator {
-  font-size: 15px;
+  font-size: var(--font-lg);
   color: var(--text-primary);
 }
 
 .topbar__page-name {
-  font-size: 15px;
+  font-size: var(--font-lg);
   font-weight: 400;
   color: var(--text-primary);
 }
@@ -149,7 +149,7 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 20px;
+  font-size: var(--font-3xl);
   cursor: pointer;
 }
 
@@ -159,7 +159,7 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
   right: -6px;
   background: var(--danger);
   color: var(--text-on-accent);
-  font-size: 10px;
+  font-size: var(--font-2xs);
   font-weight: 700;
   border-radius: 50%;
   width: 16px;
@@ -175,11 +175,11 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
   align-items: center;
   gap: 10px;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-base);
   cursor: pointer;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 8px 12px;
   transition: background-color 0.2s;
 }

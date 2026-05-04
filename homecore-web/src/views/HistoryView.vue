@@ -74,7 +74,7 @@ const filteredEvents = computed(() =>
 }
 
 .view-title {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   font-weight: 700;
   color: var(--text-primary);
   padding: 0 5px;
@@ -88,9 +88,9 @@ const filteredEvents = computed(() =>
 .filter-select {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-base);
   padding: 7px 28px 7px 12px;
   cursor: pointer;
   outline: none;
@@ -115,7 +115,7 @@ const filteredEvents = computed(() =>
   padding: 12px 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   transition: border-color 0.2s;
 }
 
@@ -157,24 +157,24 @@ const filteredEvents = computed(() =>
 }
 
 .timeline-device {
-  font-size: 14px;
+  font-size: var(--font-md);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .timeline-time {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
   font-weight: 500;
 }
 
 .timeline-action {
-  font-size: 13px;
+  font-size: var(--font-base);
   color: var(--text-secondary);
 }
 
 .timeline-user {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 </style>

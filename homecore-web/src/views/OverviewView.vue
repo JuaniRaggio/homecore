@@ -121,14 +121,14 @@ const homes = [
 }
 
 .greeting-text {
-  font-size: 28px;
+  font-size: var(--font-6xl);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .greeting-sub {
-  font-size: 14px;
+  font-size: var(--font-md);
   color: var(--text-muted);
 }
 
@@ -137,7 +137,7 @@ const homes = [
 }
 
 .section-title {
-  font-size: 16px;
+  font-size: var(--font-xl);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 14px;
@@ -164,12 +164,12 @@ const homes = [
   padding: 12px 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .critical-icon {
   color: var(--amber);
-  font-size: 16px;
+  font-size: var(--font-xl);
 }
 
 .critical-info {
@@ -179,21 +179,21 @@ const homes = [
 }
 
 .critical-name {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .critical-location {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
 .critical-status {
-  font-size: 12px;
+  font-size: var(--font-sm);
   font-weight: 600;
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: var(--radius-full);
 }
 
 .critical-status--warning {
@@ -220,12 +220,12 @@ const homes = [
   padding: 12px 16px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .fav-routine-star {
   color: var(--amber);
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .fav-routine-info {
@@ -235,18 +235,18 @@ const homes = [
 }
 
 .fav-routine-name {
-  font-size: 13px;
+  font-size: var(--font-base);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .fav-routine-home {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
 .fav-routine-schedule {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-secondary);
 }
 
@@ -254,9 +254,9 @@ const homes = [
   background: none;
   border: 1px solid var(--border);
   color: var(--accent);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--font-sm);
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
 }
@@ -280,11 +280,11 @@ const homes = [
   padding: 16px 20px;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .energy-icon {
-  font-size: 22px;
+  font-size: var(--font-4xl);
   color: var(--accent);
 }
 
@@ -298,13 +298,13 @@ const homes = [
 }
 
 .energy-value {
-  font-size: 20px;
+  font-size: var(--font-3xl);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .energy-label {
-  font-size: 12px;
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 </style>

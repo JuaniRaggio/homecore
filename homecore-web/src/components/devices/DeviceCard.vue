@@ -79,7 +79,7 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
   cursor: pointer;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -101,14 +101,14 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
 }
 
 .device-icon-wrap {
-  font-size: 22px;
+  font-size: var(--font-4xl);
   color: var(--accent);
 }
 
 .star {
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .star--yellow {
@@ -117,17 +117,17 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
 
 .device-name {
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-xl);
 }
 
 .device-room {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: var(--font-md);
 }
 
 .device-status {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-base);
 }
 
 .status--on {
