@@ -120,18 +120,18 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 .topbar__house-name {
   font-size: 15px;
   font-weight: 700;
-  color: #6f8df8 ;
+  color: var(--accent);
 }
 
 .topbar__separator {
   font-size: 15px;
-  color:  #d0d3db;
+  color: var(--text-primary);
 }
 
 .topbar__page-name {
   font-size: 15px;
   font-weight: 400;
-  color:  #d0d3db;
+  color: var(--text-primary);
 }
 
 .topbar__right {
@@ -157,8 +157,8 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
   position: absolute;
   top: -4px;
   right: -6px;
-  background: #e74c3c;
-  color: #fff;
+  background: var(--danger);
+  color: var(--text-on-accent);
   font-size: 10px;
   font-weight: 700;
   border-radius: 50%;
@@ -185,6 +185,6 @@ const currentPageLabel = computed(() => routeLabels[route.name] || '')
 }
 
 .topbar__user:hover {
-  background-color: #181924;
+  background-color: var(--bg-sidebar);
 }
 </style>

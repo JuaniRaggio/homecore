@@ -120,7 +120,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 }
 
 .star--yellow {
-  color: #f1c40f;
+  color: var(--amber);
 }
 
 .routine-card__schedule {
@@ -164,7 +164,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 
 .btn-exec {
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   padding: 7px 14px;
   border-radius: 8px;

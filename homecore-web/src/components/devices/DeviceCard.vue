@@ -112,7 +112,7 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
 }
 
 .star--yellow {
-  color: #f1c40f;
+  color: var(--amber);
 }
 
 .device-name {
@@ -131,6 +131,6 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
 }
 
 .status--on {
-  color: #2ecc71;
+  color: var(--success);
 }
 </style>
