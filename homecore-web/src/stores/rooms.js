@@ -1,18 +1,49 @@
-
-// Store de habitaciones
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import * as api from '@/services/api'
 
 export const useRoomsStore = defineStore('rooms', () => {
-  // const rooms = ref([])
-  // const selectedFloor = ref(0)
-  // const loading = ref(false)
+  const rooms = ref([])
+  const loading = ref(false)
+  const error = ref(null)
 
-  // const roomsByFloor = computed(() => rooms.value.filter(r => r.floor === selectedFloor.value))
+  const roomNames = computed(() => rooms.value.map(r => r.name))
 
-  // async function fetchRooms(homeId) { /* api.getRooms(homeId) */ }
-  // async function addRoom(homeId, data) { /* api.createRoom() y push a rooms */ }
-  // async function removeRoom(roomId) { /* api.deleteRoom() y filtrar de rooms */ }
+  function getById(id) {
+    return rooms.value.find(r => String(r.id) === String(id))
+  }
 
-  return {}
+  async function fetchRooms(homeId) {
+    loading.value = true
+    error.value = null
+    try {
+      rooms.value = await api.getRooms(homeId)
+    } catch (e) {
+      error.value = e.message
+    } finally {
+      loading.value = false
+    }
+  }
 
-  return {}
+  async function addRoom(homeId, data) {
+    const room = await api.createRoom(homeId, data)
+    rooms.value.push(room)
+  }
+
+  async function updateRoom(id, data) {
+    const updated = await api.updateRoom(id, data)
+    const idx = rooms.value.findIndex(r => String(r.id) === String(id))
+    if (idx !== -1) rooms.value[idx] = { ...rooms.value[idx], ...updated }
+  }
+
+  async function removeRoom(id) {
+    await api.deleteRoom(id)
+    rooms.value = rooms.value.filter(r => String(r.id) !== String(id))
+  }
+
+  function clear() {
+    rooms.value = []
+  }
+
+  return { rooms, loading, error, roomNames, getById, fetchRooms, addRoom, updateRoom, removeRoom, clear }
 })

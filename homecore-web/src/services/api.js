@@ -10,7 +10,7 @@ function headers() {
 }
 
 async function request(method, path, body=null) {
-  const options = {method, headers: getHeaders()}
+  const options = {method, headers: headers()}
   if( body!== null) options.body = JSON.stringify(body)
 
   const res = await fetch(`${BASE_URL}${path}`, options) //request a la API
