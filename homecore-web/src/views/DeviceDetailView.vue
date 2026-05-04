@@ -103,6 +103,36 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+
+const router = useRouter()
+const route = useRoute()
+
+const device = ref({
+})
+
+const brightness = ref(80)
+const color = ref('#818cf8')
+const locked = ref(true)
+const position = ref(75)
+const zones = ref([
+])
+
+function togglePower() {
+  device.value.isOn = !device.value.isOn
+}
+
+const recentHistory = computed(() => [
+])
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr)
+  const day = d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
+  const time = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  return `${day} ${time}`
+}
 </script>
 
 <style scoped>
