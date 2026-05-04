@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
 
+const MAX_CONCURRENT_REQUESTS = 3
+
 export const useDevicesStore = defineStore('devices', () => {
   const devices = ref([]) //aquí se guardarán los dispositivos obtenidos de la API
   const loading = ref(false) // error se puede usar para mostrar mensajes de error en la UI si algo falla al cargar 
@@ -24,7 +26,7 @@ const activeDevices = computed(() => devices.value.filter(d => d.isOn))
     // Itera por cada habitacion y obtiene sus dispositivos,
     // agregando el nombre de la habitacion a cada dispositivo.
     // Limita a 3 requests concurrentes para no saturar la API.
-    const limit = pLimit(3)
+    const limit = pLimit(MAX_CONCURRENT_REQUESTS)
     try {
       const roomList = await api.getRooms(homeId)
       const batches = await Promise.all(
