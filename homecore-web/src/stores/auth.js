@@ -1,121 +1,76 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import * as api from '@/services/api'
 
-const RESTRICTED_DEVICE_TYPES = {
-}
 
 export const useAuthStore = defineStore('auth', () => {
+  const token = ref(localStorage.getItem('auth_token') || null)
   const user = ref(null)
-  const isAuthenticated = computed(() => !!user.value)
-  const pin = ref('1234')
+  const pendingCredentials = ref(null)
+  const pendingVerifyCode = ref(null)
 
-  const familyProfiles = ref([
-  ])
-  const activeProfile = ref(familyProfiles.value[0])
-  const isAdmin = computed(() => activeProfile.value.role === 'admin')
+  const isAuthenticated = computed(() => !!token.value)
 
-  function switchProfile(profileId) {
-    const profile = familyProfiles.value.find(p => p.id === profileId)
-    if (profile) {
-      activeProfile.value = profile
+  async function register(name, email, password) {
+    try {
+      await api.register({ name, email, password })
+    } catch (error) {
+      if (error.status === 409) return { success: false, conflict: true, error: error.message }
+      return { success: false, error: error.message }
     }
-  }
-
-  function isRestricted(deviceType) {
-    const restricted = RESTRICTED_DEVICE_TYPES[activeProfile.value.role]
-    return restricted ? restricted.includes(deviceType) : false
-  }
-
-  const registeredUsers = ref([
-  ])
-
-  function login(email, password) {
-    const found = registeredUsers.value.find(
-      u => u.email === email && u.password === password
-    )
-    if (found) {
-      if (!found.verified) {
-        return { success: false, error: 'Cuenta no verificada. Revisa tu correo electronico.' }
-      }
-      user.value = { ...found }
-      activeProfile.value = familyProfiles.value[0]
+    try {
+      const response = await api.sendVerification(email)
+      console.log('[sendVerification response]', response)
+      // sendVerification puede devolver el código como string directo o dentro de {token: "..."}
+      const code = typeof response === 'string' ? response : (response?.token ?? response?.code)
+      pendingVerifyCode.value = code
+      pendingCredentials.value = { email, password }
       return { success: true }
-    }
-    return { success: false, error: 'Credenciales incorrectas. Verifica tu email y contrasena.' }
-  }
-
-  function register(name, email, password) {
-    const exists = registeredUsers.value.find(u => u.email === email)
-    if (exists) {
-      return { success: false, error: 'Ya existe una cuenta con ese email.' }
-    }
-    const newUser = {
-      id: registeredUsers.value.length + 1,
-      name,
-      email,
-      password,
-      avatar: null,
-      verified: false,
-      notificationsEnabled: true,
-      pinEnabled: false,
-    }
-    registeredUsers.value.push(newUser)
-    return { success: true }
-  }
-
-  function verifyAccount(code) {
-  }
-
-  function recoverPassword(email) {
-    const found = registeredUsers.value.find(u => u.email === email)
-    if (found) {
-      return { success: true, message: 'Se envio un enlace de recuperacion a tu correo.' }
-    }
-    return { success: false, error: 'No existe una cuenta con ese email.' }
-  }
-
-  function changePassword(currentPassword, newPassword) {
-    if (!user.value) return { success: false, error: 'No hay sesion activa.' }
-    if (user.value.password !== currentPassword) {
-      return { success: false, error: 'La contrasena actual es incorrecta.' }
-    }
-    user.value.password = newPassword
-    const reg = registeredUsers.value.find(u => u.id === user.value.id)
-    if (reg) reg.password = newPassword
-    return { success: true }
-  }
-
-  function toggleNotifications() {
-    if (user.value) {
-      user.value.notificationsEnabled = !user.value.notificationsEnabled
+    } catch (error) {
+      return { success: false, error: error.message }
     }
   }
 
-  function verifyPin(inputPin) {
-    return inputPin === pin.value
+  async function login(email, password) {
+    try {
+      token.value = null
+      localStorage.removeItem('auth_token')
+      const response = await api.login(email, password)
+      token.value = response.token
+      user.value = { email }
+      localStorage.setItem('auth_token', response.token)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
   }
 
   function logout() {
+    token.value = null
     user.value = null
+    localStorage.removeItem('auth_token')
   }
 
-  return {
-    user,
-    isAuthenticated,
-    pin,
-    familyProfiles,
-    activeProfile,
-    isAdmin,
-    switchProfile,
-    isRestricted,
-    registeredUsers,
-    login,
-    register,
-    verifyAccount,
-    recoverPassword,
-    changePassword,
-    toggleNotifications,
-    verifyPin,
-    logout
+  async function verifyAccount() {
+    try {
+      await api.verifyAccount(pendingVerifyCode.value)
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+    if (pendingCredentials.value) {
+      const { email, password } = pendingCredentials.value
+      pendingCredentials.value = null
+      return await login(email, password)
+    }
+    return { success: true, needsLogin: true }
   }
+
+  function recover(email) {
+    if (!email) {
+      return { success: false, error: 'Ingrese su email' }
+    }
+    return { success: true }
+  }
+
+  return { token, user, isAuthenticated, register, login, logout, verifyAccount, recover }
 })

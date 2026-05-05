@@ -5,30 +5,31 @@
         <div class="icon-app">
           <img src="@/assets/homecore-icono.svg" alt="HomeCore Icon" class="icon-image">
         </div>
-        <h1 class="auth-title">Recuperar contrasena</h1>
-        <p class="auth-subtitle">Ingresa tu email y te enviaremos un enlace para restablecer tu contrasena</p>
+        <h1 class="auth-title">HomeCore</h1>
       </div>
 
       <div class="auth-card">
+        <div class="card-top-row">
+          <h2 class="card-subtitle">Recuperar cuenta</h2>
+          <a class="back-link" @click.prevent="router.back()">Volver</a>
+        </div>
+
+        <p class="card-description">
+          Ingresa tu email y te enviaremos un enlace para restablecer tu contrasena.
+        </p>
+
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input
-            v-model="email"
-            type="email"
-            placeholder="tu@email.com"
-            @keyup.enter="handleRecover"
-          />
+          <input v-model="email" type="email" placeholder="Ingrese su email" @keyup.enter="handleRecover" />
         </div>
 
         <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
         <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
 
-        <button class="btn-primary" @click="handleRecover" :disabled="!email.trim()">
-          Enviar enlace
+        <button class="btn-primary" @click="handleRecover" :disabled="sent">
+          {{ sent ? 'Email enviado' : 'Enviar enlace' }}
         </button>
       </div>
-
-      <button class="btn-accent" @click="router.push('/login')">Volver al login</button>
     </div>
   </div>
 </template>
@@ -44,14 +45,16 @@ const authStore = useAuthStore()
 const email = ref('')
 const errorMsg = ref('')
 const successMsg = ref('')
+const sent = ref(false)
 
 function handleRecover() {
   errorMsg.value = ''
   successMsg.value = ''
 
-  const result = authStore.recoverPassword(email.value)
+  const result = authStore.recover(email.value)
   if (result.success) {
-    successMsg.value = result.message
+    sent.value = true
+    successMsg.value = 'Si el email existe, recibirás un enlace de recuperación.'
   } else {
     errorMsg.value = result.error
   }
@@ -59,9 +62,34 @@ function handleRecover() {
 </script>
 
 <style scoped>
-.auth-subtitle {
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2xs);
+}
+
+.card-subtitle {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.back-link {
   font-size: var(--font-base);
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--text-on-accent);
+}
+
+.card-description {
+  font-size: var(--font-sm);
   color: var(--text-muted);
-  text-align: center;
+  margin-bottom: var(--space-sm);
 }
 </style>
