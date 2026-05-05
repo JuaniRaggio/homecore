@@ -9,8 +9,23 @@
       </div>
 
       <div class="auth-card verify-card">
-        <p v-if="loading" class="status-msg">Verificando cuenta...</p>
-        <p v-else-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+        <template v-if="!success">
+          <p class="verify-instruction">Ingresá el código que te enviamos por email</p>
+          <form @submit.prevent="submit">
+            <input
+              v-model="code"
+              class="auth-input"
+              type="text"
+              placeholder="Código de verificación"
+              :disabled="loading"
+              autocomplete="off"
+            />
+            <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+            <button class="auth-btn" type="submit" :disabled="loading || !code.trim()">
+              {{ loading ? 'Verificando...' : 'Verificar' }}
+            </button>
+          </form>
+        </template>
         <p v-else class="success-msg">¡Registro exitoso! Entrando...</p>
       </div>
     </div>
@@ -18,39 +33,45 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const loading = ref(true)
+const code = ref('')
+const loading = ref(false)
 const errorMsg = ref('')
+const success = ref(false)
 
-onMounted(async () => {
-  const result = await authStore.verifyAccount()
+async function submit() {
+  errorMsg.value = ''
+  loading.value = true
+  const result = await authStore.verifyAccount(code.value.trim())
   loading.value = false
   if (result.success) {
+    success.value = true
     setTimeout(() => router.push(result.needsLogin ? '/login' : '/overview'), 1200)
   } else {
-    errorMsg.value = result.error || 'Error al verificar la cuenta'
+    errorMsg.value = result.error || 'Código incorrecto, intentá de nuevo'
   }
-})
+}
 </script>
 
 <style scoped>
 .verify-card {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
   min-height: 80px;
 }
 
-.status-msg {
+.verify-instruction {
   color: var(--text-secondary);
   font-size: var(--font-base);
   text-align: center;
+  margin: 0;
 }
 
 .success-msg {
@@ -64,5 +85,6 @@ onMounted(async () => {
   color: #d32f2f;
   font-size: var(--font-sm);
   text-align: center;
+  margin: 0;
 }
 </style>
