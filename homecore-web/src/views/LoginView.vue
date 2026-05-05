@@ -41,6 +41,6 @@ function handleLogin() {
 }
 
 function handleRegister() {
-  router.push('/register')
+  router.push('/registro')
 }
 </script>

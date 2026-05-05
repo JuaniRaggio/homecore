@@ -48,6 +48,10 @@ export const getDevice =(id) => request('GET', `/devices/${id}`)
 export const createDevice =(roomId, data) => request('POST', `/rooms/${roomId}/devices`, data)
 export const updateDevice = (id, data) => request('PUT', `/devices/${id}`, data)
 export const deleteDevice = (id) => request('DELETE', `/devices/${id}`)
+
+// -- Auth/Autenticación --
+export const register = (data) => request('POST', '/auth/register', data)
+export const login = (email, password) => request('POST', '/auth/login', { email, password })
 export const executeAction = (id, actionName, params) =>
   request('PUT', `/devices/${id}/execute/${actionName}`, params ?? {})
 

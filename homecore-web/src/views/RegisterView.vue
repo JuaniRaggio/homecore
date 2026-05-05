@@ -14,6 +14,8 @@
           <a class="back-link" @click.prevent="router.back()">Volver</a>
         </div>
 
+        <div v-if="error" class="error-message">{{ error }}</div>
+
         <div class="form-group">
           <label class="form-label">Nombre</label>
           <input v-model="name" type="text" placeholder="Ingrese su nombre" />
@@ -34,7 +36,9 @@
           <input v-model="confirmPassword" type="password" placeholder="Confirme su contrasena" />
         </div>
 
-        <button class="btn-primary" @click="handleRegister">Crear Cuenta</button>
+        <button class="btn-primary" @click="handleRegister" :disabled="loading">
+          {{ loading ? 'Creando cuenta...' : 'Crear Cuenta' }}
+        </button>
       </div>
     </div>
   </div>
@@ -43,25 +47,40 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const loading = ref(false)
+const error = ref('')
 
-function handleRegister() {
-  if (password.value !== confirmPassword.value) {
-    alert('Las contrasenas no coinciden')
+async function handleRegister() {
+  error.value = ''
+  
+  if (!name.value || !email.value || !password.value) {
+    error.value = 'Por favor complete todos los campos'
     return
   }
 
-  console.log({
-    name: name.value,
-    email: email.value,
-    password: password.value
-  })
+  if (password.value !== confirmPassword.value) {
+    error.value = 'Las contraseñas no coinciden'
+    return
+  }
+
+  loading.value = true
+  const result = await authStore.register(name.value, email.value, password.value)
+  loading.value = false
+
+  if (result.success) {
+    router.push('/overview')
+  } else {
+    error.value = result.error || 'Error al registrarse'
+  }
 }
 </script>
 
@@ -89,5 +108,19 @@ function handleRegister() {
 
 .back-link:hover {
   color: var(--text-on-accent);
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: var(--font-sm);
+  margin-bottom: var(--space-xs);
+  padding: 0.5rem;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>
