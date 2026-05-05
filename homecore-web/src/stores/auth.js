@@ -1,13 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
-
+import emailjs from '@emailjs/browser'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null)
   const user = ref(null)
   const pendingCredentials = ref(null)
-  const pendingVerifyCode = ref(null)
 
   const isAuthenticated = computed(() => !!token.value)
 
@@ -20,10 +19,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
     try {
       const response = await api.sendVerification(email)
-      console.log('[sendVerification response]', response)
-      // sendVerification puede devolver el código como string directo o dentro de {token: "..."}
       const code = typeof response === 'string' ? response : (response?.token ?? response?.code)
-      pendingVerifyCode.value = code
+      const expiryTime = new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        { passcode: code, email, user_name: name, time: expiryTime, company_name: 'HomeCore' },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
       pendingCredentials.value = { email, password }
       return { success: true }
     } catch (error) {
@@ -51,9 +54,9 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth_token')
   }
 
-  async function verifyAccount() {
+  async function verifyAccount(code) {
     try {
-      await api.verifyAccount(pendingVerifyCode.value)
+      await api.verifyAccount(code)
     } catch (error) {
       return { success: false, error: error.message }
     }
