@@ -5,6 +5,15 @@ const RESTRICTED_DEVICE_TYPES = {
 }
 
 export const useAuthStore = defineStore('auth', () => {
+  const user = ref(null)
+  const isAuthenticated = computed(() => !!user.value)
+  const pin = ref('1234')
+
+  const familyProfiles = ref([
+  ])
+  const activeProfile = ref(familyProfiles.value[0])
+  const isAdmin = computed(() => activeProfile.value.role === 'admin')
+
   function switchProfile(profileId) {
     const profile = familyProfiles.value.find(p => p.id === profileId)
     if (profile) {
@@ -66,6 +75,14 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function changePassword(currentPassword, newPassword) {
+    if (!user.value) return { success: false, error: 'No hay sesion activa.' }
+    if (user.value.password !== currentPassword) {
+      return { success: false, error: 'La contrasena actual es incorrecta.' }
+    }
+    user.value.password = newPassword
+    const reg = registeredUsers.value.find(u => u.id === user.value.id)
+    if (reg) reg.password = newPassword
+    return { success: true }
   }
 
   function toggleNotifications() {
