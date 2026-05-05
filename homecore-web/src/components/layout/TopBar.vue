@@ -33,7 +33,7 @@
       <!-- Menu de usuario -->
       <!-- TODO: Al hacer click, abrir dropdown con opciones (cerrar sesion, perfil, etc.) -->
       <div class="topbar__user">
-        <span class="user-name">Juani Raggio</span>
+        <span class="user-name">Soy Sabalero</span>
         <i class="fa-solid fa-chevron-down"></i>
       
       </div>

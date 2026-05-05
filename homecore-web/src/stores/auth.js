@@ -2,19 +2,30 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 
+
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null)
   const user = ref(null)
+  const pendingCredentials = ref(null)
+  const pendingVerifyCode = ref(null)
 
   const isAuthenticated = computed(() => !!token.value)
 
   async function register(name, email, password) {
     try {
-      const response = await api.register({ name, email, password })
-      token.value = response.token
-      user.value = { name, email }
-      localStorage.setItem('auth_token', response.token)
-      return { success: true, data: response }
+      await api.register({ name, email, password })
+    } catch (error) {
+      if (error.status === 409) return { success: false, conflict: true, error: error.message }
+      return { success: false, error: error.message }
+    }
+    try {
+      const response = await api.sendVerification(email)
+      console.log('[sendVerification response]', response)
+      // sendVerification puede devolver el código como string directo o dentro de {token: "..."}
+      const code = typeof response === 'string' ? response : (response?.token ?? response?.code)
+      pendingVerifyCode.value = code
+      pendingCredentials.value = { email, password }
+      return { success: true }
     } catch (error) {
       return { success: false, error: error.message }
     }
@@ -22,11 +33,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function login(email, password) {
     try {
+      token.value = null
+      localStorage.removeItem('auth_token')
       const response = await api.login(email, password)
       token.value = response.token
       user.value = { email }
       localStorage.setItem('auth_token', response.token)
-      return { success: true, data: response }
+      return { success: true }
     } catch (error) {
       return { success: false, error: error.message }
     }
@@ -38,11 +51,18 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth_token')
   }
 
-  function verifyAccount(code) {
-    if (!code || code.length !== 6) {
-      return { success: false, error: 'El codigo debe tener 6 digitos' }
+  async function verifyAccount() {
+    try {
+      await api.verifyAccount(pendingVerifyCode.value)
+    } catch (error) {
+      return { success: false, error: error.message }
     }
-    return { success: true }
+    if (pendingCredentials.value) {
+      const { email, password } = pendingCredentials.value
+      pendingCredentials.value = null
+      return await login(email, password)
+    }
+    return { success: true, needsLogin: true }
   }
 
   function recover(email) {

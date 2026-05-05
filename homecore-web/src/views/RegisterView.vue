@@ -77,7 +77,9 @@ async function handleRegister() {
   loading.value = false
 
   if (result.success) {
-    router.push('/overview')
+    router.push('/verificar')
+  } else if (result.conflict) {
+    router.push('/login')
   } else {
     error.value = result.error || 'Error al registrarse'
   }

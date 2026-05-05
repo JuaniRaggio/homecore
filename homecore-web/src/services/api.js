@@ -3,10 +3,13 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const API_KEY = import.meta.env.VITE_API_KEY
 
 function headers() {
-  return {
+  const h = {
     'Content-Type': 'application/json',
-    'X-API-KEY': API_KEY
+    'X-API-Key': API_KEY
   }
+  const token = localStorage.getItem('auth_token')
+  if (token) h['Authorization'] = `Bearer ${token}`
+  return h
 }
 
 async function request(method, path, body=null) {
@@ -14,9 +17,11 @@ async function request(method, path, body=null) {
   if( body!== null) options.body = JSON.stringify(body)
 
   const res = await fetch(`${BASE_URL}${path}`, options) //request a la API
-  if( !res.ok ) {
+  if (!res.ok) {
     const errorData = await res.json().catch(() => ({}))
-    throw new Error(errorData.message || 'API request failed')
+    const err = new Error(errorData.error?.description || errorData.message || 'API request failed')
+    err.status = res.status
+    throw err
   }
   const json = await res.json()
   return json.result !== undefined ? json.result : json
@@ -50,8 +55,10 @@ export const updateDevice = (id, data) => request('PUT', `/devices/${id}`, data)
 export const deleteDevice = (id) => request('DELETE', `/devices/${id}`)
 
 // -- Auth/Autenticación --
-export const register = (data) => request('POST', '/auth/register', data)
-export const login = (email, password) => request('POST', '/auth/login', { email, password })
+export const register = (data) => request('POST', '/users/register', data)
+export const sendVerification = (email) => request('POST', '/users/send-verification', { email })
+export const login = (email, password) => request('POST', '/users/login', { email, password })
+export const verifyAccount = (code) => request('POST', '/users/verify-account', { code })
 export const executeAction = (id, actionName, params) =>
   request('PUT', `/devices/${id}/execute/${actionName}`, params ?? {})
 

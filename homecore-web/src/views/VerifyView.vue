@@ -5,89 +5,64 @@
         <div class="icon-app">
           <img src="@/assets/homecore-icono.svg" alt="HomeCore Icon" class="icon-image">
         </div>
-        <h1 class="auth-title">Verificar cuenta</h1>
-        <p class="auth-subtitle">Ingresa el codigo de 6 digitos que enviamos a tu correo</p>
+        <h1 class="auth-title">HomeCore</h1>
       </div>
 
-      <div class="auth-card">
-        <div class="form-group">
-          <label class="form-label">Codigo de verificacion</label>
-          <input
-            v-model="code"
-            type="text"
-            maxlength="6"
-            placeholder="123456"
-            class="verify-code-input"
-            @keyup.enter="handleVerify"
-          />
-        </div>
-
-        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
-        <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
-
-        <button class="btn-primary" @click="handleVerify" :disabled="code.length < 6">
-          Verificar
-        </button>
+      <div class="auth-card verify-card">
+        <p v-if="loading" class="status-msg">Verificando cuenta...</p>
+        <p v-else-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+        <p v-else class="success-msg">¡Registro exitoso! Entrando...</p>
       </div>
-
-      <button class="btn-accent" @click="router.push('/login')">Volver al login</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const code = ref('')
+const loading = ref(true)
 const errorMsg = ref('')
-const successMsg = ref('')
 
-function handleVerify() {
-  errorMsg.value = ''
-  successMsg.value = ''
-
-  const result = authStore.verifyAccount(code.value)
+onMounted(async () => {
+  const result = await authStore.verifyAccount()
+  loading.value = false
   if (result.success) {
-    successMsg.value = 'Cuenta verificada correctamente. Redirigiendo...'
-    setTimeout(() => router.push('/login'), 1500)
+    setTimeout(() => router.push(result.needsLogin ? '/login' : '/overview'), 1200)
   } else {
-    errorMsg.value = result.error
+    errorMsg.value = result.error || 'Error al verificar la cuenta'
   }
-}
+})
 </script>
 
 <style scoped>
-.auth-subtitle {
+.verify-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+}
+
+.status-msg {
+  color: var(--text-secondary);
   font-size: var(--font-base);
-  color: var(--text-muted);
   text-align: center;
 }
 
-.verify-code-input {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--bg-auth-input);
-  color: var(--text-primary);
-  font-size: var(--font-2xl);
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 8px;
+.success-msg {
+  color: var(--accent);
+  font-size: var(--font-base);
   text-align: center;
-  outline: none;
-  transition: border-color 0.2s;
+  font-weight: 600;
 }
 
-.verify-code-input::placeholder {
-  color: var(--text-muted);
-}
-
-.verify-code-input:focus {
-  border-color: var(--accent);
+.error-msg {
+  color: #d32f2f;
+  font-size: var(--font-sm);
+  text-align: center;
 }
 </style>
