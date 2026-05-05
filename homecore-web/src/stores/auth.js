@@ -58,12 +58,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function recoverPassword(email) {
+    const found = registeredUsers.value.find(u => u.email === email)
+    if (found) {
+      return { success: true, message: 'Se envio un enlace de recuperacion a tu correo.' }
+    }
+    return { success: false, error: 'No existe una cuenta con ese email.' }
   }
 
   function changePassword(currentPassword, newPassword) {
   }
 
   function toggleNotifications() {
+    if (user.value) {
+      user.value.notificationsEnabled = !user.value.notificationsEnabled
+    }
   }
 
   function verifyPin(inputPin) {
