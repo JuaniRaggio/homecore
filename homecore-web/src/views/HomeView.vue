@@ -112,9 +112,7 @@ const stats = computed(() => ({
   active: devicesStore.activeDevices.length,
   total: devicesStore.devices.length,
   rooms: roomsStore.rooms.length,
-  consumption: devicesStore.devices
-    .filter(d => d.isOn)
-    .reduce((sum, d) => sum + (d.type?.powerUsage ?? 0), 0)
+  consumption: devicesStore.totalConsumption
 }))
 
 function toggleDevice(id) {
@@ -136,6 +134,7 @@ async function deleteRoom(roomId) {
 onMounted(() => {
   if (homeId.value) {
     devicesStore.fetchAllForHome(homeId.value)
+    devicesStore.fetchDeviceTypes()
     roomsStore.fetchRooms(homeId.value)
     routinesStore.fetchRoutines()
   }
