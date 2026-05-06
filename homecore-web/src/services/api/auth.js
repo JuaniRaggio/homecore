@@ -17,8 +17,8 @@ export const logout = () => request('POST', '/users/logout')
 export const verifyAccount = (code) => request('POST', '/users/verify-account', { code })
 export const sendVerification = (email) => request('POST', '/users/send-verification', { email })
 export const getMailerConfig = () => request('GET', '/mailerconfig')
-export const createMailerConfig = (config) => request('POST', '/mailerconfig', data)
-export const updateMailerConfig = (config) => request('POST', '/mailerconfig', data)
+export const createMailerConfig = (config) => request('POST', '/mailerconfig', config)
+export const updateMailerConfig = (config) => request('PUT', '/mailerconfig', config)
 export const deleteMailerConfig = () => request('DELETE', '/mailerconfig')
 
 /*Mailer-Template*/
