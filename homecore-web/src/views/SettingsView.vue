@@ -108,10 +108,18 @@ async function handleChangePassword() {
     return
   }
 
-  passwordSuccess.value = 'Contrasena actualizada correctamente'
-  currentPassword.value = ''
-  newPassword.value = ''
-  confirmPassword.value = ''
+  loading.value = true
+  const result = await authStore.changePassword(currentPassword.value, newPassword.value)
+  loading.value = false
+
+  if (result.success) {
+    passwordSuccess.value = 'Contraseña actualizada correctamente'
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } else {
+    passwordError.value = result.error || 'Error al cambiar la contraseña'
+  }
 }
 </script>
 
