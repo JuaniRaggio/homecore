@@ -2,11 +2,11 @@
   <div class="rooms-view">
     <div class="rooms-header">
       <h1 class="view-title">Habitaciones</h1>
-      <button class="btn-new-room" @click="openNewRoomModal">+ Nueva Habitacion</button>
+      <button class="btn-add" @click="openNewRoomModal">+ Nueva Habitacion</button>
     </div>
-    
 
-    
+
+
     <p v-if="roomsStore.loading" class="state-loading">Cargando habitaciones...</p>
     <p v-else-if="roomsStore.error" class="state-error">{{ roomsStore.error }}</p>
     <p v-else-if="roomsStore.rooms.length === 0" class="state-empty">Sin habitaciones</p>
@@ -24,7 +24,7 @@
               <i class="fa-solid fa-xmark"></i>
             </button>
 
-           </div>        
+           </div>
         </div>
 
         <div class="room-card__body">
@@ -72,6 +72,24 @@
         <div class="modal-actions">
           <button class="btn-cancel" @click="closeModal">Cancelar</button>
           <button class="btn-confirm" @click="confirmNewRoom" :disabled="!newRoomName.trim()">Crear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal editar habitacion -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
+      <div class="modal">
+        <h2 class="modal-title">Editar habitacion</h2>
+        <input
+          v-model="editRoomName"
+          class="modal-input"
+          type="text"
+          placeholder="Nombre de la habitacion"
+          @keyup.enter="confirmEditRoom"
+        />
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="closeEditModal">Cancelar</button>
+          <button class="btn-confirm" @click="confirmEditRoom" :disabled="!editRoomName.trim()">Guardar</button>
         </div>
       </div>
     </div>
@@ -137,9 +155,32 @@ async function deleteRoom(roomId) {
   }
 }
 
+// Edit room modal
+const showEditModal = ref(false)
+const editingRoom = ref(null)
+const editRoomName = ref('')
+
 function editRoom(room) {
-  // TODO: abrir modal de edicion
-  console.log('edit room', room)
+  editingRoom.value = room
+  editRoomName.value = room.name
+  showEditModal.value = true
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingRoom.value = null
+  editRoomName.value = ''
+}
+
+async function confirmEditRoom() {
+  if (!editRoomName.value.trim() || !editingRoom.value) return
+  try {
+    await roomsStore.updateRoom(editingRoom.value.id, { name: editRoomName.value.trim() })
+    toast.show('Habitacion actualizada', 'success')
+  } catch {
+    toast.show('Error al actualizar habitacion', 'error')
+  }
+  closeEditModal()
 }
 
 async function toggleDevice(device) {
@@ -151,16 +192,13 @@ async function toggleDevice(device) {
   }
 }
 
-function editDevice(device) {
-  // TODO: abrir modal de edicion de dispositivo
-  console.log('edit device', device)
+function editDevice() {
+  toast.show('Edicion de dispositivo proximamente', 'info')
 }
 
 function linkDevice(room, event) {
-  const deviceId = event.target.value
-  // TODO: vincular dispositivo a habitacion via API
-  console.log('link device', deviceId, 'to room', room.id)
   event.target.value = ''
+  toast.show('Vinculacion proximamente', 'info')
 }
 
 onMounted(() => {
@@ -183,21 +221,6 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
-
-.btn-new-room {
-  background-color: var(--accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 8px 16px;
-  font-size: var(--font-md);
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-new-room:hover {
-  background-color: var(--accent-hover);
-}
 
 .rooms-grid {
   display: grid;
@@ -299,58 +322,6 @@ onMounted(() => {
   outline: none;
   border-color: var(--accent);
 }
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.modal-title {
-  font-size: 17px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.modal-input {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-md);
-  padding: 8px 12px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.modal-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-
 
 @media (max-width: 900px) {
   .rooms-grid {
