@@ -8,3 +8,6 @@ export const deleteDevice = (id) => request('DELETE', `/devices/${id}`)
 
 export const executeAction = (id, actionName, params) =>
   request('PUT', `/devices/${id}/execute/${actionName}`, params ?? {})
+
+export const getDeviceTypes = () => request('GET', '/devicetypes')
+export const getDeviceType = (id) => request('GET', `/devicetypes/${id}`)
