@@ -193,12 +193,12 @@ async function toggleDevice(device) {
 }
 
 function editDevice() {
-  toast.show('Edicion de dispositivo proximamente', 'info')
+  toast.show('TODO: Edicion de dispositivo proximamente', 'info')
 }
 
 function linkDevice(room, event) {
   event.target.value = ''
-  toast.show('Vinculacion proximamente', 'info')
+  toast.show('TODO: Vinculacion proximamente', 'info')
 }
 
 onMounted(() => {

@@ -23,7 +23,7 @@
         <!-- Tabs de pisos -->
         <div class="floor-tabs">
           <button class="floor-tab floor-tab--active">Piso 0</button>
-          <button class="floor-tab floor-tab--disabled" disabled title="Proximamente">
+          <button class="floor-tab floor-tab--disabled" disabled title="TODO: Proximamente">
             <i class="fa-solid fa-plus"></i> Piso
           </button>
         </div>
@@ -42,7 +42,7 @@
 
       <!-- ISOMETRIA DE LA CASA -->
       <div class="isometry-placeholder">
-        <p class="state-empty">Vista isometrica proximamente</p>
+        <p class="state-empty">TODO: Vista isometrica proximamente</p>
       </div>
     </div>
   </section>

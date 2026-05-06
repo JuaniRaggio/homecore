@@ -24,7 +24,7 @@
     <!-- Dispositivos criticos (cross-home) -->
     <section class="overview-section">
       <h2 class="section-title">Dispositivos criticos</h2>
-      <p class="state-empty">Alertas de dispositivos proximamente</p>
+      <p class="state-empty">TODO: Alertas de dispositivos proximamente</p>
     </section>
 
     <!-- Rutinas favoritas (cross-home) -->
@@ -49,7 +49,7 @@
     <!-- Resumen energetico general -->
     <section class="overview-section">
       <h2 class="section-title">Resumen energetico</h2>
-      <p class="state-empty">Resumen energetico proximamente</p>
+      <p class="state-empty">TODO: Resumen energetico proximamente</p>
     </section>
   </main>
 </template>

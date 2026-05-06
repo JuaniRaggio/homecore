@@ -89,7 +89,7 @@
               <span class="zone-name">{{ zone.name }}</span>
               <ToggleSwitch :model-value="zone.active" @update:model-value="zone.active = $event" />
             </div>
-            <p v-if="zones.length === 0" class="no-controls">Gestion de zonas proximamente</p>
+            <p v-if="zones.length === 0" class="no-controls">TODO: Gestion de zonas proximamente</p>
           </div>
         </template>
 
@@ -111,7 +111,7 @@
 
       <div class="history-card">
         <h2 class="controls-title">Actividad reciente</h2>
-        <p class="no-controls">Historial proximamente</p>
+        <p class="no-controls">TODO: Historial proximamente</p>
       </div>
     </div>
     </template>
