@@ -75,8 +75,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useToastStore } from '@/stores/toast'
 
 const authStore = useAuthStore()
+const toast = useToastStore()
 
 const userName = computed(() => authStore.user?.name ?? '')
 const userEmail = computed(() => authStore.user?.email ?? '')
@@ -114,11 +116,13 @@ async function handleChangePassword() {
 
   if (result.success) {
     passwordSuccess.value = 'Contraseña actualizada correctamente'
+    toast.show('Contraseña actualizada', 'success')
     currentPassword.value = ''
     newPassword.value = ''
     confirmPassword.value = ''
   } else {
     passwordError.value = result.error || 'Error al cambiar la contraseña'
+    toast.show('Error al cambiar contraseña', 'error')
   }
 }
 </script>
