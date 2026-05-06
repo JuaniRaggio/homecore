@@ -41,29 +41,21 @@
 
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
+import { useDevicesStore } from '@/stores/devices'
+
+const route = useRoute()
+const devicesStore = useDevicesStore()
 
 const filterType = ref('')
 const filterRoom = ref('')
 
-const devices = ref([
-  { id: '1',  name: 'Lampara principal',       room: 'Living',               type: 'light',   isOn: true,  statusText: 'Encendido - 80%',  isFavorite: true  },
-  { id: '2',  name: 'Velador izquierdo',        room: 'Dormitorio principal', type: 'light',   isOn: false, statusText: 'Apagado',           isFavorite: false },
-  { id: '3',  name: 'Lampara cocina',           room: 'Cocina',               type: 'light',   isOn: true,  statusText: 'Encendido - 100%', isFavorite: false },
-  { id: '4',  name: 'Puerta principal',         room: 'Living',               type: 'door',    isOn: false, statusText: 'Apagado',           isFavorite: true  },
-  { id: '5',  name: 'Puerta cochera',           room: 'Sin habitacion',       type: 'door',    isOn: false, statusText: 'Apagado',           isFavorite: false },
-  { id: '6',  name: 'Alarma perimetral',        room: 'Sin habitacion',       type: 'alarm',   isOn: true,  statusText: 'Activada',          isFavorite: true  },
-  { id: '7',  name: 'Grifo jardin',             room: 'Sin habitacion',       type: 'water',   isOn: false, statusText: 'Apagado',           isFavorite: false },
-  { id: '8',  name: 'Grifo cocina inteligente', room: 'Cocina',               type: 'water',   isOn: false, statusText: 'Apagado',           isFavorite: false },
-  { id: '9',  name: 'Cortina living',           room: 'Living',               type: 'curtain', isOn: false, statusText: 'Apagado',           isFavorite: false },
-  { id: '10', name: 'Cortina dormitorio',       room: 'Dormitorio principal', type: 'curtain', isOn: false, statusText: 'Apagado',           isFavorite: true  },
-])
-
-const rooms = computed(() => [...new Set(devices.value.map(d => d.room))])
+const rooms = computed(() => [...new Set(devicesStore.devices.map(d => d.room))])
 
 const filteredDevices = computed(() =>
-  devices.value.filter(d => {
+  devicesStore.devices.filter(d => {
     if (filterType.value && d.type !== filterType.value) return false
     if (filterRoom.value && d.room !== filterRoom.value) return false
     return true
@@ -71,21 +63,17 @@ const filteredDevices = computed(() =>
 )
 
 function handleToggle(id) {
-  const device = devices.value.find(d => d.id === id)
-  if (!device) return
-  device.isOn = !device.isOn
-  if (device.type === 'alarm') {
-    device.statusText = device.isOn ? 'Activada' : 'Apagado'
-  } else {
-    device.statusText = device.isOn ? 'Encendido' : 'Apagado'
-  }
+  devicesStore.toggleDevice(id)
 }
 
 function handleToggleFavorite(id) {
-  const device = devices.value.find(d => d.id === id)
-  if (device) device.isFavorite = !device.isFavorite
+  devicesStore.toggleFavorite(id)
 }
 
+onMounted(() => {
+  const homeId = route.params.homeId
+  if (homeId) devicesStore.fetchAllForHome(homeId)
+})
 </script>
 
 <style scoped>
