@@ -33,12 +33,11 @@
       <!-- Menu de usuario -->
       <!-- TODO: Al hacer click, abrir dropdown con opciones (cerrar sesion, perfil, etc.) -->
       <div class="topbar__user">
-        <span class="user-name">Juan Raggio</span>
+        <span class="user-name">{{ authStore.user?.name ?? '' }}</span>
         <i class="fa-solid fa-chevron-down"></i>
-      
       </div>
 
-        <div class="avatar">JR</div>
+      <div class="avatar">{{ authStore.userInitials }}</div>
     </div>
   </header>
 </template>

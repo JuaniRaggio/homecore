@@ -59,6 +59,7 @@ export const register = (data) => request('POST', '/users/register', data)
 export const sendVerification = (email) => request('POST', '/users/send-verification', { email })
 export const login = (email, password) => request('POST', '/users/login', { email, password })
 export const verifyAccount = (code) => request('POST', '/users/verify-account', { code })
+export const getUserProfile = () => request('GET', '/users/profile')
 export const executeAction = (id, actionName, params) =>
   request('PUT', `/devices/${id}/execute/${actionName}`, params ?? {})
 
