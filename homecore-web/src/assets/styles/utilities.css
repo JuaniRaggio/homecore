@@ -9,6 +9,30 @@
   color: var(--amber);
 }
 
+/* Estados de carga */
+.state-loading {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-md);
+  padding: 32px 0;
+}
+
+.state-error {
+  text-align: center;
+  color: var(--danger);
+  font-size: var(--font-md);
+  padding: 20px 16px;
+  background-color: rgba(248, 113, 113, 0.08);
+  border-radius: var(--radius-md);
+}
+
+.state-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-md);
+  padding: 32px 0;
+}
+
 /* Avatar circular */
 .avatar {
   width: 34px;
