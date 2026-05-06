@@ -1,19 +1,16 @@
 <template>
   <!-- Tarjeta individual de dispositivo -->
   <!-- Props: recibe un objeto device con { id, name, room, type, status, isFavorite, isOn } -->
-  <div class="device-card">
+  <div class="device-card" @click="$emit('open', device.id)">
     <div class="device-card__header">
-      <!-- Icono del dispositivo: depende del type (light, door, ac, etc.) -->
-      <!-- TODO: Mapear device.type a un icono de Font Awesome -->
       <span class="device-icon-wrap">
         <i :class="deviceIcon"></i>
       </span>
 
-      <!-- Estrella de favorito: al clickear, togglear favorito via API -->
       <span
         class="star"
         :class="{ 'star--yellow': device.isFavorite }"
-        @click="$emit('toggle-favorite', device.id)"
+        @click.stop="$emit('toggle-favorite', device.id)"
       >
         <i :class="device.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
       </span>
@@ -22,13 +19,11 @@
     <div class="device-name">{{ device.name }}</div>
     <div class="device-room">{{ device.room }}</div>
 
-    <!-- Status: texto descriptivo del estado actual (Encendido, Apagado, 80%, etc.) -->
     <div class="device-status" :class="{ 'status--on': device.isOn }">
       {{ device.statusText }}
     </div>
 
-    <!-- Toggle on/off -->
-    <ToggleSwitch :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" />
+    <ToggleSwitch :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
   </div>
 </template>
 
@@ -54,7 +49,7 @@ const props = defineProps({
   }
 })
 
-defineEmits(['toggle', 'toggle-favorite'])
+defineEmits(['toggle', 'toggle-favorite', 'open'])
 
 // Mapeo de tipo de dispositivo a icono de Font Awesome
 const iconMap = {
