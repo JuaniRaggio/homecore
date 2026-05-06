@@ -7,14 +7,19 @@
   <!-- SECCION DE LA CASA: stats + pisos/habitaciones + isometria -->
   <section class="house-section">
     <!-- Barra de estadisticas -->
-    <div class="stats-bar">
-      <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
-      <span class="stat-sep">|</span>
-      <span class="stat-item"><b>{{ stats.total }}</b> dispositivos</span>
-      <span class="stat-sep">|</span>
-      <span class="stat-item"><b>{{ stats.rooms }}</b> habitaciones</span>
-      <span class="stat-sep">|</span>
-      <span class="stat-item"><b>{{ stats.consumption }}W</b> consumo</span>
+    <div class="stats-row">
+      <div class="stats-bar">
+        <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-item"><b>{{ stats.total }}</b> dispositivos</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-item"><b>{{ stats.rooms }}</b> habitaciones</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-item"><b>{{ stats.consumption }}W</b> consumo</span>
+      </div>
+      <button class="icon-btn" @click="openEditHomeModal" title="Editar hogar">
+        <i class="fa-regular fa-pen-to-square"></i>
+      </button>
     </div>
 
     <div class="house-inner">
@@ -31,7 +36,7 @@
         <ul class="room-list">
           <li v-for="room in rooms" :key="room.id" class="room-item">
             {{ room.name }}
-            <button class="room-close" @click="deleteRoom(room.id)"><i class="fa-solid fa-xmark"></i></button>
+            <button class="room-close" @click="requestDeleteRoom(room.id)"><i class="fa-solid fa-xmark"></i></button>
           </li>
         </ul>
 
@@ -87,6 +92,29 @@
     </section>
   </div>
 
+  <!-- Modal editar hogar -->
+  <div v-if="showEditHomeModal" class="modal-overlay" @click.self="closeEditHomeModal">
+    <div class="modal">
+      <h2 class="modal-title">Editar hogar</h2>
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input
+          v-model="editHomeName"
+          class="modal-input"
+          type="text"
+          placeholder="Nombre del hogar"
+          @keyup.enter="confirmEditHome"
+        />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="closeEditHomeModal" :disabled="saving">Cancelar</button>
+        <button class="btn-confirm" @click="confirmEditHome" :disabled="saving || !editHomeName.trim()">
+          {{ saving ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal nueva habitacion -->
   <div v-if="showNewRoomModal" class="modal-overlay" @click.self="closeNewRoomModal">
     <div class="modal">
@@ -99,8 +127,23 @@
         @keyup.enter="confirmNewRoom"
       />
       <div class="modal-actions">
-        <button class="btn-cancel" @click="closeNewRoomModal">Cancelar</button>
-        <button class="btn-confirm" @click="confirmNewRoom" :disabled="!newRoomName.trim()">Crear</button>
+        <button class="btn-cancel" @click="closeNewRoomModal" :disabled="saving">Cancelar</button>
+        <button class="btn-confirm" @click="confirmNewRoom" :disabled="saving || !newRoomName.trim()">
+          {{ saving ? 'Creando...' : 'Crear' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Modal confirmar eliminacion habitacion -->
+  <div v-if="showDeleteRoomConfirm" class="modal-overlay" @click.self="showDeleteRoomConfirm = false">
+    <div class="modal">
+      <h2 class="modal-title">Eliminar habitacion</h2>
+      <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados quedaran sin habitacion.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="showDeleteRoomConfirm = false" :disabled="deleting">Cancelar</button>
+        <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoom" :disabled="deleting">
+          {{ deleting ? 'Eliminando...' : 'Eliminar' }}
+        </button>
       </div>
     </div>
   </div>
@@ -115,6 +158,7 @@ import RoutineRow from '@/components/routines/RoutineRow.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
+import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
@@ -123,7 +167,10 @@ const homeId = computed(() => route.params.homeId)
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
+const homesStore = useHomesStore()
 const toast = useToastStore()
+
+const currentHome = computed(() => homesStore.getById(homeId.value))
 
 const favoriteDevices = computed(() => devicesStore.favoriteDevices)
 const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
@@ -162,12 +209,30 @@ async function executeRoutine(id) {
   }
 }
 
-async function deleteRoom(roomId) {
+// Loading state for modals
+const saving = ref(false)
+
+// Delete room confirmation
+const showDeleteRoomConfirm = ref(false)
+const deletingRoomId = ref(null)
+const deleting = ref(false)
+
+function requestDeleteRoom(roomId) {
+  deletingRoomId.value = roomId
+  showDeleteRoomConfirm.value = true
+}
+
+async function confirmDeleteRoom() {
+  if (deleting.value) return
+  deleting.value = true
   try {
-    await roomsStore.removeRoom(roomId)
+    await roomsStore.removeRoom(deletingRoomId.value)
     toast.show('Habitacion eliminada', 'success')
+    showDeleteRoomConfirm.value = false
   } catch {
     toast.show('Error al eliminar habitacion', 'error')
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -186,14 +251,45 @@ function closeNewRoomModal() {
 }
 
 async function confirmNewRoom() {
-  if (!newRoomName.value.trim()) return
+  if (!newRoomName.value.trim() || saving.value) return
+  saving.value = true
   try {
     await roomsStore.addRoom(homeId.value, { name: newRoomName.value.trim() })
     toast.show('Habitacion creada', 'success')
+    closeNewRoomModal()
   } catch {
     toast.show('Error al crear habitacion', 'error')
+  } finally {
+    saving.value = false
   }
-  closeNewRoomModal()
+}
+
+// Modal editar hogar
+const showEditHomeModal = ref(false)
+const editHomeName = ref('')
+
+function openEditHomeModal() {
+  editHomeName.value = currentHome.value?.name || ''
+  showEditHomeModal.value = true
+}
+
+function closeEditHomeModal() {
+  showEditHomeModal.value = false
+  editHomeName.value = ''
+}
+
+async function confirmEditHome() {
+  if (!editHomeName.value.trim() || saving.value) return
+  saving.value = true
+  try {
+    await homesStore.updateHome(homeId.value, { name: editHomeName.value.trim() })
+    toast.show('Hogar actualizado', 'success')
+    closeEditHomeModal()
+  } catch {
+    toast.show('Error al actualizar hogar', 'error')
+  } finally {
+    saving.value = false
+  }
 }
 
 onMounted(() => {
@@ -211,6 +307,13 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
 .stats-bar {
   display: flex;
   align-items: center;
@@ -219,7 +322,6 @@ onMounted(() => {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  margin-bottom: 16px;
   max-width: fit-content;
   font-size: var(--font-base);
   color: var(--text-muted);
