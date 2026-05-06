@@ -2,7 +2,7 @@
   <main class="page-content--full">
     <!-- Saludo personalizado -->
     <section class="overview-greeting">
-      <h1 class="greeting-text">Bienvenido Juan</h1>
+      <h1 class="greeting-text">Bienvenido {{ userName }}</h1>
       <p class="greeting-sub">Bienvenido a HomeCore</p>
     </section>
 
@@ -105,14 +105,20 @@
 </template>
 
 <script setup>
+import { onMounted, computed } from 'vue'
 import HomeCard from '@/components/homes/HomeCard.vue'
+import { useHomesStore } from '@/stores/homes'
+import { useAuthStore } from '@/stores/auth'
 
-// TODO: Importar store de homes y cargar desde API en onMounted
-// Datos mock de casas del usuario
-const homes = [
-  { id: '1', name: 'Casa Martinez', activeDevices: 8, totalDevices: 14, consumption: 210 },
-  { id: '2', name: 'Depto Centro', activeDevices: 3, totalDevices: 6, consumption: 132 },
-]
+const homesStore = useHomesStore()
+const authStore = useAuthStore()
+
+const homes = computed(() => homesStore.homes)
+const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
+
+onMounted(() => {
+  homesStore.fetchHomes()
+})
 </script>
 
 <style scoped>

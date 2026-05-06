@@ -117,29 +117,31 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import { useDevicesStore } from '@/stores/devices'
+import * as api from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
+const devicesStore = useDevicesStore()
 
-const device = ref({
-})
+const device = ref({})
+const loading = ref(true)
 
 const brightness = ref(80)
 const color = ref('#818cf8')
 const locked = ref(true)
 const position = ref(75)
-const zones = ref([
-])
+const zones = ref([])
 
-function togglePower() {
+async function togglePower() {
+  await devicesStore.toggleDevice(device.value.id)
   device.value.isOn = !device.value.isOn
 }
 
-const recentHistory = computed(() => [
-])
+const recentHistory = computed(() => [])
 
 function formatDate(dateStr) {
   const d = new Date(dateStr)
@@ -147,6 +149,16 @@ function formatDate(dateStr) {
   const time = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
   return `${day} ${time}`
 }
+
+onMounted(async () => {
+  const deviceId = route.params.deviceId
+  try {
+    device.value = await api.getDevice(deviceId)
+  } catch {
+    device.value = {}
+  }
+  loading.value = false
+})
 </script>
 
 <style scoped>
