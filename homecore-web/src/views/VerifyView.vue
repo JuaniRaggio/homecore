@@ -10,7 +10,10 @@
 
       <div class="auth-card verify-card">
         <template v-if="!success">
-          <p class="verify-instruction">Ingresá el código de verificación (disponible en Network → Response)</p>
+          <p class="verify-instruction">
+            Te enviamos un código de verificación{{ authStore.pendingEmail ? ` a ${authStore.pendingEmail}` : ' a tu correo' }}.
+            Ingresalo para activar tu cuenta.
+          </p>
           <form @submit.prevent="submit">
             <input
               v-model="code"

@@ -6,8 +6,10 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null)
   const user = ref(null)
   const pendingCredentials = ref(null)
+  const templateReady = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
+  const pendingEmail = computed(() => pendingCredentials.value?.email || null)
 
   const userInitials = computed(() => {
     if (!user.value?.name) return '?'
@@ -28,6 +30,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function ensureRegistrationTemplate() {
+    if (templateReady.value) return
+    try {
+      const templates = await api.getAllEmailTemplates()
+      const exists = Array.isArray(templates) && templates.some(t => t.type === 'REGISTRATION')
+      if (!exists) {
+        await api.createEmailTemplate({
+          type: 'REGISTRATION',
+          subject: 'Código de verificación - HomeCore',
+          template: '<div><h1>Bienvenido <%FIRST_NAME%></h1><p>Tu código de verificación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
+        })
+      }
+      templateReady.value = true
+    } catch {
+      // si falla no bloqueamos el flujo
+    }
+  }
+
   async function register(name, email, password) {
     try {
       await api.register({ name, email, password })
@@ -36,6 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: false, error: error.message }
     }
     try {
+      await ensureRegistrationTemplate()
       await api.sendVerification(email)
       pendingCredentials.value = { email, password }
       return { success: true }
@@ -106,7 +127,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
-    token, user, isAuthenticated, userInitials,
+    token, user, isAuthenticated, userInitials, pendingEmail,
     register, login, logout, verifyAccount, recover, changePassword,
     fetchProfile, initializeAuth
   }

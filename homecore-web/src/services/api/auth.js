@@ -13,19 +13,21 @@ export const resetPassword = (code, newPassword) =>
   request('POST', '/users/reset-password', { code, newPassword })
 export const logout = () => request('POST', '/users/logout')
 
-/*Mailer Config*/
+/*Verification*/
 export const verifyAccount = (code) => request('POST', '/users/verify-account', { code })
 export const sendVerification = (email) => request('POST', '/users/send-verification', { email })
+
+/*Mailer Config*/
 export const getMailerConfig = () => request('GET', '/mailerconfig')
 export const createMailerConfig = (config) => request('POST', '/mailerconfig', config)
 export const updateMailerConfig = (config) => request('PUT', '/mailerconfig', config)
 export const deleteMailerConfig = () => request('DELETE', '/mailerconfig')
 
-/*Mailer-Template*/
-export const postMailerTemplate = () => request('POST', '/emailtemplates')
-export const getAllMailerTemplates = () => request('GET', '/emailtemplates')
-export const getMailerTemplate = (templateId) => request('POST', `/emailtemplates/${templateId}`)
-export const updateEmailTemplate = (templateId, data) => request('POST', `/emailtemplates/${templateId}`, data)
+/*Email Templates*/
+export const createEmailTemplate = (data) => request('POST', '/emailtemplates', data)
+export const getAllEmailTemplates = () => request('GET', '/emailtemplates')
+export const getEmailTemplate = (templateId) => request('GET', `/emailtemplates/${templateId}`)
+export const updateEmailTemplate = (templateId, data) => request('PUT', `/emailtemplates/${templateId}`, data)
 export const deleteEmailTemplate = (templateId) => request('DELETE', `/emailtemplates/${templateId}`)
 
 
