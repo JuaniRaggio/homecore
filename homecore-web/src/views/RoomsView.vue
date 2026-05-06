@@ -20,7 +20,7 @@
             <button class="icon-btn" @click="editRoom(room)" title="Editar">
               <i class="fa-regular fa-pen-to-square"></i>
             </button>
-            <button class="icon-btn icon-btn--delete" @click="deleteRoom(room.id)" title="Eliminar">
+            <button class="icon-btn icon-btn--delete" @click="requestDeleteRoom(room.id)" title="Eliminar">
               <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -35,7 +35,7 @@
               <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
-              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="unlinkDevice(device.id)" title="Desvincular">
+              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="requestUnlink(device.id)" title="Desvincular">
                 <i class="fa-solid fa-link-slash"></i>
               </button>
             </div>
@@ -73,8 +73,10 @@
           @keyup.enter="confirmNewRoom"
         />
         <div class="modal-actions">
-          <button class="btn-cancel" @click="closeModal">Cancelar</button>
-          <button class="btn-confirm" @click="confirmNewRoom" :disabled="!newRoomName.trim()">Crear</button>
+          <button class="btn-cancel" @click="closeModal" :disabled="saving">Cancelar</button>
+          <button class="btn-confirm" @click="confirmNewRoom" :disabled="saving || !newRoomName.trim()">
+            {{ saving ? 'Creando...' : 'Crear' }}
+          </button>
         </div>
       </div>
     </div>
@@ -91,12 +93,42 @@
           @keyup.enter="confirmEditRoom"
         />
         <div class="modal-actions">
-          <button class="btn-cancel" @click="closeEditModal">Cancelar</button>
-          <button class="btn-confirm" @click="confirmEditRoom" :disabled="!editRoomName.trim()">Guardar</button>
+          <button class="btn-cancel" @click="closeEditModal" :disabled="saving">Cancelar</button>
+          <button class="btn-confirm" @click="confirmEditRoom" :disabled="saving || !editRoomName.trim()">
+            {{ saving ? 'Guardando...' : 'Guardar' }}
+          </button>
         </div>
       </div>
     </div>
 
+
+    <!-- Modal confirmar eliminacion habitacion -->
+    <div v-if="showDeleteConfirm" class="modal-overlay" @click.self="showDeleteConfirm = false">
+      <div class="modal">
+        <h2 class="modal-title">Eliminar habitacion</h2>
+        <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados quedaran sin habitacion.</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showDeleteConfirm = false" :disabled="deleting">Cancelar</button>
+          <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoom" :disabled="deleting">
+            {{ deleting ? 'Eliminando...' : 'Eliminar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal confirmar desvinculacion -->
+    <div v-if="showUnlinkConfirm" class="modal-overlay" @click.self="showUnlinkConfirm = false">
+      <div class="modal">
+        <h2 class="modal-title">Desvincular dispositivo</h2>
+        <p class="modal-desc">Estas seguro de que queres desvincular este dispositivo de la habitacion?</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showUnlinkConfirm = false" :disabled="deleting">Cancelar</button>
+          <button class="btn-confirm btn-confirm--danger" @click="confirmUnlink" :disabled="deleting">
+            {{ deleting ? 'Desvinculando...' : 'Desvincular' }}
+          </button>
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -127,6 +159,58 @@ const availableDevices = computed(() =>
   devicesStore.devices.filter(d => !d.room)
 )
 
+// Loading states
+const saving = ref(false)
+const deleting = ref(false)
+
+// Delete room confirmation
+const showDeleteConfirm = ref(false)
+const deletingRoomId = ref(null)
+
+function requestDeleteRoom(roomId) {
+  deletingRoomId.value = roomId
+  showDeleteConfirm.value = true
+}
+
+async function confirmDeleteRoom() {
+  if (deleting.value) return
+  deleting.value = true
+  try {
+    await roomsStore.removeRoom(deletingRoomId.value)
+    toast.show('Habitacion eliminada', 'success')
+    showDeleteConfirm.value = false
+  } catch {
+    toast.show('Error al eliminar habitacion', 'error')
+  } finally {
+    deleting.value = false
+  }
+}
+
+// Unlink device confirmation
+const showUnlinkConfirm = ref(false)
+const unlinkingDeviceId = ref(null)
+
+function requestUnlink(deviceId) {
+  unlinkingDeviceId.value = deviceId
+  showUnlinkConfirm.value = true
+}
+
+async function confirmUnlink() {
+  if (deleting.value) return
+  deleting.value = true
+  try {
+    await api.unlinkDeviceFromRoom(unlinkingDeviceId.value)
+    toast.show('Dispositivo desvinculado', 'success')
+    showUnlinkConfirm.value = false
+    const homeId = route.params.homeId
+    if (homeId) await devicesStore.fetchAllForHome(homeId)
+  } catch {
+    toast.show('Error al desvincular dispositivo', 'error')
+  } finally {
+    deleting.value = false
+  }
+}
+
 const showModal = ref(false)
 const newRoomName = ref('')
 
@@ -140,23 +224,17 @@ function closeModal() {
 }
 
 async function confirmNewRoom() {
-  if (!newRoomName.value.trim()) return
+  if (!newRoomName.value.trim() || saving.value) return
+  saving.value = true
   const homeId = route.params.homeId
   try {
     await roomsStore.addRoom(homeId, { name: newRoomName.value.trim() })
     toast.show('Habitacion creada', 'success')
+    closeModal()
   } catch {
     toast.show('Error al crear habitacion', 'error')
-  }
-  closeModal()
-}
-
-async function deleteRoom(roomId) {
-  try {
-    await roomsStore.removeRoom(roomId)
-    toast.show('Habitacion eliminada', 'success')
-  } catch {
-    toast.show('Error al eliminar habitacion', 'error')
+  } finally {
+    saving.value = false
   }
 }
 
@@ -178,14 +256,17 @@ function closeEditModal() {
 }
 
 async function confirmEditRoom() {
-  if (!editRoomName.value.trim() || !editingRoom.value) return
+  if (!editRoomName.value.trim() || !editingRoom.value || saving.value) return
+  saving.value = true
   try {
     await roomsStore.updateRoom(editingRoom.value.id, { name: editRoomName.value.trim() })
     toast.show('Habitacion actualizada', 'success')
+    closeEditModal()
   } catch {
     toast.show('Error al actualizar habitacion', 'error')
+  } finally {
+    saving.value = false
   }
-  closeEditModal()
 }
 
 async function toggleDevice(device) {
@@ -212,17 +293,6 @@ async function linkDevice(room, event) {
     if (homeId) await devicesStore.fetchAllForHome(homeId)
   } catch {
     toast.show('Error al vincular dispositivo', 'error')
-  }
-}
-
-async function unlinkDevice(deviceId) {
-  try {
-    await api.unlinkDeviceFromRoom(deviceId)
-    toast.show('Dispositivo desvinculado', 'success')
-    const homeId = route.params.homeId
-    if (homeId) await devicesStore.fetchAllForHome(homeId)
-  } catch {
-    toast.show('Error al desvincular dispositivo', 'error')
   }
 }
 
@@ -279,28 +349,6 @@ onMounted(() => {
   display: flex;
   gap: 6px;
   align-items: center;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 4px;
-  font-size: var(--font-md);
-  transition: color 0.15s;
-}
-
-.icon-btn:hover {
-  color: var(--text-primary);
-}
-
-.icon-btn--delete:hover {
-  color: var(--danger);
-}
-
-.icon-btn--sm {
-  font-size: var(--font-sm);
 }
 
 .room-card__body {
