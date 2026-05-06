@@ -1,6 +1,9 @@
 <template>
   <!-- Vista principal "Inicio" - contiene todo lo que estaba en page-content del HTML original -->
 
+  <p v-if="devicesStore.loading" class="state-loading">Cargando...</p>
+  <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
+  <template v-else>
   <!-- SECCION DE LA CASA: stats + pisos/habitaciones + isometria -->
   <section class="house-section">
     <!-- Barra de estadisticas -->
@@ -86,6 +89,7 @@
       </div>
     </section>
   </div>
+  </template>
 </template>
 
 <script setup>
@@ -96,6 +100,7 @@ import RoutineRow from '@/components/routines/RoutineRow.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const homeId = computed(() => route.params.homeId)
@@ -103,6 +108,7 @@ const homeId = computed(() => route.params.homeId)
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
+const toast = useToastStore()
 
 const favoriteDevices = computed(() => devicesStore.favoriteDevices)
 const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
@@ -115,20 +121,39 @@ const stats = computed(() => ({
   consumption: devicesStore.totalConsumption
 }))
 
-function toggleDevice(id) {
-  devicesStore.toggleDevice(id)
+async function toggleDevice(id) {
+  try {
+    await devicesStore.toggleDevice(id)
+    toast.show('Dispositivo actualizado', 'success')
+  } catch {
+    toast.show('Error al cambiar estado del dispositivo', 'error')
+  }
 }
 
-function toggleFavorite(id) {
-  devicesStore.toggleFavorite(id)
+async function toggleFavorite(id) {
+  try {
+    await devicesStore.toggleFavorite(id)
+  } catch {
+    toast.show('Error al cambiar favorito', 'error')
+  }
 }
 
-function executeRoutine(id) {
-  routinesStore.execute(id)
+async function executeRoutine(id) {
+  try {
+    await routinesStore.execute(id)
+    toast.show('Rutina ejecutada', 'success')
+  } catch {
+    toast.show('Error al ejecutar rutina', 'error')
+  }
 }
 
 async function deleteRoom(roomId) {
-  await roomsStore.removeRoom(roomId)
+  try {
+    await roomsStore.removeRoom(roomId)
+    toast.show('Habitacion eliminada', 'success')
+  } catch {
+    toast.show('Error al eliminar habitacion', 'error')
+  }
 }
 
 onMounted(() => {
