@@ -23,54 +23,8 @@
 import { ref } from 'vue'
 import RoutineCard from '@/components/routines/RoutineCard.vue'
 
-const routines = ref([
-  {
-    id: '1',
-    name: 'Buenos días',
-    description: 'Abre persianas y enciende luces suaves',
-    time: '07:30',
-    days: 'Lun, Mar, Mie, Jue, Vie',
-    isFavorite: true,
-    isActive: true,
-    actions: [
-      { device: 'Cortina living', action: 'abrir' },
-      { device: 'Cortina dormitorio', action: 'abrir' },
-      { device: 'Lampara principal', action: 'encender' },
-      { device: 'Velador izquierdo', action: 'encender' },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Buenas noches',
-    description: 'Cierra todo y activa alarma',
-    time: '23:00',
-    days: 'Lun, Mar, Mie, Jue, Vie, Sab, Dom',
-    isFavorite: true,
-    isActive: true,
-    actions: [
-      { device: 'Cortina living', action: 'cerrar' },
-      { device: 'Cortina dormitorio', action: 'cerrar' },
-      { device: 'Puerta principal', action: 'cerrar' },
-      { device: 'Puerta cochera', action: 'cerrar' },
-      { device: 'Lampara principal', action: 'apagar' },
-      { device: 'Lampara cocina', action: 'apagar' },
-      { device: 'Alarma perimetral', action: 'activar' },
-    ],
-  },
-  {
-    id: '3',
-    name: 'Riego automático',
-    description: 'Activa aspersores del jardín por 15 minutos',
-    time: '06:00',
-    days: 'Mar, Jue, Sab',
-    isFavorite: false,
-    isActive: false,
-    actions: [
-      { device: 'Grifo jardín', action: 'abrir' },
-      { device: 'Grifo cocina inteligente', action: 'abrir' },
-    ],
-  },
-])
+const routinesStore = useRoutinesStore()
+const routines = routinesStore.routines
 
 function handleExecute(id) {
   console.log('Ejecutar rutina', id)
