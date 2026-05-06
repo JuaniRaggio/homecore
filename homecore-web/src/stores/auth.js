@@ -111,6 +111,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function resetPassword(code, newPassword) {
+    try {
+      await api.resetPassword(code, newPassword)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
   async function changePassword(currentPassword, newPassword) {
     try {
       await api.changePassword(currentPassword, newPassword)
@@ -128,7 +137,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     token, user, isAuthenticated, userInitials, pendingEmail,
-    register, login, logout, verifyAccount, recover, changePassword,
+    register, login, logout, verifyAccount, recover, resetPassword, changePassword,
     fetchProfile, initializeAuth
   }
 })
