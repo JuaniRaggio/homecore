@@ -18,7 +18,7 @@ export const useDevicesStore = defineStore('devices', () => {
     devices.value
       .filter(d => d.isOn)
       .reduce((sum, d) => {
-        const dt = deviceTypes.value.find(t => String(t.id) === String(d.type?.id ?? d.type))
+        const dt = deviceTypes.value.find(t => String(t.id) === String(d.typeId))
         return sum + (dt?.powerUsage ?? 0)
       }, 0)
   )
@@ -36,9 +36,33 @@ export const useDevicesStore = defineStore('devices', () => {
   }
 
   function getPowerUsage(device) {
-    const typeId = device.type?.id ?? device.type
+    const typeId = device.typeId ?? device.type?.id ?? device.type
     const dt = deviceTypes.value.find(t => String(t.id) === String(typeId))
     return dt?.powerUsage ?? 0
+  }
+
+  // Normaliza un dispositivo de la API a un formato plano para la UI
+  function normalizeDevice(d, roomName) {
+    const state = d.state || {}
+    const typeName = d.type?.name || d.type || ''
+    const isOn = state.status === 'on' || state.status === 'opened'
+      || state.status === 'active' || state.status === 'playing' || false
+    const room = roomName || d.room?.name || d.room || ''
+
+    let statusText = isOn ? 'Encendido' : 'Apagado'
+    if (typeName === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
+    if (typeName === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
+
+    return {
+      ...d,
+      type: typeName,
+      typeId: d.type?.id || d.type,
+      room,
+      roomId: d.room?.id || null,
+      isOn,
+      isFavorite: d.meta?.favorite || d.isFavorite || false,
+      statusText,
+    }
   }
 
   async function fetchAllForHome(homeId) {
@@ -46,9 +70,6 @@ export const useDevicesStore = defineStore('devices', () => {
     error.value = null
     devices.value = []
 
-    // Itera por cada habitacion y obtiene sus dispositivos,
-    // agregando el nombre de la habitacion a cada dispositivo.
-    // Limita a 3 requests concurrentes para no saturar la API.
     const limit = pLimit(MAX_CONCURRENT_REQUESTS)
     try {
       const roomList = await api.getRooms(homeId)
@@ -56,10 +77,7 @@ export const useDevicesStore = defineStore('devices', () => {
         roomList.map(room => limit(async () => {
           try {
             const roomDevices = await api.getDevices(room.id)
-            return roomDevices.map(d => ({
-              ...d,
-              room: d.room ?? room.name,
-            }))
+            return roomDevices.map(d => normalizeDevice(d, room.name))
           } catch {
             return []
           }
@@ -74,27 +92,23 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
-
-  
   async function toggleDevice(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
     const action = device.isOn ? 'turnOff' : 'turnOn'
-    await api.executeAction(id, action, {})
+    await api.executeAction(id, action, [])
     device.isOn = !device.isOn
     if (device.type === 'alarm') {
-      device.statusText = device.isOn ? 'Activada' : 'Apagado'
+      device.statusText = device.isOn ? 'Activada' : 'Desactivada'
     } else {
       device.statusText = device.isOn ? 'Encendido' : 'Apagado'
     }
   }
 
-
-
-    async function toggleFavorite(id) {
+  async function toggleFavorite(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
-    await api.updateDevice(id, { isFavorite: !device.isFavorite })
+    await api.updateDevice(id, { meta: { favorite: !device.isFavorite } })
     device.isFavorite = !device.isFavorite
   }
 

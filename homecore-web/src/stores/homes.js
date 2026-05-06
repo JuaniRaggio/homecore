@@ -49,10 +49,18 @@ export const useHomesStore = defineStore('homes', () => {
     homes.value.push(home)
   }
 
+  async function updateHome(id, data) {
+    const updated = await api.updateHome(id, data)
+    const idx = homes.value.findIndex(h => String(h.id) === String(id))
+    if (idx !== -1) {
+      homes.value[idx] = { ...homes.value[idx], ...updated }
+    }
+  }
+
   async function removeHome(id) {
     await api.deleteHome(id)
     homes.value = homes.value.filter(h => String(h.id) !== String(id))
   }
 
-  return { homes, loading, error, selectedHomeId, selectedHome, fetchHomes, getById, homeExists, selectHome, syncFromRoute, addHome, removeHome }
+  return { homes, loading, error, selectedHomeId, selectedHome, fetchHomes, getById, homeExists, selectHome, syncFromRoute, addHome, updateHome, removeHome }
 })
