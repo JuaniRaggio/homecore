@@ -78,46 +78,26 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import { useRoomsStore } from '@/stores/rooms'
+import { useDevicesStore } from '@/stores/devices'
 
-const rooms = ref([
-  {
-    id: 1,name: 'Living', devices: [
-      { id: 101, name: 'Lampara principal', type: 'light', isOn: true },
-      { id: 102, name: 'Puerta principal', type: 'door', isOn: false },
-      { id: 103, name: 'Cortina living', type: 'curtain', isOn: false },
-    ],
-  },
-  {
-    id: 2, name: 'Dormitorio principal', devices: [
-      { id: 201, name: 'Velador izquierdo', type: 'light', isOn: false },
-      { id: 202, name: 'Cortina dormitorio', type: 'curtain', isOn: false },
-    ],
-  },
-  {
-    id: 3, name: 'Cocina', devices: [
-      { id: 301, name: 'Lampara cocina', type: 'light', isOn: true },
-      { id: 302, name: 'Grifo cocina inteligente', type: 'water', isOn: false },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Bano',
-    devices: [],
-  },
-  {
-    id: 5,
-    name: 'Oficina',
-    devices: [],
-  },
-])
+const route = useRoute()
+const roomsStore = useRoomsStore()
+const devicesStore = useDevicesStore()
 
-const availableDevices = ref([
-  { id: 901, name: 'Aire acondicionado' },
-  { id: 902, name: 'Parlante inteligente' },
-  { id: 903, name: 'Aspiradora robot' },
-])
+const rooms = computed(() =>
+  roomsStore.rooms.map(room => ({
+    ...room,
+    devices: devicesStore.devices.filter(d => d.room === room.name)
+  }))
+)
+
+const availableDevices = computed(() =>
+  devicesStore.devices.filter(d => !d.room)
+)
 
 const showModal = ref(false)
 const newRoomName = ref('')
@@ -131,18 +111,15 @@ function closeModal() {
   newRoomName.value = ''
 }
 
-function confirmNewRoom() {
+async function confirmNewRoom() {
   if (!newRoomName.value.trim()) return
-  rooms.value.push({
-    id: Date.now(),
-    name: newRoomName.value.trim(),
-    devices: [],
-  })
+  const homeId = route.params.homeId
+  await roomsStore.addRoom(homeId, { name: newRoomName.value.trim() })
   closeModal()
 }
 
-function deleteRoom(roomId) {
-  rooms.value = rooms.value.filter(r => r.id !== roomId)
+async function deleteRoom(roomId) {
+  await roomsStore.removeRoom(roomId)
 }
 
 function editRoom(room) {
@@ -151,7 +128,7 @@ function editRoom(room) {
 }
 
 function toggleDevice(device) {
-  device.isOn = !device.isOn
+  devicesStore.toggleDevice(device.id)
 }
 
 function editDevice(device) {
@@ -160,13 +137,19 @@ function editDevice(device) {
 }
 
 function linkDevice(room, event) {
-  const deviceId = Number(event.target.value)
-  const device = availableDevices.value.find(d => d.id === deviceId)
-  if (device) {
-    room.devices.push({ ...device, isOn: false })
-  }
+  const deviceId = event.target.value
+  // TODO: vincular dispositivo a habitacion via API
+  console.log('link device', deviceId, 'to room', room.id)
   event.target.value = ''
 }
+
+onMounted(() => {
+  const homeId = route.params.homeId
+  if (homeId) {
+    roomsStore.fetchRooms(homeId)
+    devicesStore.fetchAllForHome(homeId)
+  }
+})
 </script>
 <style scoped>
 .rooms-view {
