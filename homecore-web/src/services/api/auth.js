@@ -1,8 +1,8 @@
 import { request } from './client'
 
-export const register = (data) => request('POST', '/users/register', data)
+export const register = (name, email, password) => request('POST', '/users/register', { name, email, password })
 export const login = (email, password) => request('POST', '/users/login', { email, password })
-export const getUserProfile = () => request('GET', '/users/profile')
+export const getUserProfile = (email, password) => request('GET', '/users/profile', { email, password })
 export const updateProfile = (data) => request('POST', '/users/profile', data)
 
 /* Password management */

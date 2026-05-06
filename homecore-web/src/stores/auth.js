@@ -21,9 +21,9 @@ export const useAuthStore = defineStore('auth', () => {
       .join('')
   })
 
-  async function fetchProfile() {
+  async function fetchProfile(email, password) {
     try {
-      const profile = await api.getUserProfile()
+      const profile = await api.getUserProfile(email, password)
       user.value = profile
     } catch {
       // token invalido o expirado — no romper la app
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function register(name, email, password) {
     try {
-      await api.register({ name, email, password })
+      await api.register(name, email, password)
     } catch (error) {
       if (error.status === 409) return { success: false, conflict: true, error: error.message }
       return { success: false, error: error.message }
@@ -70,12 +70,12 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = null
       localStorage.removeItem('auth_token')
       const response = await api.login(email, password)
-      token.value = response.token
-      localStorage.setItem('auth_token', response.token)
-      await fetchProfile()
+      // token.value = response.token
+      // localStorage.setItem('auth_token', response.token)
+      await fetchProfile(email, password)
       return { success: true }
     } catch (error) {
-      return { success: false, error: error.message }
+      return { success: false, error: "Error de inicio de sesion" }
     }
   }
 
