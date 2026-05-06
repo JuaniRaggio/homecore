@@ -4,6 +4,12 @@
       <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i> Volver
       </button>
+    </div>
+
+    <p v-if="loading" class="state-loading">Cargando dispositivo...</p>
+    <p v-else-if="loadError" class="state-error">{{ loadError }}</p>
+    <template v-else>
+    <div class="detail-header-info">
       <h1 class="view-title">{{ device.name }}</h1>
       <span class="device-room">{{ device.room }}</span>
     </div>
@@ -113,6 +119,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -121,14 +128,17 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import { useDevicesStore } from '@/stores/devices'
+import { useToastStore } from '@/stores/toast'
 import * as api from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
 const devicesStore = useDevicesStore()
+const toast = useToastStore()
 
 const device = ref({})
 const loading = ref(true)
+const loadError = ref('')
 
 const brightness = ref(80)
 const color = ref('#818cf8')
@@ -137,8 +147,13 @@ const position = ref(75)
 const zones = ref([])
 
 async function togglePower() {
-  await devicesStore.toggleDevice(device.value.id)
-  device.value.isOn = !device.value.isOn
+  try {
+    await devicesStore.toggleDevice(device.value.id)
+    device.value.isOn = !device.value.isOn
+    toast.show('Dispositivo actualizado', 'success')
+  } catch {
+    toast.show('Error al cambiar estado del dispositivo', 'error')
+  }
 }
 
 const recentHistory = computed(() => [])
@@ -154,8 +169,8 @@ onMounted(async () => {
   const deviceId = route.params.deviceId
   try {
     device.value = await api.getDevice(deviceId)
-  } catch {
-    device.value = {}
+  } catch (e) {
+    loadError.value = e.message || 'Error al cargar dispositivo'
   }
   loading.value = false
 })

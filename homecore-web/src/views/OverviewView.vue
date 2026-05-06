@@ -9,8 +9,10 @@
     <!-- Grilla de casas -->
     <section class="overview-section">
       <h2 class="section-title">Mis propiedades</h2>
-      <div class="homes-grid">
-        <!-- TODO: Reemplazar con v-for iterando sobre casas del store/API -->
+      <p v-if="homesStore.loading" class="state-loading">Cargando propiedades...</p>
+      <p v-else-if="homesStore.error" class="state-error">{{ homesStore.error }}</p>
+      <p v-else-if="homes.length === 0" class="state-empty">Sin propiedades</p>
+      <div v-else class="homes-grid">
         <HomeCard
           v-for="home in homes"
           :key="home.id"

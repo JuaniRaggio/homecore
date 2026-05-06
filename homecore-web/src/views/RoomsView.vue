@@ -7,7 +7,10 @@
     
 
     
-    <div class="rooms-grid">
+    <p v-if="roomsStore.loading" class="state-loading">Cargando habitaciones...</p>
+    <p v-else-if="roomsStore.error" class="state-error">{{ roomsStore.error }}</p>
+    <p v-else-if="roomsStore.rooms.length === 0" class="state-empty">Sin habitaciones</p>
+    <div v-else class="rooms-grid">
       <div v-for="room in rooms" :key="room.id" class="room-card">
 
         <div class="room-card__header">
@@ -83,10 +86,12 @@ import { useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import { useRoomsStore } from '@/stores/rooms'
 import { useDevicesStore } from '@/stores/devices'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const roomsStore = useRoomsStore()
 const devicesStore = useDevicesStore()
+const toast = useToastStore()
 
 const rooms = computed(() =>
   roomsStore.rooms.map(room => ({
@@ -114,12 +119,22 @@ function closeModal() {
 async function confirmNewRoom() {
   if (!newRoomName.value.trim()) return
   const homeId = route.params.homeId
-  await roomsStore.addRoom(homeId, { name: newRoomName.value.trim() })
+  try {
+    await roomsStore.addRoom(homeId, { name: newRoomName.value.trim() })
+    toast.show('Habitacion creada', 'success')
+  } catch {
+    toast.show('Error al crear habitacion', 'error')
+  }
   closeModal()
 }
 
 async function deleteRoom(roomId) {
-  await roomsStore.removeRoom(roomId)
+  try {
+    await roomsStore.removeRoom(roomId)
+    toast.show('Habitacion eliminada', 'success')
+  } catch {
+    toast.show('Error al eliminar habitacion', 'error')
+  }
 }
 
 function editRoom(room) {
@@ -127,8 +142,13 @@ function editRoom(room) {
   console.log('edit room', room)
 }
 
-function toggleDevice(device) {
-  devicesStore.toggleDevice(device.id)
+async function toggleDevice(device) {
+  try {
+    await devicesStore.toggleDevice(device.id)
+    toast.show('Dispositivo actualizado', 'success')
+  } catch {
+    toast.show('Error al cambiar estado del dispositivo', 'error')
+  }
 }
 
 function editDevice(device) {

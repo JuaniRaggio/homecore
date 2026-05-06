@@ -5,7 +5,10 @@
       <button class="btn-add">+ Nueva rutina</button>
     </div>
 
-    <div class="routines-grid">
+    <p v-if="routinesStore.loading" class="state-loading">Cargando rutinas...</p>
+    <p v-else-if="routinesStore.error" class="state-error">{{ routinesStore.error }}</p>
+    <p v-else-if="routinesStore.routines.length === 0" class="state-empty">Sin rutinas</p>
+    <div v-else class="routines-grid">
       <RoutineCard
         v-for="routine in routines"
         :key="routine.id"
@@ -23,22 +26,37 @@
 import { onMounted } from 'vue'
 import RoutineCard from '@/components/routines/RoutineCard.vue'
 import { useRoutinesStore } from '@/stores/routines'
+import { useToastStore } from '@/stores/toast'
 
 const routinesStore = useRoutinesStore()
+const toast = useToastStore()
 const routines = routinesStore.routines
 
-function handleExecute(id) {
-  routinesStore.execute(id)
+async function handleExecute(id) {
+  try {
+    await routinesStore.execute(id)
+    toast.show('Rutina ejecutada', 'success')
+  } catch {
+    toast.show('Error al ejecutar rutina', 'error')
+  }
 }
 
-function handleToggleFavorite(id) {
-  routinesStore.toggleFavorite(id)
+async function handleToggleFavorite(id) {
+  try {
+    await routinesStore.toggleFavorite(id)
+  } catch {
+    toast.show('Error al cambiar favorito', 'error')
+  }
 }
 
-function handleToggleActive(id) {
-  routinesStore.update(id, {
-    isActive: !routinesStore.getById(id)?.isActive
-  })
+async function handleToggleActive(id) {
+  try {
+    await routinesStore.update(id, {
+      isActive: !routinesStore.getById(id)?.isActive
+    })
+  } catch {
+    toast.show('Error al cambiar estado de rutina', 'error')
+  }
 }
 
 function handleViewDetail(id) {
