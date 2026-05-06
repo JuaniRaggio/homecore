@@ -112,10 +112,40 @@ export const useDevicesStore = defineStore('devices', () => {
     device.isFavorite = !device.isFavorite
   }
 
+  function applyDeviceEvent(data) {
+    const deviceId = data.deviceId ?? data.device?.id
+    if (!deviceId) return
+    const device = devices.value.find(d => String(d.id) === String(deviceId))
+    if (!device) return
+
+    const action = data.action || data.event
+    if (action === 'turnOn' || action === 'open' || action === 'activate' || action === 'play') {
+      device.isOn = true
+    } else if (action === 'turnOff' || action === 'close' || action === 'deactivate' || action === 'stop' || action === 'pause') {
+      device.isOn = false
+    }
+
+    if (action === 'lock') {
+      device.statusText = 'Cerrada'
+    } else if (action === 'unlock') {
+      device.statusText = 'Abierta'
+    } else if (device.type === 'alarm') {
+      device.statusText = device.isOn ? 'Activada' : 'Desactivada'
+    } else {
+      device.statusText = device.isOn ? 'Encendido' : 'Apagado'
+    }
+
+    // Merge any extra state data the server sent
+    if (data.data) {
+      Object.assign(device, data.data)
+    }
+  }
+
   return {
     devices, deviceTypes, loading, error,
     favoriteDevices, activeDevices, totalConsumption,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
+    applyDeviceEvent,
   }
 
 })
