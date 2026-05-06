@@ -2,7 +2,7 @@
   <main class="page-content--full">
     <!-- Saludo personalizado -->
     <section class="overview-greeting">
-      <h1 class="greeting-text">Bienvenido Juan</h1>
+      <h1 class="greeting-text">Bienvenido {{ userName }}</h1>
       <p class="greeting-sub">Bienvenido a HomeCore</p>
     </section>
 
