@@ -1,42 +1,49 @@
 <template>
-  <nav class="sidebar">
-    
+  <nav class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
+
     <div class="property-selector">
-      <span class="property-name">Casa Martinez</span>
-      <i class="fa-solid fa-chevron-down"></i>
+      <span class="property-name">{{ houseName }}</span>
+      <i v-if="!collapsed" class="fa-solid fa-chevron-down"></i>
     </div>
 
     <!-- Links de navegacion: cada uno apunta a una ruta del router -->
     <ul class="nav-list">
       <li v-for="item in navItems" :key="item.label" class="nav-item">
-        <router-link :to="item.route" exact-active-class="active">
+        <router-link :to="item.route" exact-active-class="active" :title="item.label">
           <i :class="item.icon"></i>
-          {{ item.label }}
+          <span class="nav-label">{{ item.label }}</span>
         </router-link>
       </li>
     </ul>
 
     <!-- Footer del sidebar -->
     <div class="sidebar__footer">
-      <router-link :to="`/casa/${homeId}/configuracion`" active-class="active" class="sidebar__config">
+      <router-link :to="`/casa/${homeId}/configuracion`" active-class="active" class="sidebar__config" title="Configuracion">
         <i class="fa-solid fa-gear"></i>
-        Configuracion
+        <span class="nav-label">Configuracion</span>
       </router-link>
 
-      <!-- TODO: Implementar colapso del sidebar (toggle una clase CSS que reduzca el ancho) -->
-      <button class="sidebar__btn" @click="() => {}">
-        <i class="fa-solid fa-chevron-left"></i>
+      <button class="sidebar__btn" @click="collapsed = !collapsed" :title="collapsed ? 'Expandir' : 'Colapsar'">
+        <i :class="collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left'"></i>
       </button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useHomesStore } from '@/stores/homes'
 
 const route = useRoute()
+const homesStore = useHomesStore()
 const homeId = computed(() => route.params.homeId)
+const collapsed = ref(false)
+
+const houseName = computed(() => {
+  if (!homeId.value) return 'HomeCore'
+  return homesStore.getById(homeId.value)?.name ?? 'Casa'
+})
 
 // Items de navegacion del sidebar
 // Las rutas se computan dinamicamente segun el homeId activo
@@ -48,9 +55,6 @@ const navItems = computed(() => [
   { icon: 'fa-solid fa-chart-line',             label: 'Historial',     route: `/casa/${homeId.value}/historial` },
   { icon: 'fa-solid fa-bolt',                   label: 'Consumo',       route: `/casa/${homeId.value}/consumo` },
 ])
-
-// TODO: Importar el store de homes para el nombre de la casa en el selector
-// TODO: Implementar logica de colapso del sidebar (ref booleana + clase condicional)
 </script>
 
 <style scoped>
@@ -67,13 +71,51 @@ const navItems = computed(() => [
   padding: 20px 0;
   z-index: 90;
   overflow-y: auto;
+  transition: width 0.25s ease;
+}
+
+.sidebar--collapsed {
+  width: 60px;
+}
+
+.sidebar--collapsed .property-name,
+.sidebar--collapsed .nav-label {
+  display: none;
+}
+
+.sidebar--collapsed .property-selector {
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.sidebar--collapsed .nav-item a {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar--collapsed .nav-item a i {
+  margin-right: 0;
+}
+
+.sidebar--collapsed .sidebar__config {
+  justify-content: center;
+}
+
+.sidebar--collapsed .sidebar__config .nav-label {
+  display: none;
+}
+
+.sidebar--collapsed .sidebar__footer {
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
 }
 
 .property-selector {
   cursor: pointer;
   display: flex;
-  justify-content: space-between; /* texto a la izquierda, icono a la derecha */
-  align-items: center;            /* centra verticalmente */
+  justify-content: space-between;
+  align-items: center;
   background-color: var(--bg-card);
   padding: 12px 15px;
   border-radius: var(--radius-md);
@@ -83,7 +125,7 @@ const navItems = computed(() => [
 }
 
 .property-selector:hover {
-  background-color: var(--bg-nav-hover); 
+  background-color: var(--bg-nav-hover);
 
 }
 
@@ -94,6 +136,9 @@ const navItems = computed(() => [
   flex: 1;
   display: flex;
   align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .property-selector i {
@@ -108,7 +153,8 @@ const navItems = computed(() => [
 }
 
 .nav-item a {
-  display: block;
+  display: flex;
+  align-items: center;
   padding: 10px 14px;
   border-radius: var(--radius-md);
 
@@ -127,6 +173,8 @@ const navItems = computed(() => [
 
 .nav-item a i {
   margin-right: 5px;
+  min-width: 20px;
+  text-align: center;
 }
 
 /* router-link agrega la clase "active" automaticamente cuando la ruta coincide */
@@ -150,6 +198,9 @@ const navItems = computed(() => [
   text-decoration: none;
   font-size: var(--font-md);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .sidebar__btn {
