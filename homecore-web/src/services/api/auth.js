@@ -2,12 +2,12 @@ import { request } from './client'
 
 export const register = (name, email, password) => request('POST', '/users/register', { name, email, password })
 export const login = (email, password) => request('POST', '/users/login', { email, password })
-export const getUserProfile = (email, password) => request('GET', '/users/profile', { email, password })
+export const getUserProfile = () => request('GET', '/users/profile')
 export const updateProfile = (data) => request('POST', '/users/profile', data)
 
 /* Password management */
-export const changePassword = (currentPassword, newPassword) =>
-  request('POST', '/users/change-password', { currentPassword, newPassword })
+export const changePassword = (oldPassword, newPassword) =>
+  request('POST', '/users/change-password', { oldPassword, newPassword })
 export const forgotPassword = (email) => request('POST', '/users/forgot-password', { email })
 export const resetPassword = (code, newPassword) =>
   request('POST', '/users/reset-password', { code, newPassword })
