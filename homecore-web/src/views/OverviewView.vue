@@ -19,6 +19,7 @@
           :home="home"
         />
       </div>
+      <router-link to="/nueva-propiedad" class="btn-add">+ Nueva propiedad</router-link>
     </section>
 
     <!-- Dispositivos criticos (cross-home) -->
@@ -119,6 +120,12 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
+}
+
+.btn-add {
+  display: inline-block;
+  margin-top: 14px;
+  text-decoration: none;
 }
 
 /* -- Rutinas favoritas -- */
