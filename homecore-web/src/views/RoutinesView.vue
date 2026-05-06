@@ -38,8 +38,10 @@
           rows="3"
         ></textarea>
         <div class="modal-actions">
-          <button class="btn-cancel" @click="closeCreateModal">Cancelar</button>
-          <button class="btn-confirm" @click="confirmCreate" :disabled="!newRoutineName.trim()">Crear</button>
+          <button class="btn-cancel" @click="closeCreateModal" :disabled="saving">Cancelar</button>
+          <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !newRoutineName.trim()">
+            {{ saving ? 'Creando...' : 'Crear' }}
+          </button>
         </div>
       </div>
     </div>
@@ -69,6 +71,19 @@
           <button class="btn-cancel btn-cancel--danger" @click="deleteFromDetail">Eliminar</button>
           <button class="btn-confirm" @click="executeFromDetail">Ejecutar</button>
           <button class="btn-cancel" @click="closeDetailModal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal confirmar eliminacion rutina -->
+    <div v-if="showDeleteConfirm" class="modal-overlay" @click.self="showDeleteConfirm = false">
+      <div class="modal">
+        <h2 class="modal-title">Eliminar rutina</h2>
+        <p class="modal-desc">Estas seguro de que queres eliminar "{{ detailRoutine?.name }}"? Esta accion no se puede deshacer.</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showDeleteConfirm = false" :disabled="deleting">Cancelar</button>
+          <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoutine" :disabled="deleting">
+            {{ deleting ? 'Eliminando...' : 'Eliminar' }}
+          </button>
         </div>
       </div>
     </div>
@@ -112,6 +127,13 @@ async function handleToggleActive(id) {
   }
 }
 
+// Loading states
+const saving = ref(false)
+const deleting = ref(false)
+
+// Delete confirmation
+const showDeleteConfirm = ref(false)
+
 // Create modal
 const showCreateModal = ref(false)
 const newRoutineName = ref('')
@@ -130,7 +152,8 @@ function closeCreateModal() {
 }
 
 async function confirmCreate() {
-  if (!newRoutineName.value.trim()) return
+  if (!newRoutineName.value.trim() || saving.value) return
+  saving.value = true
   try {
     await routinesStore.create({
       name: newRoutineName.value.trim(),
@@ -138,10 +161,12 @@ async function confirmCreate() {
     })
     toast.show('Rutina creada', 'success')
     await routinesStore.fetchRoutines()
+    closeCreateModal()
   } catch {
     toast.show('Error al crear rutina', 'error')
+  } finally {
+    saving.value = false
   }
-  closeCreateModal()
 }
 
 // Detail modal
@@ -160,15 +185,24 @@ function closeDetailModal() {
   detailRoutine.value = null
 }
 
-async function deleteFromDetail() {
+function deleteFromDetail() {
   if (!detailRoutine.value) return
+  showDeleteConfirm.value = true
+}
+
+async function confirmDeleteRoutine() {
+  if (!detailRoutine.value || deleting.value) return
+  deleting.value = true
   try {
     await routinesStore.remove(detailRoutine.value.id)
     toast.show('Rutina eliminada', 'success')
+    showDeleteConfirm.value = false
+    closeDetailModal()
   } catch {
     toast.show('Error al eliminar rutina', 'error')
+  } finally {
+    deleting.value = false
   }
-  closeDetailModal()
 }
 
 async function executeFromDetail() {
