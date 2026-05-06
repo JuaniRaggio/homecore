@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
-import emailjs from '@emailjs/browser'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null)
@@ -37,15 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: false, error: error.message }
     }
     try {
-      const response = await api.sendVerification(email)
-      const code = typeof response === 'string' ? response : (response?.token ?? response?.code)
-      const expiryTime = new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        { passcode: code, email, user_name: name, time: expiryTime, company_name: 'HomeCore' },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      )
+      await api.sendVerification(email)
       pendingCredentials.value = { email, password }
       return { success: true }
     } catch (error) {

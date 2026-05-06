@@ -10,7 +10,7 @@
 
       <div class="auth-card verify-card">
         <template v-if="!success">
-          <p class="verify-instruction">Ingresá el código que te enviamos por email</p>
+          <p class="verify-instruction">Ingresá el código de verificación (disponible en Network → Response)</p>
           <form @submit.prevent="submit">
             <input
               v-model="code"

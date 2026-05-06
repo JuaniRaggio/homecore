@@ -46,8 +46,10 @@
 
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
 
 
 // Mostrar nombre de casa solo cuando estamos dentro de una ruta /casa/:homeId
