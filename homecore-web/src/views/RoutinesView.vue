@@ -20,29 +20,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 import RoutineCard from '@/components/routines/RoutineCard.vue'
+import { useRoutinesStore } from '@/stores/routines'
 
 const routinesStore = useRoutinesStore()
 const routines = routinesStore.routines
 
 function handleExecute(id) {
-  console.log('Ejecutar rutina', id)
+  routinesStore.execute(id)
 }
 
 function handleToggleFavorite(id) {
-  const routine = routines.value.find(r => r.id === id)
-  if (routine) routine.isFavorite = !routine.isFavorite
+  routinesStore.toggleFavorite(id)
 }
 
 function handleToggleActive(id) {
-  const routine = routines.value.find(r => r.id === id)
-  if (routine) routine.isActive = !routine.isActive
+  routinesStore.update(id, {
+    isActive: !routinesStore.getById(id)?.isActive
+  })
 }
 
 function handleViewDetail(id) {
   console.log('Ver detalle rutina', id)
 }
+
+onMounted(() => {
+  routinesStore.fetchRoutines()
+})
 </script>
 
 <style scoped>
