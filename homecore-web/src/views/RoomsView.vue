@@ -32,8 +32,11 @@
             <span class="device-name">{{ device.name }}</span>
             <div class="device-row__controls">
               <ToggleSwitch :model-value="device.isOn" @update:model-value="toggleDevice(device)" />
-              <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Editar">
+              <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
                 <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="unlinkDevice(device.id)" title="Desvincular">
+                <i class="fa-solid fa-link-slash"></i>
               </button>
             </div>
           </div>
@@ -100,13 +103,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import { useRoomsStore } from '@/stores/rooms'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
+import * as api from '@/services/api'
 
 const route = useRoute()
+const router = useRouter()
 const roomsStore = useRoomsStore()
 const devicesStore = useDevicesStore()
 const toast = useToastStore()
@@ -192,13 +197,33 @@ async function toggleDevice(device) {
   }
 }
 
-function editDevice() {
-  toast.show('TODO: Edicion de dispositivo proximamente', 'info')
+function editDevice(device) {
+  router.push({ name: 'device-detail', params: { homeId: route.params.homeId, id: device.id } })
 }
 
-function linkDevice(room, event) {
+async function linkDevice(room, event) {
+  const deviceId = event.target.value
   event.target.value = ''
-  toast.show('TODO: Vinculacion proximamente', 'info')
+  if (!deviceId) return
+  try {
+    await api.linkDeviceToRoom(room.id, deviceId)
+    toast.show('Dispositivo vinculado', 'success')
+    const homeId = route.params.homeId
+    if (homeId) await devicesStore.fetchAllForHome(homeId)
+  } catch {
+    toast.show('Error al vincular dispositivo', 'error')
+  }
+}
+
+async function unlinkDevice(deviceId) {
+  try {
+    await api.unlinkDeviceFromRoom(deviceId)
+    toast.show('Dispositivo desvinculado', 'success')
+    const homeId = route.params.homeId
+    if (homeId) await devicesStore.fetchAllForHome(homeId)
+  } catch {
+    toast.show('Error al desvincular dispositivo', 'error')
+  }
 }
 
 onMounted(() => {
