@@ -1,7 +1,7 @@
 <template>
   <div class="devices-view">
     <h1 class="view-title">Dispositivos</h1>
-    
+
     <div class="devices-header">
       <div class="devices-filters">
         <select v-model="filterType" class="filter-select">
@@ -19,7 +19,7 @@
 
         </select>
       </div>
-      <button class="btn-add">+ Nuevo dispositivo</button>
+      <button class="btn-add" @click="openCreateDeviceModal">+ Nuevo dispositivo</button>
 
     </div>
 
@@ -35,6 +35,39 @@
         @toggle-favorite="handleToggleFavorite"
       />
     </div>
+
+    <!-- Modal crear dispositivo -->
+    <div v-if="showCreateModal" class="modal-overlay" @click.self="closeCreateModal">
+      <div class="modal">
+        <h2 class="modal-title">Nuevo dispositivo</h2>
+        <input
+          v-model="newDeviceName"
+          class="modal-input"
+          type="text"
+          placeholder="Nombre del dispositivo"
+        />
+        <select v-model="newDeviceType" class="modal-input">
+          <option value="" disabled>Tipo de dispositivo</option>
+          <option value="light">Luz</option>
+          <option value="door">Puerta</option>
+          <option value="alarm">Alarma</option>
+          <option value="curtain">Cortina</option>
+          <option value="water">Grifo</option>
+        </select>
+        <select v-model="newDeviceRoom" class="modal-input">
+          <option value="" disabled>Habitacion</option>
+          <option
+            v-for="room in roomsList"
+            :key="room.id"
+            :value="room.id"
+          >{{ room.name }}</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="closeCreateModal">Cancelar</button>
+          <button class="btn-confirm" @click="confirmCreateDevice" :disabled="!canCreate">Crear</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -45,16 +78,20 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import { useDevicesStore } from '@/stores/devices'
+import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
+import * as api from '@/services/api'
 
 const route = useRoute()
 const devicesStore = useDevicesStore()
+const roomsStore = useRoomsStore()
 const toast = useToastStore()
 
 const filterType = ref('')
 const filterRoom = ref('')
 
 const rooms = computed(() => [...new Set(devicesStore.devices.map(d => d.room))])
+const roomsList = computed(() => roomsStore.rooms)
 
 const filteredDevices = computed(() =>
   devicesStore.devices.filter(d => {
@@ -81,9 +118,49 @@ async function handleToggleFavorite(id) {
   }
 }
 
+// Create device modal
+const showCreateModal = ref(false)
+const newDeviceName = ref('')
+const newDeviceType = ref('')
+const newDeviceRoom = ref('')
+
+const canCreate = computed(() =>
+  newDeviceName.value.trim() && newDeviceType.value && newDeviceRoom.value
+)
+
+function openCreateDeviceModal() {
+  newDeviceName.value = ''
+  newDeviceType.value = ''
+  newDeviceRoom.value = ''
+  showCreateModal.value = true
+}
+
+function closeCreateModal() {
+  showCreateModal.value = false
+}
+
+async function confirmCreateDevice() {
+  if (!canCreate.value) return
+  try {
+    await api.createDevice(newDeviceRoom.value, {
+      name: newDeviceName.value.trim(),
+      typeName: newDeviceType.value
+    })
+    toast.show('Dispositivo creado', 'success')
+    const homeId = route.params.homeId
+    if (homeId) await devicesStore.fetchAllForHome(homeId)
+  } catch {
+    toast.show('Error al crear dispositivo', 'error')
+  }
+  closeCreateModal()
+}
+
 onMounted(() => {
   const homeId = route.params.homeId
-  if (homeId) devicesStore.fetchAllForHome(homeId)
+  if (homeId) {
+    devicesStore.fetchAllForHome(homeId)
+    roomsStore.fetchRooms(homeId)
+  }
 })
 </script>
 
@@ -118,4 +195,53 @@ onMounted(() => {
   gap: 16px;
 }
 
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-md);
+  padding: 8px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 </style>
