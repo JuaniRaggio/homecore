@@ -10,6 +10,25 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
+  const userInitials = computed(() => {
+    if (!user.value?.name) return '?'
+    return user.value.name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(w => w[0].toUpperCase())
+      .join('')
+  })
+
+  async function fetchProfile() {
+    try {
+      const profile = await api.getUserProfile()
+      user.value = profile
+    } catch {
+      // token invalido o expirado — no romper la app
+    }
+  }
+
   async function register(name, email, password) {
     try {
       await api.register({ name, email, password })
@@ -40,8 +59,8 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.removeItem('auth_token')
       const response = await api.login(email, password)
       token.value = response.token
-      user.value = { email }
       localStorage.setItem('auth_token', response.token)
+      await fetchProfile()
       return { success: true }
     } catch (error) {
       return { success: false, error: error.message }
@@ -75,5 +94,15 @@ export const useAuthStore = defineStore('auth', () => {
     return { success: true }
   }
 
-  return { token, user, isAuthenticated, register, login, logout, verifyAccount, recover }
+  async function initializeAuth() {
+    if (token.value && !user.value) {
+      await fetchProfile()
+    }
+  }
+
+  return {
+    token, user, isAuthenticated, userInitials,
+    register, login, logout, verifyAccount, recover,
+    fetchProfile, initializeAuth
+  }
 })

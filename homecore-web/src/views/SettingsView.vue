@@ -2,85 +2,71 @@
   <div class="settings-view">
     <h1 class="view-title">Configuracion</h1>
 
-    <!-- Seccion: Perfil -->
+    <!-- Perfil -->
     <section class="settings-section">
-      <h2 class="section-title">Perfil</h2>
       <div class="settings-card">
-        <div class="profile-row">
-          <div class="avatar-lg">JR</div>
-          <div class="profile-info">
-            <span class="profile-name">Juani Raggio</span>
-            <span class="profile-email">juani@example.com</span>
-          </div>
-          <button class="btn-secondary">Editar perfil</button>
+        <h2 class="card-title">Perfil</h2>
+        <div class="card-divider" />
+        <div class="info-row">
+          <span class="info-label">Nombre</span>
+          <span class="info-value">{{ userName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ userEmail }}</span>
         </div>
       </div>
     </section>
 
-    <!-- Seccion: Casa -->
+    <!-- Cambiar contrasena -->
     <section class="settings-section">
-      <h2 class="section-title">Propiedad</h2>
       <div class="settings-card">
-        <div class="setting-row">
-          <div class="setting-label">
-            <span class="setting-name">Nombre</span>
-            <span class="setting-value">Casa Martinez</span>
-          </div>
-          <button class="btn-secondary">Cambiar</button>
-        </div>
-        <div class="setting-row">
-          <div class="setting-label">
-            <span class="setting-name">Direccion</span>
-            <span class="setting-value">Av. Libertador 1234, CABA</span>
-          </div>
-          <button class="btn-secondary">Cambiar</button>
-        </div>
-      </div>
-    </section>
+        <h2 class="card-title">Cambiar contrasena</h2>
+        <div class="card-divider" />
 
-    <!-- Seccion: Usuarios y permisos -->
-    <section class="settings-section">
-      <h2 class="section-title">Usuarios con acceso</h2>
-      <div class="settings-card">
-        <div v-for="user in users" :key="user.email" class="user-row">
-          <div class="user-avatar">{{ user.initials }}</div>
-          <div class="user-info">
-            <span class="user-name">{{ user.name }}</span>
-            <span class="user-email">{{ user.email }}</span>
+        <div class="field-group">
+          <label class="field-label">Contrasena actual</label>
+          <div class="input-wrap">
+            <input
+              v-model="currentPassword"
+              :type="showCurrent ? 'text' : 'password'"
+              placeholder="Tu contrasena actual"
+              class="field-input"
+            />
+            <button class="btn-show" @click="showCurrent = !showCurrent">Mostrar</button>
           </div>
-          <span class="user-role" :class="`role--${user.role}`">{{ user.roleLabel }}</span>
         </div>
-        <button class="btn-add-user">
-          <i class="fa-solid fa-plus"></i> Invitar usuario
-        </button>
-      </div>
-    </section>
 
-    <!-- Seccion: Notificaciones -->
-    <section class="settings-section">
-      <h2 class="section-title">Notificaciones</h2>
-      <div class="settings-card">
-        <div v-for="pref in notifPrefs" :key="pref.key" class="notif-row">
-          <div class="notif-label">
-            <span class="notif-name">{{ pref.label }}</span>
-            <span class="notif-desc">{{ pref.description }}</span>
+        <div class="field-group">
+          <label class="field-label">Nueva contrasena</label>
+          <div class="input-wrap">
+            <input
+              v-model="newPassword"
+              :type="showNew ? 'text' : 'password'"
+              placeholder="Minimo 8 caracteres"
+              class="field-input"
+            />
+            <button class="btn-show" @click="showNew = !showNew">Mostrar</button>
           </div>
-          <ToggleSwitch :model-value="pref.enabled" @update:model-value="pref.enabled = $event" />
         </div>
-      </div>
-    </section>
 
-    <!-- Seccion: Zona peligrosa -->
-    <section class="settings-section">
-      <h2 class="section-title section-title--danger">Zona peligrosa</h2>
-      <div class="settings-card settings-card--danger">
-        <div class="setting-row">
-          <div class="setting-label">
-            <span class="setting-name">Eliminar casa</span>
-            <span class="setting-value">Se eliminaran todos los dispositivos, rutinas e historial.</span>
+        <div class="field-group">
+          <label class="field-label">Confirmar nueva contrasena</label>
+          <div class="input-wrap">
+            <input
+              v-model="confirmPassword"
+              :type="showConfirm ? 'text' : 'password'"
+              placeholder="Repite tu nueva contrasena"
+              class="field-input"
+            />
+            <button class="btn-show" @click="showConfirm = !showConfirm">Mostrar</button>
           </div>
-          <button class="btn-danger">Eliminar</button>
         </div>
+
+        <div v-if="passwordError" class="msg msg--error">{{ passwordError }}</div>
+        <div v-if="passwordSuccess" class="msg msg--success">{{ passwordSuccess }}</div>
+
+        <button class="btn-save" @click="handleChangePassword">Guardar cambios</button>
       </div>
     </section>
   </div>
@@ -88,21 +74,44 @@
 
 <script setup>
 import { ref } from 'vue'
-import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import { useAuthStore } from '@/stores/auth'
 
-// Mock data
-const users = ref([
-  { name: 'Juani Raggio',   email: 'juani@example.com',    initials: 'JR', role: 'admin',  roleLabel: 'Admin' },
-  { name: 'Maria Lopez',    email: 'maria@example.com',    initials: 'ML', role: 'user',   roleLabel: 'Usuario' },
-  { name: 'Pedro Gomez',    email: 'pedro@example.com',    initials: 'PG', role: 'guest',  roleLabel: 'Invitado' },
-])
+const authStore = useAuthStore()
 
-const notifPrefs = ref([
-  { key: 'security',   label: 'Seguridad',          description: 'Alarma activada, puerta forzada, etc.',     enabled: true  },
-  { key: 'devices',    label: 'Dispositivos',       description: 'Cambios de estado en dispositivos criticos', enabled: true  },
-  { key: 'routines',   label: 'Rutinas',            description: 'Rutina ejecutada o fallida',                 enabled: false },
-  { key: 'energy',     label: 'Consumo energetico', description: 'Alerta si se supera el umbral diario',      enabled: true  },
-])
+const userName = ref('Juani Raggio')
+const userEmail = ref(authStore.user?.email ?? 'juani@homecore.com')
+
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const showCurrent = ref(false)
+const showNew = ref(false)
+const showConfirm = ref(false)
+const passwordError = ref('')
+const passwordSuccess = ref('')
+
+function handleChangePassword() {
+  passwordError.value = ''
+  passwordSuccess.value = ''
+
+  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+    passwordError.value = 'Completa todos los campos'
+    return
+  }
+  if (newPassword.value.length < 8) {
+    passwordError.value = 'La nueva contrasena debe tener al menos 8 caracteres'
+    return
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    passwordError.value = 'Las contrasenas no coinciden'
+    return
+  }
+
+  passwordSuccess.value = 'Contrasena actualizada correctamente'
+  currentPassword.value = ''
+  newPassword.value = ''
+  confirmPassword.value = ''
+}
 </script>
 
 <style scoped>
@@ -116,226 +125,131 @@ const notifPrefs = ref([
 }
 
 .settings-section {
-  margin-bottom: 28px;
-}
-
-.section-title {
-  font-size: var(--font-md);
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
-}
-
-.section-title--danger {
-  color: var(--danger);
+  margin-bottom: 20px;
 }
 
 .settings-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 16px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-.settings-card--danger {
-  border-color: rgba(248, 113, 113, 0.3);
-}
-
-/* Profile */
-.profile-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.avatar-lg {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
+.card-title {
   font-size: var(--font-xl);
-  color: var(--text-on-accent);
-}
-
-.profile-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-name {
-  font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
+  margin: 0;
 }
 
-.profile-email {
-  font-size: var(--font-base);
-  color: var(--text-muted);
+.card-divider {
+  height: 1px;
+  background-color: var(--border);
+  margin: 0 -24px;
 }
 
-/* Setting rows */
-.setting-row {
+/* Info rows (Perfil) */
+.info-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
 }
 
-.setting-label {
-  display: flex;
-  flex-direction: column;
-}
-
-.setting-name {
+.info-label {
   font-size: var(--font-md);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.setting-value {
-  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
-/* Users */
-.user-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.user-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background-color: var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: var(--font-sm);
+.info-value {
+  font-size: var(--font-md);
   color: var(--text-primary);
 }
 
-.user-info {
+/* Form fields (Cambiar contrasena) */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: var(--font-md);
+  color: var(--text-muted);
+}
+
+.input-wrap {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  gap: 8px;
+}
+
+.field-input {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name {
-  font-size: var(--font-md);
-  font-weight: 600;
+  background: none;
+  border: none;
+  outline: none;
   color: var(--text-primary);
+  font-size: var(--font-md);
+  padding: 12px 0;
 }
 
-.user-email {
-  font-size: var(--font-sm);
+.field-input::placeholder {
   color: var(--text-muted);
 }
 
-.user-role {
-  font-size: var(--font-sm);
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-}
-
-.role--admin {
-  background-color: rgba(129, 140, 248, 0.15);
+.btn-show {
+  background: none;
+  border: none;
   color: var(--accent);
+  font-size: var(--font-md);
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
 }
 
-.role--user {
-  background-color: rgba(52, 211, 153, 0.15);
+.btn-show:hover {
+  color: var(--accent-hover);
+}
+
+/* Feedback messages */
+.msg {
+  font-size: var(--font-sm);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.msg--error {
+  background-color: rgba(248, 113, 113, 0.1);
+  color: var(--danger);
+}
+
+.msg--success {
+  background-color: rgba(58, 139, 113, 0.1);
   color: var(--success);
 }
 
-.role--guest {
-  background-color: rgba(132, 148, 167, 0.15);
-  color: var(--text-muted);
-}
-
-.btn-add-user {
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-muted);
+/* Save button */
+.btn-save {
+  align-self: flex-end;
+  background-color: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
   border-radius: var(--radius-md);
-  padding: 10px;
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.btn-add-user:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* Notificaciones */
-.notif-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.notif-label {
-  display: flex;
-  flex-direction: column;
-}
-
-.notif-name {
+  padding: 10px 20px;
   font-size: var(--font-md);
   font-weight: 600;
-  color: var(--text-primary);
-}
-
-.notif-desc {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
-}
-
-/* Buttons */
-.btn-secondary {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  padding: 6px 14px;
-  font-size: var(--font-base);
   cursor: pointer;
-  transition: border-color 0.2s;
-  white-space: nowrap;
+  transition: opacity 0.2s;
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent);
-}
-
-.btn-danger {
-  background: none;
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  color: var(--danger);
-  border-radius: var(--radius-md);
-  padding: 6px 14px;
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: background-color 0.2s;
-  white-space: nowrap;
-}
-
-.btn-danger:hover {
-  background-color: rgba(248, 113, 113, 0.1);
+.btn-save:hover {
+  opacity: 0.85;
 }
 </style>
