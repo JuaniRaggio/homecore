@@ -22,9 +22,9 @@ export const useAuthStore = defineStore('auth', () => {
       .join('')
   })
 
-  async function fetchProfile(email, password) {
+  async function fetchProfile() {
     try {
-      const profile = await api.getUserProfile(email, password)
+      const profile = await api.getUserProfile()
       user.value = profile
     } catch {
       // token invalido o expirado — no romper la app
@@ -73,7 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.login(email, password)
       token.value = response.token
       localStorage.setItem('auth_token', response.token)
-      await fetchProfile(email, password)
+      await fetchProfile()
       socketConnect(response.token)
       return { success: true }
     } catch (error) {
