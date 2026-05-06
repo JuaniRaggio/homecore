@@ -163,3 +163,32 @@
 .btn-detail:hover {
   color: var(--text-primary);
 }
+
+/* Boton icono inline (editar, eliminar en headers) */
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: var(--font-lg);
+  transition: color 0.15s;
+}
+
+.icon-btn:hover {
+  color: var(--text-primary);
+}
+
+.icon-btn--delete:hover {
+  color: var(--danger);
+}
+
+.icon-btn--sm {
+  font-size: var(--font-sm);
+  padding: 2px 4px;
+}
+
+/* Variante danger para boton confirmar (eliminar en modales) */
+.btn-confirm--danger {
+  background-color: var(--danger);
+}
