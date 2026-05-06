@@ -6,16 +6,39 @@ import pLimit from 'p-limit'
 const MAX_CONCURRENT_REQUESTS = 3
 
 export const useDevicesStore = defineStore('devices', () => {
-  const devices = ref([]) //aquí se guardarán los dispositivos obtenidos de la API
-  const loading = ref(false) // error se puede usar para mostrar mensajes de error en la UI si algo falla al cargar 
-  const error = ref(null)   // Aquí se pueden definir getters computados para filtrar
+  const devices = ref([])
+  const deviceTypes = ref([])
+  const loading = ref(false)
+  const error = ref(null)
 
+  const favoriteDevices = computed(() => devices.value.filter(d => d.isFavorite))
+  const activeDevices = computed(() => devices.value.filter(d => d.isOn))
 
-const favoriteDevices = computed(() => devices.value.filter(d => d.isFavorite)) 
-const activeDevices = computed(() => devices.value.filter(d => d.isOn))
+  const totalConsumption = computed(() =>
+    devices.value
+      .filter(d => d.isOn)
+      .reduce((sum, d) => {
+        const dt = deviceTypes.value.find(t => String(t.id) === String(d.type?.id ?? d.type))
+        return sum + (dt?.powerUsage ?? 0)
+      }, 0)
+  )
 
   function clear() {
     devices.value = []
+  }
+
+  async function fetchDeviceTypes() {
+    try {
+      deviceTypes.value = await api.getDeviceTypes()
+    } catch {
+      // no bloquear si falla
+    }
+  }
+
+  function getPowerUsage(device) {
+    const typeId = device.type?.id ?? device.type
+    const dt = deviceTypes.value.find(t => String(t.id) === String(typeId))
+    return dt?.powerUsage ?? 0
   }
 
   async function fetchAllForHome(homeId) {
@@ -76,10 +99,9 @@ const activeDevices = computed(() => devices.value.filter(d => d.isOn))
   }
 
   return {
-    devices, loading, error,
-    favoriteDevices, activeDevices,
-    clear, fetchAllForHome, toggleDevice, toggleFavorite,
+    devices, deviceTypes, loading, error,
+    favoriteDevices, activeDevices, totalConsumption,
+    clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
   }
-
 
 })
