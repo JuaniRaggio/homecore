@@ -7,7 +7,6 @@
   <!-- SECCION DE LA CASA: stats + pisos/habitaciones + isometria -->
   <section class="house-section">
     <!-- Barra de estadisticas -->
-    <!-- TODO: Reemplazar los # con datos reales del store (dispositivos activos, total, habitaciones, consumo) -->
     <div class="stats-bar">
       <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
       <span class="stat-sep">|</span>
@@ -22,11 +21,9 @@
       <!-- Panel izquierdo: selector de pisos y lista de habitaciones -->
       <div class="house-panel">
         <!-- Tabs de pisos -->
-        <!-- TODO: Iterar sobre los pisos reales de la casa (desde la API/store) -->
-        <!-- TODO: Al clickear un piso, cargar sus habitaciones -->
         <div class="floor-tabs">
           <button class="floor-tab floor-tab--active">Piso 0</button>
-          <button class="floor-tab">
+          <button class="floor-tab floor-tab--disabled" disabled title="Proximamente">
             <i class="fa-solid fa-plus"></i> Piso
           </button>
         </div>
@@ -38,15 +35,15 @@
           </li>
         </ul>
 
-        <!-- TODO: Al clickear, abrir modal/formulario para crear habitacion nueva -->
-        <button class="btn-add-room">
+        <button class="btn-add-room" @click="openNewRoomModal">
           <i class="fa-solid fa-plus"></i> Agregar habitacion
         </button>
       </div>
 
       <!-- ISOMETRIA DE LA CASA -->
-      <!-- TODO: Aca va la visualizacion isometrica/plano de la casa -->
-      <!-- Puede ser un componente aparte: HouseIsometry.vue -->
+      <div class="isometry-placeholder">
+        <p class="state-empty">Vista isometrica proximamente</p>
+      </div>
     </div>
   </section>
 
@@ -89,11 +86,29 @@
       </div>
     </section>
   </div>
+
+  <!-- Modal nueva habitacion -->
+  <div v-if="showNewRoomModal" class="modal-overlay" @click.self="closeNewRoomModal">
+    <div class="modal">
+      <h2 class="modal-title">Nueva habitacion</h2>
+      <input
+        v-model="newRoomName"
+        class="modal-input"
+        type="text"
+        placeholder="Nombre de la habitacion"
+        @keyup.enter="confirmNewRoom"
+      />
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="closeNewRoomModal">Cancelar</button>
+        <button class="btn-confirm" @click="confirmNewRoom" :disabled="!newRoomName.trim()">Crear</button>
+      </div>
+    </div>
+  </div>
   </template>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
@@ -154,6 +169,31 @@ async function deleteRoom(roomId) {
   } catch {
     toast.show('Error al eliminar habitacion', 'error')
   }
+}
+
+// Modal nueva habitacion
+const showNewRoomModal = ref(false)
+const newRoomName = ref('')
+
+function openNewRoomModal() {
+  newRoomName.value = ''
+  showNewRoomModal.value = true
+}
+
+function closeNewRoomModal() {
+  showNewRoomModal.value = false
+  newRoomName.value = ''
+}
+
+async function confirmNewRoom() {
+  if (!newRoomName.value.trim()) return
+  try {
+    await roomsStore.addRoom(homeId.value, { name: newRoomName.value.trim() })
+    toast.show('Habitacion creada', 'success')
+  } catch {
+    toast.show('Error al crear habitacion', 'error')
+  }
+  closeNewRoomModal()
 }
 
 onMounted(() => {
@@ -221,6 +261,11 @@ onMounted(() => {
   border-color: var(--border);
 }
 
+.floor-tab--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .room-list {
   list-style: none;
   margin-bottom: 12px;
@@ -273,6 +318,17 @@ onMounted(() => {
   color: var(--accent);
 }
 
+.isometry-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-xl);
+}
+
 /* -- Grilla inferior: 2 columnas -- */
 .bottom-grid {
   display: grid;
@@ -315,4 +371,5 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
 }
+
 </style>
