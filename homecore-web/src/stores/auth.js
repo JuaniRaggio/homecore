@@ -87,11 +87,25 @@ export const useAuthStore = defineStore('auth', () => {
     return { success: true, needsLogin: true }
   }
 
-  function recover(email) {
+  async function recover(email) {
     if (!email) {
       return { success: false, error: 'Ingrese su email' }
     }
-    return { success: true }
+    try {
+      await api.forgotPassword(email)
+      return { success: true, message: 'Se envio un codigo de recuperacion a tu correo.' }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  async function changePassword(currentPassword, newPassword) {
+    try {
+      await api.changePassword(currentPassword, newPassword)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
   }
 
   async function initializeAuth() {
@@ -102,7 +116,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     token, user, isAuthenticated, userInitials,
-    register, login, logout, verifyAccount, recover,
+    register, login, logout, verifyAccount, recover, changePassword,
     fetchProfile, initializeAuth
   }
 })
