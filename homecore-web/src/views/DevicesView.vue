@@ -33,6 +33,7 @@
         :device="device"
         @toggle="handleToggle"
         @toggle-favorite="handleToggleFavorite"
+        @open="handleOpenDevice"
       />
     </div>
 
@@ -63,8 +64,10 @@
           >{{ room.name }}</option>
         </select>
         <div class="modal-actions">
-          <button class="btn-cancel" @click="closeCreateModal">Cancelar</button>
-          <button class="btn-confirm" @click="confirmCreateDevice" :disabled="!canCreate">Crear</button>
+          <button class="btn-cancel" @click="closeCreateModal" :disabled="saving">Cancelar</button>
+          <button class="btn-confirm" @click="confirmCreateDevice" :disabled="saving || !canCreate">
+            {{ saving ? 'Creando...' : 'Crear' }}
+          </button>
         </div>
       </div>
     </div>
@@ -75,7 +78,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
@@ -83,6 +86,7 @@ import { useToastStore } from '@/stores/toast'
 import * as api from '@/services/api'
 
 const route = useRoute()
+const router = useRouter()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const toast = useToastStore()
@@ -118,11 +122,17 @@ async function handleToggleFavorite(id) {
   }
 }
 
+function handleOpenDevice(id) {
+  router.push({ name: 'device-detail', params: { homeId: route.params.homeId, id } })
+}
+
 // Create device modal
 const showCreateModal = ref(false)
 const newDeviceName = ref('')
 const newDeviceType = ref('')
 const newDeviceRoom = ref('')
+
+const saving = ref(false)
 
 const canCreate = computed(() =>
   newDeviceName.value.trim() && newDeviceType.value && newDeviceRoom.value
@@ -140,7 +150,8 @@ function closeCreateModal() {
 }
 
 async function confirmCreateDevice() {
-  if (!canCreate.value) return
+  if (!canCreate.value || saving.value) return
+  saving.value = true
   try {
     await api.createDevice(newDeviceRoom.value, {
       name: newDeviceName.value.trim(),
@@ -149,10 +160,12 @@ async function confirmCreateDevice() {
     toast.show('Dispositivo creado', 'success')
     const homeId = route.params.homeId
     if (homeId) await devicesStore.fetchAllForHome(homeId)
+    closeCreateModal()
   } catch {
     toast.show('Error al crear dispositivo', 'error')
+  } finally {
+    saving.value = false
   }
-  closeCreateModal()
 }
 
 onMounted(() => {
