@@ -105,6 +105,11 @@
   border-color: var(--text-secondary);
 }
 
+.btn-cancel--danger {
+  color: var(--danger);
+  margin-right: auto;
+}
+
 /* Boton confirmar (modales, formularios) */
 .btn-confirm {
   background-color: var(--accent);
