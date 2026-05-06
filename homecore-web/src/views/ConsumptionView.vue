@@ -18,28 +18,28 @@
       <div class="summary-card">
         <i class="fa-solid fa-bolt summary-icon"></i>
         <div class="summary-data">
-          <span class="summary-value">{{ summary.total }} kWh</span>
-          <span class="summary-label">Consumo total</span>
+          <span class="summary-value">{{ devicesStore.totalConsumption }} W</span>
+          <span class="summary-label">Consumo actual (tiempo real)</span>
         </div>
       </div>
       <div class="summary-card">
         <i class="fa-solid fa-calendar-day summary-icon"></i>
         <div class="summary-data">
-          <span class="summary-value">{{ summary.daily }} kWh</span>
+          <span class="summary-value" title="TODO: Datos historicos proximamente">--</span>
           <span class="summary-label">Promedio diario</span>
         </div>
       </div>
       <div class="summary-card">
         <i class="fa-solid fa-arrow-trend-down summary-icon summary-icon--success"></i>
         <div class="summary-data">
-          <span class="summary-value">{{ summary.change }}</span>
+          <span class="summary-value" title="TODO: Datos historicos proximamente">--</span>
           <span class="summary-label">vs. periodo anterior</span>
         </div>
       </div>
       <div class="summary-card">
         <i class="fa-solid fa-coins summary-icon summary-icon--amber"></i>
         <div class="summary-data">
-          <span class="summary-value">${{ summary.cost }}</span>
+          <span class="summary-value" title="TODO: Datos historicos proximamente">--</span>
           <span class="summary-label">Costo estimado</span>
         </div>
       </div>
@@ -49,20 +49,16 @@
     <section class="chart-section">
       <h2 class="section-title">Consumo a lo largo del tiempo</h2>
       <div class="chart-placeholder">
-        <!-- TODO: Integrar libreria de graficos (Chart.js, etc.) -->
-        <div class="chart-bars">
-          <div v-for="bar in chartData" :key="bar.label" class="chart-bar-wrap">
-            <div class="chart-bar" :style="{ height: bar.pct + '%' }"></div>
-            <span class="chart-bar-label">{{ bar.label }}</span>
-          </div>
-        </div>
+        <p class="state-empty">TODO: Grafico de consumo proximamente</p>
       </div>
     </section>
 
     <!-- Desglose por dispositivo -->
     <section class="breakdown-section">
       <h2 class="section-title">Desglose por dispositivo</h2>
-      <div class="breakdown-list">
+      <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
+      <p v-else-if="breakdown.length === 0" class="state-empty">Sin dispositivos activos</p>
+      <div v-else class="breakdown-list">
         <div v-for="item in breakdown" :key="item.name" class="breakdown-item">
           <div class="breakdown-info">
             <span class="breakdown-name">{{ item.name }}</span>
@@ -71,7 +67,7 @@
           <div class="breakdown-bar-wrap">
             <div class="breakdown-bar" :style="{ width: item.pct + '%' }"></div>
           </div>
-          <span class="breakdown-value">{{ item.kwh }} kWh</span>
+          <span class="breakdown-value">{{ item.watts }} W</span>
         </div>
       </div>
     </section>
@@ -79,7 +75,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useDevicesStore } from '@/stores/devices'
+import { useToastStore } from '@/stores/toast'
+
+const route = useRoute()
+const devicesStore = useDevicesStore()
+const toast = useToastStore()
 
 const periods = [
   { label: 'Diario', value: 'daily' },
@@ -89,33 +92,36 @@ const periods = [
 
 const period = ref('monthly')
 
-// Mock data - sera reemplazada por datos de la API
-const summary = {
-  total: 210,
-  daily: 7.0,
-  change: '-12%',
-  cost: 8400,
-}
+const breakdown = computed(() => {
+  const items = devicesStore.devices
+    .filter(d => d.isOn)
+    .map(d => ({
+      name: d.name,
+      room: d.room ?? '--',
+      watts: devicesStore.getPowerUsage(d),
+    }))
+    .sort((a, b) => b.watts - a.watts)
 
-const chartData = [
-  { label: 'Lun', pct: 45 },
-  { label: 'Mar', pct: 62 },
-  { label: 'Mie', pct: 38 },
-  { label: 'Jue', pct: 72 },
-  { label: 'Vie', pct: 55 },
-  { label: 'Sab', pct: 80 },
-  { label: 'Dom', pct: 48 },
-]
+  const max = items.length > 0 ? items[0].watts : 1
+  return items.map(item => ({
+    ...item,
+    pct: max > 0 ? Math.round((item.watts / max) * 100) : 0,
+  }))
+})
 
-const breakdown = [
-  { name: 'Aire acondicionado',       room: 'Dormitorio',  kwh: 68,  pct: 100 },
-  { name: 'Lampara principal',        room: 'Living',      kwh: 42,  pct: 62  },
-  { name: 'Calefon electrico',        room: 'Bano',        kwh: 35,  pct: 51  },
-  { name: 'Heladera',                 room: 'Cocina',      kwh: 30,  pct: 44  },
-  { name: 'Lampara cocina',           room: 'Cocina',      kwh: 18,  pct: 26  },
-  { name: 'Cortina living (motor)',   room: 'Living',      kwh: 10,  pct: 15  },
-  { name: 'Otros',                    room: '-',           kwh: 7,   pct: 10  },
-]
+onMounted(async () => {
+  const homeId = route.params.homeId
+  if (homeId) {
+    try {
+      await Promise.all([
+        devicesStore.fetchAllForHome(homeId),
+        devicesStore.fetchDeviceTypes(),
+      ])
+    } catch {
+      toast.show('Error al cargar datos de consumo', 'error')
+    }
+  }
+})
 </script>
 
 <style scoped>
@@ -221,45 +227,10 @@ const breakdown = [
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  height: 200px;
+  min-height: 100px;
   display: flex;
-  align-items: flex-end;
-}
-
-.chart-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  width: 100%;
-  height: 100%;
-}
-
-.chart-bar-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  height: 100%;
-  justify-content: flex-end;
-}
-
-.chart-bar {
-  width: 100%;
-  max-width: 40px;
-  background-color: var(--accent);
-  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.chart-bar-wrap:hover .chart-bar {
-  opacity: 1;
-}
-
-.chart-bar-label {
-  font-size: var(--font-xs);
-  color: var(--text-muted);
-  margin-top: 6px;
+  justify-content: center;
 }
 
 /* Breakdown */
