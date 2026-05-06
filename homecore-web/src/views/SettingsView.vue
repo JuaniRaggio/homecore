@@ -73,13 +73,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 
-const userName = ref('Juani Raggio')
-const userEmail = ref(authStore.user?.email ?? 'juani@homecore.com')
+const userName = computed(() => authStore.user?.name ?? '')
+const userEmail = computed(() => authStore.user?.email ?? '')
 
 const currentPassword = ref('')
 const newPassword = ref('')
@@ -89,8 +89,9 @@ const showNew = ref(false)
 const showConfirm = ref(false)
 const passwordError = ref('')
 const passwordSuccess = ref('')
+const loading = ref(false)
 
-function handleChangePassword() {
+async function handleChangePassword() {
   passwordError.value = ''
   passwordSuccess.value = ''
 
