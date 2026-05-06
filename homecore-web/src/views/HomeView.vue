@@ -125,28 +125,57 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
+import { useDevicesStore } from '@/stores/devices'
+import { useRoomsStore } from '@/stores/rooms'
+import { useRoutinesStore } from '@/stores/routines'
 
 const route = useRoute()
 const homeId = computed(() => route.params.homeId)
 
-// TODO: Importar stores de dispositivos, habitaciones y rutinas
-// TODO: En onMounted(), cargar datos desde la API:
-//   - Habitaciones de la casa activa
-//   - Dispositivos favoritos
-//   - Rutinas favoritas
-//   - Stats (activos, total dispositivos, habitaciones, consumo)
+const devicesStore = useDevicesStore()
+const roomsStore = useRoomsStore()
+const routinesStore = useRoutinesStore()
 
-// TODO: Funciones handler para:
-//   - toggleDevice(id): prender/apagar dispositivo via API
-//   - toggleFavorite(id): marcar/desmarcar favorito via API
-//   - executeRoutine(id): ejecutar rutina via API
-//   - deleteRoom(id): eliminar habitacion (con confirmacion)
-//   - addRoom(): abrir formulario para agregar habitacion
-//   - selectFloor(floorId): cambiar piso activo
+const favoriteDevices = computed(() => devicesStore.favoriteDevices)
+const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
+const rooms = computed(() => roomsStore.rooms)
+
+const stats = computed(() => ({
+  active: devicesStore.activeDevices.length,
+  total: devicesStore.devices.length,
+  rooms: roomsStore.rooms.length,
+  consumption: devicesStore.devices
+    .filter(d => d.isOn)
+    .reduce((sum, d) => sum + (d.type?.powerUsage ?? 0), 0)
+}))
+
+function toggleDevice(id) {
+  devicesStore.toggleDevice(id)
+}
+
+function toggleFavorite(id) {
+  devicesStore.toggleFavorite(id)
+}
+
+function executeRoutine(id) {
+  routinesStore.execute(id)
+}
+
+async function deleteRoom(roomId) {
+  await roomsStore.removeRoom(roomId)
+}
+
+onMounted(() => {
+  if (homeId.value) {
+    devicesStore.fetchAllForHome(homeId.value)
+    roomsStore.fetchRooms(homeId.value)
+    routinesStore.fetchRoutines()
+  }
+})
 </script>
 
 <style scoped>
