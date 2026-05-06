@@ -23,7 +23,10 @@
 
     </div>
 
-    <div class="devices-grid">
+    <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
+    <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
+    <p v-else-if="devicesStore.devices.length === 0" class="state-empty">Sin dispositivos</p>
+    <div v-else class="devices-grid">
       <DeviceCard
         v-for="device in filteredDevices"
         :key="device.id"
@@ -32,9 +35,6 @@
         @toggle-favorite="handleToggleFavorite"
       />
     </div>
-    
-
-    
   </div>
 </template>
 
@@ -45,9 +45,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import { useDevicesStore } from '@/stores/devices'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const devicesStore = useDevicesStore()
+const toast = useToastStore()
 
 const filterType = ref('')
 const filterRoom = ref('')
@@ -62,12 +64,21 @@ const filteredDevices = computed(() =>
   })
 )
 
-function handleToggle(id) {
-  devicesStore.toggleDevice(id)
+async function handleToggle(id) {
+  try {
+    await devicesStore.toggleDevice(id)
+    toast.show('Dispositivo actualizado', 'success')
+  } catch {
+    toast.show('Error al cambiar estado del dispositivo', 'error')
+  }
 }
 
-function handleToggleFavorite(id) {
-  devicesStore.toggleFavorite(id)
+async function handleToggleFavorite(id) {
+  try {
+    await devicesStore.toggleFavorite(id)
+  } catch {
+    toast.show('Error al cambiar favorito', 'error')
+  }
 }
 
 onMounted(() => {
