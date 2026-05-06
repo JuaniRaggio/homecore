@@ -3,7 +3,7 @@ import { request } from './client'
 export const register = (data) => request('POST', '/users/register', data)
 export const login = (email, password) => request('POST', '/users/login', { email, password })
 export const getUserProfile = () => request('GET', '/users/profile')
-export const updateProfile = (data) => request('PUT', '/users/profile', data)
+export const updateProfile = (data) => request('POST', '/users/profile', data)
 
 /*Password management*/
 export const changePassword = (currentPassword, newPassword) =>
@@ -18,9 +18,15 @@ export const verifyAccount = (code) => request('POST', '/users/verify-account', 
 export const sendVerification = (email) => request('POST', '/users/send-verification', { email })
 export const getMailerConfig = () => request('GET', '/mailerconfig')
 export const createMailerConfig = (config) => request('POST', '/mailerconfig', data)
-export const updateMailerConfig = (config) => request('PUT', '/mailerconfig', data)
+export const updateMailerConfig = (config) => request('POST', '/mailerconfig', data)
 export const deleteMailerConfig = () => request('DELETE', '/mailerconfig')
 
+/*Mailer-Template*/
+export const postMailerTemplate = () => request('POST', '/emailtemplates')
+export const getAllMailerTemplates = () => request('GET', '/emailtemplates')
+export const getMailerTemplate = (templateId) => request('POST', `/emailtemplates/${templateId}`)
+export const updateEmailTemplate = (templateId, data) => request('POST', `/emailtemplates/${templateId}`, data)
+export const deleteEmailTemplate = (templateId) => request('DELETE', `/emailtemplates/${templateId}`)
 
 
 
