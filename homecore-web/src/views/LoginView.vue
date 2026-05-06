@@ -57,7 +57,7 @@ async function handleLogin() {
   if (result.success) {
     router.push('/overview')
   } else {
-    error.value = result.error || 'Error al iniciar sesión'
+    error.value = result.error || 'Error al iniciar sesion'
   }
 }
 
