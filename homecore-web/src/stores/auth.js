@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
+import { connect as socketConnect, disconnect as socketDisconnect } from '@/services/socket'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null)
@@ -73,6 +74,7 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = response.token
       localStorage.setItem('auth_token', response.token)
       await fetchProfile(email, password)
+      socketConnect(response.token)
       return { success: true }
     } catch (error) {
       return { success: false, error: "Error de inicio de sesion" }
@@ -80,6 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function logout() {
+    socketDisconnect()
     token.value = null
     user.value = null
     localStorage.removeItem('auth_token')
@@ -132,6 +135,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function initializeAuth() {
     if (token.value && !user.value) {
       await fetchProfile()
+      socketConnect(token.value)
     }
   }
 
