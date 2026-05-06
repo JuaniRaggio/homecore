@@ -89,6 +89,7 @@
               <span class="zone-name">{{ zone.name }}</span>
               <ToggleSwitch :model-value="zone.active" @update:model-value="zone.active = $event" />
             </div>
+            <p v-if="zones.length === 0" class="no-controls">TODO: Gestion de zonas proximamente</p>
           </div>
         </template>
 
@@ -110,13 +111,7 @@
 
       <div class="history-card">
         <h2 class="controls-title">Actividad reciente</h2>
-        <div class="history-list">
-          <div v-for="entry in recentHistory" :key="entry.id" class="history-entry">
-            <span class="history-action">{{ entry.action }}</span>
-            <span class="history-date">{{ formatDate(entry.date) }}</span>
-          </div>
-          <p v-if="recentHistory.length === 0" class="no-controls">Sin actividad registrada.</p>
-        </div>
+        <p class="no-controls">TODO: Historial proximamente</p>
       </div>
     </div>
     </template>
@@ -124,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import { useDevicesStore } from '@/stores/devices'
@@ -156,14 +151,6 @@ async function togglePower() {
   }
 }
 
-const recentHistory = computed(() => [])
-
-function formatDate(dateStr) {
-  const d = new Date(dateStr)
-  const day = d.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
-  const time = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-  return `${day} ${time}`
-}
 
 onMounted(async () => {
   const deviceId = route.params.deviceId
