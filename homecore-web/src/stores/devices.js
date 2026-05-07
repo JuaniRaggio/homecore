@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
+import { useHistoryStore } from './history'
 
 const MAX_CONCURRENT_REQUESTS = 3
 
@@ -87,6 +88,15 @@ export const useDevicesStore = defineStore('devices', () => {
     } else {
       device.statusText = device.isOn ? 'Encendido' : 'Apagado'
     }
+
+    const history = useHistoryStore()
+
+    history.addEntry({
+      deviceId: device.id,
+      deviceName: device.name,
+      action: device.statusText,
+      type: device.type === 'alarm' ? 'security' : 'device'
+    })
   }
 
 

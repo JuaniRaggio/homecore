@@ -35,21 +35,26 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useHistoryStore } from '../stores/history'
 
 const filterType = ref('')
 const filterPeriod = ref('today')
 
-// Mock data - sera reemplazada por datos de la API
-const events = ref([
-  { id: 1, type: 'device',   device: 'Lampara principal',  action: 'Encendida',           user: 'Juani',          time: '14:32' },
-  { id: 2, type: 'device',   device: 'Cortina living',     action: 'Abierta',             user: 'Juani',          time: '14:30' },
-  { id: 3, type: 'routine',  device: 'Buenos dias',        action: 'Rutina ejecutada',    user: 'Automatico',     time: '07:30' },
-  { id: 4, type: 'security', device: 'Puerta principal',   action: 'Cerrada',             user: 'Juani',          time: '07:15' },
-  { id: 5, type: 'device',   device: 'Alarma perimetral',  action: 'Desactivada',         user: 'Juani',          time: '07:10' },
-  { id: 6, type: 'security', device: 'Alarma perimetral',  action: 'Activada',            user: 'Rutina: Buenas noches', time: '23:00' },
-  { id: 7, type: 'device',   device: 'Grifo jardin',       action: 'Encendido (15 min)',  user: 'Rutina: Riego',  time: '06:00' },
-  { id: 8, type: 'routine',  device: 'Buenas noches',      action: 'Rutina ejecutada',    user: 'Automatico',     time: '23:00' },
-])
+const history = useHistoryStore()
+
+const events = computed(() =>
+  history.sorted.map(e => ({
+    id: e.id,
+    type: e.type,
+    device: e.deviceName,
+    action: e.action,
+    user: 'Usuario',
+    time: new Date(e.date).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }))
+)
 
 const filteredEvents = computed(() =>
   events.value.filter(e => {
