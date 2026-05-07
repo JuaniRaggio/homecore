@@ -24,7 +24,7 @@ export const updateMailerConfig = (config) => request('PUT', '/mailerconfig', co
 export const deleteMailerConfig = () => request('DELETE', '/mailerconfig')
 
 /* Mailer-Template */
-export const postMailerTemplate = () => request('POST', '/emailtemplates')
+export const postMailerTemplate = (data) => request('POST', '/emailtemplates', data)
 export const getAllMailerTemplates = () => request('GET', '/emailtemplates')
 export const getMailerTemplate = (templateId) => request('POST', `/emailtemplates/${templateId}`)
 export const updateEmailTemplate = (templateId, data) => request('POST', `/emailtemplates/${templateId}`, data)
