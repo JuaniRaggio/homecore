@@ -1,9 +1,21 @@
 <template>
   <nav class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
 
-    <div class="property-selector">
+    <div class="property-selector" @click="toggleHomeMenu" v-click-outside="closeHomeMenu">
       <span class="property-name">{{ houseName }}</span>
-      <i v-if="!collapsed" class="fa-solid fa-chevron-down"></i>
+      <i v-if="!collapsed" class="fa-solid fa-chevron-down" :class="{ 'chevron--open': showHomeMenu }"></i>
+    </div>
+
+    <div v-if="showHomeMenu && !collapsed" class="home-menu">
+      <button
+        v-for="home in homesStore.homes"
+        :key="home.id"
+        class="home-menu__item"
+        :class="{ 'home-menu__item--active': String(home.id) === String(homeId) }"
+        @click="switchHome(home.id)"
+      >
+        {{ home.name }}
+      </button>
     </div>
 
     <!-- Links de navegacion: cada uno apunta a una ruta del router -->
@@ -32,18 +44,45 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useHomesStore } from '@/stores/homes'
 
 const route = useRoute()
+const router = useRouter()
 const homesStore = useHomesStore()
 const homeId = computed(() => route.params.homeId)
 const collapsed = ref(false)
+const showHomeMenu = ref(false)
 
 const houseName = computed(() => {
   if (!homeId.value) return 'HomeCore'
   return homesStore.getById(homeId.value)?.name ?? 'Casa'
 })
+
+function toggleHomeMenu() {
+  showHomeMenu.value = !showHomeMenu.value
+}
+
+function closeHomeMenu() {
+  showHomeMenu.value = false
+}
+
+function switchHome(newHomeId) {
+  showHomeMenu.value = false
+  const subPath = route.path.replace(`/casa/${homeId.value}`, '')
+  const safe = subPath.startsWith('/dispositivos/') ? '/dispositivos' : subPath
+  router.push(`/casa/${newHomeId}${safe}`)
+}
+
+const vClickOutside = {
+  mounted(el, binding) {
+    el._clickOutside = (e) => { if (!el.contains(e.target)) binding.value() }
+    document.addEventListener('click', el._clickOutside)
+  },
+  unmounted(el) {
+    document.removeEventListener('click', el._clickOutside)
+  }
+}
 
 // Items de navegacion del sidebar
 // Las rutas se computan dinamicamente segun el homeId activo
@@ -126,7 +165,41 @@ const navItems = computed(() => [
 
 .property-selector:hover {
   background-color: var(--bg-nav-hover);
+}
 
+.chevron--open {
+  transform: rotate(180deg);
+  transition: transform 0.2s;
+}
+
+.home-menu {
+  margin: 0 10px 8px 10px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.home-menu__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.home-menu__item:hover {
+  background-color: var(--bg-nav-hover);
+}
+
+.home-menu__item--active {
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .property-name {
