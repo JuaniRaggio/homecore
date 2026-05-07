@@ -34,10 +34,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function ensureRegistrationTemplate() {
     if (templateReady.value) return
     try {
-      const templates = await api.getAllEmailTemplates()
+      const templates = await api.getAllMailerTemplates()
       const exists = Array.isArray(templates) && templates.some(t => t.type === 'REGISTRATION')
       if (!exists) {
-        await api.createEmailTemplate({
+        await api.postMailerTemplate({
           type: 'REGISTRATION',
           subject: 'Código de verificación - HomeCore',
           template: '<div><h1>Bienvenido <%FIRST_NAME%></h1><p>Tu código de verificación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
@@ -53,7 +53,17 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await api.register(name, email, password)
     } catch (error) {
-      if (error.status === 409) return { success: false, conflict: true, error: error.message }
+      if (error.status === 409) {
+        // Account exists — try sending verification to distinguish unverified vs already verified
+        try {
+          await ensureRegistrationTemplate()
+          await api.sendVerification(email)
+          pendingCredentials.value = { email, password }
+          return { success: true }
+        } catch {
+          return { success: false, conflict: true }
+        }
+      }
       return { success: false, error: error.message }
     }
     try {
