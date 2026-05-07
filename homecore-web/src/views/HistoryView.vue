@@ -7,54 +7,51 @@
           <option value="">Todos los eventos</option>
           <option value="device">Dispositivos</option>
           <option value="routine">Rutinas</option>
-          <option value="security">Seguridad</option>
-        </select>
-        <select v-model="filterPeriod" class="filter-select">
-          <option value="today">Hoy</option>
-          <option value="week">Esta semana</option>
-          <option value="month">Este mes</option>
         </select>
       </div>
     </div>
 
-    <div class="timeline">
-      <div v-for="event in filteredEvents" :key="event.id" class="timeline-item">
-        <div class="timeline-dot" :class="`timeline-dot--${event.type}`"></div>
-        <div class="timeline-content">
-          <div class="timeline-row">
-            <span class="timeline-device">{{ event.device }}</span>
-            <span class="timeline-time">{{ event.time }}</span>
+    <p v-if="loading" class="state-loading">Cargando historial...</p>
+    <p v-else-if="error" class="state-error">{{ error }}</p>
+    <p v-else-if="filteredEvents.length === 0" class="state-empty">Sin eventos registrados</p>
+    <template v-else>
+      <div class="timeline">
+        <div v-for="event in filteredEvents" :key="event.id" class="timeline-item">
+          <div class="timeline-dot" :class="`timeline-dot--${event.type}`"></div>
+          <div class="timeline-content">
+            <div class="timeline-row">
+              <span class="timeline-device">{{ event.deviceName }}</span>
+              <span class="timeline-time">{{ formatDate(event.timestamp) }}</span>
+            </div>
+            <span class="timeline-action">{{ event.action }}</span>
           </div>
-          <span class="timeline-action">{{ event.action }}</span>
-          <span class="timeline-user">{{ event.user }}</span>
         </div>
       </div>
-    </div>
+
+      <div v-if="hasMore" class="load-more">
+        <button class="btn-add" @click="loadMore" :disabled="loadingMore">
+          {{ loadingMore ? 'Cargando...' : 'Cargar mas' }}
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useHistoryStore } from '../stores/history'
+import { useDevicesStore } from '@/stores/devices'
+import * as api from '@/services/api'
 
+const devicesStore = useDevicesStore()
 const filterType = ref('')
-const filterPeriod = ref('today')
-
-const history = useHistoryStore()
-
-const events = computed(() =>
-  history.sorted.map(e => ({
-    id: e.id,
-    type: e.type,
-    device: e.deviceName,
-    action: e.action,
-    user: 'Usuario',
-    time: new Date(e.date).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }))
-)
+const events = ref([])
+const loading = ref(true)
+const loadingMore = ref(false)
+const error = ref('')
+const offset = ref(0)
+const pageSize = 30
+const hasMore = ref(true)
 
 const filteredEvents = computed(() =>
   events.value.filter(e => {
@@ -62,6 +59,61 @@ const filteredEvents = computed(() =>
     return true
   })
 )
+
+function getDeviceName(deviceId) {
+  const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+  return device?.name || `Dispositivo ${deviceId}`
+}
+
+function classifyEvent(log) {
+  const action = (log.actionName || '').toLowerCase()
+  if (action.includes('routine') || action.includes('execute')) return 'routine'
+  return 'device'
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const now = new Date()
+  const isToday = date.toDateString() === now.toDateString()
+  if (isToday) {
+    return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  }
+  return date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+function mapLogs(rawLogs) {
+  return rawLogs.map(log => ({
+    id: log.id,
+    deviceName: log.device?.name || getDeviceName(log.deviceId),
+    action: log.actionName || 'Accion',
+    timestamp: log.timestamp,
+    type: classifyEvent(log),
+  }))
+}
+
+async function fetchLogs() {
+  try {
+    const data = await api.getAllDeviceLogs(pageSize, offset.value)
+    const logs = Array.isArray(data) ? data : []
+    if (logs.length < pageSize) hasMore.value = false
+    events.value = [...events.value, ...mapLogs(logs)]
+    offset.value += logs.length
+  } catch (e) {
+    error.value = e.message || 'Error al cargar historial'
+  }
+}
+
+async function loadMore() {
+  loadingMore.value = true
+  await fetchLogs()
+  loadingMore.value = false
+}
+
+onMounted(async () => {
+  await fetchLogs()
+  loading.value = false
+})
 </script>
 
 <style scoped>
@@ -82,7 +134,6 @@ const filteredEvents = computed(() =>
   display: flex;
   gap: 8px;
 }
-
 
 /* Timeline */
 .timeline {
@@ -122,10 +173,6 @@ const filteredEvents = computed(() =>
   background-color: var(--success);
 }
 
-.timeline-dot--security {
-  background-color: var(--amber);
-}
-
 .timeline-content {
   flex: 1;
   display: flex;
@@ -156,8 +203,9 @@ const filteredEvents = computed(() =>
   color: var(--text-secondary);
 }
 
-.timeline-user {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }
 </style>

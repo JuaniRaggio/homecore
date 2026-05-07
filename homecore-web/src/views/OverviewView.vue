@@ -9,97 +9,48 @@
     <!-- Grilla de casas -->
     <section class="overview-section">
       <h2 class="section-title">Mis propiedades</h2>
-      <div class="homes-grid">
-        <!-- TODO: Reemplazar con v-for iterando sobre casas del store/API -->
+      <p v-if="homesStore.loading" class="state-loading">Cargando propiedades...</p>
+      <p v-else-if="homesStore.error" class="state-error">{{ homesStore.error }}</p>
+      <p v-else-if="homes.length === 0" class="state-empty">Sin propiedades</p>
+      <div v-else class="homes-grid">
         <HomeCard
           v-for="home in homes"
           :key="home.id"
           :home="home"
         />
       </div>
+      <router-link to="/nueva-propiedad" class="btn-add">+ Nueva propiedad</router-link>
     </section>
 
     <!-- Dispositivos criticos (cross-home) -->
     <section class="overview-section">
       <h2 class="section-title">Dispositivos criticos</h2>
-      <div class="critical-devices">
-        <!-- TODO: Reemplazar con datos reales del store -->
-        <div class="critical-item">
-          <i class="fa-solid fa-triangle-exclamation critical-icon"></i>
-          <div class="critical-info">
-            <span class="critical-name">Sensor de humo - Cocina</span>
-            <span class="critical-location">Casa Martinez</span>
-          </div>
-          <span class="critical-status critical-status--warning">Bateria baja</span>
-        </div>
-        <div class="critical-item">
-          <i class="fa-solid fa-triangle-exclamation critical-icon"></i>
-          <div class="critical-info">
-            <span class="critical-name">Camara exterior</span>
-            <span class="critical-location">Depto Centro</span>
-          </div>
-          <span class="critical-status critical-status--danger">Sin conexion</span>
-        </div>
-      </div>
+      <p class="state-empty">TODO: Alertas de dispositivos proximamente</p>
     </section>
 
     <!-- Rutinas favoritas (cross-home) -->
     <section class="overview-section">
       <h2 class="section-title">Rutinas favoritas</h2>
-      <div class="fav-routines">
-        <!-- TODO: Reemplazar con datos reales del store -->
-        <div class="fav-routine-item">
+      <div v-if="favoriteRoutines.length > 0" class="fav-routines">
+        <div v-for="routine in favoriteRoutines" :key="routine.id" class="fav-routine-item">
           <i class="fa-solid fa-star fav-routine-star"></i>
           <div class="fav-routine-info">
-            <span class="fav-routine-name">Buenos dias</span>
-            <span class="fav-routine-home">Casa Martinez</span>
+            <span class="fav-routine-name">{{ routine.name }}</span>
+            <span class="fav-routine-home">{{ routine.description || '' }}</span>
           </div>
-          <span class="fav-routine-schedule">07:30 - L a V</span>
-          <button class="fav-routine-btn">
-            <i class="fa-solid fa-play"></i>
-          </button>
-        </div>
-        <div class="fav-routine-item">
-          <i class="fa-solid fa-star fav-routine-star"></i>
-          <div class="fav-routine-info">
-            <span class="fav-routine-name">Buenas noches</span>
-            <span class="fav-routine-home">Casa Martinez</span>
-          </div>
-          <span class="fav-routine-schedule">22:00 - Todos</span>
-          <button class="fav-routine-btn">
+          <span class="fav-routine-schedule">{{ routine.time }} - {{ routine.days }}</span>
+          <button class="fav-routine-btn" @click="executeRoutine(routine.id)">
             <i class="fa-solid fa-play"></i>
           </button>
         </div>
       </div>
+      <p v-else class="state-empty">Sin rutinas favoritas</p>
     </section>
 
     <!-- Resumen energetico general -->
     <section class="overview-section">
       <h2 class="section-title">Resumen energetico</h2>
-      <div class="energy-summary">
-        <!-- TODO: Reemplazar con datos reales agregados de todas las casas -->
-        <div class="energy-card">
-          <i class="fa-solid fa-bolt energy-icon"></i>
-          <div class="energy-data">
-            <span class="energy-value">342 kWh</span>
-            <span class="energy-label">Consumo total (mes)</span>
-          </div>
-        </div>
-        <div class="energy-card">
-          <i class="fa-solid fa-arrow-trend-down energy-icon energy-icon--success"></i>
-          <div class="energy-data">
-            <span class="energy-value">-12%</span>
-            <span class="energy-label">vs. mes anterior</span>
-          </div>
-        </div>
-        <div class="energy-card">
-          <i class="fa-solid fa-mobile-screen-button energy-icon"></i>
-          <div class="energy-data">
-            <span class="energy-value">18</span>
-            <span class="energy-label">Dispositivos activos</span>
-          </div>
-        </div>
-      </div>
+      <p class="state-empty">TODO: Resumen energetico proximamente</p>
     </section>
   </main>
 </template>
@@ -109,15 +60,30 @@ import { onMounted, computed } from 'vue'
 import HomeCard from '@/components/homes/HomeCard.vue'
 import { useHomesStore } from '@/stores/homes'
 import { useAuthStore } from '@/stores/auth'
+import { useRoutinesStore } from '@/stores/routines'
+import { useToastStore } from '@/stores/toast'
 
 const homesStore = useHomesStore()
 const authStore = useAuthStore()
+const routinesStore = useRoutinesStore()
+const toast = useToastStore()
 
 const homes = computed(() => homesStore.homes)
 const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
+const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
+
+async function executeRoutine(id) {
+  try {
+    await routinesStore.execute(id)
+    toast.show('Rutina ejecutada', 'success')
+  } catch {
+    toast.show('Error al ejecutar rutina', 'error')
+  }
+}
 
 onMounted(() => {
   homesStore.fetchHomes()
+  routinesStore.fetchRoutines()
 })
 </script>
 
@@ -156,60 +122,10 @@ onMounted(() => {
   gap: 16px;
 }
 
-/* -- Dispositivos criticos -- */
-.critical-devices {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.critical-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.critical-icon {
-  color: var(--amber);
-  font-size: var(--font-xl);
-}
-
-.critical-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.critical-name {
-  font-size: var(--font-base);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.critical-location {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
-}
-
-.critical-status {
-  font-size: var(--font-sm);
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-}
-
-.critical-status--warning {
-  background-color: rgba(251, 191, 36, 0.15);
-  color: var(--amber);
-}
-
-.critical-status--danger {
-  background-color: rgba(248, 113, 113, 0.15);
-  color: var(--danger);
+.btn-add {
+  display: inline-block;
+  margin-top: 14px;
+  text-decoration: none;
 }
 
 /* -- Rutinas favoritas -- */
@@ -270,47 +186,5 @@ onMounted(() => {
 .fav-routine-btn:hover {
   background-color: var(--card-hover);
   border-color: var(--accent);
-}
-
-/* -- Resumen energetico -- */
-.energy-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.energy-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 20px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.energy-icon {
-  font-size: var(--font-4xl);
-  color: var(--accent);
-}
-
-.energy-icon--success {
-  color: var(--success);
-}
-
-.energy-data {
-  display: flex;
-  flex-direction: column;
-}
-
-.energy-value {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.energy-label {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
 }
 </style>

@@ -1,29 +1,34 @@
 <template>
   <!-- Vista principal "Inicio" - contiene todo lo que estaba en page-content del HTML original -->
 
+  <p v-if="devicesStore.loading" class="state-loading">Cargando...</p>
+  <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
+  <template v-else>
   <!-- SECCION DE LA CASA: stats + pisos/habitaciones + isometria -->
   <section class="house-section">
     <!-- Barra de estadisticas -->
-    <!-- TODO: Reemplazar los # con datos reales del store (dispositivos activos, total, habitaciones, consumo) -->
-    <div class="stats-bar">
-      <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
-      <span class="stat-sep">|</span>
-      <span class="stat-item"><b>{{ stats.total }}</b> dispositivos</span>
-      <span class="stat-sep">|</span>
-      <span class="stat-item"><b>{{ stats.rooms }}</b> habitaciones</span>
-      <span class="stat-sep">|</span>
-      <span class="stat-item"><b>{{ stats.consumption }}W</b> consumo</span>
+    <div class="stats-row">
+      <div class="stats-bar">
+        <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-item"><b>{{ stats.total }}</b> dispositivos</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-item"><b>{{ stats.rooms }}</b> habitaciones</span>
+        <span class="stat-sep">|</span>
+        <span class="stat-item"><b>{{ stats.consumption }}W</b> consumo</span>
+      </div>
+      <button class="icon-btn" @click="openEditHomeModal" title="Editar hogar">
+        <i class="fa-regular fa-pen-to-square"></i>
+      </button>
     </div>
 
     <div class="house-inner">
       <!-- Panel izquierdo: selector de pisos y lista de habitaciones -->
       <div class="house-panel">
         <!-- Tabs de pisos -->
-        <!-- TODO: Iterar sobre los pisos reales de la casa (desde la API/store) -->
-        <!-- TODO: Al clickear un piso, cargar sus habitaciones -->
         <div class="floor-tabs">
           <button class="floor-tab floor-tab--active">Piso 0</button>
-          <button class="floor-tab">
+          <button class="floor-tab floor-tab--disabled" disabled title="TODO: Proximamente">
             <i class="fa-solid fa-plus"></i> Piso
           </button>
         </div>
@@ -31,19 +36,19 @@
         <ul class="room-list">
           <li v-for="room in rooms" :key="room.id" class="room-item">
             {{ room.name }}
-            <button class="room-close" @click="deleteRoom(room.id)"><i class="fa-solid fa-xmark"></i></button>
+            <button class="room-close" @click="requestDeleteRoom(room.id)"><i class="fa-solid fa-xmark"></i></button>
           </li>
         </ul>
 
-        <!-- TODO: Al clickear, abrir modal/formulario para crear habitacion nueva -->
-        <button class="btn-add-room">
+        <button class="btn-add-room" @click="openNewRoomModal">
           <i class="fa-solid fa-plus"></i> Agregar habitacion
         </button>
       </div>
 
       <!-- ISOMETRIA DE LA CASA -->
-      <!-- TODO: Aca va la visualizacion isometrica/plano de la casa -->
-      <!-- Puede ser un componente aparte: HouseIsometry.vue -->
+      <div class="isometry-placeholder">
+        <p class="state-empty">TODO: Vista isometrica proximamente</p>
+      </div>
     </div>
   </section>
 
@@ -86,16 +91,75 @@
       </div>
     </section>
   </div>
+
+  <!-- Modal editar hogar -->
+  <div v-if="showEditHomeModal" class="modal-overlay" @click.self="closeEditHomeModal">
+    <div class="modal">
+      <h2 class="modal-title">Editar hogar</h2>
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input
+          v-model="editHomeName"
+          class="modal-input"
+          type="text"
+          placeholder="Nombre del hogar"
+          @keyup.enter="confirmEditHome"
+        />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="closeEditHomeModal" :disabled="saving">Cancelar</button>
+        <button class="btn-confirm" @click="confirmEditHome" :disabled="saving || !editHomeName.trim()">
+          {{ saving ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal nueva habitacion -->
+  <div v-if="showNewRoomModal" class="modal-overlay" @click.self="closeNewRoomModal">
+    <div class="modal">
+      <h2 class="modal-title">Nueva habitacion</h2>
+      <input
+        v-model="newRoomName"
+        class="modal-input"
+        type="text"
+        placeholder="Nombre de la habitacion"
+        @keyup.enter="confirmNewRoom"
+      />
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="closeNewRoomModal" :disabled="saving">Cancelar</button>
+        <button class="btn-confirm" @click="confirmNewRoom" :disabled="saving || !newRoomName.trim()">
+          {{ saving ? 'Creando...' : 'Crear' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Modal confirmar eliminacion habitacion -->
+  <div v-if="showDeleteRoomConfirm" class="modal-overlay" @click.self="showDeleteRoomConfirm = false">
+    <div class="modal">
+      <h2 class="modal-title">Eliminar habitacion</h2>
+      <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados quedaran sin habitacion.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="showDeleteRoomConfirm = false" :disabled="deleting">Cancelar</button>
+        <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoom" :disabled="deleting">
+          {{ deleting ? 'Eliminando...' : 'Eliminar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  </template>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
+import { useHomesStore } from '@/stores/homes'
+import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const homeId = computed(() => route.params.homeId)
@@ -103,6 +167,10 @@ const homeId = computed(() => route.params.homeId)
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
+const homesStore = useHomesStore()
+const toast = useToastStore()
+
+const currentHome = computed(() => homesStore.getById(homeId.value))
 
 const favoriteDevices = computed(() => devicesStore.favoriteDevices)
 const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
@@ -115,20 +183,113 @@ const stats = computed(() => ({
   consumption: devicesStore.totalConsumption
 }))
 
-function toggleDevice(id) {
-  devicesStore.toggleDevice(id)
+async function toggleDevice(id) {
+  try {
+    await devicesStore.toggleDevice(id)
+    toast.show('Dispositivo actualizado', 'success')
+  } catch {
+    toast.show('Error al cambiar estado del dispositivo', 'error')
+  }
 }
 
-function toggleFavorite(id) {
-  devicesStore.toggleFavorite(id)
+async function toggleFavorite(id) {
+  try {
+    await devicesStore.toggleFavorite(id)
+  } catch {
+    toast.show('Error al cambiar favorito', 'error')
+  }
 }
 
-function executeRoutine(id) {
-  routinesStore.execute(id)
+async function executeRoutine(id) {
+  try {
+    await routinesStore.execute(id)
+    toast.show('Rutina ejecutada', 'success')
+  } catch {
+    toast.show('Error al ejecutar rutina', 'error')
+  }
 }
 
-async function deleteRoom(roomId) {
-  await roomsStore.removeRoom(roomId)
+// Loading state for modals
+const saving = ref(false)
+
+// Delete room confirmation
+const showDeleteRoomConfirm = ref(false)
+const deletingRoomId = ref(null)
+const deleting = ref(false)
+
+function requestDeleteRoom(roomId) {
+  deletingRoomId.value = roomId
+  showDeleteRoomConfirm.value = true
+}
+
+async function confirmDeleteRoom() {
+  if (deleting.value) return
+  deleting.value = true
+  try {
+    await roomsStore.removeRoom(deletingRoomId.value)
+    toast.show('Habitacion eliminada', 'success')
+    showDeleteRoomConfirm.value = false
+  } catch {
+    toast.show('Error al eliminar habitacion', 'error')
+  } finally {
+    deleting.value = false
+  }
+}
+
+// Modal nueva habitacion
+const showNewRoomModal = ref(false)
+const newRoomName = ref('')
+
+function openNewRoomModal() {
+  newRoomName.value = ''
+  showNewRoomModal.value = true
+}
+
+function closeNewRoomModal() {
+  showNewRoomModal.value = false
+  newRoomName.value = ''
+}
+
+async function confirmNewRoom() {
+  if (!newRoomName.value.trim() || saving.value) return
+  saving.value = true
+  try {
+    await roomsStore.addRoom(homeId.value, { name: newRoomName.value.trim() })
+    toast.show('Habitacion creada', 'success')
+    closeNewRoomModal()
+  } catch {
+    toast.show('Error al crear habitacion', 'error')
+  } finally {
+    saving.value = false
+  }
+}
+
+// Modal editar hogar
+const showEditHomeModal = ref(false)
+const editHomeName = ref('')
+
+function openEditHomeModal() {
+  editHomeName.value = currentHome.value?.name || ''
+  showEditHomeModal.value = true
+}
+
+function closeEditHomeModal() {
+  showEditHomeModal.value = false
+  editHomeName.value = ''
+}
+
+async function confirmEditHome() {
+  if (!editHomeName.value.trim() || saving.value) return
+  saving.value = true
+  try {
+    await homesStore.updateHome(homeId.value, { name: editHomeName.value.trim() })
+    toast.show('Hogar actualizado', 'success')
+    closeEditHomeModal()
+  } catch {
+    toast.show('Error al actualizar hogar', 'error')
+  } finally {
+    saving.value = false
+  }
 }
 
 onMounted(() => {
@@ -146,6 +307,13 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
 .stats-bar {
   display: flex;
   align-items: center;
@@ -154,7 +322,6 @@ onMounted(() => {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  margin-bottom: 16px;
   max-width: fit-content;
   font-size: var(--font-base);
   color: var(--text-muted);
@@ -194,6 +361,11 @@ onMounted(() => {
   background-color: var(--bg-main);
   color: var(--text-on-accent);
   border-color: var(--border);
+}
+
+.floor-tab--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .room-list {
@@ -248,6 +420,17 @@ onMounted(() => {
   color: var(--accent);
 }
 
+.isometry-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background-color: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-xl);
+}
+
 /* -- Grilla inferior: 2 columnas -- */
 .bottom-grid {
   display: grid;
@@ -290,4 +473,5 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
 }
+
 </style>

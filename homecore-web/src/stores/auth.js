@@ -1,14 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
-import emailjs from '@emailjs/browser'
+import { connect as socketConnect, disconnect as socketDisconnect } from '@/services/socket'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('auth_token') || null)
   const user = ref(null)
   const pendingCredentials = ref(null)
+  const templateReady = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
+  const pendingEmail = computed(() => pendingCredentials.value?.email || null)
 
   const userInitials = computed(() => {
     if (!user.value?.name) return '?'
@@ -29,23 +31,34 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function ensureRegistrationTemplate() {
+    if (templateReady.value) return
+    try {
+      const templates = await api.getAllEmailTemplates()
+      const exists = Array.isArray(templates) && templates.some(t => t.type === 'REGISTRATION')
+      if (!exists) {
+        await api.createEmailTemplate({
+          type: 'REGISTRATION',
+          subject: 'Código de verificación - HomeCore',
+          template: '<div><h1>Bienvenido <%FIRST_NAME%></h1><p>Tu código de verificación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
+        })
+      }
+      templateReady.value = true
+    } catch {
+      // si falla no bloqueamos el flujo
+    }
+  }
+
   async function register(name, email, password) {
     try {
-      await api.register({ name, email, password })
+      await api.register(name, email, password)
     } catch (error) {
       if (error.status === 409) return { success: false, conflict: true, error: error.message }
       return { success: false, error: error.message }
     }
     try {
-      const response = await api.sendVerification(email)
-      const code = typeof response === 'string' ? response : (response?.token ?? response?.code)
-      const expiryTime = new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        { passcode: code, email, user_name: name, time: expiryTime, company_name: 'HomeCore' },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      )
+      await ensureRegistrationTemplate()
+      await api.sendVerification(email)
       pendingCredentials.value = { email, password }
       return { success: true }
     } catch (error) {
@@ -61,13 +74,15 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = response.token
       localStorage.setItem('auth_token', response.token)
       await fetchProfile()
+      socketConnect(response.token)
       return { success: true }
     } catch (error) {
-      return { success: false, error: error.message }
+      return { success: false, error: "Error de inicio de sesion" }
     }
   }
 
   function logout() {
+    socketDisconnect()
     token.value = null
     user.value = null
     localStorage.removeItem('auth_token')
@@ -99,6 +114,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function resetPassword(code, newPassword) {
+    try {
+      await api.resetPassword(code, newPassword)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
   async function changePassword(currentPassword, newPassword) {
     try {
       await api.changePassword(currentPassword, newPassword)
@@ -111,12 +135,13 @@ export const useAuthStore = defineStore('auth', () => {
   async function initializeAuth() {
     if (token.value && !user.value) {
       await fetchProfile()
+      socketConnect(token.value)
     }
   }
 
   return {
-    token, user, isAuthenticated, userInitials,
-    register, login, logout, verifyAccount, recover, changePassword,
+    token, user, isAuthenticated, userInitials, pendingEmail,
+    register, login, logout, verifyAccount, recover, resetPassword, changePassword,
     fetchProfile, initializeAuth
   }
 })
