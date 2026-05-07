@@ -9,7 +9,8 @@ export function connect(token) {
   if (socket) disconnect()
 
   socket = io(import.meta.env.VITE_WS_URL, {
-    auth: { token }
+    auth: { token },
+    transports: ['websocket']
   })
 
   socket.on('connect', () => {
