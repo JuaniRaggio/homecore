@@ -36,39 +36,4 @@ defineProps({
 defineEmits(['update:brightness', 'update:color'])
 </script>
 
-<style scoped>
-.control-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.control-label {
-  font-size: var(--font-base);
-  color: var(--text-muted);
-  min-width: 70px;
-}
-
-.control-value {
-  font-size: var(--font-base);
-  color: var(--text-secondary);
-  min-width: 50px;
-}
-
-.slider {
-  flex: 1;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-.color-picker {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  background: none;
-  padding: 2px;
-}
-</style>
+<!-- Estilos en controls.css global -->

@@ -1,5 +1,5 @@
 <template>
-  <div class="history-card">
+  <div class="card card--xl history-card">
     <h2 class="controls-title">Actividad reciente</h2>
     <p v-if="logsLoading" class="no-controls">Cargando historial...</p>
     <div v-else-if="logs.length > 0" class="history-list">
@@ -51,13 +51,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.history-card {
-  padding: 20px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-}
-
 .controls-title {
   font-size: var(--font-lg);
   font-weight: 600;

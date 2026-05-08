@@ -85,7 +85,7 @@ const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plu
 }
 
 .device-card:hover {
-  background-color: rgba(79, 110, 247, 0.12);
+  background-color: var(--card-hover);
 }
 
 .device-card__header {
