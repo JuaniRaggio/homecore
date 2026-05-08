@@ -138,7 +138,7 @@
   <div v-if="showDeleteRoomConfirm" class="modal-overlay" @click.self="showDeleteRoomConfirm = false">
     <div class="modal">
       <h2 class="modal-title">Eliminar habitacion</h2>
-      <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados quedaran sin habitacion.</p>
+      <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados.</p>
       <div class="modal-actions">
         <button class="btn-cancel" @click="showDeleteRoomConfirm = false" :disabled="deleting">Cancelar</button>
         <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoom" :disabled="deleting">
@@ -229,8 +229,8 @@ async function confirmDeleteRoom() {
   try {
     const roomDevices = devicesStore.getDevicesByRoomId(deletingRoomId.value)
     if (roomDevices.length) {
-      await Promise.all(roomDevices.map(d => api.unlinkDeviceFromRoom(d.id)))
-      roomDevices.forEach(d => devicesStore.clearDeviceRoom(d.id))
+      await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
+      roomDevices.forEach(d => devicesStore.removeDevice(d.id))
     }
     await roomsStore.removeRoom(deletingRoomId.value)
     toast.show('Habitacion eliminada', 'success')
