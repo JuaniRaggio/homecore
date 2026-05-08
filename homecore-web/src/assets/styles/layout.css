@@ -14,6 +14,12 @@
   padding-bottom: 40px;
 }
 
+/* Vista centrada con ancho limitado (detalle, edicion) */
+.view-narrow {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 /* Titulo de vista */
 .view-title {
   font-size: var(--font-3xl);

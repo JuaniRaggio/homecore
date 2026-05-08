@@ -1,5 +1,5 @@
 <template>
-  <main class="edit-device">
+  <main class="edit-device view-narrow">
     <section class="edit-header">
       <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i> Volver
@@ -157,7 +157,6 @@ async function handleSave() {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 480px;
 }
 
 .form-card {
