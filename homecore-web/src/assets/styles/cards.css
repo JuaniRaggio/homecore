@@ -11,6 +11,19 @@
   padding: 20px;
 }
 
+/* Titulo y divisor dentro de tarjetas */
+.card-title {
+  font-size: var(--font-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.card-divider {
+  height: 1px;
+  background-color: var(--border);
+}
+
 /* Tarjeta de formulario (edicion, creacion) */
 .form-card {
   display: flex;
