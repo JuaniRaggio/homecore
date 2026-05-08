@@ -20,32 +20,6 @@
       />
     </div>
 
-    <!-- Modal crear rutina -->
-    <div v-if="showCreateModal" class="modal-overlay" @click.self="closeCreateModal">
-      <div class="modal">
-        <h2 class="modal-title">Nueva rutina</h2>
-        <input
-          v-model="newRoutineName"
-          class="modal-input"
-          type="text"
-          placeholder="Nombre de la rutina"
-          @keyup.enter="confirmCreate"
-        />
-        <textarea
-          v-model="newRoutineDesc"
-          class="modal-input modal-textarea"
-          placeholder="Descripcion (opcional)"
-          rows="3"
-        ></textarea>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="closeCreateModal" :disabled="saving">Cancelar</button>
-          <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !newRoutineName.trim()">
-            {{ saving ? 'Creando...' : 'Crear' }}
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Modal detalle rutina -->
     <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
       <div class="modal modal--wide">
@@ -92,13 +66,20 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import RoutineCard from '@/components/routines/RoutineCard.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
 
+const route = useRoute()
+const router = useRouter()
 const routinesStore = useRoutinesStore()
 const toast = useToastStore()
 const routines = routinesStore.routines
+
+function openCreateModal() {
+  router.push({ name: 'new-routine', params: { homeId: route.params.homeId } })
+}
 
 async function handleExecute(id) {
   try {
@@ -134,40 +115,7 @@ const deleting = ref(false)
 // Delete confirmation
 const showDeleteConfirm = ref(false)
 
-// Create modal
 const showCreateModal = ref(false)
-const newRoutineName = ref('')
-const newRoutineDesc = ref('')
-
-function openCreateModal() {
-  newRoutineName.value = ''
-  newRoutineDesc.value = ''
-  showCreateModal.value = true
-}
-
-function closeCreateModal() {
-  showCreateModal.value = false
-  newRoutineName.value = ''
-  newRoutineDesc.value = ''
-}
-
-async function confirmCreate() {
-  if (!newRoutineName.value.trim() || saving.value) return
-  saving.value = true
-  try {
-    await routinesStore.create({
-      name: newRoutineName.value.trim(),
-      description: newRoutineDesc.value.trim()
-    })
-    toast.show('Rutina creada', 'success')
-    await routinesStore.fetchRoutines()
-    closeCreateModal()
-  } catch {
-    toast.show('Error al crear rutina', 'error')
-  } finally {
-    saving.value = false
-  }
-}
 
 // Detail modal
 const showDetailModal = ref(false)

@@ -16,6 +16,7 @@ const DevicesView = () => import('@/views/DevicesView.vue')
 const DeviceDetailView = () => import('@/views/DeviceDetailView.vue')
 const RoomsView = () => import('@/views/RoomsView.vue')
 const RoutinesView = () => import('@/views/RoutinesView.vue')
+const NewRoutineView = () => import('@/views/NewRoutineView.vue')
 const HistoryView = () => import('@/views/HistoryView.vue')
 const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
@@ -83,6 +84,11 @@ const routes = [
         path: 'rutinas',
         name: 'routines',
         component: RoutinesView
+      },
+      {
+        path: 'rutinas/nueva',
+        name: 'new-routine',
+        component: NewRoutineView
       },
       {
         path: 'historial',
