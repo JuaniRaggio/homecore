@@ -62,7 +62,7 @@ const filteredEvents = computed(() =>
 
 function getDeviceName(deviceId) {
   const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
-  return device?.name || `Dispositivo ${deviceId}`
+  return device?.name || 'Dispositivo eliminado'
 }
 
 function classifyEvent(log) {
