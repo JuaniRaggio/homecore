@@ -52,7 +52,7 @@
           </option>
         </select>
         <select v-model="newDeviceRoom" class="modal-input">
-          <option value="">Sin habitacion</option>
+          <option value="" disabled>Seleccionar habitacion</option>
           <option
             v-for="room in roomsList"
             :key="room.id"
@@ -131,7 +131,7 @@ const newDeviceRoom = ref('')
 const saving = ref(false)
 
 const canCreate = computed(() =>
-  newDeviceName.value.trim() && newDeviceType.value
+  newDeviceName.value.trim() && newDeviceType.value && newDeviceRoom.value
 )
 
 function openCreateDeviceModal() {
@@ -151,7 +151,7 @@ async function confirmCreateDevice() {
   try {
     await api.createDevice(newDeviceRoom.value, {
       name: newDeviceName.value.trim(),
-      type: { id: newDeviceType.value }
+      type: { id: newDeviceType.value },
     })
     toast.show('Dispositivo creado', 'success')
     const homeId = route.params.homeId

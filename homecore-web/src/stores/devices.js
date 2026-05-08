@@ -85,10 +85,7 @@ export const useDevicesStore = defineStore('devices', () => {
 
     const limit = pLimit(MAX_CONCURRENT_REQUESTS)
     try {
-      const [roomList, allDevices] = await Promise.all([
-        api.getRooms(homeId),
-        api.getAllDevices(),
-      ])
+      const roomList = await api.getRooms(homeId)
 
       const batches = await Promise.all(
         roomList.map(room => limit(async () => {
@@ -101,15 +98,7 @@ export const useDevicesStore = defineStore('devices', () => {
         }))
       )
 
-      const roomDevices = batches.flat()
-      const roomDeviceIds = new Set(roomDevices.map(d => String(d.id)))
-
-      const unroomed = allDevices
-        .filter(d => !d.room)
-        .filter(d => !roomDeviceIds.has(String(d.id)))
-        .map(d => normalizeDevice(d))
-
-      devices.value = [...roomDevices, ...unroomed]
+      devices.value = batches.flat()
     } catch (e) {
       error.value = e.message
     } finally {
