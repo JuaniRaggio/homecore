@@ -72,3 +72,10 @@
 .filter-select:focus {
   border-color: var(--accent);
 }
+
+/* Acciones de formulario (cancelar + guardar) */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

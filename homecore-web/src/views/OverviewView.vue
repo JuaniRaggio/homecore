@@ -11,10 +11,10 @@
       <h2 class="section-title">Mis propiedades</h2>
       <p v-if="homesStore.loading" class="state-loading">Cargando propiedades...</p>
       <p v-else-if="homesStore.error" class="state-error">{{ homesStore.error }}</p>
-      <p v-else-if="homes.length === 0" class="state-empty">Sin propiedades</p>
+      <p v-else-if="homesStore.homes.length === 0" class="state-empty">Sin propiedades</p>
       <div v-else class="homes-grid">
         <HomeCard
-          v-for="home in homes"
+          v-for="home in enrichedHomes"
           :key="home.id"
           :home="home"
         />
@@ -25,7 +25,27 @@
     <!-- Dispositivos criticos (cross-home) -->
     <section class="overview-section">
       <h2 class="section-title">Dispositivos criticos</h2>
-      <p class="state-empty">TODO: Alertas de dispositivos proximamente</p>
+      <p v-if="overview.loading.value" class="state-loading">Cargando...</p>
+      <p v-else-if="overview.criticalDevices.value.length === 0" class="state-empty">
+        Sin alertas activas
+      </p>
+      <div v-else class="critical-devices">
+        <div
+          v-for="device in overview.criticalDevices.value"
+          :key="device.id"
+          class="critical-device-item"
+        >
+          <i :class="device.type === 'alarm'
+            ? 'fa-solid fa-bell critical-icon critical-icon--alarm'
+            : 'fa-solid fa-door-open critical-icon critical-icon--door'"
+          ></i>
+          <div class="critical-device-info">
+            <span class="critical-device-name">{{ device.name }}</span>
+            <span class="critical-device-room">{{ device.room }}</span>
+          </div>
+          <span class="critical-device-status">{{ device.statusText }}</span>
+        </div>
+      </div>
     </section>
 
     <!-- Rutinas favoritas (cross-home) -->
@@ -38,7 +58,7 @@
             <span class="fav-routine-name">{{ routine.name }}</span>
             <span class="fav-routine-home">{{ routine.description || '' }}</span>
           </div>
-          <span class="fav-routine-schedule">{{ routine.time }} - {{ routine.days }}</span>
+          <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
           <button class="fav-routine-btn" @click="executeRoutine(routine.id)">
             <i class="fa-solid fa-play"></i>
           </button>
@@ -50,7 +70,30 @@
     <!-- Resumen energetico general -->
     <section class="overview-section">
       <h2 class="section-title">Resumen energetico</h2>
-      <p class="state-empty">TODO: Resumen energetico proximamente</p>
+      <p v-if="overview.loading.value" class="state-loading">Cargando...</p>
+      <div v-else class="summary-grid">
+        <div class="summary-card">
+          <i class="fa-solid fa-bolt summary-icon"></i>
+          <div class="summary-data">
+            <span class="summary-value">{{ overview.totalConsumption.value }} W</span>
+            <span class="summary-label">Consumo total actual</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <i class="fa-solid fa-plug summary-icon summary-icon--success"></i>
+          <div class="summary-data">
+            <span class="summary-value">{{ overview.totalActiveDevices.value }}</span>
+            <span class="summary-label">Dispositivos activos</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <i class="fa-solid fa-microchip summary-icon"></i>
+          <div class="summary-data">
+            <span class="summary-value">{{ overview.totalDeviceCount.value }}</span>
+            <span class="summary-label">Dispositivos totales</span>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 </template>
@@ -62,15 +105,20 @@ import { useHomesStore } from '@/stores/homes'
 import { useAuthStore } from '@/stores/auth'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
+import { useOverviewData } from '@/composables/useOverviewData'
 
 const homesStore = useHomesStore()
 const authStore = useAuthStore()
 const routinesStore = useRoutinesStore()
 const toast = useToastStore()
+const overview = useOverviewData()
 
-const homes = computed(() => homesStore.homes)
 const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
 const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
+
+const enrichedHomes = computed(() =>
+  homesStore.homes.map(h => overview.enrichHome(h))
+)
 
 async function executeRoutine(id) {
   try {
@@ -81,9 +129,18 @@ async function executeRoutine(id) {
   }
 }
 
-onMounted(() => {
-  homesStore.fetchHomes()
-  routinesStore.fetchRoutines()
+onMounted(async () => {
+  try {
+    await Promise.all([
+      homesStore.fetchHomes(),
+      routinesStore.fetchRoutines(),
+    ])
+    if (homesStore.homes.length > 0) {
+      await overview.fetchAllHomesDevices(homesStore.homes)
+    }
+  } catch {
+    toast.show('Error al cargar datos del overview', 'error')
+  }
 })
 </script>
 
@@ -108,10 +165,9 @@ onMounted(() => {
   margin-bottom: 28px;
 }
 
+/* Override del global section-title para el overview (fuente mas grande) */
 .section-title {
   font-size: var(--font-xl);
-  font-weight: 600;
-  color: var(--text-primary);
   margin-bottom: 14px;
 }
 
@@ -126,6 +182,50 @@ onMounted(() => {
   display: inline-block;
   margin-top: 14px;
   text-decoration: none;
+}
+
+/* -- Dispositivos criticos -- */
+.critical-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.critical-device-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.critical-icon { font-size: var(--font-xl); }
+.critical-icon--alarm { color: var(--danger); }
+.critical-icon--door { color: var(--amber); }
+
+.critical-device-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.critical-device-name {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.critical-device-room {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+}
+
+.critical-device-status {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--danger);
 }
 
 /* -- Rutinas favoritas -- */

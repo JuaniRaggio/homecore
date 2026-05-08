@@ -80,8 +80,11 @@
   color: var(--text-muted);
   font-size: var(--font-base);
   cursor: pointer;
-  margin-bottom: var(--space-3xl);
+  margin-bottom: var(--space-lg);
   padding: var(--space-2xs) 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   transition: color 0.2s;
 }
 

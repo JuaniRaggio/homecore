@@ -5,7 +5,7 @@
     </div>
 
     <!-- Resumen -->
-    <div class="summary-cards">
+    <div class="summary-grid summary-grid--mb">
       <div class="summary-card">
         <i class="fa-solid fa-bolt summary-icon"></i>
         <div class="summary-data">
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Graficos -->
-    <div class="charts-row">
+    <div class="grid-2 charts-row">
       <section class="chart-card">
         <h2 class="section-title">Consumo por tipo de dispositivo</h2>
         <div class="chart-wrap chart-wrap--donut">
@@ -53,8 +53,8 @@
       <h2 class="section-title">Detalle por dispositivo</h2>
       <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
       <p v-else-if="activeDevices.length === 0" class="state-empty">Sin dispositivos activos</p>
-      <div v-else class="breakdown-table-wrap">
-        <table class="breakdown-table">
+      <div v-else class="data-table-wrap">
+        <table class="data-table">
           <thead>
             <tr>
               <th class="col-device">Dispositivo</th>
@@ -278,62 +278,16 @@ onMounted(async () => {
   gap: 12px;
 }
 
+.summary-grid--mb { margin-bottom: 28px; }
 
-/* Summary */
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.summary-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.summary-icon { font-size: var(--font-3xl); color: var(--accent); }
-.summary-icon--success { color: var(--success); }
-
-.summary-data { display: flex; flex-direction: column; }
-
-.summary-value {
-  font-size: var(--font-2xl);
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.summary-label { font-size: var(--font-xs); color: var(--text-muted); }
-
-/* Charts row */
-.charts-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 28px;
-}
-
-@media (max-width: 768px) {
-  .charts-row { grid-template-columns: 1fr; }
-}
+/* Charts */
+.charts-row { margin-bottom: 28px; }
 
 .chart-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-}
-
-.section-title {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
 }
 
 .chart-wrap--donut {
@@ -346,59 +300,10 @@ onMounted(async () => {
 
 .chart-wrap--bar { height: 260px; }
 
-/* Breakdown table */
+/* Tabla detalle */
 .breakdown-section { margin-bottom: 20px; }
-
-.breakdown-table-wrap {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.breakdown-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.breakdown-table thead tr {
-  border-bottom: 1px solid var(--border);
-}
-
-.breakdown-table th {
-  padding: 12px 20px;
-  text-align: left;
-  font-size: var(--font-sm);
-  font-weight: 600;
-  color: var(--accent);
-}
-
-.breakdown-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background-color 0.15s;
-}
-
-.breakdown-table tbody tr:last-child { border-bottom: none; }
-.breakdown-table tbody tr:hover { background-color: var(--bg-main); }
-
-.breakdown-table td {
-  padding: 14px 20px;
-  font-size: var(--font-base);
-  color: var(--text-primary);
-}
 
 .col-device { min-width: 180px; font-weight: 500; }
 .col-status { width: 120px; }
 .col-consumption { width: 160px; text-align: right; font-weight: 600; }
-
-.badge--active {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  background-color: rgba(72, 199, 142, 0.15);
-  color: var(--success, #48c78e);
-  border: 1px solid rgba(72, 199, 142, 0.3);
-}
 </style>

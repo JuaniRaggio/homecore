@@ -27,11 +27,11 @@
         <h2 class="step-title">Nombre y descripcion</h2>
         <div class="form-group">
           <label class="form-label">Nombre de la rutina</label>
-          <input v-model="form.name" class="wizard-input" type="text" placeholder="Ej: Buenos dias" />
+          <input v-model="form.name" class="form-input" type="text" placeholder="Ej: Buenos dias" />
         </div>
         <div class="form-group">
           <label class="form-label">Descripcion (opcional)</label>
-          <input v-model="form.description" class="wizard-input" type="text" placeholder="Ej: Abre persianas y enciende luces suaves" />
+          <input v-model="form.description" class="form-input" type="text" placeholder="Ej: Abre persianas y enciende luces suaves" />
         </div>
       </div>
 
@@ -113,7 +113,7 @@
         </p>
         <div class="form-group">
           <label class="form-label">Hora de ejecucion</label>
-          <input v-model="form.time" class="wizard-input wizard-input--time" type="time" />
+          <input v-model="form.time" class="form-input form-input-time" type="time" />
         </div>
         <div class="form-group">
           <label class="form-label">Dias de la semana</label>
@@ -346,21 +346,6 @@ onMounted(() => {
   padding: 0;
 }
 
-.btn-back {
-  background: none;
-  border: none;
-  color: var(--accent);
-  cursor: pointer;
-  font-size: var(--font-base);
-  padding: 0;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-back:hover { text-decoration: underline; }
-
 .view-title { margin-bottom: 20px; }
 
 .wizard-card {
@@ -449,31 +434,19 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
+/* Override del global: agrega margen entre form-groups del wizard */
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
   margin-bottom: 16px;
 }
 
+/* Override del global: label con color accent para el wizard */
 .form-label {
   font-size: var(--font-sm);
   color: var(--accent);
-  font-weight: 600;
 }
 
-.wizard-input {
-  background-color: var(--bg-main);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 12px 14px;
-  width: 100%;
-}
+.form-input-time { max-width: 200px; }
 
-.wizard-input--time { max-width: 200px; }
-.wizard-input:focus { outline: none; border-color: var(--accent); }
 
 /* Device grid */
 .device-grid {

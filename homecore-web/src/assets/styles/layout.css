@@ -35,3 +35,23 @@
   color: var(--text-primary);
   margin-bottom: var(--space-lg);
 }
+
+/* Grilla de resumen (consumo, overview) */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* Grilla de 2 columnas (responsive) */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
