@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
 import { useHistoryStore } from './history'
+import { normalizeDevice } from '@/utils/device-helpers'
 
 const MAX_CONCURRENT_REQUESTS = 3
 
@@ -56,30 +57,6 @@ export const useDevicesStore = defineStore('devices', () => {
     const typeId = device.typeId ?? device.type?.id ?? device.type
     const dt = deviceTypes.value.find(t => String(t.id) === String(typeId))
     return dt?.powerUsage ?? 0
-  }
-
-  // Normaliza un dispositivo de la API a un formato plano para la UI
-  function normalizeDevice(d, roomName) {
-    const state = d.state || {}
-    const typeName = d.type?.name || d.type || ''
-    const isOn = state.status === 'on' || state.status === 'opened'
-      || state.status === 'active' || state.status === 'playing' || false
-    const room = roomName || d.room?.name || d.room || ''
-
-    let statusText = isOn ? 'Encendido' : 'Apagado'
-    if (typeName === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
-    if (typeName === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
-
-    return {
-      ...d,
-      type: typeName,
-      typeId: d.type?.id || d.type,
-      room,
-      roomId: d.room?.id || null,
-      isOn,
-      isFavorite: d.metadata?.favorite || d.meta?.favorite || d.isFavorite || false,
-      statusText,
-    }
   }
 
   async function fetchAllForHome(homeId) {
