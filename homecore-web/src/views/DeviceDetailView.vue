@@ -1,5 +1,5 @@
 <template>
-  <div class="device-detail">
+  <div class="device-detail view-narrow">
     <div class="detail-header">
       <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i> Volver
@@ -247,8 +247,6 @@ onMounted(async () => {
 <style scoped>
 .device-detail {
   padding: 0;
-  max-width: 600px;
-  margin: 0 auto;
 }
 
 .detail-header {
