@@ -146,32 +146,28 @@ export const useDevicesStore = defineStore('devices', () => {
     device.isFavorite = newFavorite
   }
 
-  function applyDeviceEvent(data) {
-    const deviceId = data.deviceId ?? data.device?.id
+  // Payload del websocket: { id, data } donde id=deviceId, data=estado nuevo
+  function applyDeviceEvent(event) {
+    const deviceId = event.id ?? event.deviceId ?? event.device?.id
     if (!deviceId) return
     const device = devices.value.find(d => String(d.id) === String(deviceId))
     if (!device) return
 
-    const action = data.action || data.event
-    if (action === 'turnOn' || action === 'open' || action === 'activate' || action === 'play') {
-      device.isOn = true
-    } else if (action === 'turnOff' || action === 'close' || action === 'deactivate' || action === 'stop' || action === 'pause') {
-      device.isOn = false
+    const state = event.data || {}
+
+    // Actualizar estado on/off segun el status recibido
+    if (state.status !== undefined) {
+      device.isOn = state.status === 'on' || state.status === 'opened'
+        || state.status === 'active' || state.status === 'playing'
     }
 
-    if (action === 'lock') {
-      device.statusText = 'Cerrada'
-    } else if (action === 'unlock') {
-      device.statusText = 'Abierta'
+    // Actualizar lock para puertas
+    if (state.lock !== undefined) {
+      device.statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
     } else if (device.type === 'alarm') {
       device.statusText = device.isOn ? 'Activada' : 'Desactivada'
-    } else {
+    } else if (state.status !== undefined) {
       device.statusText = device.isOn ? 'Encendido' : 'Apagado'
-    }
-
-    // Merge any extra state data the server sent
-    if (data.data) {
-      Object.assign(device, data.data)
     }
   }
 

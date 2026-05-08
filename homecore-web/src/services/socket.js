@@ -9,7 +9,7 @@ export function connect(token) {
   if (socket) disconnect()
 
   socket = io(import.meta.env.VITE_WS_URL, {
-    auth: { token },
+    auth: { token, apiKey: import.meta.env.VITE_API_KEY },
     transports: ['websocket']
   })
 
@@ -26,13 +26,14 @@ export function connect(token) {
   })
 
   // Device events
+  // Payload: { device, timestamp }
   socket.on('deviceCreated', (data) => {
     console.log('[Socket] deviceCreated', data)
     const homesStore = useHomesStore()
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
     }
-    const name = data.device?.name || data.name || 'Nuevo dispositivo'
+    const name = data.device?.name || 'Nuevo dispositivo'
     useNotificationsStore().addNotification({
       title: 'Dispositivo agregado',
       message: `Se agrego "${name}" al hogar.`,
@@ -40,13 +41,14 @@ export function connect(token) {
     })
   })
 
+  // Payload: { device, changes, timestamp }
   socket.on('deviceUpdated', (data) => {
     console.log('[Socket] deviceUpdated', data)
     const homesStore = useHomesStore()
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
     }
-    const name = data.device?.name || data.name || 'Un dispositivo'
+    const name = data.device?.name || 'Un dispositivo'
     useNotificationsStore().addNotification({
       title: 'Dispositivo actualizado',
       message: `"${name}" fue modificado.`,
@@ -54,13 +56,14 @@ export function connect(token) {
     })
   })
 
+  // Payload: { deviceId, device, timestamp }
   socket.on('deviceDeleted', (data) => {
     console.log('[Socket] deviceDeleted', data)
     const homesStore = useHomesStore()
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
     }
-    const name = data.device?.name || data.name || 'Un dispositivo'
+    const name = data.device?.name || 'Un dispositivo'
     useNotificationsStore().addNotification({
       title: 'Dispositivo eliminado',
       message: `"${name}" fue eliminado del hogar.`,
@@ -68,14 +71,14 @@ export function connect(token) {
     })
   })
 
+  // Payload: { id, data } - id es el deviceId, data es el estado nuevo
   socket.on('deviceEvent', (data) => {
     console.log('[Socket] deviceEvent', data)
     const devicesStore = useDevicesStore()
     devicesStore.applyDeviceEvent(data)
-    const deviceId = data.deviceId ?? data.device?.id
-    const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
-    const name = device?.name || data.device?.name || 'Un dispositivo'
-    const action = data.action || data.event || 'Evento'
+    const device = devicesStore.devices.find(d => String(d.id) === String(data.id))
+    const name = device?.name || 'Un dispositivo'
+    const action = device?.statusText || 'Evento'
     useNotificationsStore().addNotification({
       title: 'Evento de dispositivo',
       message: `${name}: ${action}`,
@@ -83,23 +86,24 @@ export function connect(token) {
     })
   })
 
-  // Home sharing events
+  // Payload: { homeId, sharedBy, timestamp }
   socket.on('homeShared', (data) => {
     console.log('[Socket] homeShared', data)
     useHomesStore().fetchHomes()
     useNotificationsStore().addNotification({
       title: 'Hogar compartido',
-      message: data.message || 'Un hogar fue compartido contigo.',
+      message: `Un hogar fue compartido contigo.`,
       type: 'info'
     })
   })
 
+  // Payload: { homeId, unsharedBy, timestamp }
   socket.on('homeUnshared', (data) => {
     console.log('[Socket] homeUnshared', data)
     useHomesStore().fetchHomes()
     useNotificationsStore().addNotification({
       title: 'Hogar desvinculado',
-      message: data.message || 'Se te quito el acceso a un hogar.',
+      message: `Se te quito el acceso a un hogar.`,
       type: 'warning'
     })
   })
