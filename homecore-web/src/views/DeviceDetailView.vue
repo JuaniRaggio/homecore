@@ -13,7 +13,7 @@
       <div class="detail-title-row">
         <h1 class="view-title">{{ device.name }}</h1>
         <div class="detail-actions">
-          <button class="icon-btn" @click="openEditModal" title="Editar nombre">
+          <button class="icon-btn" @click="goToEdit" title="Editar dispositivo">
             <i class="fa-regular fa-pen-to-square"></i>
           </button>
           <button class="icon-btn icon-btn--delete" @click="openDeleteConfirm" title="Eliminar dispositivo">
@@ -72,29 +72,6 @@
     </div>
     </template>
 
-    <!-- Modal editar nombre -->
-    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
-      <div class="modal">
-        <h2 class="modal-title">Editar dispositivo</h2>
-        <div class="form-group">
-          <label class="form-label">Nombre</label>
-          <input
-            v-model="editName"
-            class="modal-input"
-            type="text"
-            placeholder="Nombre del dispositivo"
-            @keyup.enter="confirmEdit"
-          />
-        </div>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="closeEditModal" :disabled="saving">Cancelar</button>
-          <button class="btn-confirm" @click="confirmEdit" :disabled="saving || !editName.trim()">
-            {{ saving ? 'Guardando...' : 'Guardar' }}
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Modal confirmar eliminacion -->
     <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
       <div class="modal">
@@ -139,39 +116,14 @@ const color = ref('#ffffff')
 const locked = ref(false)
 const position = ref(0)
 
-// Edit modal
-const showEditModal = ref(false)
-const editName = ref('')
-
 // Loading state for modals
 const saving = ref(false)
 
 // Delete modal
 const showDeleteModal = ref(false)
 
-function openEditModal() {
-  editName.value = device.value.name || ''
-  showEditModal.value = true
-}
-
-function closeEditModal() {
-  showEditModal.value = false
-  editName.value = ''
-}
-
-async function confirmEdit() {
-  if (!editName.value.trim() || saving.value) return
-  saving.value = true
-  try {
-    await api.updateDevice(device.value.id, { name: editName.value.trim() })
-    device.value.name = editName.value.trim()
-    toast.show('Dispositivo actualizado', 'success')
-    closeEditModal()
-  } catch {
-    toast.show('Error al actualizar dispositivo', 'error')
-  } finally {
-    saving.value = false
-  }
+function goToEdit() {
+  router.push({ name: 'edit-device', params: { homeId: route.params.homeId, id: device.value.id } })
 }
 
 function openDeleteConfirm() {
@@ -295,6 +247,8 @@ onMounted(async () => {
 <style scoped>
 .device-detail {
   padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .detail-header {
@@ -325,7 +279,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 600px;
 }
 
 /* Status card */

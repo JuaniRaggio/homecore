@@ -171,11 +171,32 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
+  async function updateDevice(id, data) {
+    await api.updateDevice(id, data)
+    const device = devices.value.find(d => String(d.id) === String(id))
+    if (device) {
+      if (data.name) device.name = data.name
+      if (data.type?.id) {
+        const dt = deviceTypes.value.find(t => String(t.id) === String(data.type.id))
+        if (dt) {
+          device.type = dt.name
+          device.typeId = dt.id
+        }
+      }
+      if (data.room?.id) {
+        device.roomId = data.room.id
+      } else if (data.room === null) {
+        device.room = ''
+        device.roomId = null
+      }
+    }
+  }
+
   return {
     devices, deviceTypes, loading, error,
     favoriteDevices, activeDevices, totalConsumption,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
-    applyDeviceEvent, clearDeviceRoom, getDevicesByRoomId,
+    applyDeviceEvent, clearDeviceRoom, getDevicesByRoomId, updateDevice,
   }
 
 })
