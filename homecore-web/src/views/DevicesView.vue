@@ -6,11 +6,9 @@
       <div class="devices-filters">
         <select v-model="filterType" class="filter-select">
           <option value="">Todos los tipos</option>
-          <option value="light">Luces</option>
-          <option value="door">Puertas</option>
-          <option value="alarm">Alarmas</option>
-          <option value="curtain">Cortina</option>
-          <option value="water">Grifo</option>
+          <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.name">
+            {{ dt.name }}
+          </option>
         </select>
 
         <select v-model="filterRoom" class="filter-select">

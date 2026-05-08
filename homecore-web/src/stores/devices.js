@@ -61,7 +61,7 @@ export const useDevicesStore = defineStore('devices', () => {
       room,
       roomId: d.room?.id || null,
       isOn,
-      isFavorite: d.meta?.favorite || d.isFavorite || false,
+      isFavorite: d.metadata?.favorite || d.meta?.favorite || d.isFavorite || false,
       statusText,
     }
   }
@@ -118,8 +118,15 @@ export const useDevicesStore = defineStore('devices', () => {
   async function toggleFavorite(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
-    await api.updateDevice(id, { meta: { favorite: !device.isFavorite } })
-    device.isFavorite = !device.isFavorite
+    const newFavorite = !device.isFavorite
+    const body = {
+      name: device.name,
+      type: { id: device.typeId },
+      metadata: { ...(device.metadata || {}), favorite: newFavorite },
+    }
+    if (device.roomId) body.room = { id: device.roomId }
+    await api.updateDevice(id, body)
+    device.isFavorite = newFavorite
   }
 
   function applyDeviceEvent(data) {
