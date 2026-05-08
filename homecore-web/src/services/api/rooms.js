@@ -1,7 +1,8 @@
 import { request } from './client'
 
+export const getAllRooms = () => request('GET', '/rooms')
 export const getRooms = async (homeId) => {
-  const rooms = await request('GET', '/rooms')
+  const rooms = await getAllRooms()
   return rooms.filter(r => String(r.home?.id) === String(homeId))
 }
 export const getRoom = (id) => request('GET', `/rooms/${id}`)
