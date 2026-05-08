@@ -20,6 +20,7 @@ const NewRoutineView = () => import('@/views/NewRoutineView.vue')
 const HistoryView = () => import('@/views/HistoryView.vue')
 const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
+const EditDeviceView = () => import('@/views/EditDeviceView.vue')
 
 const routes = [
   {
@@ -74,6 +75,11 @@ const routes = [
         path: 'dispositivos/:id',
         name: 'device-detail',
         component: DeviceDetailView
+      },
+      {
+        path: 'dispositivos/:id/editar',
+        name: 'edit-device',
+        component: EditDeviceView
       },
       {
         path: 'habitaciones',
