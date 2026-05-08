@@ -28,6 +28,18 @@ export const useDevicesStore = defineStore('devices', () => {
     devices.value = []
   }
 
+  function clearDeviceRoom(deviceId) {
+    const device = devices.value.find(d => String(d.id) === String(deviceId))
+    if (device) {
+      device.room = ''
+      device.roomId = null
+    }
+  }
+
+  function getDevicesByRoomId(roomId) {
+    return devices.value.filter(d => String(d.roomId) === String(roomId))
+  }
+
   async function fetchDeviceTypes() {
     try {
       deviceTypes.value = await api.getDeviceTypes()
@@ -73,7 +85,11 @@ export const useDevicesStore = defineStore('devices', () => {
 
     const limit = pLimit(MAX_CONCURRENT_REQUESTS)
     try {
-      const roomList = await api.getRooms(homeId)
+      const [roomList, allDevices] = await Promise.all([
+        api.getRooms(homeId),
+        api.getAllDevices(),
+      ])
+
       const batches = await Promise.all(
         roomList.map(room => limit(async () => {
           try {
@@ -85,7 +101,15 @@ export const useDevicesStore = defineStore('devices', () => {
         }))
       )
 
-      devices.value = batches.flat()
+      const roomDevices = batches.flat()
+      const roomDeviceIds = new Set(roomDevices.map(d => String(d.id)))
+
+      const unroomed = allDevices
+        .filter(d => !d.room)
+        .filter(d => !roomDeviceIds.has(String(d.id)))
+        .map(d => normalizeDevice(d))
+
+      devices.value = [...roomDevices, ...unroomed]
     } catch (e) {
       error.value = e.message
     } finally {
@@ -162,7 +186,7 @@ export const useDevicesStore = defineStore('devices', () => {
     devices, deviceTypes, loading, error,
     favoriteDevices, activeDevices, totalConsumption,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
-    applyDeviceEvent,
+    applyDeviceEvent, clearDeviceRoom, getDevicesByRoomId,
   }
 
 })

@@ -176,6 +176,11 @@ async function confirmDeleteRoom() {
   if (deleting.value) return
   deleting.value = true
   try {
+    const room = rooms.value.find(r => String(r.id) === String(deletingRoomId.value))
+    if (room?.devices?.length) {
+      await Promise.all(room.devices.map(d => api.unlinkDeviceFromRoom(d.id)))
+      room.devices.forEach(d => devicesStore.clearDeviceRoom(d.id))
+    }
     await roomsStore.removeRoom(deletingRoomId.value)
     toast.show('Habitacion eliminada', 'success')
     showDeleteConfirm.value = false
@@ -200,10 +205,9 @@ async function confirmUnlink() {
   deleting.value = true
   try {
     await api.unlinkDeviceFromRoom(unlinkingDeviceId.value)
+    devicesStore.clearDeviceRoom(unlinkingDeviceId.value)
     toast.show('Dispositivo desvinculado', 'success')
     showUnlinkConfirm.value = false
-    const homeId = route.params.homeId
-    if (homeId) await devicesStore.fetchAllForHome(homeId)
   } catch {
     toast.show('Error al desvincular dispositivo', 'error')
   } finally {

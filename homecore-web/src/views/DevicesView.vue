@@ -52,7 +52,7 @@
           </option>
         </select>
         <select v-model="newDeviceRoom" class="modal-input">
-          <option value="" disabled>Habitacion</option>
+          <option value="">Sin habitacion</option>
           <option
             v-for="room in roomsList"
             :key="room.id"
@@ -131,7 +131,7 @@ const newDeviceRoom = ref('')
 const saving = ref(false)
 
 const canCreate = computed(() =>
-  newDeviceName.value.trim() && newDeviceType.value && newDeviceRoom.value
+  newDeviceName.value.trim() && newDeviceType.value
 )
 
 function openCreateDeviceModal() {

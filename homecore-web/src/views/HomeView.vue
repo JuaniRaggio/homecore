@@ -160,6 +160,7 @@ import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
+import * as api from '@/services/api'
 
 const route = useRoute()
 const homeId = computed(() => route.params.homeId)
@@ -226,6 +227,11 @@ async function confirmDeleteRoom() {
   if (deleting.value) return
   deleting.value = true
   try {
+    const roomDevices = devicesStore.getDevicesByRoomId(deletingRoomId.value)
+    if (roomDevices.length) {
+      await Promise.all(roomDevices.map(d => api.unlinkDeviceFromRoom(d.id)))
+      roomDevices.forEach(d => devicesStore.clearDeviceRoom(d.id))
+    }
     await roomsStore.removeRoom(deletingRoomId.value)
     toast.show('Habitacion eliminada', 'success')
     showDeleteRoomConfirm.value = false

@@ -1,6 +1,7 @@
 import { request } from './client'
 
 export const getDevices = (roomId) => request('GET', `/rooms/${roomId}/devices`)
+export const getAllDevices = () => request('GET', '/devices')
 export const getDevice = (id) => request('GET', `/devices/${id}`)
 export const createDevice = (roomId, data) => {
   const body = { ...data }
