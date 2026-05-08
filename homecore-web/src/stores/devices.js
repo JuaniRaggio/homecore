@@ -36,6 +36,10 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
+  function removeDevice(deviceId) {
+    devices.value = devices.value.filter(d => String(d.id) !== String(deviceId))
+  }
+
   function getDevicesByRoomId(roomId) {
     return devices.value.filter(d => String(d.roomId) === String(roomId))
   }
@@ -196,7 +200,11 @@ export const useDevicesStore = defineStore('devices', () => {
     devices, deviceTypes, loading, error,
     favoriteDevices, activeDevices, totalConsumption,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
+<<<<<<< Updated upstream
     applyDeviceEvent, clearDeviceRoom, getDevicesByRoomId, updateDevice,
+=======
+    applyDeviceEvent, clearDeviceRoom, removeDevice, getDevicesByRoomId,
+>>>>>>> Stashed changes
   }
 
 })
