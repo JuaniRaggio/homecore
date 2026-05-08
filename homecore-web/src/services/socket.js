@@ -32,6 +32,12 @@ export function connect(token) {
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
     }
+    const name = data.device?.name || data.name || 'Nuevo dispositivo'
+    useNotificationsStore().addNotification({
+      title: 'Dispositivo agregado',
+      message: `Se agrego "${name}" al hogar.`,
+      type: 'info'
+    })
   })
 
   socket.on('deviceUpdated', (data) => {
@@ -40,6 +46,12 @@ export function connect(token) {
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
     }
+    const name = data.device?.name || data.name || 'Un dispositivo'
+    useNotificationsStore().addNotification({
+      title: 'Dispositivo actualizado',
+      message: `"${name}" fue modificado.`,
+      type: 'info'
+    })
   })
 
   socket.on('deviceDeleted', (data) => {
@@ -48,11 +60,27 @@ export function connect(token) {
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
     }
+    const name = data.device?.name || data.name || 'Un dispositivo'
+    useNotificationsStore().addNotification({
+      title: 'Dispositivo eliminado',
+      message: `"${name}" fue eliminado del hogar.`,
+      type: 'warning'
+    })
   })
 
   socket.on('deviceEvent', (data) => {
     console.log('[Socket] deviceEvent', data)
-    useDevicesStore().applyDeviceEvent(data)
+    const devicesStore = useDevicesStore()
+    devicesStore.applyDeviceEvent(data)
+    const deviceId = data.deviceId ?? data.device?.id
+    const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+    const name = device?.name || data.device?.name || 'Un dispositivo'
+    const action = data.action || data.event || 'Evento'
+    useNotificationsStore().addNotification({
+      title: 'Evento de dispositivo',
+      message: `${name}: ${action}`,
+      type: 'info'
+    })
   })
 
   // Home sharing events
