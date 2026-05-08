@@ -85,7 +85,7 @@ async function submit() {
 }
 
 .error-msg {
-  color: #d32f2f;
+  color: var(--danger);
   font-size: var(--font-sm);
   text-align: center;
   margin: 0;

@@ -386,13 +386,13 @@ onMounted(() => {
 
 .step--active .step-circle {
   background-color: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: var(--accent);
 }
 
 .step--done .step-circle {
   background-color: var(--success);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: var(--success);
 }
 
@@ -571,7 +571,7 @@ onMounted(() => {
   background-color: var(--accent);
   border: none;
   border-radius: var(--radius-md);
-  color: #fff;
+  color: var(--text-on-accent);
   font-size: var(--font-base);
   font-weight: 600;
   padding: 10px 28px;
@@ -584,7 +584,7 @@ onMounted(() => {
 
 .step-warning {
   font-size: var(--font-sm);
-  color: var(--warning, #e6a817);
+  color: var(--warning);
   background-color: rgba(230, 168, 23, 0.1);
   border: 1px solid rgba(230, 168, 23, 0.3);
   border-radius: var(--radius-md);

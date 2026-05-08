@@ -4,7 +4,7 @@
 
     <!-- Perfil -->
     <section class="settings-section">
-      <div class="settings-card">
+      <div class="form-card settings-card">
         <h2 class="card-title">Perfil</h2>
         <div class="card-divider" />
         <div class="info-row">
@@ -20,7 +20,7 @@
 
     <!-- Cambiar contrasena -->
     <section class="settings-section">
-      <div class="settings-card">
+      <div class="form-card settings-card">
         <h2 class="card-title">Cambiar contrasena</h2>
         <div class="card-divider" />
 
@@ -141,26 +141,13 @@ async function handleChangePassword() {
   margin-bottom: 20px;
 }
 
+/* Override: gap mas chico y padding horizontal extra */
 .settings-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
   gap: 16px;
-}
-
-.card-title {
-  font-size: var(--font-xl);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
+  padding: 20px 24px;
 }
 
 .card-divider {
-  height: 1px;
-  background-color: var(--border);
   margin: 0 -24px;
 }
 
@@ -239,12 +226,12 @@ async function handleChangePassword() {
 }
 
 .msg--error {
-  background-color: rgba(248, 113, 113, 0.1);
+  background-color: var(--danger-bg);
   color: var(--danger);
 }
 
 .msg--success {
-  background-color: rgba(58, 139, 113, 0.1);
+  background-color: var(--success-bg);
   color: var(--success);
 }
 

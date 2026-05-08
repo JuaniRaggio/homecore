@@ -39,7 +39,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useHistoryStore } from '../stores/history'
 import { useDevicesStore } from '@/stores/devices'
 import * as api from '@/services/api'
 

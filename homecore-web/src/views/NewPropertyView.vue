@@ -1,11 +1,11 @@
 <template>
   <main class="page-content--full">
     <section class="new-property-header">
-      <button class="back-btn" @click="router.back()">
+      <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i>
         Volver
       </button>
-      <h1 class="page-title">Nueva propiedad</h1>
+      <h1 class="view-title">Nueva propiedad</h1>
     </section>
 
     <section class="new-property-form">
@@ -66,30 +66,6 @@ async function handleCreate() {
   align-items: center;
   gap: 16px;
   margin-bottom: 32px;
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  border-radius: var(--radius-md);
-  padding: 8px 14px;
-  font-size: var(--font-sm);
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.back-btn:hover {
-  background-color: var(--card-hover);
-}
-
-.page-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
 }
 
 .new-property-form {

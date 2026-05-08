@@ -11,7 +11,7 @@
     <p v-else-if="roomsStore.error" class="state-error">{{ roomsStore.error }}</p>
     <p v-else-if="roomsStore.rooms.length === 0" class="state-empty">Sin habitaciones</p>
     <div v-else class="rooms-grid">
-      <div v-for="room in rooms" :key="room.id" class="room-card">
+      <div v-for="room in rooms" :key="room.id" class="card card--xl room-card">
 
         <div class="room-card__header">
            <span class="room-name">{{ room.name }}</span>
@@ -328,11 +328,8 @@ onMounted(() => {
   align-items: start;
 }
 
+/* Layout sobre .card .card--xl */
 .room-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;

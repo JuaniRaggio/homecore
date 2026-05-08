@@ -113,16 +113,11 @@ async function handleRegister() {
 }
 
 .error-message {
-  color: #d32f2f;
+  color: var(--danger);
   font-size: var(--font-sm);
   margin-bottom: var(--space-xs);
   padding: 0.5rem;
-  background-color: #ffebee;
-  border-radius: 4px;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  background-color: var(--danger-bg);
+  border-radius: var(--radius-xs);
 }
 </style>

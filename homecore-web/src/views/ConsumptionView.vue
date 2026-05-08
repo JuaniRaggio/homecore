@@ -31,7 +31,7 @@
 
     <!-- Graficos -->
     <div class="grid-2 charts-row">
-      <section class="chart-card">
+      <section class="card card--xl chart-card">
         <h2 class="section-title">Consumo por tipo de dispositivo</h2>
         <div class="chart-wrap chart-wrap--donut">
           <Doughnut v-if="donutData.labels.length" :data="donutData" :options="donutOptions" />
@@ -39,7 +39,7 @@
         </div>
       </section>
 
-      <section class="chart-card">
+      <section class="card card--xl chart-card">
         <h2 class="section-title">Consumo por dispositivo</h2>
         <div class="chart-wrap chart-wrap--bar">
           <Bar v-if="barData.labels.length" :data="barData" :options="barOptions" />
@@ -283,12 +283,7 @@ onMounted(async () => {
 /* Charts */
 .charts-row { margin-bottom: 28px; }
 
-.chart-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-}
+/* chart-card: layout sobre .card .card--xl */
 
 .chart-wrap--donut {
   display: flex;

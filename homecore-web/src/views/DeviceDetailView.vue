@@ -25,7 +25,7 @@
     </div>
 
     <div class="detail-body">
-      <div class="status-card">
+      <div class="card card--xl status-card">
         <div class="status-row">
           <span class="status-label">Estado</span>
           <span class="status-value" :class="device.isOn ? 'status--on' : 'status--off'">
@@ -35,7 +35,7 @@
         <ToggleSwitch :model-value="device.isOn" @update:model-value="togglePower" />
       </div>
 
-      <div class="controls-card">
+      <div class="card card--xl controls-card">
         <h2 class="controls-title">Controles</h2>
 
         <LightControls
@@ -279,15 +279,11 @@ onMounted(async () => {
   gap: 16px;
 }
 
-/* Status card */
+/* Status card (layout sobre .card .card--xl) */
 .status-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
 }
 
 .status-row {
@@ -306,22 +302,10 @@ onMounted(async () => {
   font-weight: 600;
 }
 
-.status--on {
-  color: var(--success);
-}
+.status--on { color: var(--success); }
+.status--off { color: var(--text-muted); }
 
-.status--off {
-  color: var(--text-muted);
-}
-
-/* Controls card */
-.controls-card {
-  padding: 20px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-}
-
+/* Controls card (usa .card-title global para el titulo) */
 .controls-title {
   font-size: var(--font-lg);
   font-weight: 600;
