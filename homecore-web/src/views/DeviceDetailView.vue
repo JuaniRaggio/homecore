@@ -247,6 +247,8 @@ onMounted(async () => {
 <style scoped>
 .device-detail {
   padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .detail-header {
@@ -277,7 +279,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 600px;
 }
 
 /* Status card */
