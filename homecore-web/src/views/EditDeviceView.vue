@@ -143,27 +143,6 @@ async function handleSave() {
 </script>
 
 <style scoped>
-.edit-device {
-  padding: 0;
-}
-
-.edit-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.edit-header .btn-back {
-  margin-bottom: 0;
-}
-
-.view-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
 .edit-form {
   display: flex;
   flex-direction: column;
@@ -179,24 +158,6 @@ async function handleSave() {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-}
-
-.form-select {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--bg-auth-input);
-  color: var(--text-primary);
-  font-size: var(--font-md);
-  font-family: 'Inter', sans-serif;
-  outline: none;
-  transition: border-color 0.2s;
-  cursor: pointer;
-}
-
-.form-select:focus {
-  border-color: var(--accent);
 }
 
 .form-actions {
