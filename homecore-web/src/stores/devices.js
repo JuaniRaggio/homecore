@@ -200,11 +200,7 @@ export const useDevicesStore = defineStore('devices', () => {
     devices, deviceTypes, loading, error,
     favoriteDevices, activeDevices, totalConsumption,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
-<<<<<<< Updated upstream
-    applyDeviceEvent, clearDeviceRoom, getDevicesByRoomId, updateDevice,
-=======
-    applyDeviceEvent, clearDeviceRoom, removeDevice, getDevicesByRoomId,
->>>>>>> Stashed changes
+    applyDeviceEvent, clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice,
   }
 
 })
