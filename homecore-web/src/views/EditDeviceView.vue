@@ -1,9 +1,8 @@
 <template>
   <main class="edit-device">
-    <section class="new-property-header">
-      <button class="back-btn" @click="router.back()">
-        <i class="fa-solid fa-arrow-left"></i>
-        Volver
+    <section class="edit-header">
+      <button class="btn-back" @click="router.back()">
+        <i class="fa-solid fa-arrow-left"></i> Volver
       </button>
       <h1 class="view-title">Editar dispositivo</h1>
     </section>
