@@ -1,0 +1,59 @@
+/* Contenedor de tabla con bordes redondeados */
+.data-table-wrap {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Tabla de datos */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  padding: 12px 20px;
+  text-align: left;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s;
+}
+
+.data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--bg-main);
+}
+
+.data-table td {
+  padding: 14px 20px;
+  font-size: var(--font-base);
+  color: var(--text-primary);
+}
+
+/* Badge generico */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+
+.badge--active {
+  background-color: rgba(72, 199, 142, 0.15);
+  color: var(--success, #48c78e);
+  border: 1px solid rgba(72, 199, 142, 0.3);
+}
