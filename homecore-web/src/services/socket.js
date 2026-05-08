@@ -10,7 +10,7 @@ export function connect(token) {
 
   socket = io(import.meta.env.VITE_WS_URL, {
     auth: { token, apiKey: import.meta.env.VITE_API_KEY },
-    transports: ['websocket']
+    transports: ['polling'],
   })
 
   socket.on('connect', () => {
