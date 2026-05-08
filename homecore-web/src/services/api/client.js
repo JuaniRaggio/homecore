@@ -22,6 +22,8 @@ export async function request(method, path, body = null) {
     err.status = res.status
     throw err
   }
-  const json = await res.json()
+  const text = await res.text()
+  if (!text) return null
+  const json = JSON.parse(text)
   return json.result !== undefined ? json.result : json
 }

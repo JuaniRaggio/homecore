@@ -49,11 +49,9 @@
         />
         <select v-model="newDeviceType" class="modal-input">
           <option value="" disabled>Tipo de dispositivo</option>
-          <option value="light">Luz</option>
-          <option value="door">Puerta</option>
-          <option value="alarm">Alarma</option>
-          <option value="curtain">Cortina</option>
-          <option value="water">Grifo</option>
+          <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
+            {{ dt.name }}
+          </option>
         </select>
         <select v-model="newDeviceRoom" class="modal-input">
           <option value="" disabled>Habitacion</option>
@@ -155,7 +153,7 @@ async function confirmCreateDevice() {
   try {
     await api.createDevice(newDeviceRoom.value, {
       name: newDeviceName.value.trim(),
-      typeName: newDeviceType.value
+      type: { id: newDeviceType.value }
     })
     toast.show('Dispositivo creado', 'success')
     const homeId = route.params.homeId
@@ -172,6 +170,7 @@ onMounted(() => {
   const homeId = route.params.homeId
   if (homeId) {
     devicesStore.fetchAllForHome(homeId)
+    devicesStore.fetchDeviceTypes()
     roomsStore.fetchRooms(homeId)
   }
 })

@@ -2,7 +2,7 @@ import { request } from './client'
 
 export const getDevices = (roomId) => request('GET', `/rooms/${roomId}/devices`)
 export const getDevice = (id) => request('GET', `/devices/${id}`)
-export const createDevice = (roomId, data) => request('POST', `/rooms/${roomId}/devices`, data)
+export const createDevice = (roomId, data) => request('POST', '/devices', { ...data, room: { id: roomId } })
 export const updateDevice = (id, data) => request('PUT', `/devices/${id}`, data)
 export const deleteDevice = (id) => request('DELETE', `/devices/${id}`)
 
