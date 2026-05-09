@@ -1,3 +1,27 @@
+const TYPE_LABELS = {
+  light:   'Luz',
+  door:    'Puerta',
+  alarm:   'Alarma',
+  water:   'Grifo',
+  curtain: 'Cortina',
+  ac:      'Aire acondicionado',
+  speaker: 'Parlante',
+  vacuum:  'Aspiradora',
+  fridge:  'Heladera',
+  oven:    'Horno',
+  lock:    'Cerradura',
+}
+
+/**
+ * Traduce el nombre de tipo de dispositivo (ingles de la API) a espanol.
+ * Si no encuentra traduccion, devuelve el nombre original capitalizado.
+ */
+export function translateType(typeName) {
+  if (!typeName) return ''
+  const key = typeName.toLowerCase()
+  return TYPE_LABELS[key] || typeName.charAt(0).toUpperCase() + typeName.slice(1)
+}
+
 /**
  * Normaliza un dispositivo de la API a un formato plano para la UI.
  */
