@@ -4,10 +4,12 @@
     <input
       v-model="newDeviceName"
       class="modal-input"
+      :class="{ 'modal-input--error': nameError }"
       type="text"
-      placeholder="Nombre del dispositivo"
+      placeholder="Nombre del dispositivo (min. 3 caracteres)"
       @keyup.enter="confirmCreate"
     />
+    <span v-if="nameError" class="modal-field-error">{{ nameError }}</span>
     <select v-model="newDeviceType" class="modal-input">
       <option value="" disabled>Tipo de dispositivo</option>
       <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
@@ -38,6 +40,7 @@ import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 import { translateType } from '@/utils/device-helpers'
+import { friendlyError } from '@/utils/friendly-error'
 import * as api from '@/services/api'
 
 const props = defineProps({
@@ -52,13 +55,23 @@ const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const toast = useToastStore()
 
+const MIN_NAME_LENGTH = 3
+
 const newDeviceName = ref('')
 const newDeviceType = ref('')
 const newDeviceRoom = ref('')
 const saving = ref(false)
 
+const nameError = computed(() => {
+  const name = newDeviceName.value.trim()
+  if (!name) return ''
+  if (name.length < MIN_NAME_LENGTH) return `El nombre debe tener al menos ${MIN_NAME_LENGTH} caracteres`
+  return ''
+})
+
 const canCreate = computed(() => {
-  if (!newDeviceName.value.trim() || !newDeviceType.value) return false
+  const name = newDeviceName.value.trim()
+  if (!name || name.length < MIN_NAME_LENGTH || !newDeviceType.value) return false
   if (!props.roomId && !newDeviceRoom.value) return false
   return true
 })
@@ -88,8 +101,8 @@ async function confirmCreate() {
     if (props.homeId) await devicesStore.fetchAllForHome(props.homeId)
     emit('created')
     emit('close')
-  } catch {
-    toast.show('No se pudo crear el dispositivo. Verifica los datos e intenta de nuevo.', 'error')
+  } catch (e) {
+    toast.show(friendlyError(e), 'error')
   } finally {
     saving.value = false
   }

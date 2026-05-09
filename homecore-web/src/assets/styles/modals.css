@@ -58,6 +58,16 @@
   border-color: var(--accent);
 }
 
+.modal-input--error {
+  border-color: var(--danger);
+}
+
+.modal-field-error {
+  font-size: var(--font-sm);
+  color: var(--danger);
+  margin-top: -10px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
