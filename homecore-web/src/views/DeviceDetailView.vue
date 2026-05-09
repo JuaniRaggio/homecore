@@ -32,7 +32,7 @@
             {{ statusLabel }}
           </span>
         </div>
-        <ToggleSwitch :model-value="device.isOn" :disabled="busy" @update:model-value="togglePower" />
+        <ToggleSwitch :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
       <div class="card card--xl controls-card">
@@ -42,32 +42,32 @@
           v-if="device.type === 'light'"
           :brightness="brightness"
           :color="color"
-          :disabled="busy"
+          :disabled="cmd.busy.value"
           @update:brightness="setBrightness"
           @update:color="setColor"
         />
         <DoorControls
           v-else-if="device.type === 'door'"
           :locked="locked"
-          :disabled="busy"
+          :disabled="cmd.busy.value"
           @toggle-lock="toggleLock"
         />
         <CurtainControls
           v-else-if="device.type === 'curtain'"
           :position="position"
-          :disabled="busy"
+          :disabled="cmd.busy.value"
           @update:position="setPositionTo"
         />
         <AlarmControls
           v-else-if="device.type === 'alarm'"
           :is-on="device.isOn"
-          :disabled="busy"
+          :disabled="cmd.busy.value"
           @toggle="togglePower"
         />
         <WaterControls
           v-else-if="device.type === 'water'"
           :is-on="device.isOn"
-          :disabled="busy"
+          :disabled="cmd.busy.value"
           @toggle="togglePower"
         />
         <p v-else class="no-controls">Este dispositivo solo tiene encendido/apagado.</p>
@@ -105,14 +105,17 @@ import DeviceHistory from '@/components/devices/DeviceHistory.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { useModal } from '@/composables/useModal'
+import { useDeviceCommand } from '@/composables/useDeviceCommand'
 import { friendlyError } from '@/utils/friendly-error'
 import { getStatusMap } from '@/config/device-types'
+import { normalizeDevice } from '@/utils/device-helpers'
 import * as api from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
 const devicesStore = useDevicesStore()
 const toast = useToastStore()
+const cmd = useDeviceCommand()
 
 const device = ref({})
 const loading = ref(true)
@@ -123,9 +126,8 @@ const color = ref('#ffffff')
 const locked = ref(false)
 const position = ref(0)
 
-// Loading states
+// Loading state for delete
 const saving = ref(false)
-const busy = ref(false)
 
 // Delete modal
 const deleteModal = useModal()
@@ -158,83 +160,57 @@ async function confirmDelete() {
 }
 
 async function togglePower() {
-  if (busy.value) return
-  busy.value = true
   const map = getStatusMap(device.value.type)
   const action = device.value.isOn ? map.actionOff : map.actionOn
   const verb = device.value.isOn ? map.verbOff : map.verbOn
-  try {
-    await api.executeAction(device.value.id, action)
-    device.value.isOn = !device.value.isOn
-    const newMap = getStatusMap(device.value.type)
-    toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
-  } catch {
-    toast.show(`No se pudo ${verb} el dispositivo. Verifica que este conectado.`, 'error')
-  } finally {
-    busy.value = false
-  }
+  await cmd.execute(device.value.id, action, {
+    successMsg: null,
+    errorMsg: `No se pudo ${verb} el dispositivo. Verifica que este conectado.`,
+    onSuccess() {
+      device.value.isOn = !device.value.isOn
+      const newMap = getStatusMap(device.value.type)
+      toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
+    },
+  })
 }
 
 async function setBrightness(value) {
-  if (busy.value) return
-  busy.value = true
   brightness.value = value
-  try {
-    await api.executeAction(device.value.id, 'setBrightness', [value])
-    toast.show(`Brillo ajustado a ${value}%`, 'success')
-  } catch {
-    toast.show('No se pudo cambiar el brillo. Verifica que el dispositivo este encendido.', 'error')
-  } finally {
-    busy.value = false
-  }
+  await cmd.execute(device.value.id, 'setBrightness', {
+    params: [value],
+    successMsg: `Brillo ajustado a ${value}%`,
+    errorMsg: 'No se pudo cambiar el brillo. Verifica que el dispositivo este encendido.',
+  })
 }
 
 async function setColor(value) {
-  if (busy.value) return
-  busy.value = true
   color.value = value
-  try {
-    await api.executeAction(device.value.id, 'setColor', [value])
-    toast.show('Color actualizado', 'success')
-  } catch {
-    toast.show('No se pudo cambiar el color. Verifica que el dispositivo este encendido.', 'error')
-  } finally {
-    busy.value = false
-  }
+  await cmd.execute(device.value.id, 'setColor', {
+    params: [value],
+    successMsg: 'Color actualizado',
+    errorMsg: 'No se pudo cambiar el color. Verifica que el dispositivo este encendido.',
+  })
 }
 
 async function toggleLock() {
-  if (busy.value) return
-  busy.value = true
   const actionLabel = locked.value ? 'desbloquear' : 'bloquear'
-  try {
-    const action = locked.value ? 'unlock' : 'lock'
-    await api.executeAction(device.value.id, action)
-    locked.value = !locked.value
-    toast.show(locked.value ? 'Puerta bloqueada' : 'Puerta desbloqueada', 'success')
-  } catch {
-    toast.show(`No se pudo ${actionLabel} la puerta. Verifica que este conectada.`, 'error')
-  } finally {
-    busy.value = false
-  }
-}
-
-async function setPosition() {
-  if (busy.value) return
-  busy.value = true
-  try {
-    await api.executeAction(device.value.id, 'setLevel', [position.value])
-    toast.show(`Posicion ajustada a ${position.value}%`, 'success')
-  } catch {
-    toast.show('No se pudo cambiar la posicion. Verifica que el dispositivo este conectado.', 'error')
-  } finally {
-    busy.value = false
-  }
+  const action = locked.value ? 'unlock' : 'lock'
+  await cmd.execute(device.value.id, action, {
+    errorMsg: `No se pudo ${actionLabel} la puerta. Verifica que este conectada.`,
+    onSuccess() {
+      locked.value = !locked.value
+      toast.show(locked.value ? 'Puerta bloqueada' : 'Puerta desbloqueada', 'success')
+    },
+  })
 }
 
 async function setPositionTo(value) {
   position.value = value
-  await setPosition()
+  await cmd.execute(device.value.id, 'setLevel', {
+    params: [value],
+    successMsg: `Posicion ajustada a ${value}%`,
+    errorMsg: 'No se pudo cambiar la posicion. Verifica que el dispositivo este conectado.',
+  })
 }
 
 async function loadDeviceState(id) {
@@ -249,21 +225,6 @@ async function loadDeviceState(id) {
     }
   } catch {
     // El state puede no estar disponible para todos los dispositivos
-  }
-}
-
-function normalizeDevice(d) {
-  const state = d.state || {}
-  const typeName = d.type?.name || ''
-  const isOn = state.status === 'on' || state.status === 'opened'
-    || state.status === 'active' || state.status === 'playing' || false
-  const room = d.room?.name || ''
-
-  return {
-    ...d,
-    type: typeName,
-    room,
-    isOn,
   }
 }
 
