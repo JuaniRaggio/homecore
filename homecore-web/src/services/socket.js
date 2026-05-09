@@ -2,6 +2,7 @@ import { io } from 'socket.io-client'
 import { useDevicesStore } from '@/stores/devices'
 import { useHomesStore } from '@/stores/homes'
 import { useNotificationsStore } from '@/stores/notifications'
+import { describeAction } from '@/config/routine-actions'
 
 let socket = null
 
@@ -11,8 +12,26 @@ function log(...args) {
   if (isDev) console.log('[Socket]', ...args)
 }
 
-function describeEvent(state) {
+// Mapeo de campos de estado del websocket a nombres de accion de la API
+const STATE_FIELD_TO_ACTION = {
+  brightness: 'setBrightness',
+  level: 'setLevel',
+  temperature: 'setTemperature',
+  freezerTemperature: 'setFreezerTemperature',
+  mode: 'setMode',
+  fanSpeed: 'setFanSpeed',
+  volume: 'setVolume',
+  genre: 'setGenre',
+  color: 'setColor',
+  heat: 'setHeatSource',
+  grill: 'setGrillMode',
+  convection: 'setConvectionMode',
+}
+
+function describeEvent(state, deviceType) {
   if (!state) return 'Estado actualizado'
+
+  // Estado on/off primero
   if (state.status === 'on') return 'Encendido'
   if (state.status === 'off') return 'Apagado'
   if (state.status === 'opened') return 'Abierta'
@@ -22,8 +41,18 @@ function describeEvent(state) {
   if (state.status === 'playing') return 'Reproduciendo'
   if (state.lock === 'locked') return 'Bloqueada'
   if (state.lock === 'unlocked') return 'Desbloqueada'
-  if (state.level !== undefined) return `Nivel: ${state.level}%`
-  if (state.brightness !== undefined) return `Brillo: ${state.brightness}%`
+
+  // Describir cambios de estado especificos usando describeAction
+  if (deviceType) {
+    const parts = []
+    for (const [field, actionName] of Object.entries(STATE_FIELD_TO_ACTION)) {
+      if (state[field] !== undefined) {
+        parts.push(describeAction(deviceType, actionName, [state[field]]))
+      }
+    }
+    if (parts.length) return parts.join(' | ')
+  }
+
   return 'Estado actualizado'
 }
 
@@ -100,10 +129,10 @@ export function connect(token) {
     devicesStore.applyDeviceEvent(data)
     const device = devicesStore.devices.find(d => String(d.id) === String(data.id))
     const name = device?.name || data.device?.name || 'Dispositivo'
-    const status = device?.statusText || describeEvent(data.data)
+    const description = describeEvent(data.data, device?.type)
     useNotificationsStore().addNotification({
       title: name,
-      message: status,
+      message: description,
       type: 'info'
     })
   })

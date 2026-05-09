@@ -11,14 +11,14 @@
         :disabled="disabled"
         class="slider"
         @input="$emit('update:position', Number($event.target.value))"
-        @change="$emit('update:position', Number($event.target.value))"
+        @change="$emit('change:position', Number($event.target.value))"
       />
       <span class="control-value">{{ position }}%</span>
     </div>
     <div class="control-row">
-      <button class="btn-control btn-control--sm" :disabled="disabled" @click="$emit('update:position', positionLimits.min)">Cerrar</button>
-      <button class="btn-control btn-control--sm" :disabled="disabled" @click="$emit('update:position', 50)">Media</button>
-      <button class="btn-control btn-control--sm" :disabled="disabled" @click="$emit('update:position', positionLimits.max)">Abrir</button>
+      <button class="btn-control btn-control--sm" :disabled="disabled" @click="$emit('change:position', positionLimits.min)">Cerrar</button>
+      <button class="btn-control btn-control--sm" :disabled="disabled" @click="$emit('change:position', 50)">Media</button>
+      <button class="btn-control btn-control--sm" :disabled="disabled" @click="$emit('change:position', positionLimits.max)">Abrir</button>
     </div>
   </div>
 </template>
@@ -32,7 +32,7 @@ const props = defineProps({
   limits: { type: Object, default: () => ({}) },
 })
 
-defineEmits(['update:position'])
+defineEmits(['update:position', 'change:position'])
 
 const positionLimits = computed(() => ({
   min: props.limits.position?.min ?? 0,

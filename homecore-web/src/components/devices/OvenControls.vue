@@ -11,7 +11,7 @@
         :disabled="disabled"
         class="slider"
         @input="$emit('update:temperature', Number($event.target.value))"
-        @change="$emit('update:temperature', Number($event.target.value))"
+        @change="$emit('change:temperature', Number($event.target.value))"
       />
       <span class="control-value">{{ temperature }}°C</span>
     </div>
@@ -63,7 +63,7 @@ const props = defineProps({
   limits: { type: Object, default: () => ({}) },
 })
 
-defineEmits(['update:temperature', 'update:heatSource', 'update:grillMode', 'update:convectionMode'])
+defineEmits(['update:temperature', 'change:temperature', 'update:heatSource', 'update:grillMode', 'update:convectionMode'])
 
 const tempLimits = computed(() => ({
   min: props.limits.temperature?.min ?? 90,

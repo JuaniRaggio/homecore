@@ -38,7 +38,7 @@
         class="slider ac-temp-slider"
         :class="`ac-slider--${mode}`"
         @input="$emit('update:temperature', Number($event.target.value))"
-        @change="$emit('update:temperature', Number($event.target.value))"
+        @change="$emit('change:temperature', Number($event.target.value))"
       />
       <span class="control-value ac-temp-value" :class="`ac-temp--${mode}`">{{ temperature }}&deg;C</span>
     </div>
@@ -87,7 +87,7 @@ const props = defineProps({
   limits: { type: Object, default: () => ({}) },
 })
 
-defineEmits(['update:temperature', 'update:mode', 'update:fanSpeed'])
+defineEmits(['update:temperature', 'change:temperature', 'update:mode', 'update:fanSpeed'])
 
 const tempLimits = computed(() => ({
   min: props.limits.temperature?.min ?? 18,

@@ -11,7 +11,7 @@
         :disabled="disabled"
         class="slider"
         @input="$emit('update:volume', Number($event.target.value))"
-        @change="$emit('update:volume', Number($event.target.value))"
+        @change="$emit('change:volume', Number($event.target.value))"
       />
       <span class="control-value">{{ volume }}</span>
     </div>
@@ -56,7 +56,7 @@ const props = defineProps({
   limits: { type: Object, default: () => ({}) },
 })
 
-defineEmits(['update:volume', 'update:genre', 'action'])
+defineEmits(['update:volume', 'change:volume', 'update:genre', 'action'])
 
 const volLimits = computed(() => ({
   min: props.limits.volume?.min ?? 0,

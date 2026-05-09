@@ -44,8 +44,10 @@
           :color="color"
           :disabled="cmd.busy.value"
           :limits="lightLimits"
-          @update:brightness="setBrightness"
-          @update:color="setColor"
+          @update:brightness="v => brightness = v"
+          @change:brightness="setBrightness"
+          @update:color="v => color = v"
+          @change:color="setColor"
         />
         <DoorControls
           v-else-if="device.type === 'door'"
@@ -58,7 +60,8 @@
           :position="position"
           :disabled="cmd.busy.value"
           :limits="curtainLimits"
-          @update:position="setPositionTo"
+          @update:position="v => position = v"
+          @change:position="setPositionTo"
         />
         <AlarmControls
           v-else-if="device.type === 'alarm'"
@@ -79,7 +82,8 @@
           :fan-speed="deviceState.acFanSpeed"
           :disabled="cmd.busy.value"
           :limits="acLimits"
-          @update:temperature="setAcTemperature"
+          @update:temperature="v => deviceState.acTemperature = v"
+          @change:temperature="setAcTemperature"
           @update:mode="setAcMode"
           @update:fan-speed="setAcFanSpeed"
         />
@@ -89,7 +93,8 @@
           :genre="deviceState.genre"
           :disabled="cmd.busy.value"
           :limits="speakerLimits"
-          @update:volume="setSpeakerVolume"
+          @update:volume="v => deviceState.volume = v"
+          @change:volume="setSpeakerVolume"
           @update:genre="setSpeakerGenre"
           @action="handleSpeakerAction"
         />
@@ -108,8 +113,10 @@
           :mode="deviceState.fridgeMode"
           :disabled="cmd.busy.value"
           :limits="fridgeLimits"
-          @update:temperature="setFridgeTemperature"
-          @update:freezer-temperature="setFreezerTemperature"
+          @update:temperature="v => deviceState.fridgeTemp = v"
+          @change:temperature="setFridgeTemperature"
+          @update:freezer-temperature="v => deviceState.freezerTemp = v"
+          @change:freezer-temperature="setFreezerTemperature"
           @update:mode="setFridgeMode"
         />
         <OvenControls
@@ -120,7 +127,8 @@
           :convection-mode="deviceState.convectionMode"
           :disabled="cmd.busy.value"
           :limits="ovenLimits"
-          @update:temperature="setOvenTemperature"
+          @update:temperature="v => deviceState.ovenTemp = v"
+          @change:temperature="setOvenTemperature"
           @update:heat-source="setOvenHeatSource"
           @update:grill-mode="setOvenGrillMode"
           @update:convection-mode="setOvenConvectionMode"
@@ -498,8 +506,9 @@ async function loadDeviceState(id) {
 onMounted(async () => {
   const deviceId = route.params.id
   try {
+    if (!devicesStore.deviceTypes.length) await devicesStore.fetchDeviceTypes()
     const raw = await api.getDevice(deviceId)
-    device.value = normalizeDevice(raw)
+    device.value = normalizeDevice(raw, undefined, undefined, devicesStore.deviceTypes)
     await loadDeviceState(deviceId)
     if (device.value.typeId) {
       deviceLimits.fetchLimits(device.value.typeId)

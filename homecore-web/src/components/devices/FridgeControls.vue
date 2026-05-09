@@ -11,7 +11,7 @@
         :disabled="disabled"
         class="slider"
         @input="$emit('update:temperature', Number($event.target.value))"
-        @change="$emit('update:temperature', Number($event.target.value))"
+        @change="$emit('change:temperature', Number($event.target.value))"
       />
       <span class="control-value">{{ temperature }}°C</span>
     </div>
@@ -26,7 +26,7 @@
         :disabled="disabled"
         class="slider"
         @input="$emit('update:freezerTemperature', Number($event.target.value))"
-        @change="$emit('update:freezerTemperature', Number($event.target.value))"
+        @change="$emit('change:freezerTemperature', Number($event.target.value))"
       />
       <span class="control-value">{{ freezerTemperature }}°C</span>
     </div>
@@ -55,7 +55,7 @@ const props = defineProps({
   limits: { type: Object, default: () => ({}) },
 })
 
-defineEmits(['update:temperature', 'update:freezerTemperature', 'update:mode'])
+defineEmits(['update:temperature', 'change:temperature', 'update:freezerTemperature', 'change:freezerTemperature', 'update:mode'])
 
 const tempLimits = computed(() => ({
   min: props.limits.temperature?.min ?? 2,

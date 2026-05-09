@@ -36,6 +36,7 @@ const TYPE_PATTERNS = [
  */
 export function resolveTypeKey(typeName) {
   if (!typeName) return ''
+  if (typeof typeName !== 'string') return ''
   const t = typeName.toLowerCase()
   if (TYPE_LABELS[t]) return t
   for (const { key, patterns } of TYPE_PATTERNS) {
@@ -49,7 +50,7 @@ export function resolveTypeKey(typeName) {
  * Si no encuentra traduccion, devuelve el nombre original capitalizado.
  */
 export function translateType(typeName) {
-  if (!typeName) return ''
+  if (!typeName || typeof typeName !== 'string') return ''
   const key = resolveTypeKey(typeName)
   return TYPE_LABELS[key] || typeName.charAt(0).toUpperCase() + typeName.slice(1)
 }
@@ -103,10 +104,22 @@ export function resolveTypeName(device, deviceTypes = []) {
 /**
  * Normaliza un dispositivo de la API a un formato plano para la UI.
  */
-export function normalizeDevice(d, roomName, roomId) {
+export function normalizeDevice(d, roomName, roomId, deviceTypes = []) {
   const state = d.state || {}
-  const rawType = d.type?.name || d.type || ''
+
+  // Extraer nombre de tipo: puede ser string, objeto con name, u objeto sin name
+  let rawType = ''
+  if (typeof d.type === 'string') rawType = d.type
+  else if (d.type?.name) rawType = d.type.name
+  else if (d.type?.id && deviceTypes.length) {
+    const dt = deviceTypes.find(t => String(t.id) === String(d.type.id))
+    if (dt?.name) rawType = dt.name
+  }
   const type = resolveTypeKey(rawType)
+
+  // Extraer typeId: puede ser string directo o campo id del objeto
+  const typeId = (typeof d.type === 'object' && d.type !== null) ? d.type.id : d.type
+
   const isOn = state.status === 'on' || state.status === 'opened'
     || state.status === 'active' || state.status === 'playing' || false
   const room = roomName || d.room?.name || (typeof d.room === 'string' ? d.room : '')
@@ -118,7 +131,7 @@ export function normalizeDevice(d, roomName, roomId) {
   return {
     ...d,
     type,
-    typeId: d.type?.id || d.type,
+    typeId,
     room,
     roomId: roomId || d.room?.id || null,
     isOn,

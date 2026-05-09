@@ -68,8 +68,17 @@ export const useDevicesStore = defineStore('devices', () => {
         roomList.map(room => limit(async () => {
           try {
             const roomDevices = await api.getDevices(room.id)
-            return roomDevices.map(d => normalizeDevice(d, room.name, room.id))
-          } catch {
+            const normalized = []
+            for (const d of roomDevices) {
+              try {
+                normalized.push(normalizeDevice(d, room.name, room.id, deviceTypes.value))
+              } catch (e) {
+                console.error(`[devices] error normalizando device ${d.id ?? d.name ?? '?'} en room "${room.name}"`, e)
+              }
+            }
+            return normalized
+          } catch (e) {
+            console.error(`[devices] error cargando room "${room.name}" (id: ${room.id})`, e)
             return []
           }
         }))

@@ -11,7 +11,7 @@
         :disabled="disabled"
         class="slider"
         @input="$emit('update:brightness', Number($event.target.value))"
-        @change="$emit('update:brightness', Number($event.target.value))"
+        @change="$emit('change:brightness', Number($event.target.value))"
       />
       <span class="control-value">{{ brightness }}%</span>
     </div>
@@ -23,7 +23,7 @@
         :disabled="disabled"
         class="color-picker"
         @input="$emit('update:color', $event.target.value)"
-        @change="$emit('update:color', $event.target.value)"
+        @change="$emit('change:color', $event.target.value)"
       />
       <span class="control-value">{{ color }}</span>
     </div>
@@ -40,7 +40,7 @@ const props = defineProps({
   limits: { type: Object, default: () => ({}) },
 })
 
-defineEmits(['update:brightness', 'update:color'])
+defineEmits(['update:brightness', 'change:brightness', 'update:color', 'change:color'])
 
 const brightnessLimits = computed(() => ({
   min: props.limits.brightness?.min ?? 0,
