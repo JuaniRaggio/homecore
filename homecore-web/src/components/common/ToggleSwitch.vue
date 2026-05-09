@@ -1,10 +1,9 @@
 <template>
-  <!-- Toggle switch reutilizable -->
-  <!-- Usa v-model compatible: recibe modelValue, emite update:modelValue -->
-  <label class="toggle">
+  <label class="toggle" :class="{ 'toggle--disabled': disabled }">
     <input
       type="checkbox"
       :checked="modelValue"
+      :disabled="disabled"
       @change="$emit('update:modelValue', $event.target.checked)"
     >
     <span class="toggle-track">
@@ -16,6 +15,10 @@
 <script setup>
 defineProps({
   modelValue: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
     type: Boolean,
     default: false
   }
@@ -62,5 +65,11 @@ defineEmits(['update:modelValue'])
 
 .toggle input:checked + .toggle-track .toggle-thumb {
   transform: translateX(18px);
+}
+
+.toggle--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 </style>

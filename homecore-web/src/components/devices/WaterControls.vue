@@ -1,7 +1,7 @@
 <template>
   <div class="control-row">
     <span class="control-label">Caudal</span>
-    <button class="btn-control" :class="isOn ? 'btn-control--success' : ''" @click="$emit('toggle')">
+    <button class="btn-control" :class="isOn ? 'btn-control--success' : ''" :disabled="disabled" @click="$emit('toggle')">
       <i class="fa-solid fa-droplet"></i>
       {{ isOn ? 'Abierto' : 'Cerrado' }}
     </button>
@@ -11,6 +11,7 @@
 <script setup>
 defineProps({
   isOn: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
 })
 
 defineEmits(['toggle'])

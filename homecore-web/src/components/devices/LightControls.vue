@@ -7,6 +7,7 @@
         min="0"
         max="100"
         :value="brightness"
+        :disabled="disabled"
         class="slider"
         @input="$emit('update:brightness', Number($event.target.value))"
         @change="$emit('update:brightness', Number($event.target.value))"
@@ -18,6 +19,7 @@
       <input
         type="color"
         :value="color"
+        :disabled="disabled"
         class="color-picker"
         @input="$emit('update:color', $event.target.value)"
         @change="$emit('update:color', $event.target.value)"
@@ -31,6 +33,7 @@
 defineProps({
   brightness: { type: Number, default: 100 },
   color: { type: String, default: '#ffffff' },
+  disabled: { type: Boolean, default: false },
 })
 
 defineEmits(['update:brightness', 'update:color'])
