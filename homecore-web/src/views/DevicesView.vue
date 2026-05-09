@@ -1,24 +1,22 @@
 <template>
   <div class="view-content">
-    <h1 class="view-title">Dispositivos</h1>
-
     <div class="view-header">
-      <div class="devices-filters">
-        <select v-model="filterType" class="filter-select">
-          <option value="">Todos los tipos</option>
-          <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.name">
-            {{ translateType(dt.name) }}
-          </option>
-        </select>
-
-        <select v-model="filterRoom" class="filter-select">
-          <option value="">Todas las habitaciones</option>
-          <option v-for=" room in rooms" :key="room" :value="room">{{ room }}</option>
-
-        </select>
-      </div>
+      <h1 class="view-title">Dispositivos</h1>
       <button class="btn-add" @click="createModal.open">+ Nuevo dispositivo</button>
+    </div>
 
+    <div class="devices-filters">
+      <select v-model="filterType" class="filter-select">
+        <option value="">Todos los tipos</option>
+        <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="resolveTypeKey(dt.name)">
+          {{ translateType(dt.name) }}
+        </option>
+      </select>
+
+      <select v-model="filterRoom" class="filter-select">
+        <option value="">Todas las habitaciones</option>
+        <option v-for="room in rooms" :key="room" :value="room">{{ room }}</option>
+      </select>
     </div>
 
     <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
@@ -54,7 +52,7 @@ import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
 import { useHomeData } from '@/composables/useHomeData'
-import { translateType } from '@/utils/device-helpers'
+import { translateType, resolveTypeKey } from '@/utils/device-helpers'
 
 const router = useRouter()
 const { homeId, devicesStore } = useHomeData()
@@ -84,14 +82,11 @@ const createModal = useModal()
 <style scoped>
 .devices-filters {
   display: flex;
-  gap: 8px;
-}
-.btn-add {
-  margin-left: auto;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-4xl);
 }
 
 .items-grid--narrow {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
-
 </style>
