@@ -106,6 +106,7 @@ import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { useModal } from '@/composables/useModal'
 import { friendlyError } from '@/utils/friendly-error'
+import { getStatusMap } from '@/config/device-types'
 import * as api from '@/services/api'
 
 const router = useRouter()
@@ -131,17 +132,6 @@ const deleteModal = useModal()
 const deleteDescription = computed(() =>
   `Estas seguro de que queres eliminar "${device.value.name}"? Esta accion no se puede deshacer.`
 )
-
-// Mapeo de acciones y etiquetas por tipo de dispositivo
-const STATUS_MAP = {
-  door:  { on: 'Abierta',   off: 'Cerrada',      actionOn: 'open',   actionOff: 'close',   verbOn: 'abrir',     verbOff: 'cerrar' },
-  alarm: { on: 'Activada',  off: 'Desactivada',   actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'activar',   verbOff: 'desactivar' },
-}
-const DEFAULT_STATUS = { on: 'Encendido', off: 'Apagado', actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'encender', verbOff: 'apagar' }
-
-function getStatusMap(type) {
-  return STATUS_MAP[type] || DEFAULT_STATUS
-}
 
 const statusLabel = computed(() => {
   const map = getStatusMap(device.value.type)
