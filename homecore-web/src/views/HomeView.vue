@@ -125,14 +125,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
-import { useDevicesStore } from '@/stores/devices'
-import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
@@ -140,13 +137,11 @@ import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useRoutineActions } from '@/composables/useRoutineActions'
 import { useModal } from '@/composables/useModal'
 import { useConfirmAction } from '@/composables/useConfirmAction'
+import { useHomeData } from '@/composables/useHomeData'
 import * as api from '@/services/api'
 
-const route = useRoute()
-const homeId = computed(() => route.params.homeId)
+const { homeId, devicesStore, roomsStore } = useHomeData()
 
-const devicesStore = useDevicesStore()
-const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
 const homesStore = useHomesStore()
 const toast = useToastStore()
@@ -208,11 +203,9 @@ async function confirmEditHome(name) {
   }
 }
 
+// Fetch routines additionally (useHomeData already fetches devices + rooms)
 onMounted(() => {
   if (homeId.value) {
-    devicesStore.fetchAllForHome(homeId.value)
-    devicesStore.fetchDeviceTypes()
-    roomsStore.fetchRooms(homeId.value)
     routinesStore.fetchRoutines()
   }
 })

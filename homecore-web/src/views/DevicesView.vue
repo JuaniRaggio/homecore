@@ -1,8 +1,8 @@
 <template>
-  <div class="devices-view">
+  <div class="view-content">
     <h1 class="view-title">Dispositivos</h1>
 
-    <div class="devices-header">
+    <div class="view-header">
       <div class="devices-filters">
         <select v-model="filterType" class="filter-select">
           <option value="">Todos los tipos</option>
@@ -24,7 +24,7 @@
     <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
     <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
     <p v-else-if="devicesStore.devices.length === 0" class="state-empty">Sin dispositivos</p>
-    <div v-else class="devices-grid">
+    <div v-else class="items-grid items-grid--narrow">
       <DeviceCard
         v-for="device in filteredDevices"
         :key="device.id"
@@ -37,7 +37,7 @@
 
     <CreateDeviceModal
       :visible="createModal.visible.value"
-      :home-id="String(route.params.homeId)"
+      :home-id="String(homeId)"
       @close="createModal.close"
       @created="createModal.close"
     />
@@ -47,20 +47,17 @@
 
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
-import { useDevicesStore } from '@/stores/devices'
-import { useRoomsStore } from '@/stores/rooms'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
+import { useHomeData } from '@/composables/useHomeData'
 import { translateType } from '@/utils/device-helpers'
 
-const route = useRoute()
 const router = useRouter()
-const devicesStore = useDevicesStore()
-const roomsStore = useRoomsStore()
+const { homeId, devicesStore } = useHomeData()
 const deviceActions = useDeviceActions()
 
 const filterType = ref('')
@@ -77,35 +74,14 @@ const filteredDevices = computed(() =>
 )
 
 function handleOpenDevice(id) {
-  router.push({ name: 'device-detail', params: { homeId: route.params.homeId, id } })
+  router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })
 }
 
 // Create device modal
 const createModal = useModal()
-
-onMounted(() => {
-  const homeId = route.params.homeId
-  if (homeId) {
-    devicesStore.fetchAllForHome(homeId)
-    devicesStore.fetchDeviceTypes()
-    roomsStore.fetchRooms(homeId)
-  }
-})
 </script>
 
 <style scoped>
-.devices-view {
-  padding: 0;
-}
-
-.devices-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-}
-
 .devices-filters {
   display: flex;
   gap: 8px;
@@ -114,10 +90,8 @@ onMounted(() => {
   margin-left: auto;
 }
 
-.devices-grid {
-  display: grid;
+.items-grid--narrow {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
 }
 
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div class="rooms-view">
-    <div class="rooms-header">
+  <div class="view-content">
+    <div class="view-header">
       <h1 class="view-title">Habitaciones</h1>
       <button class="btn-add" @click="createRoomModal.open">+ Nueva Habitacion</button>
     </div>
@@ -63,7 +63,7 @@
 
     <CreateRoomModal
       :visible="createRoomModal.visible.value"
-      :home-id="String(route.params.homeId)"
+      :home-id="String(homeId)"
       @close="createRoomModal.close"
       @created="createRoomModal.close"
     />
@@ -106,24 +106,21 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
-import { useRoomsStore } from '@/stores/rooms'
-import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
 import { useConfirmAction } from '@/composables/useConfirmAction'
+import { useHomeData } from '@/composables/useHomeData'
 import * as api from '@/services/api'
 
-const route = useRoute()
 const router = useRouter()
-const roomsStore = useRoomsStore()
-const devicesStore = useDevicesStore()
+const { homeId, devicesStore, roomsStore } = useHomeData()
 const toast = useToastStore()
 const deviceActions = useDeviceActions()
 
@@ -199,11 +196,11 @@ async function confirmEditRoom(name) {
 }
 
 function editDevice(device) {
-  router.push({ name: 'device-detail', params: { homeId: route.params.homeId, id: device.id } })
+  router.push({ name: 'device-detail', params: { homeId: homeId.value, id: device.id } })
 }
 
 function openRoom(roomId) {
-  router.push({ name: 'room-detail', params: { homeId: route.params.homeId, roomId } })
+  router.push({ name: 'room-detail', params: { homeId: homeId.value, roomId } })
 }
 
 async function linkDevice(room, event) {
@@ -213,34 +210,13 @@ async function linkDevice(room, event) {
   try {
     await api.linkDeviceToRoom(room.id, deviceId)
     toast.show('Dispositivo vinculado', 'success')
-    const homeId = route.params.homeId
-    if (homeId) await devicesStore.fetchAllForHome(homeId)
+    if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
   } catch {
     toast.show('No se pudo vincular el dispositivo a la habitacion. Intenta de nuevo.', 'error')
   }
 }
-
-onMounted(() => {
-  const homeId = route.params.homeId
-  if (homeId) {
-    roomsStore.fetchRooms(homeId)
-    devicesStore.fetchAllForHome(homeId)
-  }
-})
 </script>
 <style scoped>
-.rooms-view {
-  padding: 0;
-}
-
-.rooms-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-
 .rooms-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

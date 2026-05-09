@@ -1,6 +1,6 @@
 <template>
-  <div class="consumption-view">
-    <div class="consumption-header">
+  <div class="view-content">
+    <div class="view-header">
       <h1 class="view-title">Consumo</h1>
     </div>
 
@@ -17,7 +17,7 @@
         <i class="fa-solid fa-calendar-day summary-icon"></i>
         <div class="summary-data">
           <span class="summary-value">{{ totalWh }} Wh</span>
-          <span class="summary-label">Consumo del día (proyección)</span>
+          <span class="summary-label">Consumo del dia (proyeccion)</span>
         </div>
       </div>
       <div class="summary-card">
@@ -68,7 +68,7 @@
               <td class="col-status">
                 <span class="badge badge--active">Activo</span>
               </td>
-              <td class="col-consumption">{{ item.wh }} Wh/día</td>
+              <td class="col-consumption">{{ item.wh }} Wh/dia</td>
             </tr>
           </tbody>
         </table>
@@ -94,6 +94,7 @@ import {
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { translateType } from '@/utils/device-helpers'
+import { getDeviceColor } from '@/config/device-types'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
@@ -136,49 +137,6 @@ const tableRows = computed(() =>
     .sort((a, b) => b.wh - a.wh)
 )
 
-// Colores por tipo
-const TYPE_COLORS = {
-  lamp:    '#f5a623',
-  light:   '#f5a623',
-  luz:     '#f5a623',
-  door:    '#6c8ebf',
-  puerta:  '#6c8ebf',
-  alarm:   '#e05252',
-  water:   '#4fc3f7',
-  grifo:   '#4fc3f7',
-  curtain: '#81c784',
-  cortina: '#81c784',
-  blind:   '#81c784',
-  ac:      '#ba68c8',
-  aire:    '#ba68c8',
-  speaker: '#ff8a65',
-  parlant: '#ff8a65',
-  vacuum:  '#90a4ae',
-  aspirad: '#90a4ae',
-  fridge:  '#4dd0e1',
-  helader: '#4dd0e1',
-  oven:    '#ff7043',
-  horno:   '#ff7043',
-}
-
-// Paleta de fallback para tipos sin color definido
-const FALLBACK_PALETTE = ['#9c59d1','#2ecc71','#e67e22','#1abc9c','#e91e63','#00bcd4']
-const dynamicColors = {}
-let paletteIdx = 0
-
-function colorForType(typeName) {
-  const t = (typeName || '').toLowerCase()
-  for (const [key, color] of Object.entries(TYPE_COLORS)) {
-    if (t.includes(key)) return color
-  }
-  // Asigna un color de la paleta de forma consistente por nombre
-  if (!dynamicColors[typeName]) {
-    dynamicColors[typeName] = FALLBACK_PALETTE[paletteIdx % FALLBACK_PALETTE.length]
-    paletteIdx++
-  }
-  return dynamicColors[typeName]
-}
-
 // Donut: agrupa por tipo
 const donutData = computed(() => {
   const groups = {}
@@ -192,7 +150,7 @@ const donutData = computed(() => {
     labels,
     datasets: [{
       data: labels.map(l => groups[l]),
-      backgroundColor: labels.map(l => colorForType(l)),
+      backgroundColor: labels.map(l => getDeviceColor(l)),
       borderWidth: 2,
       borderColor: '#1a1a2e',
     }],
@@ -221,11 +179,11 @@ const barData = computed(() => {
   return {
     labels: rows.map(r => r.name),
     datasets: [{
-      label: 'Consumo (Wh/día)',
+      label: 'Consumo (Wh/dia)',
       data: rows.map(r => r.wh),
       backgroundColor: rows.map(r => {
         const d = activeDevices.value.find(d => d.id === r.id)
-        return colorForType(resolveTypeName(d))
+        return getDeviceColor(resolveTypeName(d))
       }),
       borderRadius: 4,
     }],
@@ -271,23 +229,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.consumption-view { padding: 0; }
-
-.consumption-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
 .summary-grid--mb { margin-bottom: 28px; }
 
 /* Charts */
 .charts-row { margin-bottom: 28px; }
-
-/* chart-card: layout sobre .card .card--xl */
 
 .chart-wrap--donut {
   display: flex;

@@ -1,6 +1,6 @@
 <template>
-  <div class="room-detail-view">
-    <div class="room-detail-header">
+  <div class="view-content">
+    <div class="view-header">
       <h1 class="view-title">{{ roomName }}</h1>
       <button class="btn-add" @click="createModal.open">+ Nuevo dispositivo</button>
     </div>
@@ -8,7 +8,7 @@
     <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
     <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
     <p v-else-if="roomDevices.length === 0" class="state-empty">Sin dispositivos en esta habitacion</p>
-    <div v-else class="devices-grid">
+    <div v-else class="items-grid items-grid--narrow">
       <DeviceCard
         v-for="device in roomDevices"
         :key="device.id"
@@ -44,25 +44,22 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
-import { useDevicesStore } from '@/stores/devices'
-import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
+import { useHomeData } from '@/composables/useHomeData'
 import * as api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
-const devicesStore = useDevicesStore()
-const roomsStore = useRoomsStore()
+const { homeId, devicesStore, roomsStore } = useHomeData()
 const toast = useToastStore()
 const deviceActions = useDeviceActions()
 
-const homeId = computed(() => route.params.homeId)
 const roomId = computed(() => route.params.roomId)
 
 const room = computed(() =>
@@ -97,32 +94,11 @@ async function linkDevice(event) {
 }
 
 const createModal = useModal()
-
-onMounted(() => {
-  if (homeId.value) {
-    devicesStore.fetchAllForHome(homeId.value)
-    devicesStore.fetchDeviceTypes()
-    roomsStore.fetchRooms(homeId.value)
-  }
-})
 </script>
 
 <style scoped>
-.room-detail-view {
-  padding: 0;
-}
-
-.room-detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.devices-grid {
-  display: grid;
+.items-grid--narrow {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
 }
 
 .link-section {

@@ -1,6 +1,6 @@
 <template>
-  <div class="history-view">
-    <div class="history-header">
+  <div class="view-content">
+    <div class="view-header">
       <h1 class="view-title">Historial</h1>
       <div class="history-filters">
         <select v-model="filterType" class="filter-select">
@@ -117,19 +117,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.history-view {
-  padding: 0;
-}
-
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
 .history-filters {
   display: flex;
   gap: 8px;
