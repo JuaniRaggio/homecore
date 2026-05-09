@@ -32,6 +32,7 @@ import { computed } from 'vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { getDisplayName } from '@/utils/device-helpers'
+import { getDeviceIcon } from '@/config/device-types'
 
 const devicesStore = useDevicesStore()
 
@@ -55,22 +56,7 @@ const displayName = computed(() => {
 
 defineEmits(['toggle', 'toggle-favorite', 'open'])
 
-// Mapeo de tipo de dispositivo a icono de Font Awesome
-const iconMap = {
-  light:   'fa-regular fa-lightbulb',
-  door:    'fa-regular fa-door-open',
-  alarm:   'fa-regular fa-clock',
-  water:   'fa-solid fa-faucet',
-  curtain: 'fa-solid fa-table-list',
-  ac:      'fa-solid fa-temperature-half',
-  speaker: 'fa-solid fa-volume-high',
-  vacuum:  'fa-solid fa-broom',
-  fridge:  'fa-solid fa-snowflake',
-  oven:    'fa-solid fa-fire-burner',
-  lock:    'fa-solid fa-lock',
-}
-
-const deviceIcon = computed(() => iconMap[props.device.type] || 'fa-solid fa-plug')
+const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 </script>
 
 <style scoped>
