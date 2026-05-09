@@ -131,7 +131,8 @@ onMounted(async () => {
     if (homesStore.homes.length > 0) {
       await overview.fetchAllHomesDevices(homesStore.homes)
     }
-  } catch {
+  } catch (e) {
+    console.error('[Overview] Error cargando datos:', e)
     toast.show('No se pudieron cargar los datos. Verifica tu conexion e intenta recargar la pagina.', 'error')
   }
 })

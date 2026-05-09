@@ -210,7 +210,8 @@ onMounted(async () => {
         devicesStore.fetchAllForHome(homeId),
         devicesStore.fetchDeviceTypes(),
       ])
-    } catch {
+    } catch (e) {
+      console.error('[Consumption] Error cargando datos de consumo:', e)
       toast.show('No se pudieron cargar los datos de consumo. Verifica tu conexion e intenta recargar la pagina.', 'error')
     }
   }

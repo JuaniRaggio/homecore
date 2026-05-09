@@ -269,11 +269,13 @@ async function submit() {
         for (const dev of roomDevices) {
           try {
             await api.createDevice(room.id, { name: dev.name, type: { id: dev.typeId } })
-          } catch {
+          } catch (e) {
+            console.error(`[NewProperty] Error creando dispositivo "${dev.name}":`, e)
             errorMsg.value = `No se pudo crear el dispositivo "${dev.name}". La propiedad y habitaciones fueron creadas correctamente.`
           }
         }
-      } catch {
+      } catch (e) {
+        console.error(`[NewProperty] Error creando habitacion "${rooms.value[i].name}":`, e)
         errorMsg.value = `No se pudo crear la habitacion "${rooms.value[i].name}". La propiedad fue creada, podes agregar habitaciones desde la vista del hogar.`
       }
     }
@@ -282,7 +284,8 @@ async function submit() {
     for (const dev of devicesWithoutRoom.value) {
       try {
         await api.createDevice(null, { name: dev.name, type: { id: dev.typeId } })
-      } catch {
+      } catch (e) {
+        console.error(`[NewProperty] Error creando dispositivo sin habitacion "${dev.name}":`, e)
         errorMsg.value = `No se pudo crear el dispositivo "${dev.name}". Podes agregarlo despues desde la vista de dispositivos.`
       }
     }

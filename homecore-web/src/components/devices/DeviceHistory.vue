@@ -41,7 +41,8 @@ async function loadDeviceLogs() {
       action: describeAction(props.deviceType, log.actionName || log.action || '', log.params),
       timestamp: log.timestamp,
     }))
-  } catch {
+  } catch (e) {
+    console.error(`[DeviceHistory] Error cargando logs del dispositivo ${props.deviceId}:`, e)
     logs.value = []
   }
   logsLoading.value = false

@@ -136,6 +136,7 @@ async function handleSave() {
     toast.show('Dispositivo actualizado', 'success')
     router.back()
   } catch (e) {
+    console.error(`[EditDevice] Error actualizando dispositivo ${route.params.id}:`, e)
     errorMsg.value = friendlyError(e)
   } finally {
     saving.value = false

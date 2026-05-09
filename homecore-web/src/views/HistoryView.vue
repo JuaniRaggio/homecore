@@ -100,6 +100,7 @@ async function fetchLogs() {
     events.value = [...events.value, ...mapLogs(logs)]
     offset.value += logs.length
   } catch (e) {
+    console.error('[History] Error cargando logs:', e)
     error.value = friendlyError(e)
   }
 }

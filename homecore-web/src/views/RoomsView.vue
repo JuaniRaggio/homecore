@@ -211,7 +211,8 @@ async function linkDevice(room, event) {
     await api.linkDeviceToRoom(room.id, deviceId)
     toast.show('Dispositivo vinculado', 'success')
     if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
-  } catch {
+  } catch (e) {
+    console.error(`[Rooms] Error vinculando dispositivo ${deviceId} a habitacion ${room.id}:`, e)
     toast.show('No se pudo vincular el dispositivo a la habitacion. Intenta de nuevo.', 'error')
   }
 }

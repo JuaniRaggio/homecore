@@ -239,7 +239,8 @@ async function submit() {
 
     toast.show('Rutina creada', 'success')
     router.push({ name: 'routines', params: { homeId: homeId.value } })
-  } catch {
+  } catch (e) {
+    console.error('[NewRoutine] Error creando rutina:', e)
     toast.show('No se pudo crear la rutina. Verifica los datos e intenta de nuevo.', 'error')
   } finally {
     saving.value = false

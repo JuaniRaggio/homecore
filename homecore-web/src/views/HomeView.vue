@@ -196,7 +196,8 @@ async function confirmEditHome(name) {
     await homesStore.updateHome(homeId.value, { name })
     toast.show('Hogar actualizado', 'success')
     editHomeModal.close()
-  } catch {
+  } catch (e) {
+    console.error(`[Home] Error actualizando hogar ${homeId.value}:`, e)
     toast.show('No se pudo actualizar el hogar. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false

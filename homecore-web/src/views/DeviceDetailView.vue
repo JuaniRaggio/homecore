@@ -183,7 +183,7 @@ import { useToastStore } from '@/stores/toast'
 import { useModal } from '@/composables/useModal'
 import { useDeviceCommand } from '@/composables/useDeviceCommand'
 import { useDeviceLimits } from '@/composables/useDeviceLimits'
-import { friendlyError } from '@/utils/friendly-error'
+import { friendlyError, actionError } from '@/utils/friendly-error'
 import { getStatusMap } from '@/config/device-types'
 import { normalizeDevice } from '@/utils/device-helpers'
 import { describeAction } from '@/config/routine-actions'
@@ -276,8 +276,9 @@ async function confirmDelete() {
     toast.show('Dispositivo eliminado', 'success')
     deleteModal.close()
     router.back()
-  } catch {
-    toast.show('No se pudo eliminar el dispositivo. Verifica tu conexion e intenta de nuevo.', 'error')
+  } catch (e) {
+    console.error(`[DeviceDetail] Error eliminando dispositivo ${device.value.id}:`, e)
+    toast.show('No se pudo eliminar el dispositivo.', 'error')
   } finally {
     saving.value = false
   }
@@ -289,7 +290,7 @@ async function togglePower() {
   const verb = device.value.isOn ? map.verbOff : map.verbOn
   await cmd.execute(device.value.id, action, {
     successMsg: null,
-    errorMsg: `No se pudo ${verb} el dispositivo.`,
+    errorMsg: actionError(`${verb} el dispositivo`),
     onSuccess() {
       device.value.isOn = !device.value.isOn
       const newMap = getStatusMap(device.value.type)
@@ -303,7 +304,7 @@ async function setBrightness(value) {
   await cmd.execute(device.value.id, 'setBrightness', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setBrightness', [value]),
-    errorMsg: 'No se pudo cambiar el brillo.',
+    errorMsg: actionError('cambiar el brillo'),
   })
 }
 
@@ -312,7 +313,7 @@ async function setColor(value) {
   await cmd.execute(device.value.id, 'setColor', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setColor', [value]),
-    errorMsg: 'No se pudo cambiar el color.',
+    errorMsg: actionError('cambiar el color'),
   })
 }
 
@@ -320,7 +321,7 @@ async function toggleLock() {
   const actionLabel = locked.value ? 'desbloquear' : 'bloquear'
   const action = locked.value ? 'unlock' : 'lock'
   await cmd.execute(device.value.id, action, {
-    errorMsg: `No se pudo ${actionLabel} la puerta.`,
+    errorMsg: actionError(`${actionLabel} la puerta`),
     onSuccess() {
       locked.value = !locked.value
       toast.show(describeAction(device.value.type, locked.value ? 'lock' : 'unlock'), 'success')
@@ -333,7 +334,7 @@ async function handleArmAway(code) {
   await cmd.execute(device.value.id, 'armAway', {
     params: [code],
     successMsg: describeAction(device.value.type, 'armAway'),
-    errorMsg: 'No se pudo activar la alarma.',
+    errorMsg: actionError('activar la alarma'),
     onSuccess() { device.value.isOn = true },
   })
 }
@@ -342,7 +343,7 @@ async function handleArmHome(code) {
   await cmd.execute(device.value.id, 'armHome', {
     params: [code],
     successMsg: describeAction(device.value.type, 'armHome'),
-    errorMsg: 'No se pudo activar la alarma.',
+    errorMsg: actionError('activar la alarma'),
     onSuccess() { device.value.isOn = true },
   })
 }
@@ -351,7 +352,7 @@ async function handleDisarm(code) {
   await cmd.execute(device.value.id, 'disarm', {
     params: [code],
     successMsg: describeAction(device.value.type, 'disarm'),
-    errorMsg: 'No se pudo desactivar la alarma. Verifica el codigo de seguridad.',
+    errorMsg: actionError('desactivar la alarma'),
     onSuccess() { device.value.isOn = false },
   })
 }
@@ -361,7 +362,7 @@ async function setPositionTo(value) {
   await cmd.execute(device.value.id, 'setLevel', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setLevel', [value]),
-    errorMsg: 'No se pudo cambiar la posicion.',
+    errorMsg: actionError('cambiar la posicion'),
   })
 }
 
@@ -371,7 +372,7 @@ async function setAcTemperature(value) {
   await cmd.execute(device.value.id, 'setTemperature', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setTemperature', [value]),
-    errorMsg: 'No se pudo cambiar la temperatura.',
+    errorMsg: actionError('cambiar la temperatura'),
   })
 }
 
@@ -380,7 +381,7 @@ async function setAcMode(value) {
   await cmd.execute(device.value.id, 'setMode', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setMode', [value]),
-    errorMsg: 'No se pudo cambiar el modo.',
+    errorMsg: actionError('cambiar el modo'),
   })
 }
 
@@ -389,7 +390,7 @@ async function setAcFanSpeed(value) {
   await cmd.execute(device.value.id, 'setFanSpeed', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setFanSpeed', [value]),
-    errorMsg: 'No se pudo cambiar la velocidad del ventilador.',
+    errorMsg: actionError('cambiar la velocidad del ventilador'),
   })
 }
 
@@ -399,7 +400,7 @@ async function setSpeakerVolume(value) {
   await cmd.execute(device.value.id, 'setVolume', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setVolume', [value]),
-    errorMsg: 'No se pudo cambiar el volumen.',
+    errorMsg: actionError('cambiar el volumen'),
   })
 }
 
@@ -408,19 +409,19 @@ async function setSpeakerGenre(value) {
   await cmd.execute(device.value.id, 'setGenre', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setGenre', [value]),
-    errorMsg: 'No se pudo cambiar el genero.',
+    errorMsg: actionError('cambiar el genero'),
   })
 }
 
 async function handleSpeakerAction(actionName) {
   await cmd.execute(device.value.id, actionName, {
     successMsg: describeAction(device.value.type, actionName),
-    errorMsg: `No se pudo ejecutar la accion.`,
+    errorMsg: actionError('ejecutar la accion'),
     async onSuccess() {
       try {
         const state = await api.getDeviceState(device.value.id)
         if (state?.song !== undefined) deviceState.currentSong = state.song
-      } catch { /* state puede no estar disponible */ }
+      } catch (e) { console.error('[DeviceDetail] Error recargando estado del speaker:', e) }
     },
   })
 }
@@ -431,14 +432,14 @@ async function setVacuumMode(value) {
   await cmd.execute(device.value.id, 'setMode', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setMode', [value]),
-    errorMsg: 'No se pudo cambiar el modo.',
+    errorMsg: actionError('cambiar el modo'),
   })
 }
 
 async function handleVacuumAction(actionName) {
   await cmd.execute(device.value.id, actionName, {
     successMsg: describeAction(device.value.type, actionName),
-    errorMsg: `No se pudo ejecutar la accion.`,
+    errorMsg: actionError('ejecutar la accion'),
   })
 }
 
@@ -447,7 +448,7 @@ async function setVacuumLocation(roomId) {
   await cmd.execute(device.value.id, 'setLocation', {
     params: [roomId],
     successMsg: describeAction(device.value.type, 'setLocation', [roomId]),
-    errorMsg: 'No se pudo cambiar la ubicacion.',
+    errorMsg: actionError('cambiar la ubicacion'),
   })
 }
 
@@ -457,7 +458,7 @@ async function setFridgeTemperature(value) {
   await cmd.execute(device.value.id, 'setTemperature', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setTemperature', [value]),
-    errorMsg: 'No se pudo cambiar la temperatura.',
+    errorMsg: actionError('cambiar la temperatura'),
   })
 }
 
@@ -466,7 +467,7 @@ async function setFreezerTemperature(value) {
   await cmd.execute(device.value.id, 'setFreezerTemperature', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setFreezerTemperature', [value]),
-    errorMsg: 'No se pudo cambiar la temperatura del freezer.',
+    errorMsg: actionError('cambiar la temperatura del freezer'),
   })
 }
 
@@ -475,7 +476,7 @@ async function setFridgeMode(value) {
   await cmd.execute(device.value.id, 'setMode', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setMode', [value]),
-    errorMsg: 'No se pudo cambiar el modo.',
+    errorMsg: actionError('cambiar el modo'),
   })
 }
 
@@ -485,7 +486,7 @@ async function setOvenTemperature(value) {
   await cmd.execute(device.value.id, 'setTemperature', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setTemperature', [value]),
-    errorMsg: 'No se pudo cambiar la temperatura.',
+    errorMsg: actionError('cambiar la temperatura'),
   })
 }
 
@@ -494,7 +495,7 @@ async function setOvenHeatSource(value) {
   await cmd.execute(device.value.id, 'setHeatSource', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
-    errorMsg: 'No se pudo cambiar la fuente de calor.',
+    errorMsg: actionError('cambiar la fuente de calor'),
   })
 }
 
@@ -503,7 +504,7 @@ async function setOvenGrillMode(value) {
   await cmd.execute(device.value.id, 'setGrillMode', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
-    errorMsg: 'No se pudo cambiar el modo grill.',
+    errorMsg: actionError('cambiar el modo grill'),
   })
 }
 
@@ -512,7 +513,7 @@ async function setOvenConvectionMode(value) {
   await cmd.execute(device.value.id, 'setConvectionMode', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
-    errorMsg: 'No se pudo cambiar el modo conveccion.',
+    errorMsg: actionError('cambiar el modo conveccion'),
   })
 }
 
@@ -541,7 +542,7 @@ async function loadDeviceState(id) {
         try {
           const playlistResult = await api.executeAction(id, 'getPlaylist')
           deviceState.playlist = playlistResult?.result ?? playlistResult ?? []
-        } catch { /* playlist puede no estar disponible */ }
+        } catch (e) { console.error('[DeviceDetail] Error cargando playlist:', e) }
       } else if (type === 'vacuum') {
         if (state.mode !== undefined) deviceState.vacuumMode = state.mode
         if (state.location !== undefined) deviceState.vacuumLocation = state.location
@@ -556,8 +557,8 @@ async function loadDeviceState(id) {
         if (state.convection !== undefined) deviceState.convectionMode = state.convection
       }
     }
-  } catch {
-    // El state puede no estar disponible para todos los dispositivos
+  } catch (e) {
+    console.error(`[DeviceDetail] Error cargando estado del dispositivo ${id}:`, e)
   }
 }
 

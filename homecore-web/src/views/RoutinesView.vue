@@ -70,7 +70,8 @@ function openCreateModal() {
 async function handleToggleFavorite(id) {
   try {
     await routinesStore.toggleFavorite(id)
-  } catch {
+  } catch (e) {
+    console.error(`[Routines] Error toggling favorito ${id}:`, e)
     toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
   }
 }
@@ -80,7 +81,8 @@ async function handleToggleActive(id) {
     await routinesStore.update(id, {
       isActive: !routinesStore.getById(id)?.isActive
     })
-  } catch {
+  } catch (e) {
+    console.error(`[Routines] Error cambiando estado de rutina ${id}:`, e)
     toast.show('No se pudo cambiar el estado de la rutina. Intenta de nuevo.', 'error')
   }
 }

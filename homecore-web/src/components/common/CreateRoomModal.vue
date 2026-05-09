@@ -56,7 +56,8 @@ async function confirmCreate() {
     toast.show('Habitacion creada', 'success')
     emit('created')
     emit('close')
-  } catch {
+  } catch (e) {
+    console.error('[CreateRoomModal] Error creando habitacion:', e)
     toast.show('No se pudo crear la habitacion. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false
