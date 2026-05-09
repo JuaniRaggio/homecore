@@ -5,6 +5,12 @@ import { useNotificationsStore } from '@/stores/notifications'
 
 let socket = null
 
+const isDev = import.meta.env.DEV
+
+function log(...args) {
+  if (isDev) console.log('[Socket]', ...args)
+}
+
 function describeEvent(state) {
   if (!state) return 'Estado actualizado'
   if (state.status === 'on') return 'Encendido'
@@ -30,21 +36,21 @@ export function connect(token) {
   })
 
   socket.on('connect', () => {
-    console.log('[Socket] Conectado:', socket.id)
+    log('Conectado:', socket.id)
   })
 
   socket.on('disconnect', (reason) => {
-    console.log('[Socket] Desconectado:', reason)
+    log('Desconectado:', reason)
   })
 
   socket.on('connect_error', (err) => {
-    console.error('[Socket] Error de conexion:', err.message)
+    log('Error de conexion:', err.message)
   })
 
   // Device events
   // Payload: { device, timestamp }
   socket.on('deviceCreated', (data) => {
-    console.log('[Socket] deviceCreated', data)
+    log('deviceCreated', data)
     const homesStore = useHomesStore()
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
@@ -59,7 +65,7 @@ export function connect(token) {
 
   // Payload: { device, changes, timestamp }
   socket.on('deviceUpdated', (data) => {
-    console.log('[Socket] deviceUpdated', data)
+    log('deviceUpdated', data)
     const homesStore = useHomesStore()
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
@@ -74,7 +80,7 @@ export function connect(token) {
 
   // Payload: { deviceId, device, timestamp }
   socket.on('deviceDeleted', (data) => {
-    console.log('[Socket] deviceDeleted', data)
+    log('deviceDeleted', data)
     const homesStore = useHomesStore()
     if (homesStore.selectedHomeId) {
       useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
@@ -89,7 +95,7 @@ export function connect(token) {
 
   // Payload: { id, data } - id es el deviceId, data es el estado nuevo
   socket.on('deviceEvent', (data) => {
-    console.log('[Socket] deviceEvent', data)
+    log('deviceEvent', data)
     const devicesStore = useDevicesStore()
     devicesStore.applyDeviceEvent(data)
     const device = devicesStore.devices.find(d => String(d.id) === String(data.id))
@@ -104,7 +110,7 @@ export function connect(token) {
 
   // Payload: { homeId, sharedBy, timestamp }
   socket.on('homeShared', (data) => {
-    console.log('[Socket] homeShared', data)
+    log('homeShared', data)
     useHomesStore().fetchHomes()
     useNotificationsStore().addNotification({
       title: 'Hogar compartido',
@@ -115,7 +121,7 @@ export function connect(token) {
 
   // Payload: { homeId, unsharedBy, timestamp }
   socket.on('homeUnshared', (data) => {
-    console.log('[Socket] homeUnshared', data)
+    log('homeUnshared', data)
     useHomesStore().fetchHomes()
     useNotificationsStore().addNotification({
       title: 'Hogar desvinculado',
@@ -129,6 +135,6 @@ export function disconnect() {
   if (socket) {
     socket.disconnect()
     socket = null
-    console.log('[Socket] Conexion cerrada manualmente')
+    log('Conexion cerrada manualmente')
   }
 }
