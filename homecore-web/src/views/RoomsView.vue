@@ -30,12 +30,12 @@
         <div class="room-card__body">
           <div v-for="device in room.devices" :key="device.id" class="room-device">
             <span class="device-name">{{ device.name }}</span>
-            <div class="device-row__controls">
-              <span @click.stop><ToggleSwitch :model-value="device.isOn" @update:model-value="toggleDevice(device)" /></span>
-              <button class="icon-btn icon-btn--sm" @click.stop="editDevice(device)" title="Ver detalle">
+            <div class="device-row__controls" @click.stop>
+              <ToggleSwitch :model-value="device.isOn" @update:model-value="toggleDevice(device)" />
+              <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
-              <button class="icon-btn icon-btn--sm icon-btn--delete" @click.stop="requestUnlink(device.id)" title="Desvincular">
+              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="requestUnlink(device.id)" title="Desvincular">
                 <i class="fa-solid fa-link-slash"></i>
               </button>
             </div>
@@ -44,8 +44,8 @@
         </div>
 
 
-         <div class="room-card__footer">
-          <select class="link-device-select" @click.stop @change="linkDevice(room, $event)">
+         <div class="room-card__footer" @click.stop>
+          <select class="link-device-select" @change="linkDevice(room, $event)">
             <option value="" disabled selected>+ Vincular dispositivo</option>
             <option
               v-for="device in availableDevices"
@@ -337,6 +337,12 @@ onMounted(() => {
   flex-direction: column;
   gap: 12px;
   cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.room-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .room-card__header {
@@ -382,23 +388,6 @@ onMounted(() => {
 
 .room-card__footer {
   margin-top: 4px;
-}
-
-.link-device-select {
-  width: 100%;
-  background-color: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  font-size: var(--font-base);
-  padding: 6px 10px;
-  cursor: pointer;
-  appearance: auto;
-}
-
-.link-device-select:focus {
-  outline: none;
-  border-color: var(--accent);
 }
 
 @media (max-width: 900px) {
