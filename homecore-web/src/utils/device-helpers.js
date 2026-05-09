@@ -13,12 +13,44 @@ const TYPE_LABELS = {
 }
 
 /**
+ * Mapeo de patrones a claves canonicas de tipo.
+ * Se evaluan en orden; el primer match gana.
+ */
+const TYPE_PATTERNS = [
+  { key: 'light',   patterns: ['light', 'lamp', 'luz'] },
+  { key: 'door',    patterns: ['door', 'puerta'] },
+  { key: 'alarm',   patterns: ['alarm'] },
+  { key: 'curtain', patterns: ['curtain', 'blind', 'persiana', 'cortina', 'toldo'] },
+  { key: 'water',   patterns: ['water', 'grifo', 'faucet', 'aspersor'] },
+  { key: 'ac',      patterns: ['ac', 'air', 'acondicionado'] },
+  { key: 'speaker', patterns: ['speaker', 'parlante'] },
+  { key: 'vacuum',  patterns: ['vacuum', 'aspiradora'] },
+  { key: 'fridge',  patterns: ['fridge', 'heladera', 'refrigerador'] },
+  { key: 'oven',    patterns: ['oven', 'horno'] },
+]
+
+/**
+ * Resuelve un nombre de tipo de dispositivo a su clave canonica
+ * (light, door, ac, speaker, etc.).
+ * Si no matchea ningun patron, devuelve el nombre original en lowercase.
+ */
+export function resolveTypeKey(typeName) {
+  if (!typeName) return ''
+  const t = typeName.toLowerCase()
+  if (TYPE_LABELS[t]) return t
+  for (const { key, patterns } of TYPE_PATTERNS) {
+    if (patterns.some(p => t.includes(p))) return key
+  }
+  return t
+}
+
+/**
  * Traduce el nombre de tipo de dispositivo (ingles de la API) a espanol.
  * Si no encuentra traduccion, devuelve el nombre original capitalizado.
  */
 export function translateType(typeName) {
   if (!typeName) return ''
-  const key = typeName.toLowerCase()
+  const key = resolveTypeKey(typeName)
   return TYPE_LABELS[key] || typeName.charAt(0).toUpperCase() + typeName.slice(1)
 }
 
@@ -73,18 +105,19 @@ export function resolveTypeName(device, deviceTypes = []) {
  */
 export function normalizeDevice(d, roomName, roomId) {
   const state = d.state || {}
-  const typeName = d.type?.name || d.type || ''
+  const rawType = d.type?.name || d.type || ''
+  const type = resolveTypeKey(rawType)
   const isOn = state.status === 'on' || state.status === 'opened'
     || state.status === 'active' || state.status === 'playing' || false
   const room = roomName || d.room?.name || d.room || ''
 
   let statusText = isOn ? 'Encendido' : 'Apagado'
-  if (typeName === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
-  if (typeName === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
+  if (type === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
+  if (type === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
 
   return {
     ...d,
-    type: typeName,
+    type,
     typeId: d.type?.id || d.type,
     room,
     roomId: roomId || d.room?.id || null,
