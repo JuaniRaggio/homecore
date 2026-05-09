@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div v-if="currentSong" class="control-row">
+      <span class="control-label">Reproduciendo</span>
+      <span class="control-value">{{ currentSong.title || currentSong }}</span>
+    </div>
     <div class="control-row">
       <span class="control-label">Volumen</span>
       <input
@@ -43,6 +47,14 @@
         <i class="fa-solid fa-forward-step"></i>
       </button>
     </div>
+    <div v-if="playlist.length" class="control-playlist">
+      <span class="control-label">Playlist</span>
+      <ol class="playlist-list">
+        <li v-for="(song, i) in playlist" :key="i" class="playlist-item" :class="{ 'playlist-item--active': currentSong && (song.title === currentSong.title || song === currentSong) }">
+          {{ song.title || song }}
+        </li>
+      </ol>
+    </div>
   </div>
 </template>
 
@@ -54,6 +66,8 @@ const props = defineProps({
   genre: { type: String, default: 'pop' },
   disabled: { type: Boolean, default: false },
   limits: { type: Object, default: () => ({}) },
+  playlist: { type: Array, default: () => [] },
+  currentSong: { type: [Object, String], default: null },
 })
 
 defineEmits(['update:volume', 'change:volume', 'update:genre', 'action'])

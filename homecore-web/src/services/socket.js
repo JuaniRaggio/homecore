@@ -26,6 +26,7 @@ const STATE_FIELD_TO_ACTION = {
   heat: 'setHeatSource',
   grill: 'setGrillMode',
   convection: 'setConvectionMode',
+  location: 'setLocation',
 }
 
 function describeEvent(state, deviceType) {
@@ -45,6 +46,10 @@ function describeEvent(state, deviceType) {
   // Describir cambios de estado especificos usando describeAction
   if (deviceType) {
     const parts = []
+    if (state.song !== undefined) {
+      const title = state.song?.title || state.song
+      parts.push(`Reproduciendo: ${title}`)
+    }
     for (const [field, actionName] of Object.entries(STATE_FIELD_TO_ACTION)) {
       if (state[field] !== undefined) {
         parts.push(describeAction(deviceType, actionName, [state[field]]))
