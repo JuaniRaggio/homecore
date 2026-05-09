@@ -115,38 +115,24 @@
     </div>
   </div>
 
-  <!-- Modal nueva habitacion -->
-  <div v-if="showNewRoomModal" class="modal-overlay" @click.self="closeNewRoomModal">
-    <div class="modal">
-      <h2 class="modal-title">Nueva habitacion</h2>
-      <input
-        v-model="newRoomName"
-        class="modal-input"
-        type="text"
-        placeholder="Nombre de la habitacion"
-        @keyup.enter="confirmNewRoom"
-      />
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="closeNewRoomModal" :disabled="saving">Cancelar</button>
-        <button class="btn-confirm" @click="confirmNewRoom" :disabled="saving || !newRoomName.trim()">
-          {{ saving ? 'Creando...' : 'Crear' }}
-        </button>
-      </div>
-    </div>
-  </div>
-  <!-- Modal confirmar eliminacion habitacion -->
-  <div v-if="showDeleteRoomConfirm" class="modal-overlay" @click.self="showDeleteRoomConfirm = false">
-    <div class="modal">
-      <h2 class="modal-title">Eliminar habitacion</h2>
-      <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados.</p>
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="showDeleteRoomConfirm = false" :disabled="deleting">Cancelar</button>
-        <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoom" :disabled="deleting">
-          {{ deleting ? 'Eliminando...' : 'Eliminar' }}
-        </button>
-      </div>
-    </div>
-  </div>
+  <CreateRoomModal
+    :visible="showNewRoomModal"
+    :home-id="String(homeId)"
+    @close="closeNewRoomModal"
+    @created="onRoomCreated"
+  />
+
+  <ConfirmModal
+    :visible="showDeleteRoomConfirm"
+    title="Eliminar habitacion"
+    description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
+    confirm-label="Eliminar"
+    confirming-label="Eliminando..."
+    :danger="true"
+    :loading="deleting"
+    @close="closeDeleteRoomConfirm"
+    @confirm="confirmDeleteRoom"
+  />
   </template>
 </template>
 
@@ -155,6 +141,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
+import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
@@ -222,6 +210,10 @@ function requestDeleteRoom(roomId) {
   showDeleteRoomConfirm.value = true
 }
 
+function closeDeleteRoomConfirm() {
+  showDeleteRoomConfirm.value = false
+}
+
 async function confirmDeleteRoom() {
   if (deleting.value) return
   deleting.value = true
@@ -243,30 +235,17 @@ async function confirmDeleteRoom() {
 
 // Modal nueva habitacion
 const showNewRoomModal = ref(false)
-const newRoomName = ref('')
 
 function openNewRoomModal() {
-  newRoomName.value = ''
   showNewRoomModal.value = true
 }
 
 function closeNewRoomModal() {
   showNewRoomModal.value = false
-  newRoomName.value = ''
 }
 
-async function confirmNewRoom() {
-  if (!newRoomName.value.trim() || saving.value) return
-  saving.value = true
-  try {
-    await roomsStore.addRoom(homeId.value, { name: newRoomName.value.trim() })
-    toast.show('Habitacion creada', 'success')
-    closeNewRoomModal()
-  } catch {
-    toast.show('No se pudo crear la habitacion. Intenta de nuevo.', 'error')
-  } finally {
-    saving.value = false
-  }
+function onRoomCreated() {
+  // Room creation and toast handled inside CreateRoomModal
 }
 
 // Modal editar hogar

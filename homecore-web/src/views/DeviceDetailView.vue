@@ -77,19 +77,17 @@
     </div>
     </template>
 
-    <!-- Modal confirmar eliminacion -->
-    <div v-if="showDeleteModal" class="modal-overlay" @click.self="showDeleteModal = false">
-      <div class="modal">
-        <h2 class="modal-title">Eliminar dispositivo</h2>
-        <p class="modal-desc">Estas seguro de que queres eliminar "{{ device.name }}"? Esta accion no se puede deshacer.</p>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="showDeleteModal = false" :disabled="saving">Cancelar</button>
-          <button class="btn-confirm btn-confirm--danger" @click="confirmDelete" :disabled="saving">
-            {{ saving ? 'Eliminando...' : 'Eliminar' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmModal
+      :visible="showDeleteModal"
+      title="Eliminar dispositivo"
+      :description="deleteDescription"
+      confirm-label="Eliminar"
+      confirming-label="Eliminando..."
+      :danger="true"
+      :loading="saving"
+      @close="closeDeleteConfirm"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
@@ -97,6 +95,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import LightControls from '@/components/devices/LightControls.vue'
 import DoorControls from '@/components/devices/DoorControls.vue'
 import CurtainControls from '@/components/devices/CurtainControls.vue'
@@ -128,6 +127,9 @@ const busy = ref(false)
 
 // Delete modal
 const showDeleteModal = ref(false)
+const deleteDescription = computed(() =>
+  `Estas seguro de que queres eliminar "${device.value.name}"? Esta accion no se puede deshacer.`
+)
 
 // Mapeo de acciones y etiquetas por tipo de dispositivo
 const STATUS_MAP = {
@@ -151,6 +153,10 @@ function goToEdit() {
 
 function openDeleteConfirm() {
   showDeleteModal.value = true
+}
+
+function closeDeleteConfirm() {
+  showDeleteModal.value = false
 }
 
 async function confirmDelete() {

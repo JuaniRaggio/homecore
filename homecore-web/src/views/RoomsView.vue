@@ -61,25 +61,12 @@
       </div>
     </div>
 
-     <!--  nueva habitacion -->
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal">
-        <h2 class="modal-title">Nueva habitacion</h2>
-        <input
-          v-model="newRoomName"
-          class="modal-input"
-          type="text"
-          placeholder="Nombre de la habitacion"
-          @keyup.enter="confirmNewRoom"
-        />
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="closeModal" :disabled="saving">Cancelar</button>
-          <button class="btn-confirm" @click="confirmNewRoom" :disabled="saving || !newRoomName.trim()">
-            {{ saving ? 'Creando...' : 'Crear' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <CreateRoomModal
+      :visible="showModal"
+      :home-id="String(route.params.homeId)"
+      @close="closeModal"
+      @created="onRoomCreated"
+    />
 
     <!-- Modal editar habitacion -->
     <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
@@ -102,33 +89,29 @@
     </div>
 
 
-    <!-- Modal confirmar eliminacion habitacion -->
-    <div v-if="showDeleteConfirm" class="modal-overlay" @click.self="showDeleteConfirm = false">
-      <div class="modal">
-        <h2 class="modal-title">Eliminar habitacion</h2>
-        <p class="modal-desc">Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados.</p>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="showDeleteConfirm = false" :disabled="deleting">Cancelar</button>
-          <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoom" :disabled="deleting">
-            {{ deleting ? 'Eliminando...' : 'Eliminar' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmModal
+      :visible="showDeleteConfirm"
+      title="Eliminar habitacion"
+      description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
+      confirm-label="Eliminar"
+      confirming-label="Eliminando..."
+      :danger="true"
+      :loading="deleting"
+      @close="closeDeleteConfirm"
+      @confirm="confirmDeleteRoom"
+    />
 
-    <!-- Modal confirmar desvinculacion -->
-    <div v-if="showUnlinkConfirm" class="modal-overlay" @click.self="showUnlinkConfirm = false">
-      <div class="modal">
-        <h2 class="modal-title">Desvincular dispositivo</h2>
-        <p class="modal-desc">Estas seguro de que queres desvincular este dispositivo de la habitacion?</p>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="showUnlinkConfirm = false" :disabled="deleting">Cancelar</button>
-          <button class="btn-confirm btn-confirm--danger" @click="confirmUnlink" :disabled="deleting">
-            {{ deleting ? 'Desvinculando...' : 'Desvincular' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmModal
+      :visible="showUnlinkConfirm"
+      title="Desvincular dispositivo"
+      description="Estas seguro de que queres desvincular este dispositivo de la habitacion?"
+      confirm-label="Desvincular"
+      confirming-label="Desvinculando..."
+      :danger="true"
+      :loading="deleting"
+      @close="closeUnlinkConfirm"
+      @confirm="confirmUnlink"
+    />
 
   </div>
 </template>
@@ -137,6 +120,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import { useRoomsStore } from '@/stores/rooms'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
@@ -172,6 +157,10 @@ function requestDeleteRoom(roomId) {
   showDeleteConfirm.value = true
 }
 
+function closeDeleteConfirm() {
+  showDeleteConfirm.value = false
+}
+
 async function confirmDeleteRoom() {
   if (deleting.value) return
   deleting.value = true
@@ -200,6 +189,10 @@ function requestUnlink(deviceId) {
   showUnlinkConfirm.value = true
 }
 
+function closeUnlinkConfirm() {
+  showUnlinkConfirm.value = false
+}
+
 async function confirmUnlink() {
   if (deleting.value) return
   deleting.value = true
@@ -216,7 +209,6 @@ async function confirmUnlink() {
 }
 
 const showModal = ref(false)
-const newRoomName = ref('')
 
 function openNewRoomModal() {
   showModal.value = true
@@ -224,22 +216,10 @@ function openNewRoomModal() {
 
 function closeModal() {
   showModal.value = false
-  newRoomName.value = ''
 }
 
-async function confirmNewRoom() {
-  if (!newRoomName.value.trim() || saving.value) return
-  saving.value = true
-  const homeId = route.params.homeId
-  try {
-    await roomsStore.addRoom(homeId, { name: newRoomName.value.trim() })
-    toast.show('Habitacion creada', 'success')
-    closeModal()
-  } catch {
-    toast.show('No se pudo crear la habitacion. Intenta de nuevo.', 'error')
-  } finally {
-    saving.value = false
-  }
+function onRoomCreated() {
+  // Room creation and toast handled inside CreateRoomModal
 }
 
 // Edit room modal

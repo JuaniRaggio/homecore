@@ -33,31 +33,13 @@
       </select>
     </div>
 
-    <!-- Modal crear dispositivo -->
-    <div v-if="showCreateModal" class="modal-overlay" @click.self="closeCreateModal">
-      <div class="modal">
-        <h2 class="modal-title">Nuevo dispositivo</h2>
-        <input
-          v-model="newDeviceName"
-          class="modal-input"
-          type="text"
-          placeholder="Nombre del dispositivo"
-          @keyup.enter="confirmCreate"
-        />
-        <select v-model="newDeviceType" class="modal-input">
-          <option value="" disabled>Tipo de dispositivo</option>
-          <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
-            {{ translateType(dt.name) }}
-          </option>
-        </select>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="closeCreateModal" :disabled="saving">Cancelar</button>
-          <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !canCreate">
-            {{ saving ? 'Creando...' : 'Crear' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <CreateDeviceModal
+      :visible="showCreateModal"
+      :room-id="String(roomId)"
+      :home-id="String(homeId)"
+      @close="closeCreateModal"
+      @created="onDeviceCreated"
+    />
   </div>
 </template>
 
@@ -65,10 +47,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
+import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
-import { translateType } from '@/utils/device-helpers'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -129,15 +111,8 @@ async function linkDevice(event) {
 
 // Crear dispositivo
 const showCreateModal = ref(false)
-const newDeviceName = ref('')
-const newDeviceType = ref('')
-const saving = ref(false)
-
-const canCreate = computed(() => newDeviceName.value.trim() && newDeviceType.value)
 
 function openCreateModal() {
-  newDeviceName.value = ''
-  newDeviceType.value = ''
   showCreateModal.value = true
 }
 
@@ -145,22 +120,8 @@ function closeCreateModal() {
   showCreateModal.value = false
 }
 
-async function confirmCreate() {
-  if (!canCreate.value || saving.value) return
-  saving.value = true
-  try {
-    await api.createDevice(roomId.value, {
-      name: newDeviceName.value.trim(),
-      type: { id: newDeviceType.value },
-    })
-    toast.show('Dispositivo creado', 'success')
-    if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
-    closeCreateModal()
-  } catch {
-    toast.show('No se pudo crear el dispositivo. Verifica los datos e intenta de nuevo.', 'error')
-  } finally {
-    saving.value = false
-  }
+function onDeviceCreated() {
+  // fetchAllForHome is handled inside CreateDeviceModal
 }
 
 onMounted(() => {

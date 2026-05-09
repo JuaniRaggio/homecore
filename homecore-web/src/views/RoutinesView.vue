@@ -48,26 +48,25 @@
         </div>
       </div>
     </div>
-    <!-- Modal confirmar eliminacion rutina -->
-    <div v-if="showDeleteConfirm" class="modal-overlay" @click.self="showDeleteConfirm = false">
-      <div class="modal">
-        <h2 class="modal-title">Eliminar rutina</h2>
-        <p class="modal-desc">Estas seguro de que queres eliminar "{{ detailRoutine?.name }}"? Esta accion no se puede deshacer.</p>
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="showDeleteConfirm = false" :disabled="deleting">Cancelar</button>
-          <button class="btn-confirm btn-confirm--danger" @click="confirmDeleteRoutine" :disabled="deleting">
-            {{ deleting ? 'Eliminando...' : 'Eliminar' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmModal
+      :visible="showDeleteConfirm"
+      title="Eliminar rutina"
+      :description="deleteDescription"
+      confirm-label="Eliminar"
+      confirming-label="Eliminando..."
+      :danger="true"
+      :loading="deleting"
+      @close="closeDeleteConfirm"
+      @confirm="confirmDeleteRoutine"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RoutineCard from '@/components/routines/RoutineCard.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
 
@@ -114,6 +113,13 @@ const deleting = ref(false)
 
 // Delete confirmation
 const showDeleteConfirm = ref(false)
+const deleteDescription = computed(() =>
+  `Estas seguro de que queres eliminar "${detailRoutine.value?.name}"? Esta accion no se puede deshacer.`
+)
+
+function closeDeleteConfirm() {
+  showDeleteConfirm.value = false
+}
 
 const showCreateModal = ref(false)
 
