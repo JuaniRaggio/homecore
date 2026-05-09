@@ -4,6 +4,7 @@ import * as api from '@/services/api'
 import pLimit from 'p-limit'
 import { normalizeDevice, calcConsumption } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
+import { getStatusMap, getStatusText } from '@/config/device-types'
 
 const MAX_CONCURRENT_REQUESTS = 3
 
@@ -85,18 +86,11 @@ export const useDevicesStore = defineStore('devices', () => {
   async function toggleDevice(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
-    const action = device.type === 'door'
-      ? (device.isOn ? 'close' : 'open')
-      : (device.isOn ? 'turnOff' : 'turnOn')
+    const map = getStatusMap(device.type)
+    const action = device.isOn ? map.actionOff : map.actionOn
     await api.executeAction(id, action, [])
     device.isOn = !device.isOn
-    if (device.type === 'door') {
-      device.statusText = device.isOn ? 'Abierta' : 'Cerrada'
-    } else if (device.type === 'alarm') {
-      device.statusText = device.isOn ? 'Activada' : 'Desactivada'
-    } else {
-      device.statusText = device.isOn ? 'Encendido' : 'Apagado'
-    }
+    device.statusText = getStatusText(device.type, device.isOn)
   }
 
   async function toggleFavorite(id) {
@@ -128,13 +122,11 @@ export const useDevicesStore = defineStore('devices', () => {
         || state.status === 'active' || state.status === 'playing'
     }
 
-    // Actualizar lock para puertas
+    // Actualizar statusText usando el mapeo centralizado
     if (state.lock !== undefined) {
       device.statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
-    } else if (device.type === 'alarm') {
-      device.statusText = device.isOn ? 'Activada' : 'Desactivada'
     } else if (state.status !== undefined) {
-      device.statusText = device.isOn ? 'Encendido' : 'Apagado'
+      device.statusText = getStatusText(device.type, device.isOn)
     }
   }
 
