@@ -316,8 +316,8 @@ onMounted(() => {
   align-items: center;
 }
 
-.add-row__input { flex: 1; }
-.add-row__select { min-width: 160px; }
+.add-row__input { flex: 2; width: auto; min-width: 0; }
+.add-row__select { flex: 1; width: auto; min-width: 120px; }
 
 /* Lista de items agregados */
 .item-list {
