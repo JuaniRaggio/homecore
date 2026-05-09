@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
-import { normalizeDevice, calcConsumption } from '@/utils/device-helpers'
+import { normalizeDevice, calcConsumption, resolveTypeKey } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 import { getStatusMap, getStatusText } from '@/config/device-types'
 
@@ -116,6 +116,38 @@ export const useDevicesStore = defineStore('devices', () => {
     device.isFavorite = newFavorite
   }
 
+  function addDeviceFromEvent(rawDevice) {
+    if (!rawDevice?.id) return
+    const exists = devices.value.some(d => String(d.id) === String(rawDevice.id))
+    if (exists) return
+    try {
+      const roomName = rawDevice.room?.name || ''
+      const roomId = rawDevice.room?.id || null
+      const normalized = normalizeDevice(rawDevice, roomName, roomId, deviceTypes.value)
+      devices.value.push(normalized)
+    } catch (e) {
+      console.error('[devices] error normalizando device del websocket', e)
+    }
+  }
+
+  function updateDeviceFromEvent(rawDevice) {
+    if (!rawDevice?.id) return
+    const device = devices.value.find(d => String(d.id) === String(rawDevice.id))
+    if (!device) return
+    if (rawDevice.name) device.name = rawDevice.name
+    if (rawDevice.room?.id) {
+      device.roomId = rawDevice.room.id
+      device.room = rawDevice.room.name || device.room
+    }
+    if (rawDevice.type) {
+      const typeName = typeof rawDevice.type === 'string' ? rawDevice.type : rawDevice.type.name
+      if (typeName) {
+        device.type = resolveTypeKey(typeName)
+        device.typeId = (typeof rawDevice.type === 'object') ? rawDevice.type.id : rawDevice.typeId
+      }
+    }
+  }
+
   // Payload del websocket: { id, data } donde id=deviceId, data=estado nuevo
   function applyDeviceEvent(event) {
     const deviceId = event.id ?? event.deviceId ?? event.device?.id
@@ -164,7 +196,8 @@ export const useDevicesStore = defineStore('devices', () => {
     devices, deviceTypes, loading, error,
     favoriteDevices, activeDevices, totalConsumption,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
-    applyDeviceEvent, clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice,
+    applyDeviceEvent, addDeviceFromEvent, updateDeviceFromEvent,
+    clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice,
   }
 
 })

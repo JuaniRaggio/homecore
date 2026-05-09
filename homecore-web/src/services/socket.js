@@ -85,9 +85,8 @@ export function connect(token) {
   // Payload: { device, timestamp }
   socket.on('deviceCreated', (data) => {
     log('deviceCreated', data)
-    const homesStore = useHomesStore()
-    if (homesStore.selectedHomeId) {
-      useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
+    if (data.device) {
+      useDevicesStore().addDeviceFromEvent(data.device)
     }
     const name = data.device?.name || 'Nuevo dispositivo'
     useNotificationsStore().addNotification({
@@ -100,9 +99,8 @@ export function connect(token) {
   // Payload: { device, changes, timestamp }
   socket.on('deviceUpdated', (data) => {
     log('deviceUpdated', data)
-    const homesStore = useHomesStore()
-    if (homesStore.selectedHomeId) {
-      useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
+    if (data.device) {
+      useDevicesStore().updateDeviceFromEvent(data.device)
     }
     const name = data.device?.name || 'Un dispositivo'
     useNotificationsStore().addNotification({
@@ -115,9 +113,9 @@ export function connect(token) {
   // Payload: { deviceId, device, timestamp }
   socket.on('deviceDeleted', (data) => {
     log('deviceDeleted', data)
-    const homesStore = useHomesStore()
-    if (homesStore.selectedHomeId) {
-      useDevicesStore().fetchAllForHome(homesStore.selectedHomeId)
+    const deviceId = data.deviceId || data.device?.id
+    if (deviceId) {
+      useDevicesStore().removeDevice(deviceId)
     }
     const name = data.device?.name || 'Un dispositivo'
     useNotificationsStore().addNotification({
