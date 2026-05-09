@@ -41,10 +41,15 @@ export const DEVICE_COLORS = {
 // Paleta de fallback para tipos sin color definido
 export const FALLBACK_PALETTE = ['#9c59d1','#2ecc71','#e67e22','#1abc9c','#e91e63','#00bcd4']
 
-// Mapeo de acciones y etiquetas por tipo de dispositivo
+// Mapeo de acciones y etiquetas por tipo de dispositivo.
+// actionOn/actionOff deben coincidir con los nombres de accion de la API.
 export const STATUS_MAP = {
-  door:  { on: 'Abierta',   off: 'Cerrada',      actionOn: 'open',   actionOff: 'close',   verbOn: 'abrir',     verbOff: 'cerrar' },
-  alarm: { on: 'Activada',  off: 'Desactivada',   actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'activar',   verbOff: 'desactivar' },
+  door:    { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  alarm:   { on: 'Activada',   off: 'Desactivada', actionOn: 'armAway', actionOff: 'disarm',  verbOn: 'activar',    verbOff: 'desactivar' },
+  water:   { on: 'Abierto',    off: 'Cerrado',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  curtain: { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  vacuum:  { on: 'Activa',     off: 'Inactiva',    actionOn: 'start',   actionOff: 'dock',    verbOn: 'iniciar',    verbOff: 'detener' },
+  speaker: { on: 'Reproduciendo', off: 'Detenido',  actionOn: 'play',    actionOff: 'stop',    verbOn: 'reproducir', verbOff: 'detener' },
 }
 
 export const DEFAULT_STATUS = {
@@ -73,4 +78,12 @@ export function getDeviceColor(typeName) {
 
 export function getStatusMap(type) {
   return STATUS_MAP[type] || DEFAULT_STATUS
+}
+
+/**
+ * Devuelve el texto de estado (statusText) segun el tipo y si esta encendido/apagado.
+ */
+export function getStatusText(type, isOn) {
+  const map = getStatusMap(type)
+  return isOn ? map.on : map.off
 }
