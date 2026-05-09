@@ -18,6 +18,7 @@ export const ACTIONS_MAP = {
     { actionName: 'armAway',  label: 'Activar (modo regular)', params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
     { actionName: 'armHome',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
     { actionName: 'disarm',   label: 'Desactivar',            params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
+    { actionName: 'changeSecurityCode', label: 'Cambiar codigo', params: [{ type: 'text', placeholder: 'Codigo nuevo' }] },
   ],
   water: [
     { actionName: 'open',     label: 'Abrir',     params: [] },
@@ -48,12 +49,14 @@ export const ACTIONS_MAP = {
     { actionName: 'previousSong',  label: 'Cancion anterior', params: [] },
     { actionName: 'setVolume',     label: 'Volumen',          params: [{ type: 'number', min: 0, max: 10, step: 1, placeholder: '0-10' }] },
     { actionName: 'setGenre',      label: 'Genero',           params: [{ type: 'select', options: ['clasica', 'country', 'dance', 'latina', 'pop', 'rock'] }] },
+    { actionName: 'getPlaylist',   label: 'Obtener playlist', params: [] },
   ],
   vacuum: [
     { actionName: 'start',   label: 'Iniciar',        params: [] },
     { actionName: 'pause',   label: 'Pausar',         params: [] },
     { actionName: 'dock',    label: 'Regresar base',  params: [] },
     { actionName: 'setMode', label: 'Modo',           params: [{ type: 'select', options: ['aspirar', 'trapear'] }] },
+    { actionName: 'setLocation', label: 'Ubicacion', params: [{ type: 'text', placeholder: 'ID habitacion' }] },
   ],
   fridge: [
     { actionName: 'setTemperature',        label: 'Temperatura',        params: [{ type: 'number', min: 2,   max: 8,   step: 1, placeholder: '2-8 C' }] },

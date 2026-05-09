@@ -67,7 +67,9 @@
           v-else-if="device.type === 'alarm'"
           :is-on="device.isOn"
           :disabled="cmd.busy.value"
-          @toggle="togglePower"
+          @arm-away="handleArmAway"
+          @arm-home="handleArmHome"
+          @disarm="handleDisarm"
         />
         <WaterControls
           v-else-if="device.type === 'water'"
@@ -93,6 +95,8 @@
           :genre="deviceState.genre"
           :disabled="cmd.busy.value"
           :limits="speakerLimits"
+          :playlist="deviceState.playlist"
+          :current-song="deviceState.currentSong"
           @update:volume="v => deviceState.volume = v"
           @change:volume="setSpeakerVolume"
           @update:genre="setSpeakerGenre"
@@ -103,7 +107,10 @@
           :mode="deviceState.vacuumMode"
           :disabled="cmd.busy.value"
           :limits="vacuumLimits"
+          :rooms="roomsStore.rooms"
+          :current-room="deviceState.vacuumLocation"
           @update:mode="setVacuumMode"
+          @update:location="setVacuumLocation"
           @action="handleVacuumAction"
         />
         <FridgeControls
@@ -171,6 +178,7 @@ import FridgeControls from '@/components/devices/FridgeControls.vue'
 import OvenControls from '@/components/devices/OvenControls.vue'
 import DeviceHistory from '@/components/devices/DeviceHistory.vue'
 import { useDevicesStore } from '@/stores/devices'
+import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 import { useModal } from '@/composables/useModal'
 import { useDeviceCommand } from '@/composables/useDeviceCommand'
@@ -184,6 +192,7 @@ import * as api from '@/services/api'
 const router = useRouter()
 const route = useRoute()
 const devicesStore = useDevicesStore()
+const roomsStore = useRoomsStore()
 const toast = useToastStore()
 const cmd = useDeviceCommand()
 const deviceLimits = useDeviceLimits()
@@ -199,8 +208,8 @@ const position = ref(0)
 
 const deviceState = reactive({
   acTemperature: 24, acMode: 'frio', acFanSpeed: 'auto',
-  volume: 5, genre: 'pop',
-  vacuumMode: 'aspirar',
+  volume: 5, genre: 'pop', playlist: [], currentSong: null,
+  vacuumMode: 'aspirar', vacuumLocation: null,
   fridgeTemp: 5, freezerTemp: -18, fridgeMode: 'normal',
   ovenTemp: 180, heatSource: 'convencional', grillMode: 'apagado', convectionMode: 'apagado',
 })
@@ -319,6 +328,34 @@ async function toggleLock() {
   })
 }
 
+// --- Alarm ---
+async function handleArmAway(code) {
+  await cmd.execute(device.value.id, 'armAway', {
+    params: [code],
+    successMsg: describeAction(device.value.type, 'armAway'),
+    errorMsg: 'No se pudo activar la alarma. Verifica el codigo de seguridad.',
+    onSuccess() { device.value.isOn = true },
+  })
+}
+
+async function handleArmHome(code) {
+  await cmd.execute(device.value.id, 'armHome', {
+    params: [code],
+    successMsg: describeAction(device.value.type, 'armHome'),
+    errorMsg: 'No se pudo activar la alarma. Verifica el codigo de seguridad.',
+    onSuccess() { device.value.isOn = true },
+  })
+}
+
+async function handleDisarm(code) {
+  await cmd.execute(device.value.id, 'disarm', {
+    params: [code],
+    successMsg: describeAction(device.value.type, 'disarm'),
+    errorMsg: 'No se pudo desactivar la alarma. Verifica el codigo de seguridad.',
+    onSuccess() { device.value.isOn = false },
+  })
+}
+
 async function setPositionTo(value) {
   position.value = value
   await cmd.execute(device.value.id, 'setLevel', {
@@ -396,6 +433,15 @@ async function handleVacuumAction(actionName) {
   await cmd.execute(device.value.id, actionName, {
     successMsg: describeAction(device.value.type, actionName),
     errorMsg: `No se pudo ejecutar la accion. Verifica que el dispositivo este conectado.`,
+  })
+}
+
+async function setVacuumLocation(roomId) {
+  deviceState.vacuumLocation = roomId
+  await cmd.execute(device.value.id, 'setLocation', {
+    params: [roomId],
+    successMsg: describeAction(device.value.type, 'setLocation', [roomId]),
+    errorMsg: 'No se pudo cambiar la ubicacion. Verifica que el dispositivo este conectado.',
   })
 }
 
@@ -485,8 +531,14 @@ async function loadDeviceState(id) {
       } else if (type === 'speaker') {
         if (state.volume !== undefined) deviceState.volume = state.volume
         if (state.genre !== undefined) deviceState.genre = state.genre
+        if (state.song !== undefined) deviceState.currentSong = state.song
+        try {
+          const playlistResult = await api.executeAction(id, 'getPlaylist')
+          deviceState.playlist = playlistResult?.result ?? playlistResult ?? []
+        } catch { /* playlist puede no estar disponible */ }
       } else if (type === 'vacuum') {
         if (state.mode !== undefined) deviceState.vacuumMode = state.mode
+        if (state.location !== undefined) deviceState.vacuumLocation = state.location
       } else if (type === 'fridge') {
         if (state.temperature !== undefined) deviceState.fridgeTemp = state.temperature
         if (state.freezerTemperature !== undefined) deviceState.freezerTemp = state.freezerTemperature
@@ -512,6 +564,9 @@ onMounted(async () => {
     await loadDeviceState(deviceId)
     if (device.value.typeId) {
       deviceLimits.fetchLimits(device.value.typeId)
+    }
+    if (device.value.type === 'vacuum' && route.params.homeId) {
+      roomsStore.fetchRooms(route.params.homeId)
     }
   } catch (e) {
     loadError.value = friendlyError(e)
