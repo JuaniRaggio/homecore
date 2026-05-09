@@ -29,7 +29,7 @@
         <div class="status-row">
           <span class="status-label">Estado</span>
           <span class="status-value" :class="device.isOn ? 'status--on' : 'status--off'">
-            {{ device.isOn ? 'Encendido' : 'Apagado' }}
+            {{ statusLabel }}
           </span>
         </div>
         <ToggleSwitch :model-value="device.isOn" :disabled="busy" @update:model-value="togglePower" />
@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import LightControls from '@/components/devices/LightControls.vue'
@@ -129,6 +129,22 @@ const busy = ref(false)
 // Delete modal
 const showDeleteModal = ref(false)
 
+// Mapeo de acciones y etiquetas por tipo de dispositivo
+const STATUS_MAP = {
+  door:  { on: 'Abierta',   off: 'Cerrada',      actionOn: 'open',   actionOff: 'close',   verbOn: 'abrir',     verbOff: 'cerrar' },
+  alarm: { on: 'Activada',  off: 'Desactivada',   actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'activar',   verbOff: 'desactivar' },
+}
+const DEFAULT_STATUS = { on: 'Encendido', off: 'Apagado', actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'encender', verbOff: 'apagar' }
+
+function getStatusMap(type) {
+  return STATUS_MAP[type] || DEFAULT_STATUS
+}
+
+const statusLabel = computed(() => {
+  const map = getStatusMap(device.value.type)
+  return device.value.isOn ? map.on : map.off
+})
+
 function goToEdit() {
   router.push({ name: 'edit-device', params: { homeId: route.params.homeId, id: device.value.id } })
 }
@@ -155,14 +171,16 @@ async function confirmDelete() {
 async function togglePower() {
   if (busy.value) return
   busy.value = true
-  const actionLabel = device.value.isOn ? 'apagar' : 'encender'
+  const map = getStatusMap(device.value.type)
+  const action = device.value.isOn ? map.actionOff : map.actionOn
+  const verb = device.value.isOn ? map.verbOff : map.verbOn
   try {
-    const action = device.value.isOn ? 'turnOff' : 'turnOn'
     await api.executeAction(device.value.id, action)
     device.value.isOn = !device.value.isOn
-    toast.show(device.value.isOn ? 'Dispositivo encendido' : 'Dispositivo apagado', 'success')
+    const newMap = getStatusMap(device.value.type)
+    toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
   } catch {
-    toast.show(`No se pudo ${actionLabel} el dispositivo. Verifica que este conectado.`, 'error')
+    toast.show(`No se pudo ${verb} el dispositivo. Verifica que este conectado.`, 'error')
   } finally {
     busy.value = false
   }

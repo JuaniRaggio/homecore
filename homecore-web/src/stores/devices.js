@@ -90,15 +90,18 @@ export const useDevicesStore = defineStore('devices', () => {
   async function toggleDevice(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
-    const action = device.isOn ? 'turnOff' : 'turnOn'
+    const action = device.type === 'door'
+      ? (device.isOn ? 'close' : 'open')
+      : (device.isOn ? 'turnOff' : 'turnOn')
     await api.executeAction(id, action, [])
     device.isOn = !device.isOn
-    if (device.type === 'alarm') {
+    if (device.type === 'door') {
+      device.statusText = device.isOn ? 'Abierta' : 'Cerrada'
+    } else if (device.type === 'alarm') {
       device.statusText = device.isOn ? 'Activada' : 'Desactivada'
     } else {
       device.statusText = device.isOn ? 'Encendido' : 'Apagado'
     }
-
   }
 
   async function toggleFavorite(id) {

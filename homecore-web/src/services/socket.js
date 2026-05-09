@@ -5,6 +5,22 @@ import { useNotificationsStore } from '@/stores/notifications'
 
 let socket = null
 
+function describeEvent(state) {
+  if (!state) return 'Estado actualizado'
+  if (state.status === 'on') return 'Encendido'
+  if (state.status === 'off') return 'Apagado'
+  if (state.status === 'opened') return 'Abierta'
+  if (state.status === 'closed') return 'Cerrada'
+  if (state.status === 'active') return 'Activada'
+  if (state.status === 'inactive') return 'Desactivada'
+  if (state.status === 'playing') return 'Reproduciendo'
+  if (state.lock === 'locked') return 'Bloqueada'
+  if (state.lock === 'unlocked') return 'Desbloqueada'
+  if (state.level !== undefined) return `Nivel: ${state.level}%`
+  if (state.brightness !== undefined) return `Brillo: ${state.brightness}%`
+  return 'Estado actualizado'
+}
+
 export function connect(token) {
   if (socket) disconnect()
 
@@ -77,11 +93,11 @@ export function connect(token) {
     const devicesStore = useDevicesStore()
     devicesStore.applyDeviceEvent(data)
     const device = devicesStore.devices.find(d => String(d.id) === String(data.id))
-    const name = device?.name || 'Un dispositivo'
-    const action = device?.statusText || 'Evento'
+    const name = device?.name || data.device?.name || 'Dispositivo'
+    const status = device?.statusText || describeEvent(data.data)
     useNotificationsStore().addNotification({
-      title: 'Evento de dispositivo',
-      message: `${name}: ${action}`,
+      title: name,
+      message: status,
       type: 'info'
     })
   })
