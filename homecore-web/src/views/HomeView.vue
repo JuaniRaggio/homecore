@@ -66,8 +66,8 @@
           v-for="device in favoriteDevices"
           :key="device.id"
           :device="device"
-          @toggle="toggleDevice"
-          @toggle-favorite="toggleFavorite"
+          @toggle="deviceActions.toggleDevice"
+          @toggle-favorite="deviceActions.toggleFavorite"
         />
         <p v-if="favoriteDevices.length === 0" class="empty-msg">Sin dispositivos favoritos</p>
       </div>
@@ -85,35 +85,22 @@
           v-for="routine in favoriteRoutines"
           :key="routine.id"
           :routine="routine"
-          @execute="executeRoutine"
+          @execute="routineActions.executeRoutine"
         />
         <p v-if="favoriteRoutines.length === 0" class="empty-msg">Sin rutinas favoritas</p>
       </div>
     </section>
   </div>
 
-  <!-- Modal editar hogar -->
-  <div v-if="showEditHomeModal" class="modal-overlay" @click.self="closeEditHomeModal">
-    <div class="modal">
-      <h2 class="modal-title">Editar hogar</h2>
-      <div class="form-group">
-        <label class="form-label">Nombre</label>
-        <input
-          v-model="editHomeName"
-          class="modal-input"
-          type="text"
-          placeholder="Nombre del hogar"
-          @keyup.enter="confirmEditHome"
-        />
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="closeEditHomeModal" :disabled="saving">Cancelar</button>
-        <button class="btn-confirm" @click="confirmEditHome" :disabled="saving || !editHomeName.trim()">
-          {{ saving ? 'Guardando...' : 'Guardar' }}
-        </button>
-      </div>
-    </div>
-  </div>
+  <EditNameModal
+    :visible="showEditHomeModal"
+    title="Editar hogar"
+    placeholder="Nombre del hogar"
+    :current-name="currentHome?.name || ''"
+    :loading="saving"
+    @close="closeEditHomeModal"
+    @save="confirmEditHome"
+  />
 
   <CreateRoomModal
     :visible="showNewRoomModal"
@@ -143,11 +130,14 @@ import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import EditNameModal from '@/components/common/EditNameModal.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
+import { useDeviceActions } from '@/composables/useDeviceActions'
+import { useRoutineActions } from '@/composables/useRoutineActions'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -158,6 +148,9 @@ const roomsStore = useRoomsStore()
 const routinesStore = useRoutinesStore()
 const homesStore = useHomesStore()
 const toast = useToastStore()
+
+const deviceActions = useDeviceActions()
+const routineActions = useRoutineActions()
 
 const currentHome = computed(() => homesStore.getById(homeId.value))
 
@@ -171,31 +164,6 @@ const stats = computed(() => ({
   rooms: roomsStore.rooms.length,
   consumption: devicesStore.totalConsumption
 }))
-
-async function toggleDevice(id) {
-  try {
-    await devicesStore.toggleDevice(id)
-  } catch {
-    toast.show('No se pudo cambiar el estado del dispositivo. Verifica que este conectado.', 'error')
-  }
-}
-
-async function toggleFavorite(id) {
-  try {
-    await devicesStore.toggleFavorite(id)
-  } catch {
-    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
-  }
-}
-
-async function executeRoutine(id) {
-  try {
-    await routinesStore.execute(id)
-    toast.show('Rutina ejecutada correctamente', 'success')
-  } catch {
-    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
-  }
-}
 
 // Loading state for modals
 const saving = ref(false)
@@ -250,23 +218,19 @@ function onRoomCreated() {
 
 // Modal editar hogar
 const showEditHomeModal = ref(false)
-const editHomeName = ref('')
 
 function openEditHomeModal() {
-  editHomeName.value = currentHome.value?.name || ''
   showEditHomeModal.value = true
 }
 
 function closeEditHomeModal() {
   showEditHomeModal.value = false
-  editHomeName.value = ''
 }
 
-async function confirmEditHome() {
-  if (!editHomeName.value.trim() || saving.value) return
+async function confirmEditHome(name) {
   saving.value = true
   try {
-    await homesStore.updateHome(homeId.value, { name: editHomeName.value.trim() })
+    await homesStore.updateHome(homeId.value, { name })
     toast.show('Hogar actualizado', 'success')
     closeEditHomeModal()
   } catch {

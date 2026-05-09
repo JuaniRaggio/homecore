@@ -31,7 +31,7 @@
           <div v-for="device in room.devices" :key="device.id" class="room-device">
             <span class="device-name">{{ device.name }}</span>
             <div class="device-row__controls" @click.stop>
-              <ToggleSwitch :model-value="device.isOn" @update:model-value="toggleDevice(device)" />
+              <ToggleSwitch :model-value="device.isOn" @update:model-value="deviceActions.toggleDevice(device.id)" />
               <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
@@ -68,25 +68,15 @@
       @created="onRoomCreated"
     />
 
-    <!-- Modal editar habitacion -->
-    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
-      <div class="modal">
-        <h2 class="modal-title">Editar habitacion</h2>
-        <input
-          v-model="editRoomName"
-          class="modal-input"
-          type="text"
-          placeholder="Nombre de la habitacion"
-          @keyup.enter="confirmEditRoom"
-        />
-        <div class="modal-actions">
-          <button class="btn-cancel" @click="closeEditModal" :disabled="saving">Cancelar</button>
-          <button class="btn-confirm" @click="confirmEditRoom" :disabled="saving || !editRoomName.trim()">
-            {{ saving ? 'Guardando...' : 'Guardar' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <EditNameModal
+      :visible="showEditModal"
+      title="Editar habitacion"
+      placeholder="Nombre de la habitacion"
+      :current-name="editingRoom?.name || ''"
+      :loading="saving"
+      @close="closeEditModal"
+      @save="confirmEditRoom"
+    />
 
 
     <ConfirmModal
@@ -122,9 +112,11 @@ import { useRoute, useRouter } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
+import EditNameModal from '@/components/common/EditNameModal.vue'
 import { useRoomsStore } from '@/stores/rooms'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
+import { useDeviceActions } from '@/composables/useDeviceActions'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -132,6 +124,7 @@ const router = useRouter()
 const roomsStore = useRoomsStore()
 const devicesStore = useDevicesStore()
 const toast = useToastStore()
+const deviceActions = useDeviceActions()
 
 const rooms = computed(() =>
   roomsStore.rooms.map(room => ({
@@ -225,39 +218,28 @@ function onRoomCreated() {
 // Edit room modal
 const showEditModal = ref(false)
 const editingRoom = ref(null)
-const editRoomName = ref('')
 
 function editRoom(room) {
   editingRoom.value = room
-  editRoomName.value = room.name
   showEditModal.value = true
 }
 
 function closeEditModal() {
   showEditModal.value = false
   editingRoom.value = null
-  editRoomName.value = ''
 }
 
-async function confirmEditRoom() {
-  if (!editRoomName.value.trim() || !editingRoom.value || saving.value) return
+async function confirmEditRoom(name) {
+  if (!editingRoom.value) return
   saving.value = true
   try {
-    await roomsStore.updateRoom(editingRoom.value.id, { name: editRoomName.value.trim() })
+    await roomsStore.updateRoom(editingRoom.value.id, { name })
     toast.show('Habitacion actualizada', 'success')
     closeEditModal()
   } catch {
     toast.show('No se pudo renombrar la habitacion. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false
-  }
-}
-
-async function toggleDevice(device) {
-  try {
-    await devicesStore.toggleDevice(device.id)
-  } catch {
-    toast.show(`No se pudo cambiar el estado de "${device.name}". Verifica que este conectado.`, 'error')
   }
 }
 
