@@ -17,7 +17,7 @@
 
         </select>
       </div>
-      <button class="btn-add" @click="openCreateDeviceModal">+ Nuevo dispositivo</button>
+      <button class="btn-add" @click="createModal.open">+ Nuevo dispositivo</button>
 
     </div>
 
@@ -36,10 +36,10 @@
     </div>
 
     <CreateDeviceModal
-      :visible="showCreateModal"
+      :visible="createModal.visible.value"
       :home-id="String(route.params.homeId)"
-      @close="closeCreateModal"
-      @created="onDeviceCreated"
+      @close="createModal.close"
+      @created="createModal.close"
     />
   </div>
 </template>
@@ -47,13 +47,14 @@
 
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useDeviceActions } from '@/composables/useDeviceActions'
+import { useModal } from '@/composables/useModal'
 import { translateType } from '@/utils/device-helpers'
 
 const route = useRoute()
@@ -80,19 +81,7 @@ function handleOpenDevice(id) {
 }
 
 // Create device modal
-const showCreateModal = ref(false)
-
-function openCreateDeviceModal() {
-  showCreateModal.value = true
-}
-
-function closeCreateModal() {
-  showCreateModal.value = false
-}
-
-function onDeviceCreated() {
-  // fetchAllForHome is handled inside CreateDeviceModal
-}
+const createModal = useModal()
 
 onMounted(() => {
   const homeId = route.params.homeId

@@ -20,43 +20,23 @@
       />
     </div>
 
-    <!-- Modal detalle rutina -->
-    <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
-      <div class="modal modal--wide">
-        <h2 class="modal-title">{{ detailRoutine?.name }}</h2>
-        <p class="modal-desc">{{ detailRoutine?.description || 'Sin descripcion' }}</p>
+    <RoutineDetailModal
+      :visible="detailModal.visible.value"
+      :routine="detailRoutine"
+      @close="closeDetailModal"
+      @delete="deleteFromDetail"
+      @execute="executeFromDetail"
+    />
 
-        <div class="detail-row">
-          <span class="detail-label">Horario</span>
-          <span class="detail-value">{{ detailRoutine?.time }} - {{ detailRoutine?.days }}</span>
-        </div>
-
-        <div class="detail-row">
-          <span class="detail-label">Acciones</span>
-          <span class="detail-value">{{ detailRoutine?.actions?.length ?? 0 }} acciones configuradas</span>
-        </div>
-
-        <div class="detail-row">
-          <span class="detail-label">Estado</span>
-          <span class="detail-value">{{ detailRoutine?.isActive ? 'Activa' : 'Inactiva' }}</span>
-        </div>
-
-        <div class="modal-actions">
-          <button class="btn-cancel btn-cancel--danger" @click="deleteFromDetail">Eliminar</button>
-          <button class="btn-confirm" @click="executeFromDetail">Ejecutar</button>
-          <button class="btn-cancel" @click="closeDetailModal">Cerrar</button>
-        </div>
-      </div>
-    </div>
     <ConfirmModal
-      :visible="showDeleteConfirm"
+      :visible="deleteConfirm.visible.value"
       title="Eliminar rutina"
       :description="deleteDescription"
       confirm-label="Eliminar"
       confirming-label="Eliminando..."
       :danger="true"
-      :loading="deleting"
-      @close="closeDeleteConfirm"
+      :loading="deleteConfirm.loading.value"
+      @close="deleteConfirm.close"
       @confirm="confirmDeleteRoutine"
     />
   </div>
@@ -66,16 +46,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RoutineCard from '@/components/routines/RoutineCard.vue'
+import RoutineDetailModal from '@/components/routines/RoutineDetailModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
 import { useRoutineActions } from '@/composables/useRoutineActions'
+import { useModal } from '@/composables/useModal'
+import { useConfirmAction } from '@/composables/useConfirmAction'
 
 const route = useRoute()
 const router = useRouter()
 const routinesStore = useRoutinesStore()
 const toast = useToastStore()
 const routineActions = useRoutineActions()
+const detailModal = useModal()
+const deleteConfirm = useConfirmAction()
 const routines = routinesStore.routines
 
 function openCreateModal() {
@@ -100,56 +85,36 @@ async function handleToggleActive(id) {
   }
 }
 
-// Loading states
-const saving = ref(false)
-const deleting = ref(false)
+// Detail modal
+const detailRoutine = ref(null)
 
-// Delete confirmation
-const showDeleteConfirm = ref(false)
 const deleteDescription = computed(() =>
   `Estas seguro de que queres eliminar "${detailRoutine.value?.name}"? Esta accion no se puede deshacer.`
 )
 
-function closeDeleteConfirm() {
-  showDeleteConfirm.value = false
-}
-
-const showCreateModal = ref(false)
-
-// Detail modal
-const showDetailModal = ref(false)
-const detailRoutine = ref(null)
-
 function handleViewDetail(id) {
   detailRoutine.value = routinesStore.getById(id)
   if (detailRoutine.value) {
-    showDetailModal.value = true
+    detailModal.open()
   }
 }
 
 function closeDetailModal() {
-  showDetailModal.value = false
+  detailModal.close()
   detailRoutine.value = null
 }
 
 function deleteFromDetail() {
   if (!detailRoutine.value) return
-  showDeleteConfirm.value = true
+  deleteConfirm.request(detailRoutine.value.id)
 }
 
 async function confirmDeleteRoutine() {
-  if (!detailRoutine.value || deleting.value) return
-  deleting.value = true
-  try {
+  await deleteConfirm.confirm(async () => {
     await routinesStore.remove(detailRoutine.value.id)
     toast.show('Rutina eliminada', 'success')
-    showDeleteConfirm.value = false
     closeDetailModal()
-  } catch {
-    toast.show('No se pudo eliminar la rutina. Intenta de nuevo.', 'error')
-  } finally {
-    deleting.value = false
-  }
+  })
 }
 
 async function executeFromDetail() {
@@ -179,24 +144,5 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.detail-label {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.detail-value {
-  font-size: var(--font-sm);
-  color: var(--text-primary);
 }
 </style>

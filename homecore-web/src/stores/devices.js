@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
-import { normalizeDevice } from '@/utils/device-helpers'
+import { normalizeDevice, calcConsumption } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 
 const MAX_CONCURRENT_REQUESTS = 3
@@ -17,12 +17,7 @@ export const useDevicesStore = defineStore('devices', () => {
   const activeDevices = computed(() => devices.value.filter(d => d.isOn))
 
   const totalConsumption = computed(() =>
-    devices.value
-      .filter(d => d.isOn)
-      .reduce((sum, d) => {
-        const dt = deviceTypes.value.find(t => String(t.id) === String(d.typeId))
-        return sum + (dt?.powerUsage ?? 0)
-      }, 0)
+    calcConsumption(devices.value, deviceTypes.value)
   )
 
   function clear() {

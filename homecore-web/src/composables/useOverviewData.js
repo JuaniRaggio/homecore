@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
-import { normalizeDevice } from '@/utils/device-helpers'
+import { normalizeDevice, calcConsumption } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 
 const MAX_CONCURRENT = 3
@@ -19,10 +19,7 @@ export function useOverviewData() {
   function enrichHome(home) {
     const devices = devicesByHome.value[home.id] || []
     const active = devices.filter(d => d.isOn)
-    const consumption = active.reduce((sum, d) => {
-      const dt = deviceTypes.value.find(t => String(t.id) === String(d.typeId))
-      return sum + (dt?.powerUsage ?? 0)
-    }, 0)
+    const consumption = calcConsumption(devices, deviceTypes.value)
 
     return {
       ...home,
@@ -41,12 +38,7 @@ export function useOverviewData() {
   )
 
   const totalConsumption = computed(() =>
-    allDevices.value
-      .filter(d => d.isOn)
-      .reduce((sum, d) => {
-        const dt = deviceTypes.value.find(t => String(t.id) === String(d.typeId))
-        return sum + (dt?.powerUsage ?? 0)
-      }, 0)
+    calcConsumption(allDevices.value, deviceTypes.value)
   )
 
   const totalActiveDevices = computed(() =>

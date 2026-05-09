@@ -37,6 +37,18 @@ export function getDisplayName(device, allDevices) {
 }
 
 /**
+ * Calcula el consumo total de una lista de dispositivos activos.
+ */
+export function calcConsumption(devices, deviceTypes) {
+  return devices
+    .filter(d => d.isOn)
+    .reduce((sum, d) => {
+      const dt = deviceTypes.find(t => String(t.id) === String(d.typeId))
+      return sum + (dt?.powerUsage ?? 0)
+    }, 0)
+}
+
+/**
  * Normaliza un dispositivo de la API a un formato plano para la UI.
  */
 export function normalizeDevice(d, roomName, roomId) {
