@@ -5,7 +5,7 @@ export const ACTIONS_MAP = {
   light: [
     { actionName: 'turnOn',        label: 'Encender',    params: [] },
     { actionName: 'turnOff',       label: 'Apagar',      params: [] },
-    { actionName: 'setBrightness', label: 'Brillo',      params: [{ type: 'number', min: 0,  max: 100, placeholder: '0-100' }] },
+    { actionName: 'setBrightness', label: 'Brillo',      params: [{ type: 'number', min: 0,  max: 100, step: 1, placeholder: '0-100' }] },
     { actionName: 'setColor',      label: 'Color',       params: [{ type: 'color' }] },
   ],
   door: [
@@ -30,12 +30,12 @@ export const ACTIONS_MAP = {
   curtain: [
     { actionName: 'open',     label: 'Abrir',    params: [] },
     { actionName: 'close',    label: 'Cerrar',   params: [] },
-    { actionName: 'setLevel', label: 'Posicion', params: [{ type: 'number', min: 0, max: 100, placeholder: '0-100' }] },
+    { actionName: 'setLevel', label: 'Posicion', params: [{ type: 'number', min: 0, max: 100, step: 1, placeholder: '0-100' }] },
   ],
   ac: [
     { actionName: 'turnOn',         label: 'Encender',    params: [] },
     { actionName: 'turnOff',        label: 'Apagar',      params: [] },
-    { actionName: 'setTemperature', label: 'Temperatura', params: [{ type: 'number', min: 18, max: 38, placeholder: '18-38 C' }] },
+    { actionName: 'setTemperature', label: 'Temperatura', params: [{ type: 'number', min: 18, max: 38, step: 1, placeholder: '18-38 C' }] },
     { actionName: 'setMode',        label: 'Modo',        params: [{ type: 'select', options: ['ventilacion', 'frio', 'calor'] }] },
     { actionName: 'setFanSpeed',    label: 'Velocidad ventilador', params: [{ type: 'select', options: ['auto', '25', '50', '75', '100'] }] },
   ],
@@ -46,7 +46,7 @@ export const ACTIONS_MAP = {
     { actionName: 'resume',        label: 'Reanudar',         params: [] },
     { actionName: 'nextSong',      label: 'Siguiente cancion',params: [] },
     { actionName: 'previousSong',  label: 'Cancion anterior', params: [] },
-    { actionName: 'setVolume',     label: 'Volumen',          params: [{ type: 'number', min: 0, max: 10, placeholder: '0-10' }] },
+    { actionName: 'setVolume',     label: 'Volumen',          params: [{ type: 'number', min: 0, max: 10, step: 1, placeholder: '0-10' }] },
     { actionName: 'setGenre',      label: 'Genero',           params: [{ type: 'select', options: ['clasica', 'country', 'dance', 'latina', 'pop', 'rock'] }] },
   ],
   vacuum: [
@@ -56,14 +56,14 @@ export const ACTIONS_MAP = {
     { actionName: 'setMode', label: 'Modo',           params: [{ type: 'select', options: ['aspirar', 'trapear'] }] },
   ],
   fridge: [
-    { actionName: 'setTemperature',        label: 'Temperatura',        params: [{ type: 'number', min: 2,   max: 8,   placeholder: '2-8 C' }] },
-    { actionName: 'setFreezerTemperature', label: 'Temperatura freezer',params: [{ type: 'number', min: -20, max: -8, placeholder: '-20 a -8 C' }] },
+    { actionName: 'setTemperature',        label: 'Temperatura',        params: [{ type: 'number', min: 2,   max: 8,   step: 1, placeholder: '2-8 C' }] },
+    { actionName: 'setFreezerTemperature', label: 'Temperatura freezer',params: [{ type: 'number', min: -20, max: -8, step: 1, placeholder: '-20 a -8 C' }] },
     { actionName: 'setMode',               label: 'Modo',               params: [{ type: 'select', options: ['normal', 'fiesta', 'vacaciones'] }] },
   ],
   oven: [
     { actionName: 'turnOn',          label: 'Encender',         params: [] },
     { actionName: 'turnOff',         label: 'Apagar',           params: [] },
-    { actionName: 'setTemperature',  label: 'Temperatura',      params: [{ type: 'number', min: 90, max: 230, placeholder: '90-230 C' }] },
+    { actionName: 'setTemperature',  label: 'Temperatura',      params: [{ type: 'number', min: 90, max: 230, step: 10, placeholder: '90-230 C' }] },
     { actionName: 'setHeatSource',   label: 'Fuente de calor',  params: [{ type: 'select', options: ['convencional', 'abajo', 'arriba'] }] },
     { actionName: 'setGrillMode',    label: 'Modo grill',       params: [{ type: 'select', options: ['apagado', 'economico', 'completo'] }] },
     { actionName: 'setConvectionMode', label: 'Modo conveccion',params: [{ type: 'select', options: ['apagado', 'economico', 'convencional'] }] },
