@@ -327,7 +327,7 @@ async function submit() {
     toast.show('Rutina creada', 'success')
     router.push({ name: 'routines', params: { homeId: homeId.value } })
   } catch {
-    toast.show('Error al crear rutina', 'error')
+    toast.show('No se pudo crear la rutina. Verifica los datos e intenta de nuevo.', 'error')
   } finally {
     saving.value = false
   }
@@ -348,105 +348,7 @@ onMounted(() => {
 
 .view-title { margin-bottom: 20px; }
 
-.wizard-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 28px;
-}
-
-/* Stepper */
-.stepper {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 0;
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.step-circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-sm);
-  font-weight: 700;
-  background-color: var(--bg-main);
-  color: var(--text-muted);
-  border: 2px solid var(--border);
-  flex-shrink: 0;
-}
-
-.step--active .step-circle {
-  background-color: var(--accent);
-  color: var(--text-on-accent);
-  border-color: var(--accent);
-}
-
-.step--done .step-circle {
-  background-color: var(--success);
-  color: var(--text-on-accent);
-  border-color: var(--success);
-}
-
-.step-label {
-  font-size: var(--font-base);
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.step--active .step-label { color: var(--text-primary); font-weight: 600; }
-.step--done .step-label   { color: var(--text-primary); }
-
-.step-line {
-  flex: 1;
-  height: 1px;
-  background-color: var(--border);
-  margin: 0 10px;
-  min-width: 20px;
-}
-
-.wizard-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 24px 0;
-}
-
-/* Step content */
-.step-content { min-height: 220px; }
-
-.step-title {
-  font-size: var(--font-xl);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.step-hint {
-  font-size: var(--font-base);
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
-
-/* Override del global: agrega margen entre form-groups del wizard */
-.form-group {
-  margin-bottom: 16px;
-}
-
-/* Override del global: label con color accent para el wizard */
-.form-label {
-  font-size: var(--font-sm);
-  color: var(--accent);
-}
-
 .form-input-time { max-width: 200px; }
-
 
 /* Device grid */
 .device-grid {
@@ -543,52 +445,4 @@ onMounted(() => {
 
 .day-btn:hover { border-color: var(--accent); }
 .day-btn--active { background-color: var(--accent); color: #fff; border-color: var(--accent); }
-
-/* Navigation */
-.wizard-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.invisible { visibility: hidden; }
-
-.btn-prev {
-  background-color: var(--bg-main);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  font-weight: 600;
-  padding: 10px 24px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.btn-prev:hover { background-color: var(--bg-nav-hover); }
-
-.btn-next, .btn-create {
-  background-color: var(--accent);
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-on-accent);
-  font-size: var(--font-base);
-  font-weight: 600;
-  padding: 10px 28px;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.btn-create { background-color: var(--success); }
-.btn-next:disabled, .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.step-warning {
-  font-size: var(--font-sm);
-  color: var(--warning);
-  background-color: rgba(230, 168, 23, 0.1);
-  border: 1px solid rgba(230, 168, 23, 0.3);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-  margin-bottom: 20px;
-}
 </style>
