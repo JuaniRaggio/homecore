@@ -54,8 +54,8 @@ export function useOverviewData() {
 
     try {
       const [types, allRooms] = await Promise.all([
-        api.getDeviceTypes().catch(() => []),
-        api.getAllRooms().catch(() => []),
+        api.getDeviceTypes().catch(e => { console.error('[overview] Error cargando tipos de dispositivo:', e); return [] }),
+        api.getAllRooms().catch(e => { console.error('[overview] Error cargando habitaciones:', e); return [] }),
       ])
       deviceTypes.value = types
 
@@ -76,7 +76,8 @@ export function useOverviewData() {
               try {
                 const roomDevices = await api.getDevices(room.id)
                 return roomDevices.map(d => normalizeDevice(d, room.name))
-              } catch {
+              } catch (e) {
+                console.error(`[overview] Error cargando dispositivos de habitacion ${room.name}:`, e)
                 return []
               }
             }))

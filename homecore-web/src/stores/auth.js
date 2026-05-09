@@ -26,8 +26,8 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const profile = await api.getUserProfile()
       user.value = profile
-    } catch {
-      // token invalido o expirado — no romper la app
+    } catch (e) {
+      console.error('[auth] Error cargando perfil (token invalido o expirado):', e)
     }
   }
 
@@ -44,8 +44,8 @@ export const useAuthStore = defineStore('auth', () => {
         })
       }
       templateReady.value = true
-    } catch {
-      // si falla no bloqueamos el flujo
+    } catch (e) {
+      console.error('[auth] Error configurando template de registro:', e)
     }
   }
 
@@ -60,7 +60,8 @@ export const useAuthStore = defineStore('auth', () => {
           await api.sendVerification(email)
           pendingCredentials.value = { email, password }
           return { success: true }
-        } catch {
+        } catch (e) {
+          console.error('[auth] Error enviando verificacion para cuenta existente:', e)
           return { success: false, conflict: true }
         }
       }
@@ -87,6 +88,7 @@ export const useAuthStore = defineStore('auth', () => {
       socketConnect(response.token)
       return { success: true }
     } catch (error) {
+      console.error('[auth] Error de login:', error)
       return { success: false, error: "Error de inicio de sesion" }
     }
   }
