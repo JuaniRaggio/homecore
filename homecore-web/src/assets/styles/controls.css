@@ -45,6 +45,12 @@
   border-color: var(--accent);
 }
 
+.btn-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .btn-control--sm {
   padding: 6px 12px;
   font-size: var(--font-sm);

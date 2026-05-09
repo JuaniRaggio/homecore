@@ -73,6 +73,11 @@
   opacity: 0.85;
 }
 
+.btn-add:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Boton volver */
 .btn-back {
   background: none;
