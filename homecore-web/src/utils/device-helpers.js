@@ -23,6 +23,20 @@ export function translateType(typeName) {
 }
 
 /**
+ * Devuelve el nombre a mostrar del dispositivo.
+ * Si hay otro dispositivo con el mismo nombre, desambigua con "habitacion::nombre".
+ */
+export function getDisplayName(device, allDevices) {
+  const hasDuplicate = allDevices.some(d =>
+    d.id !== device.id && d.name === device.name
+  )
+  if (hasDuplicate && device.room) {
+    return `${device.room}::${device.name}`
+  }
+  return device.name
+}
+
+/**
  * Normaliza un dispositivo de la API a un formato plano para la UI.
  */
 export function normalizeDevice(d, roomName) {
