@@ -95,3 +95,40 @@ export function actionsFor(typeName) {
 export function paramsFor(typeName, actionName) {
   return actionsFor(typeName).find(a => a.actionName === actionName)?.params ?? []
 }
+
+/**
+ * Sufijos de unidad por accion para descripciones legibles.
+ */
+const UNIT_SUFFIXES = {
+  setBrightness: '%',
+  setLevel: '%',
+  setTemperature: '°C',
+  setFreezerTemperature: '°C',
+}
+
+/**
+ * Genera una descripcion legible de una accion ejecutada.
+ * Usada tanto para notificaciones (toasts) como para el historial.
+ *
+ * @param {string} typeName - Tipo de dispositivo (light, ac, speaker, etc.)
+ * @param {string} actionName - Nombre de la accion de la API
+ * @param {Array} [params] - Parametros enviados a la accion
+ * @returns {string} Descripcion legible en espanol
+ */
+export function describeAction(typeName, actionName, params) {
+  const action = actionsFor(typeName).find(a => a.actionName === actionName)
+  const label = action?.label ?? actionName
+
+  if (!params || params.length === 0) return label
+
+  const suffix = UNIT_SUFFIXES[actionName] ?? ''
+  const value = params[0]
+
+  if (params.length === 2) {
+    return `${label}: ${value} ${params[1]}`
+  }
+
+  if (suffix) return `${label} ajustado a ${value}${suffix}`
+
+  return `${label}: ${value}`
+}
