@@ -1,0 +1,72 @@
+/* Tarjeta base */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.card--xl {
+  border-radius: var(--radius-xl);
+  padding: 20px;
+}
+
+/* Titulo y divisor dentro de tarjetas */
+.card-title {
+  font-size: var(--font-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.card-divider {
+  height: 1px;
+  background-color: var(--border);
+}
+
+/* Tarjeta de formulario (edicion, creacion) */
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+/* Tarjeta de resumen (consumo, overview) */
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.summary-icon {
+  font-size: var(--font-3xl);
+  color: var(--accent);
+}
+
+.summary-icon--success {
+  color: var(--success);
+}
+
+.summary-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-value {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.summary-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}

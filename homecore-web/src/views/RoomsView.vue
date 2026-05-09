@@ -1,322 +1,299 @@
 <template>
-  <div class="rooms-page">
-    <div class="rooms-page__header">
-      <h2>Habitaciones</h2>
-      <HcButton @click="showAddModal = true">+ Nueva habitacion</HcButton>
+  <div class="view-content">
+    <div class="view-header">
+      <h1 class="view-title">Habitaciones</h1>
+      <button class="btn-add" @click="createRoomModal.open">+ Nueva Habitacion</button>
     </div>
 
-    <div class="rooms-page__grid">
-      <div v-for="room in roomsStore.rooms" :key="room.id" class="room-card">
+
+
+    <p v-if="roomsStore.loading" class="state-loading">Cargando habitaciones...</p>
+    <p v-else-if="roomsStore.error" class="state-error">{{ roomsStore.error }}</p>
+    <p v-else-if="roomsStore.rooms.length === 0" class="state-empty">Sin habitaciones</p>
+    <div v-else class="rooms-grid">
+      <div v-for="room in rooms" :key="room.id" class="card card--xl room-card" @click="openRoom(room.id)">
+
         <div class="room-card__header">
-          <h3 class="room-card__name">{{ room.name }}</h3>
-          <div class="room-card__actions">
-            <button class="room-card__action-btn" @click="startEdit(room)"><HcIcon name="edit" size="sm" /></button>
-            <button class="room-card__action-btn room-card__action-btn--danger" @click="confirmDelete(room)"><HcIcon name="close" size="sm" /></button>
-          </div>
+           <span class="room-name">{{ room.name }}</span>
+           <div class="room-actions">
+
+            <button class="icon-btn" @click.stop="editRoom(room)" title="Editar">
+              <i class="fa-regular fa-pen-to-square"></i>
+            </button>
+            <button class="icon-btn icon-btn--delete" @click.stop="deleteRoomConfirm.request(room.id)" title="Eliminar">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+           </div>
         </div>
-        <div class="room-card__devices">
-          <div v-if="getRoomDevices(room.id).length > 0">
-            <div
-              v-for="device in getRoomDevices(room.id)"
-              :key="device.id"
-              class="room-card__device"
-            >
-              <span class="room-card__device-name">{{ device.name }}</span>
-              <div class="room-card__device-actions">
-                <button
-                  class="room-card__device-toggle"
-                  :class="{ 'room-card__device-toggle--on': device.on }"
-                  @click="devicesStore.toggleDevice(device.id)"
-                  :aria-label="device.on ? 'Apagar' : 'Encender'"
-                >
-                  <span class="room-card__device-toggle-knob"></span>
-                </button>
-                <button class="room-card__unlink" @click="roomsStore.unassignDevice(device.id)" title="Desvincular"><HcIcon name="unlink" size="xs" /></button>
-              </div>
+
+        <div class="room-card__body">
+          <div v-for="device in room.devices" :key="device.id" class="room-device">
+            <span class="device-name">{{ device.name }}</span>
+            <div class="device-row__controls" @click.stop>
+              <ToggleSwitch :model-value="device.isOn" @update:model-value="deviceActions.toggleDevice(device.id)" />
+              <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
+                <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="unlinkConfirm.request(device.id)" title="Desvincular">
+                <i class="fa-solid fa-link-slash"></i>
+              </button>
             </div>
           </div>
-          <p v-else class="room-card__empty">Sin dispositivos vinculados</p>
+          <p v-if="room.devices.length === 0" class="no-devices">Sin dispositivos vinculados</p>
         </div>
-        <div class="room-card__footer">
-          <select class="room-card__assign-select" @change="assignDevice(room.id, $event)">
-            <option value="">+ Vincular dispositivo</option>
-            <option v-for="device in unassignedDevices" :key="device.id" :value="device.id">
+
+
+         <div class="room-card__footer" @click.stop>
+          <select class="link-device-select" @change="linkDevice(room, $event)">
+            <option value="" disabled selected>+ Vincular dispositivo</option>
+            <option
+              v-for="device in availableDevices"
+              :key="device.id"
+              :value="device.id"
+            >
               {{ device.name }}
             </option>
           </select>
         </div>
+
+
       </div>
     </div>
 
-    <!-- Modal agregar habitacion -->
-    <HcModal v-model="showAddModal" title="Nueva habitacion">
-      <HcInput v-model="newRoomName" label="Nombre de la habitacion" placeholder="Ej: Oficina" />
-      <template #footer>
-        <HcButton variant="secondary" @click="showAddModal = false">Cancelar</HcButton>
-        <HcButton @click="addRoom">Crear</HcButton>
-      </template>
-    </HcModal>
+    <CreateRoomModal
+      :visible="createRoomModal.visible.value"
+      :home-id="String(homeId)"
+      @close="createRoomModal.close"
+      @created="createRoomModal.close"
+    />
 
-    <!-- Modal editar -->
-    <HcModal v-model="showEditModal" title="Editar habitacion">
-      <HcInput v-model="editRoomName" label="Nombre de la habitacion" />
-      <template #footer>
-        <HcButton variant="secondary" @click="showEditModal = false">Cancelar</HcButton>
-        <HcButton @click="saveEdit">Guardar</HcButton>
-      </template>
-    </HcModal>
+    <EditNameModal
+      :visible="editRoomModal.visible.value"
+      title="Editar habitacion"
+      placeholder="Nombre de la habitacion"
+      :current-name="editingRoom?.name || ''"
+      :loading="saving"
+      @close="closeEditModal"
+      @save="confirmEditRoom"
+    />
 
-    <!-- Modal confirmar eliminacion -->
-    <HcModal v-model="showDeleteModal" title="Eliminar habitacion" size="sm">
-      <p>Estas seguro de que deseas eliminar "{{ deleteTarget?.name }}"?</p>
-      <p class="text-secondary" style="margin-top: 0.5rem; font-size: 0.875rem;">
-        Los dispositivos vinculados no seran eliminados, solo desvinculados.
-      </p>
-      <template #footer>
-        <HcButton variant="secondary" @click="showDeleteModal = false">Cancelar</HcButton>
-        <HcButton variant="danger" @click="doDelete">Eliminar</HcButton>
-      </template>
-    </HcModal>
+    <ConfirmModal
+      :visible="deleteRoomConfirm.visible.value"
+      title="Eliminar habitacion"
+      description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
+      confirm-label="Eliminar"
+      confirming-label="Eliminando..."
+      :danger="true"
+      :loading="deleteRoomConfirm.loading.value"
+      @close="deleteRoomConfirm.close"
+      @confirm="confirmDeleteRoom"
+    />
+
+    <ConfirmModal
+      :visible="unlinkConfirm.visible.value"
+      title="Desvincular dispositivo"
+      description="Estas seguro de que queres desvincular este dispositivo de la habitacion?"
+      confirm-label="Desvincular"
+      confirming-label="Desvinculando..."
+      :danger="true"
+      :loading="unlinkConfirm.loading.value"
+      @close="unlinkConfirm.close"
+      @confirm="confirmUnlink"
+    />
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject } from 'vue'
-import { useRoomsStore } from '../stores/rooms'
-import { useDevicesStore } from '../stores/devices'
-import HcButton from '../components/ui/HcButton.vue'
-import HcInput from '../components/ui/HcInput.vue'
-import HcModal from '../components/ui/HcModal.vue'
-import HcIcon from '../components/ui/HcIcon.vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
+import EditNameModal from '@/components/common/EditNameModal.vue'
+import { useToastStore } from '@/stores/toast'
+import { useDeviceActions } from '@/composables/useDeviceActions'
+import { useModal } from '@/composables/useModal'
+import { useConfirmAction } from '@/composables/useConfirmAction'
+import { useHomeData } from '@/composables/useHomeData'
+import { actionError } from '@/utils/friendly-error'
+import * as api from '@/services/api'
 
-const roomsStore = useRoomsStore()
-const devicesStore = useDevicesStore()
-const toast = inject('toast')
+const router = useRouter()
+const { homeId, devicesStore, roomsStore } = useHomeData()
+const toast = useToastStore()
+const deviceActions = useDeviceActions()
 
-const showAddModal = ref(false)
-const showEditModal = ref(false)
-const showDeleteModal = ref(false)
-const newRoomName = ref('')
-const editRoomName = ref('')
-const editTarget = ref(null)
-const deleteTarget = ref(null)
-
-const unassignedDevices = computed(() =>
-  devicesStore.devices.filter(d => !d.roomId)
+const rooms = computed(() =>
+  roomsStore.rooms.map(room => ({
+    ...room,
+    devices: devicesStore.devices.filter(d => d.room === room.name)
+  }))
 )
 
-function getRoomDevices(roomId) {
-  return devicesStore.getByRoom(roomId)
+const availableDevices = computed(() =>
+  devicesStore.devices.filter(d => !d.room)
+)
+
+// Loading state for edit room
+const saving = ref(false)
+
+// Delete room confirmation
+const deleteRoomConfirm = useConfirmAction()
+
+async function confirmDeleteRoom() {
+  await deleteRoomConfirm.confirm(async (roomId) => {
+    const room = rooms.value.find(r => String(r.id) === String(roomId))
+    if (room?.devices?.length) {
+      await Promise.all(room.devices.map(d => api.deleteDevice(d.id)))
+      room.devices.forEach(d => devicesStore.removeDevice(d.id))
+    }
+    await roomsStore.removeRoom(roomId)
+    toast.show('Habitacion eliminada', 'success')
+  })
 }
 
-function addRoom() {
-  if (!newRoomName.value.trim()) return
-  roomsStore.addRoom(newRoomName.value.trim())
-  newRoomName.value = ''
-  showAddModal.value = false
-  toast.value?.show('Habitacion creada', 'success')
+// Unlink device confirmation
+const unlinkConfirm = useConfirmAction()
+
+async function confirmUnlink() {
+  await unlinkConfirm.confirm(async (deviceId) => {
+    await api.unlinkDeviceFromRoom(deviceId)
+    devicesStore.clearDeviceRoom(deviceId)
+    toast.show('Dispositivo desvinculado', 'success')
+  })
 }
 
-function startEdit(room) {
-  editTarget.value = room
-  editRoomName.value = room.name
-  showEditModal.value = true
+// Create room modal
+const createRoomModal = useModal()
+
+// Edit room modal
+const editRoomModal = useModal()
+const editingRoom = ref(null)
+
+function editRoom(room) {
+  editingRoom.value = room
+  editRoomModal.open()
 }
 
-function saveEdit() {
-  if (!editRoomName.value.trim() || !editTarget.value) return
-  roomsStore.updateRoom(editTarget.value.id, editRoomName.value.trim())
-  showEditModal.value = false
-  toast.value?.show('Habitacion actualizada', 'success')
+function closeEditModal() {
+  editRoomModal.close()
+  editingRoom.value = null
 }
 
-function confirmDelete(room) {
-  deleteTarget.value = room
-  showDeleteModal.value = true
-}
-
-function doDelete() {
-  if (deleteTarget.value) {
-    roomsStore.deleteRoom(deleteTarget.value.id)
-    showDeleteModal.value = false
-    toast.value?.show('Habitacion eliminada', 'success')
+async function confirmEditRoom(name) {
+  if (!editingRoom.value) return
+  saving.value = true
+  try {
+    await roomsStore.updateRoom(editingRoom.value.id, { name })
+    toast.show('Habitacion actualizada', 'success')
+    closeEditModal()
+  } catch (e) {
+    toast.show(e.message || actionError('renombrar la habitacion'), 'error')
+  } finally {
+    saving.value = false
   }
 }
 
-function assignDevice(roomId, event) {
+function editDevice(device) {
+  router.push({ name: 'device-detail', params: { homeId: homeId.value, id: device.id } })
+}
+
+function openRoom(roomId) {
+  router.push({ name: 'room-detail', params: { homeId: homeId.value, roomId } })
+}
+
+async function linkDevice(room, event) {
   const deviceId = event.target.value
-  if (deviceId) {
-    roomsStore.assignDevice(roomId, deviceId)
-    event.target.value = ''
-    toast.value?.show('Dispositivo vinculado', 'success')
+  event.target.value = ''
+  if (!deviceId) return
+  try {
+    await api.linkDeviceToRoom(room.id, deviceId)
+    toast.show('Dispositivo vinculado', 'success')
+    if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
+  } catch (e) {
+    console.error(`[Rooms] Error vinculando dispositivo ${deviceId} a habitacion ${room.id}:`, e)
+    toast.show(e.message || actionError('vincular el dispositivo a la habitacion'), 'error')
   }
 }
 </script>
-
 <style scoped>
-.rooms-page {
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+/* Layout sobre .card .card--xl */
+.room-card {
   display: flex;
   flex-direction: column;
-  gap: var(--hc-space-xl);
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
-.rooms-page__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.rooms-page__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--hc-space-md);
-}
-
-.room-card {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  overflow: hidden;
+.room-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .room-card__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--hc-space-lg);
-  border-bottom: 1px solid var(--hc-border);
 }
 
-.room-card__name {
-  font-size: var(--hc-font-size-lg);
+.room-name {
+  font-weight: 600;
+  font-size: var(--font-lg);
 }
 
-.room-card__actions {
+.room-actions {
   display: flex;
-  gap: var(--hc-space-xs);
+  gap: 6px;
+  align-items: center;
 }
 
-.room-card__action-btn {
-  background: none;
-  border: none;
-  color: var(--hc-text-muted);
-  cursor: pointer;
-  padding: 0.25rem;
-  font-size: 0.9rem;
-  border-radius: var(--hc-radius-sm);
-  transition: all var(--hc-transition-fast);
+.room-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.room-card__action-btn:hover {
-  background: var(--hc-bg-tertiary);
-  color: var(--hc-text-primary);
-}
-
-.room-card__action-btn--danger:hover {
-  color: var(--hc-danger);
-}
-
-.room-card__devices {
-  padding: var(--hc-space-md) var(--hc-space-lg);
-  min-height: 60px;
-}
-
-.room-card__device {
+.room-device {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--hc-space-sm) 0;
-  border-bottom: 1px solid var(--hc-border);
 }
 
-.room-card__device:last-child {
-  border-bottom: none;
-}
-
-.room-card__device-name {
-  font-size: var(--hc-font-size-sm);
-}
-
-.room-card__device-actions {
+.device-row__controls {
   display: flex;
   align-items: center;
-  gap: var(--hc-space-sm);
+  gap: 6px;
 }
 
-.room-card__device-toggle {
-  position: relative;
-  width: 36px;
-  height: 22px;
-  border: none;
-  border-radius: 11px;
-  padding: 0;
-  cursor: pointer;
-  background: var(--hc-bg-tertiary);
-  transition: background var(--hc-transition-fast);
-  flex-shrink: 0;
-}
-
-.room-card__device-toggle:hover {
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.room-card__device-toggle--on {
-  background: var(--hc-accent);
-}
-
-.room-card__device-toggle--on:hover {
-  background: var(--hc-accent);
-  filter: brightness(1.1);
-}
-
-.room-card__device-toggle-knob {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  transition: left var(--hc-transition-fast);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.room-card__device-toggle--on .room-card__device-toggle-knob {
-  left: 16px;
-}
-
-.room-card__unlink {
-  background: none;
-  border: none;
-  color: var(--hc-text-muted);
-  cursor: pointer;
-  font-size: 0.75rem;
-  opacity: 0.5;
-  transition: opacity var(--hc-transition-fast);
-}
-
-.room-card__unlink:hover {
-  opacity: 1;
-  color: var(--hc-danger);
-}
-
-.room-card__empty {
-  color: var(--hc-text-muted);
-  font-size: var(--hc-font-size-sm);
+.no-devices {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .room-card__footer {
-  padding: var(--hc-space-sm) var(--hc-space-lg) var(--hc-space-md);
+  margin-top: 4px;
 }
 
-.room-card__assign-select {
-  width: 100%;
-  background: var(--hc-bg-tertiary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  color: var(--hc-text-secondary);
-  padding: 0.375rem 0.5rem;
-  font-size: var(--hc-font-size-sm);
-  cursor: pointer;
+@media (max-width: 900px) {
+  .rooms-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

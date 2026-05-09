@@ -1,70 +1,50 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useDevicesStore } from './devices'
+import { ref, computed } from 'vue'
+import * as api from '@/services/api'
+import { friendlyError } from '@/utils/friendly-error'
 
 export const useRoomsStore = defineStore('rooms', () => {
-  const rooms = ref([
-    { id: 'room-1', name: 'Living', icon: 'couch' },
-    { id: 'room-2', name: 'Dormitorio principal', icon: 'bed' },
-    { id: 'room-3', name: 'Cocina', icon: 'kitchen' },
-    { id: 'room-4', name: 'Bano', icon: 'bath' },
-    { id: 'room-5', name: 'Oficina', icon: 'desk' }
-  ])
+  const rooms = ref([])
+  const loading = ref(false)
+  const error = ref(null)
+
+  const roomNames = computed(() => rooms.value.map(r => r.name))
 
   function getById(id) {
-    return rooms.value.find(r => r.id === id)
+    return rooms.value.find(r => String(r.id) === String(id))
   }
 
-  function getDevices(roomId) {
-    const devicesStore = useDevicesStore()
-    return devicesStore.getByRoom(roomId)
-  }
-
-  function addRoom(name) {
-    const id = 'room-' + (rooms.value.length + 1)
-    rooms.value.push({ id, name, icon: 'room' })
-    return id
-  }
-
-  function updateRoom(id, name) {
-    const room = getById(id)
-    if (room) {
-      room.name = name
+  async function fetchRooms(homeId) {
+    loading.value = true
+    error.value = null
+    try {
+      rooms.value = await api.getRooms(homeId)
+    } catch (e) {
+      error.value = friendlyError(e)
+    } finally {
+      loading.value = false
     }
   }
 
-  function deleteRoom(id) {
-    const devicesStore = useDevicesStore()
-    devicesStore.devices.forEach(d => {
-      if (d.roomId === id) d.roomId = null
-    })
-    rooms.value = rooms.value.filter(r => r.id !== id)
+  async function addRoom(homeId, data) {
+    const room = await api.createRoom(homeId, data)
+    rooms.value.push(room)
   }
 
-  function assignDevice(roomId, deviceId) {
-    const devicesStore = useDevicesStore()
-    const device = devicesStore.getById(deviceId)
-    if (device) {
-      device.roomId = roomId
-    }
+  async function updateRoom(id, data) {
+    const updated = await api.updateRoom(id, data)
+    const idx = rooms.value.findIndex(r => String(r.id) === String(id))
+    if (idx !== -1) rooms.value[idx] = { ...rooms.value[idx], ...updated }
   }
 
-  function unassignDevice(deviceId) {
-    const devicesStore = useDevicesStore()
-    const device = devicesStore.getById(deviceId)
-    if (device) {
-      device.roomId = null
-    }
+  async function removeRoom(id) {
+    await api.deleteRoom(id)
+    rooms.value = rooms.value.filter(r => String(r.id) !== String(id))
   }
 
-  return {
-    rooms,
-    getById,
-    getDevices,
-    addRoom,
-    updateRoom,
-    deleteRoom,
-    assignDevice,
-    unassignDevice
+  function clear() {
+    rooms.value = []
   }
+
+  return { rooms, loading, error, roomNames, getById, fetchRooms, addRoom, updateRoom, removeRoom, clear }
 })

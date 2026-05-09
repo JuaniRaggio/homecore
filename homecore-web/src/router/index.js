@@ -1,117 +1,120 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
-import { useHomesStore } from '../stores/homes'
-import AppLayout from '../components/layout/AppLayout.vue'
-import OverviewLayout from '../components/layout/OverviewLayout.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useHomesStore } from '@/stores/homes'
+
+import HomeLayout from '@/components/layout/HomeLayout.vue'
+
+const LoginView = () => import('@/views/LoginView.vue')
+const RegisterView = () => import('@/views/RegisterView.vue')
+const VerifyView = () => import('@/views/VerifyView.vue')
+const RecoverView = () => import('@/views/RecoverView.vue')
+const OverviewView = () => import('@/views/OverviewView.vue')
+const NewPropertyView = () => import('@/views/NewPropertyView.vue')
+const HomeView = () => import('@/views/HomeView.vue')
+const DevicesView = () => import('@/views/DevicesView.vue')
+const DeviceDetailView = () => import('@/views/DeviceDetailView.vue')
+const RoomsView = () => import('@/views/RoomsView.vue')
+const RoutinesView = () => import('@/views/RoutinesView.vue')
+const NewRoutineView = () => import('@/views/NewRoutineView.vue')
+const HistoryView = () => import('@/views/HistoryView.vue')
+const ConsumptionView = () => import('@/views/ConsumptionView.vue')
+const SettingsView = () => import('@/views/SettingsView.vue')
+const EditDeviceView = () => import('@/views/EditDeviceView.vue')
+const RoomDetailView = () => import('@/views/RoomDetailView.vue')
 
 const routes = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('../views/LoginView.vue'),
+    component: LoginView,
     meta: { public: true }
   },
   {
     path: '/registro',
     name: 'register',
-    component: () => import('../views/RegisterView.vue'),
+    component: RegisterView,
     meta: { public: true }
   },
   {
     path: '/verificar',
     name: 'verify',
-    component: () => import('../views/VerifyView.vue'),
+    component: VerifyView,
     meta: { public: true }
   },
   {
     path: '/recuperar',
     name: 'recover',
-    component: () => import('../views/RecoverView.vue'),
+    component: RecoverView,
     meta: { public: true }
   },
   {
     path: '/overview',
-    component: OverviewLayout,
-    children: [
-      {
-        path: '',
-        name: 'overview',
-        component: () => import('../views/OverviewView.vue')
-      }
-    ]
+    name: 'overview',
+    component: OverviewView
   },
   {
     path: '/nueva-propiedad',
-    component: OverviewLayout,
-    children: [
-      {
-        path: '',
-        name: 'new-property',
-        component: () => import('../views/NewPropertyView.vue')
-      }
-    ]
+    name: 'new-property',
+    component: NewPropertyView
   },
   {
-    path: '/:houseId',
-    component: AppLayout,
+    path: '/casa/:homeId',
+    component: HomeLayout,
     children: [
       {
         path: '',
-        name: 'dashboard',
-        component: () => import('../views/DashboardView.vue')
+        name: 'home',
+        component: HomeView
       },
       {
         path: 'dispositivos',
         name: 'devices',
-        component: () => import('../views/DevicesView.vue')
-      },
-      {
-        path: 'dispositivos/nuevo',
-        name: 'new-device',
-        component: () => import('../views/NewDeviceView.vue'),
-        meta: { adminOnly: true }
+        component: DevicesView
       },
       {
         path: 'dispositivos/:id',
         name: 'device-detail',
-        component: () => import('../views/DeviceDetailView.vue')
+        component: DeviceDetailView
+      },
+      {
+        path: 'dispositivos/:id/editar',
+        name: 'edit-device',
+        component: EditDeviceView
       },
       {
         path: 'habitaciones',
         name: 'rooms',
-        component: () => import('../views/RoomsView.vue')
+        component: RoomsView
+      },
+      {
+        path: 'habitaciones/:roomId',
+        name: 'room-detail',
+        component: RoomDetailView
       },
       {
         path: 'rutinas',
         name: 'routines',
-        component: () => import('../views/RoutinesView.vue')
-      },
-      {
-        path: 'rutinas/:id',
-        name: 'routine-detail',
-        component: () => import('../views/RoutineDetailView.vue')
+        component: RoutinesView
       },
       {
         path: 'rutinas/nueva',
         name: 'new-routine',
-        component: () => import('../views/NewRoutineView.vue'),
-        meta: { adminOnly: true }
+        component: NewRoutineView
       },
       {
         path: 'historial',
         name: 'history',
-        component: () => import('../views/HistoryView.vue')
+        component: HistoryView
       },
       {
         path: 'consumo',
         name: 'consumption',
-        component: () => import('../views/ConsumptionView.vue')
+        component: ConsumptionView
       },
       {
         path: 'configuracion',
         name: 'settings',
-        component: () => import('../views/SettingsView.vue'),
-        meta: { adminOnly: true }
+        component: SettingsView
       }
     ]
   },
@@ -129,17 +132,15 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore()
 
-  if (to.meta.adminOnly && !authStore.isAdmin) {
-    return { name: 'dashboard', params: { houseId: to.params.houseId } }
+  if (to.meta.public) return
+
+  if (!authStore.isAuthenticated) {
+    return { name: 'login' }
   }
 
-  if (to.params.houseId) {
+  if (to.params.homeId) {
     const homesStore = useHomesStore()
-    homesStore.syncFromRoute(to.params.houseId)
-
-    if (!homesStore.homeExists(to.params.houseId)) {
-      return '/overview'
-    }
+    homesStore.syncFromRoute(to.params.homeId)
   }
 })
 

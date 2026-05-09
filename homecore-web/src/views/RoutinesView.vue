@@ -1,69 +1,131 @@
 <template>
-  <div class="routines-page">
-    <div class="routines-page__header">
-      <h2>Rutinas</h2>
-      <router-link v-if="authStore.isAdmin" :to="`/${route.params.houseId}/rutinas/nueva`">
-        <HcButton>+ Nueva rutina</HcButton>
-      </router-link>
+  <div class="view-content">
+    <div class="view-header">
+      <h1 class="view-title">Rutinas</h1>
+      <button class="btn-add" @click="openCreateModal">+ Nueva rutina</button>
     </div>
 
-    <div class="routines-page__grid">
+    <p v-if="routinesStore.loading" class="state-loading">Cargando rutinas...</p>
+    <p v-else-if="routinesStore.error" class="state-error">{{ routinesStore.error }}</p>
+    <p v-else-if="routinesStore.routines.length === 0" class="state-empty">Sin rutinas</p>
+    <div v-else class="items-grid">
       <RoutineCard
-        v-for="routine in routinesStore.routines"
+        v-for="routine in routines"
         :key="routine.id"
         :routine="routine"
-        :restrict-execute="!authStore.isAdmin"
-        @execute="handleExecute"
+        @execute="routineActions.executeRoutine"
+        @toggle-favorite="handleToggleFavorite"
+        @toggle-active="handleToggleActive"
+        @view-detail="handleViewDetail"
       />
     </div>
 
-    <div v-if="routinesStore.routines.length === 0" class="routines-page__empty">
-      No hay rutinas creadas. Crea tu primera rutina.
-    </div>
+    <RoutineDetailModal
+      :visible="detailModal.visible.value"
+      :routine="detailRoutine"
+      @close="closeDetailModal"
+      @delete="deleteFromDetail"
+      @execute="executeFromDetail"
+    />
+
+    <ConfirmModal
+      :visible="deleteConfirm.visible.value"
+      title="Eliminar rutina"
+      :description="deleteDescription"
+      confirm-label="Eliminar"
+      confirming-label="Eliminando..."
+      :danger="true"
+      :loading="deleteConfirm.loading.value"
+      @close="deleteConfirm.close"
+      @confirm="confirmDeleteRoutine"
+    />
   </div>
 </template>
 
 <script setup>
-import { inject } from 'vue'
-import { useRoute } from 'vue-router'
-import { useRoutinesStore } from '../stores/routines'
-import { useAuthStore } from '../stores/auth'
-import RoutineCard from '../components/routines/RoutineCard.vue'
-import HcButton from '../components/ui/HcButton.vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import RoutineCard from '@/components/routines/RoutineCard.vue'
+import RoutineDetailModal from '@/components/routines/RoutineDetailModal.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import { useRoutinesStore } from '@/stores/routines'
+import { useToastStore } from '@/stores/toast'
+import { actionError } from '@/utils/friendly-error'
+import { useRoutineActions } from '@/composables/useRoutineActions'
+import { useModal } from '@/composables/useModal'
+import { useConfirmAction } from '@/composables/useConfirmAction'
 
 const route = useRoute()
+const router = useRouter()
 const routinesStore = useRoutinesStore()
-const authStore = useAuthStore()
-const toast = inject('toast')
+const toast = useToastStore()
+const routineActions = useRoutineActions()
+const detailModal = useModal()
+const deleteConfirm = useConfirmAction()
+const routines = routinesStore.routines
 
-function handleExecute(id) {
-  routinesStore.executeRoutine(id)
-  toast.value?.show('Rutina ejecutada correctamente', 'success')
+function openCreateModal() {
+  router.push({ name: 'new-routine', params: { homeId: route.params.homeId } })
 }
+
+async function handleToggleFavorite(id) {
+  try {
+    await routinesStore.toggleFavorite(id)
+  } catch (e) {
+    console.error(`[Routines] Error toggling favorito ${id}:`, e)
+    toast.show(e.message || actionError('actualizar el favorito'), 'error')
+  }
+}
+
+async function handleToggleActive(id) {
+  try {
+    await routinesStore.update(id, {
+      isActive: !routinesStore.getById(id)?.isActive
+    })
+  } catch (e) {
+    console.error(`[Routines] Error cambiando estado de rutina ${id}:`, e)
+    toast.show(e.message || actionError('cambiar el estado de la rutina'), 'error')
+  }
+}
+
+// Detail modal
+const detailRoutine = ref(null)
+
+const deleteDescription = computed(() =>
+  `Estas seguro de que queres eliminar "${detailRoutine.value?.name}"? Esta accion no se puede deshacer.`
+)
+
+function handleViewDetail(id) {
+  detailRoutine.value = routinesStore.getById(id)
+  if (detailRoutine.value) {
+    detailModal.open()
+  }
+}
+
+function closeDetailModal() {
+  detailModal.close()
+  detailRoutine.value = null
+}
+
+function deleteFromDetail() {
+  if (!detailRoutine.value) return
+  deleteConfirm.request(detailRoutine.value.id)
+}
+
+async function confirmDeleteRoutine() {
+  await deleteConfirm.confirm(async () => {
+    await routinesStore.remove(detailRoutine.value.id)
+    toast.show('Rutina eliminada', 'success')
+    closeDetailModal()
+  })
+}
+
+async function executeFromDetail() {
+  if (!detailRoutine.value) return
+  await routineActions.executeRoutine(detailRoutine.value.id)
+}
+
+onMounted(() => {
+  routinesStore.fetchRoutines()
+})
 </script>
-
-<style scoped>
-.routines-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-xl);
-}
-
-.routines-page__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.routines-page__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--hc-space-md);
-}
-
-.routines-page__empty {
-  text-align: center;
-  color: var(--hc-text-muted);
-  padding: var(--hc-space-2xl);
-}
-</style>

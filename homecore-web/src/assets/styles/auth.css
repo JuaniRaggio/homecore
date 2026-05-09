@@ -1,0 +1,68 @@
+/* Layout comun para login, register, verify, recover */
+.auth-bg {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at center, var(--bg-auth-gradient-start) 0%, var(--bg-auth-gradient-end) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 340px;
+  padding: var(--space-4xl) var(--space-xl);
+}
+
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-base);
+}
+
+.auth-title {
+  font-size: var(--font-5xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.auth-card {
+  width: 100%;
+  background-color: var(--bg-auth-card);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-4xl) var(--space-3xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* Icono de app */
+.icon-app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-image {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+/* Link auxiliar (forgot password, etc.) */
+.auth-link {
+  font-size: var(--font-base);
+  color: var(--text-on-accent);
+  text-align: center;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.auth-link:hover {
+  color: var(--text-primary);
+}

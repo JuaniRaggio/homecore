@@ -1558,3 +1558,81 @@ tu pagina o de los limites de pantalla de tus usuarios
 - Flex (Ver en vuetify)
 - Grid System (12 columnas) $=>$ Grilla construida usando flex. Te permite acomodar de forma ordenada y flexible los elementos en la interfaz
 
+
+= API
+
+== Endpoints y metodos HTTP
+
+- `GET`: consultar info
+- `POST`: crear o enviar datos
+- `PUT`: reemplazar por completo
+- `PATCH`: modificar parcialmente
+- `DELETE`: borrar o cancelar
+
+
+== Ejemplo completo
+
+
+=== Request
+
+Quiero crear un producto con nombre cafe, descr. colombiano molido y un
+precio de \$100
+
+```json
+
+POST /products
+
+body:
+{
+  "name": "Cafe",
+  "descr.": "Cafe colombiano molido",
+  "price": "$100"
+}
+
+```
+
+=== Response
+
+```js
+
+{
+  "id": 123,
+  "name": "Cafe",
+  "description": "Cafe colombiano molido",
+  "price": "$100"
+}
+
+```
+
+_El servidor confirmo el producto con id unico_
+
+== Status Codes
+
+- 200: OK
+- 201: created
+- 400: bad request (algo en la request se mando mal)
+- 401: unauthorized (falta auth)
+- 404: not found (no existe ese recurso)
+- 500: server error
+
+
+= Que es Swagger
+
+Te ordena la API de forma visual
+
+1. Mirar el endpoint - e.g.: /users
+2. Identificar el metodo - e.g.: GET, POST, PUT, etc.
+3. Lee la descripcion - "Que hace este endpoint?"
+4. Revisar parametros y body - "Que datos tengo que mandar?"
+5. Mirar las responses - "Que puede devolver el server?"
+6. Probar la llamada - "Ejecutar y mirar el resultado real"
+
+
+
+
+
+
+
+
+
+

@@ -1,347 +1,658 @@
 <template>
-  <div class="device-detail" v-if="device">
-    <div class="device-detail__header">
-      <button class="device-detail__back" @click="$router.back()">
-        <HcIcon name="arrowLeft" size="sm" /> Volver
+  <div class="device-detail view-narrow">
+    <div class="detail-header">
+      <button class="btn-back" @click="router.back()">
+        <i class="fa-solid fa-arrow-left"></i> Volver
       </button>
-      <div class="device-detail__title-row">
-        <div>
-          <h2>{{ device.name }}</h2>
-          <p class="device-detail__type">
-            <HcBadge :variant="device.on ? 'success' : 'default'">
-              {{ devicesStore.typeLabels[device.type] }}
-            </HcBadge>
-            <span class="device-detail__room">{{ roomName }}</span>
-          </p>
-        </div>
-        <div class="device-detail__actions">
-          <button
-            class="device-detail__fav"
-            :class="{ 'device-detail__fav--active': device.favorite }"
-            @click="devicesStore.toggleFavorite(device.id)"
-          >
-            <HcIcon :name="device.favorite ? 'starFilled' : 'star'" size="sm" /> {{ device.favorite ? 'Favorito' : 'Agregar a favoritos' }}
+    </div>
+
+    <p v-if="loading" class="state-loading">Cargando dispositivo...</p>
+    <p v-else-if="loadError" class="state-error">{{ loadError }}</p>
+    <template v-else>
+    <div class="detail-header-info">
+      <div class="detail-title-row">
+        <h1 class="view-title">{{ device.name }}</h1>
+        <div class="detail-actions">
+          <button class="icon-btn" @click="goToEdit" title="Editar dispositivo">
+            <i class="fa-regular fa-pen-to-square"></i>
           </button>
-          <button
-            class="device-detail__critical"
-            :class="{ 'device-detail__critical--active': device.critical }"
-            @click="devicesStore.toggleCritical(device.id)"
-          >
-            <HcIcon name="warning" size="sm" /> {{ device.critical ? 'Critico' : 'Marcar critico' }}
+          <button class="icon-btn icon-btn--delete" @click="deleteModal.open" title="Eliminar dispositivo">
+            <i class="fa-solid fa-trash"></i>
           </button>
         </div>
       </div>
+      <span class="device-room">{{ device.room }}</span>
     </div>
 
-    <div class="device-detail__content">
-      <div class="device-detail__control">
-        <HcCard title="Control">
-          <div v-if="needsPassword && !isUnlocked" class="device-detail__locked">
-            <div class="device-detail__locked-icon">
-              <HcIcon name="lock" size="2xl" />
-            </div>
-            <p class="device-detail__locked-text">Este dispositivo esta protegido con contrasena</p>
-            <div class="device-detail__locked-form">
-              <HcInput
-                v-model="passwordInput"
-                type="password"
-                placeholder="Ingresar contrasena"
-                :error="passwordError"
-                @blur="passwordError = null"
-              />
-              <HcButton @click="attemptUnlock">Desbloquear</HcButton>
-            </div>
-          </div>
-          <template v-else>
-            <LampControl v-if="device.type === 'lamp'" :device="device" />
-            <DoorControl v-else-if="device.type === 'door'" :device="device" />
-            <AlarmControl v-else-if="device.type === 'alarm'" :device="device" />
-            <FaucetControl v-else-if="device.type === 'faucet'" :device="device" />
-            <BlindsControl v-else-if="device.type === 'blinds'" :device="device" />
-          </template>
-        </HcCard>
+    <div class="detail-body">
+      <div class="card card--xl status-card">
+        <div class="status-row">
+          <span class="status-label">Estado</span>
+          <span class="status-value" :class="device.isOn ? 'status--on' : 'status--off'">
+            {{ statusLabel }}
+          </span>
+        </div>
+        <ToggleSwitch :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
-      <div class="device-detail__sidebar">
-        <HcCard title="Informacion">
-          <div class="device-detail__info-list">
-            <div class="device-detail__info-row">
-              <span>Estado</span>
-              <span :class="device.on ? 'text-success' : 'text-muted'">
-                {{ device.on ? 'Encendido' : 'Apagado' }}
-              </span>
-            </div>
-            <div class="device-detail__info-row">
-              <span>Consumo</span>
-              <span>{{ device.on ? device.consumption + 'W' : '0W' }}</span>
-            </div>
-            <div class="device-detail__info-row">
-              <span>Habitacion</span>
-              <span>{{ roomName }}</span>
-            </div>
-          </div>
-        </HcCard>
+      <div class="card card--xl controls-card">
+        <h2 class="controls-title">Controles</h2>
 
-        <HcCard title="Historial reciente">
-          <div class="device-detail__history" v-if="deviceHistory.length > 0">
-            <div v-for="entry in deviceHistory.slice(0, 5)" :key="entry.id" class="device-detail__history-item">
-              <span class="device-detail__history-action">{{ entry.action }}</span>
-              <span class="device-detail__history-date">{{ formatDate(entry.date) }}</span>
-            </div>
-          </div>
-          <p v-else class="device-detail__empty">Sin historial para este dispositivo.</p>
-        </HcCard>
+        <LightControls
+          v-if="device.type === 'light'"
+          :brightness="brightness"
+          :color="color"
+          :disabled="cmd.busy.value"
+          :limits="lightLimits"
+          @update:brightness="v => brightness = v"
+          @change:brightness="setBrightness"
+          @update:color="v => color = v"
+          @change:color="setColor"
+        />
+        <DoorControls
+          v-else-if="device.type === 'door'"
+          :locked="locked"
+          :disabled="cmd.busy.value"
+          @toggle-lock="toggleLock"
+        />
+        <CurtainControls
+          v-else-if="device.type === 'curtain'"
+          :position="position"
+          :disabled="cmd.busy.value"
+          :limits="curtainLimits"
+          @update:position="v => position = v"
+          @change:position="setPositionTo"
+        />
+        <AlarmControls
+          v-else-if="device.type === 'alarm'"
+          :is-on="device.isOn"
+          :disabled="cmd.busy.value"
+          @arm-away="handleArmAway"
+          @arm-home="handleArmHome"
+          @disarm="handleDisarm"
+        />
+        <WaterControls
+          v-else-if="device.type === 'water'"
+          :is-on="device.isOn"
+          :disabled="cmd.busy.value"
+          @toggle="togglePower"
+        />
+        <AcControls
+          v-else-if="device.type === 'ac'"
+          :temperature="deviceState.acTemperature"
+          :mode="deviceState.acMode"
+          :fan-speed="deviceState.acFanSpeed"
+          :disabled="cmd.busy.value"
+          :limits="acLimits"
+          @update:temperature="v => deviceState.acTemperature = v"
+          @change:temperature="setAcTemperature"
+          @update:mode="setAcMode"
+          @update:fan-speed="setAcFanSpeed"
+        />
+        <SpeakerControls
+          v-else-if="device.type === 'speaker'"
+          :volume="deviceState.volume"
+          :genre="deviceState.genre"
+          :disabled="cmd.busy.value"
+          :limits="speakerLimits"
+          :playlist="deviceState.playlist"
+          :current-song="deviceState.currentSong"
+          @update:volume="v => deviceState.volume = v"
+          @change:volume="setSpeakerVolume"
+          @update:genre="setSpeakerGenre"
+          @action="handleSpeakerAction"
+        />
+        <VacuumControls
+          v-else-if="device.type === 'vacuum'"
+          :mode="deviceState.vacuumMode"
+          :disabled="cmd.busy.value"
+          :limits="vacuumLimits"
+          :rooms="roomsStore.rooms"
+          :current-room="deviceState.vacuumLocation"
+          @update:mode="setVacuumMode"
+          @update:location="setVacuumLocation"
+          @action="handleVacuumAction"
+        />
+        <FridgeControls
+          v-else-if="device.type === 'fridge'"
+          :temperature="deviceState.fridgeTemp"
+          :freezer-temperature="deviceState.freezerTemp"
+          :mode="deviceState.fridgeMode"
+          :disabled="cmd.busy.value"
+          :limits="fridgeLimits"
+          @update:temperature="v => deviceState.fridgeTemp = v"
+          @change:temperature="setFridgeTemperature"
+          @update:freezer-temperature="v => deviceState.freezerTemp = v"
+          @change:freezer-temperature="setFreezerTemperature"
+          @update:mode="setFridgeMode"
+        />
+        <OvenControls
+          v-else-if="device.type === 'oven'"
+          :temperature="deviceState.ovenTemp"
+          :heat-source="deviceState.heatSource"
+          :grill-mode="deviceState.grillMode"
+          :convection-mode="deviceState.convectionMode"
+          :disabled="cmd.busy.value"
+          :limits="ovenLimits"
+          @update:temperature="v => deviceState.ovenTemp = v"
+          @change:temperature="setOvenTemperature"
+          @update:heat-source="setOvenHeatSource"
+          @update:grill-mode="setOvenGrillMode"
+          @update:convection-mode="setOvenConvectionMode"
+        />
+        <p v-else class="no-controls">Este dispositivo solo tiene encendido/apagado.</p>
       </div>
+
+      <DeviceHistory :device-id="String(device.id)" :device-type="device.type" />
     </div>
-  </div>
-  <div v-else class="device-detail__not-found">
-    <p>Dispositivo no encontrado.</p>
-    <router-link :to="`/${route.params.houseId}/dispositivos`">Volver a dispositivos</router-link>
+    </template>
+
+    <ConfirmModal
+      :visible="deleteModal.visible.value"
+      title="Eliminar dispositivo"
+      :description="deleteDescription"
+      confirm-label="Eliminar"
+      confirming-label="Eliminando..."
+      :danger="true"
+      :loading="saving"
+      @close="deleteModal.close"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useDevicesStore } from '../stores/devices'
-import { useRoomsStore } from '../stores/rooms'
-import { useHistoryStore } from '../stores/history'
-import HcCard from '../components/ui/HcCard.vue'
-import HcBadge from '../components/ui/HcBadge.vue'
-import HcIcon from '../components/ui/HcIcon.vue'
-import HcInput from '../components/ui/HcInput.vue'
-import HcButton from '../components/ui/HcButton.vue'
-import LampControl from '../components/devices/LampControl.vue'
-import DoorControl from '../components/devices/DoorControl.vue'
-import AlarmControl from '../components/devices/AlarmControl.vue'
-import FaucetControl from '../components/devices/FaucetControl.vue'
-import BlindsControl from '../components/devices/BlindsControl.vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import ConfirmModal from '@/components/common/ConfirmModal.vue'
+import LightControls from '@/components/devices/LightControls.vue'
+import DoorControls from '@/components/devices/DoorControls.vue'
+import CurtainControls from '@/components/devices/CurtainControls.vue'
+import AlarmControls from '@/components/devices/AlarmControls.vue'
+import WaterControls from '@/components/devices/WaterControls.vue'
+import AcControls from '@/components/devices/AcControls.vue'
+import SpeakerControls from '@/components/devices/SpeakerControls.vue'
+import VacuumControls from '@/components/devices/VacuumControls.vue'
+import FridgeControls from '@/components/devices/FridgeControls.vue'
+import OvenControls from '@/components/devices/OvenControls.vue'
+import DeviceHistory from '@/components/devices/DeviceHistory.vue'
+import { useDevicesStore } from '@/stores/devices'
+import { useRoomsStore } from '@/stores/rooms'
+import { useToastStore } from '@/stores/toast'
+import { useModal } from '@/composables/useModal'
+import { useDeviceCommand } from '@/composables/useDeviceCommand'
+import { useDeviceLimits } from '@/composables/useDeviceLimits'
+import { friendlyError, actionError } from '@/utils/friendly-error'
+import { getStatusMap } from '@/config/device-types'
+import { normalizeDevice } from '@/utils/device-helpers'
+import { describeAction } from '@/config/routine-actions'
+import * as api from '@/services/api'
 
+const router = useRouter()
 const route = useRoute()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
-const historyStore = useHistoryStore()
+const toast = useToastStore()
+const cmd = useDeviceCommand()
+const deviceLimits = useDeviceLimits()
 
-const device = computed(() => devicesStore.getById(route.params.id))
+const device = ref({})
+const loading = ref(true)
+const loadError = ref('')
 
-const isUnlocked = ref(false)
-const passwordInput = ref('')
-const passwordError = ref(null)
-const needsPassword = computed(() => device.value && devicesStore.hasPassword(device.value.id))
+const brightness = ref(100)
+const color = ref('#ffffff')
+const locked = ref(false)
+const position = ref(0)
 
-function attemptUnlock() {
-  if (devicesStore.verifyPassword(device.value.id, passwordInput.value)) {
-    isUnlocked.value = true
-    passwordError.value = null
-  } else {
-    passwordError.value = 'Contrasena incorrecta'
+const deviceState = reactive({
+  acTemperature: 24, acMode: 'frio', acFanSpeed: 'auto',
+  volume: 5, genre: 'pop', playlist: [], currentSong: null,
+  vacuumMode: 'aspirar', vacuumLocation: null,
+  fridgeTemp: 5, freezerTemp: -18, fridgeMode: 'normal',
+  ovenTemp: 180, heatSource: 'convencional', grillMode: 'apagado', convectionMode: 'apagado',
+})
+
+// Loading state for delete
+const saving = ref(false)
+
+// Delete modal
+const deleteModal = useModal()
+const deleteDescription = computed(() =>
+  `Estas seguro de que queres eliminar "${device.value.name}"? Esta accion no se puede deshacer.`
+)
+
+const statusLabel = computed(() => {
+  const map = getStatusMap(device.value.type)
+  return device.value.isOn ? map.on : map.off
+})
+
+const lightLimits = computed(() => ({
+  brightness: deviceLimits.getNumericLimits(device.value.type, 'setBrightness'),
+}))
+
+const curtainLimits = computed(() => ({
+  position: deviceLimits.getNumericLimits(device.value.type, 'setLevel'),
+}))
+
+const acLimits = computed(() => ({
+  temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
+  modeOptions: deviceLimits.getSelectOptions(device.value.type, 'setMode'),
+  fanSpeedOptions: deviceLimits.getSelectOptions(device.value.type, 'setFanSpeed'),
+}))
+
+const speakerLimits = computed(() => ({
+  volume: deviceLimits.getNumericLimits(device.value.type, 'setVolume'),
+  genreOptions: deviceLimits.getSelectOptions(device.value.type, 'setGenre'),
+}))
+
+const vacuumLimits = computed(() => ({
+  modeOptions: deviceLimits.getSelectOptions(device.value.type, 'setMode'),
+}))
+
+const fridgeLimits = computed(() => ({
+  temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
+  freezerTemperature: deviceLimits.getNumericLimits(device.value.type, 'setFreezerTemperature'),
+  modeOptions: deviceLimits.getSelectOptions(device.value.type, 'setMode'),
+}))
+
+const ovenLimits = computed(() => ({
+  temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
+  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeatSource'),
+  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrillMode'),
+  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvectionMode'),
+}))
+
+function goToEdit() {
+  router.push({ name: 'edit-device', params: { homeId: route.params.homeId, id: device.value.id } })
+}
+
+async function confirmDelete() {
+  if (saving.value) return
+  saving.value = true
+  try {
+    await api.deleteDevice(device.value.id)
+    toast.show('Dispositivo eliminado', 'success')
+    deleteModal.close()
+    router.back()
+  } catch (e) {
+    console.error(`[DeviceDetail] Error eliminando dispositivo ${device.value.id}:`, e)
+    toast.show('No se pudo eliminar el dispositivo.', 'error')
+  } finally {
+    saving.value = false
   }
 }
 
-const roomName = computed(() => {
-  if (!device.value?.roomId) return 'Sin habitacion'
-  const room = roomsStore.getById(device.value.roomId)
-  return room ? room.name : 'Sin habitacion'
-})
-
-const deviceHistory = computed(() => {
-  if (!device.value) return []
-  return historyStore.getByDevice(device.value.id)
-})
-
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  return date.toLocaleString('es-AR', {
-    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+async function togglePower() {
+  const map = getStatusMap(device.value.type)
+  const action = device.value.isOn ? map.actionOff : map.actionOn
+  const verb = device.value.isOn ? map.verbOff : map.verbOn
+  await cmd.execute(device.value.id, action, {
+    successMsg: null,
+    errorMsg: actionError(`${verb} el dispositivo`),
+    onSuccess() {
+      device.value.isOn = !device.value.isOn
+      const newMap = getStatusMap(device.value.type)
+      toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
+    },
   })
 }
+
+async function setBrightness(value) {
+  brightness.value = value
+  await cmd.execute(device.value.id, 'setBrightness', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setBrightness', [value]),
+    errorMsg: actionError('cambiar el brillo'),
+  })
+}
+
+async function setColor(value) {
+  color.value = value
+  await cmd.execute(device.value.id, 'setColor', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setColor', [value]),
+    errorMsg: actionError('cambiar el color'),
+  })
+}
+
+async function toggleLock() {
+  const actionLabel = locked.value ? 'desbloquear' : 'bloquear'
+  const action = locked.value ? 'unlock' : 'lock'
+  await cmd.execute(device.value.id, action, {
+    errorMsg: actionError(`${actionLabel} la puerta`),
+    onSuccess() {
+      locked.value = !locked.value
+      toast.show(describeAction(device.value.type, locked.value ? 'lock' : 'unlock'), 'success')
+    },
+  })
+}
+
+// --- Alarm ---
+async function handleArmAway(code) {
+  await cmd.execute(device.value.id, 'armAway', {
+    params: [code],
+    successMsg: describeAction(device.value.type, 'armAway'),
+    errorMsg: actionError('activar la alarma'),
+    onSuccess() { device.value.isOn = true },
+  })
+}
+
+async function handleArmHome(code) {
+  await cmd.execute(device.value.id, 'armHome', {
+    params: [code],
+    successMsg: describeAction(device.value.type, 'armHome'),
+    errorMsg: actionError('activar la alarma'),
+    onSuccess() { device.value.isOn = true },
+  })
+}
+
+async function handleDisarm(code) {
+  await cmd.execute(device.value.id, 'disarm', {
+    params: [code],
+    successMsg: describeAction(device.value.type, 'disarm'),
+    errorMsg: actionError('desactivar la alarma'),
+    onSuccess() { device.value.isOn = false },
+  })
+}
+
+async function setPositionTo(value) {
+  position.value = value
+  await cmd.execute(device.value.id, 'setLevel', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setLevel', [value]),
+    errorMsg: actionError('cambiar la posicion'),
+  })
+}
+
+// --- AC ---
+async function setAcTemperature(value) {
+  deviceState.acTemperature = value
+  await cmd.execute(device.value.id, 'setTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setTemperature', [value]),
+    errorMsg: actionError('cambiar la temperatura'),
+  })
+}
+
+async function setAcMode(value) {
+  deviceState.acMode = value
+  await cmd.execute(device.value.id, 'setMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setMode', [value]),
+    errorMsg: actionError('cambiar el modo'),
+  })
+}
+
+async function setAcFanSpeed(value) {
+  deviceState.acFanSpeed = value
+  await cmd.execute(device.value.id, 'setFanSpeed', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setFanSpeed', [value]),
+    errorMsg: actionError('cambiar la velocidad del ventilador'),
+  })
+}
+
+// --- Speaker ---
+async function setSpeakerVolume(value) {
+  deviceState.volume = value
+  await cmd.execute(device.value.id, 'setVolume', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setVolume', [value]),
+    errorMsg: actionError('cambiar el volumen'),
+  })
+}
+
+async function setSpeakerGenre(value) {
+  deviceState.genre = value
+  await cmd.execute(device.value.id, 'setGenre', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setGenre', [value]),
+    errorMsg: actionError('cambiar el genero'),
+  })
+}
+
+async function handleSpeakerAction(actionName) {
+  await cmd.execute(device.value.id, actionName, {
+    successMsg: describeAction(device.value.type, actionName),
+    errorMsg: actionError('ejecutar la accion'),
+    async onSuccess() {
+      try {
+        const state = await api.getDeviceState(device.value.id)
+        if (state?.song !== undefined) deviceState.currentSong = state.song
+      } catch (e) { console.error('[DeviceDetail] Error recargando estado del speaker:', e) }
+    },
+  })
+}
+
+// --- Vacuum ---
+async function setVacuumMode(value) {
+  deviceState.vacuumMode = value
+  await cmd.execute(device.value.id, 'setMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setMode', [value]),
+    errorMsg: actionError('cambiar el modo'),
+  })
+}
+
+async function handleVacuumAction(actionName) {
+  await cmd.execute(device.value.id, actionName, {
+    successMsg: describeAction(device.value.type, actionName),
+    errorMsg: actionError('ejecutar la accion'),
+  })
+}
+
+async function setVacuumLocation(roomId) {
+  deviceState.vacuumLocation = roomId
+  await cmd.execute(device.value.id, 'setLocation', {
+    params: [roomId],
+    successMsg: describeAction(device.value.type, 'setLocation', [roomId]),
+    errorMsg: actionError('cambiar la ubicacion'),
+  })
+}
+
+// --- Fridge ---
+async function setFridgeTemperature(value) {
+  deviceState.fridgeTemp = value
+  await cmd.execute(device.value.id, 'setTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setTemperature', [value]),
+    errorMsg: actionError('cambiar la temperatura'),
+  })
+}
+
+async function setFreezerTemperature(value) {
+  deviceState.freezerTemp = value
+  await cmd.execute(device.value.id, 'setFreezerTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setFreezerTemperature', [value]),
+    errorMsg: actionError('cambiar la temperatura del freezer'),
+  })
+}
+
+async function setFridgeMode(value) {
+  deviceState.fridgeMode = value
+  await cmd.execute(device.value.id, 'setMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setMode', [value]),
+    errorMsg: actionError('cambiar el modo'),
+  })
+}
+
+// --- Oven ---
+async function setOvenTemperature(value) {
+  deviceState.ovenTemp = value
+  await cmd.execute(device.value.id, 'setTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setTemperature', [value]),
+    errorMsg: actionError('cambiar la temperatura'),
+  })
+}
+
+async function setOvenHeatSource(value) {
+  deviceState.heatSource = value
+  await cmd.execute(device.value.id, 'setHeatSource', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
+    errorMsg: actionError('cambiar la fuente de calor'),
+  })
+}
+
+async function setOvenGrillMode(value) {
+  deviceState.grillMode = value
+  await cmd.execute(device.value.id, 'setGrillMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
+    errorMsg: actionError('cambiar el modo grill'),
+  })
+}
+
+async function setOvenConvectionMode(value) {
+  deviceState.convectionMode = value
+  await cmd.execute(device.value.id, 'setConvectionMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
+    errorMsg: actionError('cambiar el modo conveccion'),
+  })
+}
+
+async function loadDeviceState(id) {
+  try {
+    const state = await api.getDeviceState(id)
+    if (state) {
+      if (state.brightness !== undefined) brightness.value = state.brightness
+      if (state.color !== undefined) color.value = state.color
+      if (state.lock !== undefined) locked.value = state.lock === 'locked'
+      if (state.level !== undefined) position.value = state.level
+      if (state.status !== undefined) {
+        device.value.isOn = state.status === 'on' || state.status === 'opened'
+          || state.status === 'active' || state.status === 'playing'
+      }
+
+      const type = device.value.type
+      if (type === 'ac') {
+        if (state.temperature !== undefined) deviceState.acTemperature = state.temperature
+        if (state.mode !== undefined) deviceState.acMode = state.mode
+        if (state.fanSpeed !== undefined) deviceState.acFanSpeed = state.fanSpeed
+      } else if (type === 'speaker') {
+        if (state.volume !== undefined) deviceState.volume = state.volume
+        if (state.genre !== undefined) deviceState.genre = state.genre
+        if (state.song !== undefined) deviceState.currentSong = state.song
+        try {
+          const playlistResult = await api.executeAction(id, 'getPlaylist')
+          deviceState.playlist = playlistResult?.result ?? playlistResult ?? []
+        } catch (e) { console.error('[DeviceDetail] Error cargando playlist:', e) }
+      } else if (type === 'vacuum') {
+        if (state.mode !== undefined) deviceState.vacuumMode = state.mode
+        if (state.location !== undefined) deviceState.vacuumLocation = state.location
+      } else if (type === 'fridge') {
+        if (state.temperature !== undefined) deviceState.fridgeTemp = state.temperature
+        if (state.freezerTemperature !== undefined) deviceState.freezerTemp = state.freezerTemperature
+        if (state.mode !== undefined) deviceState.fridgeMode = state.mode
+      } else if (type === 'oven') {
+        if (state.temperature !== undefined) deviceState.ovenTemp = state.temperature
+        if (state.heat !== undefined) deviceState.heatSource = state.heat
+        if (state.grill !== undefined) deviceState.grillMode = state.grill
+        if (state.convection !== undefined) deviceState.convectionMode = state.convection
+      }
+    }
+  } catch (e) {
+    console.error(`[DeviceDetail] Error cargando estado del dispositivo ${id}:`, e)
+  }
+}
+
+onMounted(async () => {
+  const deviceId = route.params.id
+  try {
+    if (!devicesStore.deviceTypes.length) await devicesStore.fetchDeviceTypes()
+    const raw = await api.getDevice(deviceId)
+    device.value = normalizeDevice(raw, undefined, undefined, devicesStore.deviceTypes)
+    await loadDeviceState(deviceId)
+    if (device.value.typeId) {
+      deviceLimits.fetchLimits(device.value.typeId)
+    }
+    if (device.value.type === 'vacuum' && route.params.homeId) {
+      roomsStore.fetchRooms(route.params.homeId)
+    }
+  } catch (e) {
+    loadError.value = friendlyError(e)
+  }
+  loading.value = false
+})
 </script>
 
 <style scoped>
 .device-detail {
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-xl);
-}
-
-.device-detail__back {
-  background: none;
-  border: none;
-  color: var(--hc-accent);
-  cursor: pointer;
-  font-size: var(--hc-font-size-sm);
   padding: 0;
-  margin-bottom: var(--hc-space-md);
 }
 
-.device-detail__back:hover {
-  color: var(--hc-accent-hover);
+.detail-header {
+  margin-bottom: 24px;
 }
 
-.device-detail__title-row {
+.detail-title-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
 }
 
-.device-detail__type {
+.detail-actions {
   display: flex;
-  align-items: center;
-  gap: var(--hc-space-sm);
-  margin-top: var(--hc-space-sm);
+  gap: 6px;
 }
 
-.device-detail__room {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-muted);
+.view-title {
+  margin-bottom: 4px;
 }
 
-.device-detail__actions {
-  display: flex;
-  gap: var(--hc-space-sm);
-  align-items: flex-start;
+.device-room {
+  font-size: var(--font-base);
+  color: var(--text-muted);
 }
 
-.device-detail__fav {
-  background: none;
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  color: var(--hc-text-secondary);
-  cursor: pointer;
-  padding: 0.625rem 1rem;
-  font-size: var(--hc-font-size-sm);
-  transition: all var(--hc-transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.device-detail__fav:hover {
-  border-color: var(--hc-accent-warm);
-}
-
-.device-detail__fav--active {
-  color: var(--hc-accent-warm);
-  border-color: var(--hc-accent-warm);
-}
-
-.device-detail__critical {
-  background: none;
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  color: var(--hc-text-secondary);
-  cursor: pointer;
-  padding: 0.625rem 1rem;
-  font-size: var(--hc-font-size-sm);
-  transition: all var(--hc-transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.device-detail__critical:hover {
-  border-color: var(--hc-danger);
-}
-
-.device-detail__critical--active {
-  color: var(--hc-danger);
-  border-color: var(--hc-danger);
-}
-
-.device-detail__content {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: var(--hc-space-xl);
-}
-
-.device-detail__control {
-  min-width: 0;
-}
-
-.device-detail__sidebar {
+.detail-body {
   display: flex;
   flex-direction: column;
-  gap: var(--hc-space-md);
+  gap: 16px;
 }
 
-.device-detail__info-list {
+/* Status card (layout sobre .card .card--xl) */
+.status-card {
   display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-md);
-}
-
-.device-detail__info-row {
-  display: flex;
+  align-items: center;
   justify-content: space-between;
-  font-size: var(--hc-font-size-sm);
 }
 
-.device-detail__info-row span:first-child {
-  color: var(--hc-text-secondary);
-}
-
-.device-detail__history {
+.status-row {
   display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-sm);
-}
-
-.device-detail__history-item {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--hc-font-size-sm);
-  padding: var(--hc-space-sm) 0;
-  border-bottom: 1px solid var(--hc-border);
-}
-
-.device-detail__history-item:last-child {
-  border-bottom: none;
-}
-
-.device-detail__history-action {
-  color: var(--hc-text-primary);
-}
-
-.device-detail__history-date {
-  color: var(--hc-text-muted);
-  font-size: var(--hc-font-size-xs);
-}
-
-.device-detail__empty {
-  color: var(--hc-text-muted);
-  font-size: var(--hc-font-size-sm);
-}
-
-.device-detail__not-found {
-  text-align: center;
-  padding: var(--hc-space-2xl);
-  color: var(--hc-text-secondary);
-}
-
-.device-detail__locked {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--hc-space-lg);
-  padding: var(--hc-space-xl) 0;
+  gap: 10px;
 }
 
-.device-detail__locked-icon {
-  color: var(--hc-text-muted);
-  opacity: 0.6;
+.status-label {
+  font-size: var(--font-md);
+  color: var(--text-muted);
 }
 
-.device-detail__locked-text {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
-  text-align: center;
+.status-value {
+  font-size: var(--font-md);
+  font-weight: 600;
 }
 
-.device-detail__locked-form {
-  display: flex;
-  gap: var(--hc-space-sm);
-  align-items: flex-start;
-  width: 100%;
-  max-width: 320px;
+.status--on { color: var(--success); }
+.status--off { color: var(--text-muted); }
+
+/* Controls card (usa .card-title global para el titulo) */
+.controls-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.no-controls {
+  font-size: var(--font-base);
+  color: var(--text-muted);
 }
 </style>

@@ -1,0 +1,83 @@
+:root {
+  /* Fondos */
+  --bg-main:      #0e0d13;
+  --bg-sidebar:   #181924;
+  --bg-topbar:    #181924;
+  --bg-card:      #181924;
+  --bg-card-alt:  #1a1a24;
+  --card-hover:  #4f6ef71a;
+
+  /* Acentos */
+  --accent:       #6f78da;
+  --accent-hover: #d7ddfb;
+  --amber:         #f6bd20;
+
+  /* Semanticos */
+  --success:      #3a8b71;
+  --danger:       #f87171;
+  --warning:      #e6a817;
+  --border:       #a8a8a844;
+  --danger-bg:    rgba(248, 113, 113, 0.1);
+  --success-bg:   rgba(58, 139, 113, 0.1);
+
+  /* Texto */
+  --text-primary:   #d0d3db;
+  --text-secondary: #b0bdd0;
+  --text-muted:     #8494a7;
+  --text-on-accent: #ffffff;
+
+  /* Toggle */
+  --toggle-on:    #6a78f5;
+  --toggle-off:   #2e2e2e;
+
+  /* Superficies auth (login, register, verify, recover) */
+  --bg-auth-gradient-start: #1a1a3a;
+  --bg-auth-gradient-end:   #0d0d1a;
+  --bg-auth-card:           #2a2a4a;
+  --bg-auth-input:          #3a3a5e;
+  --bg-auth-btn:            #1a1a2e;
+  --bg-auth-btn-hover:      #0f0f20;
+
+  /* Sidebar/nav hover */
+  --bg-nav-hover:           #1d1e35;
+
+  /* Layout */
+  --sidebar-w:    220px;
+  --topbar-h:     60px;
+
+  /* Escala tipografica */
+  --font-2xs:   10px;
+  --font-xs:    11px;
+  --font-sm:    12px;
+  --font-base:  13px;
+  --font-md:    14px;
+  --font-lg:    15px;
+  --font-xl:    16px;
+  --font-2xl:   18px;
+  --font-3xl:   20px;
+  --font-4xl:   22px;
+  --font-5xl:   24px;
+  --font-6xl:   28px;
+
+  /* Escala de border-radius */
+  --radius-xs:    4px;
+  --radius-sm:    6px;
+  --radius-md:    8px;
+  --radius-lg:   10px;
+  --radius-xl:   12px;
+  --radius-2xl:  14px;
+  --radius-full: 20px;
+
+  /* Escala de espaciado */
+  --space-2xs:   4px;
+  --space-xs:    6px;
+  --space-sm:    8px;
+  --space-md:   10px;
+  --space-base: 12px;
+  --space-lg:   14px;
+  --space-xl:   16px;
+  --space-2xl:  18px;
+  --space-3xl:  20px;
+  --space-4xl:  24px;
+  --space-5xl:  28px;
+}

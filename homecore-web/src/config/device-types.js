@@ -1,0 +1,102 @@
+// Iconos por tipo de dispositivo (Font Awesome)
+export const DEVICE_ICONS = {
+  light:   'fa-regular fa-lightbulb',
+  door:    'fa-regular fa-door-open',
+  alarm:   'fa-regular fa-clock',
+  water:   'fa-solid fa-faucet',
+  curtain: 'fa-solid fa-table-list',
+  ac:      'fa-solid fa-temperature-half',
+  speaker: 'fa-solid fa-volume-high',
+  vacuum:  'fa-solid fa-broom',
+  fridge:  'fa-solid fa-snowflake',
+  oven:    'fa-solid fa-fire-burner',
+  lock:    'fa-solid fa-lock',
+}
+
+// Colores por tipo de dispositivo (para graficos)
+export const DEVICE_COLORS = {
+  lamp:    '#f5a623',
+  light:   '#f5a623',
+  luz:     '#f5a623',
+  door:    '#6c8ebf',
+  puerta:  '#6c8ebf',
+  alarm:   '#e05252',
+  water:   '#4fc3f7',
+  grifo:   '#4fc3f7',
+  curtain: '#81c784',
+  cortina: '#81c784',
+  blind:   '#81c784',
+  ac:      '#ba68c8',
+  aire:    '#ba68c8',
+  speaker: '#ff8a65',
+  parlant: '#ff8a65',
+  vacuum:  '#90a4ae',
+  aspirad: '#90a4ae',
+  fridge:  '#4dd0e1',
+  helader: '#4dd0e1',
+  oven:    '#ff7043',
+  horno:   '#ff7043',
+}
+
+// Paleta de fallback para tipos sin color definido
+export const FALLBACK_PALETTE = ['#9c59d1','#2ecc71','#e67e22','#1abc9c','#e91e63','#00bcd4']
+
+export const STATUS_MAP = {
+  door:    { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  alarm:   { on: 'Activada',   off: 'Desactivada', actionOn: 'armAway', actionOff: 'disarm',  verbOn: 'activar',    verbOff: 'desactivar' },
+  water:   { on: 'Abierto',    off: 'Cerrado',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  curtain: { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  vacuum:  { on: 'Activa',     off: 'Inactiva',    actionOn: 'start',   actionOff: 'dock',    verbOn: 'iniciar',    verbOff: 'detener' },
+  speaker: { on: 'Reproduciendo', off: 'Detenido',  actionOn: 'play',    actionOff: 'stop',    verbOn: 'reproducir', verbOff: 'detener' },
+}
+
+export const DEFAULT_STATUS = {
+  on: 'Encendido', off: 'Apagado', actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'encender', verbOff: 'apagar'
+}
+
+/**
+ * @param {string} type - Clave canonica del tipo (ej: "light", "alarm")
+ * @returns {string} Clase CSS de Font Awesome. Fallback: "fa-solid fa-plug"
+ */
+export function getDeviceIcon(type) {
+  return DEVICE_ICONS[type] || 'fa-solid fa-plug'
+}
+
+const dynamicColors = {}
+let paletteIdx = 0
+
+/**
+ * Asigna colores persistentes: si un tipo no esta en DEVICE_COLORS, le asigna uno de FALLBACK_PALETTE
+ * y lo recuerda para toda la sesion.
+ * @param {string} typeName - Nombre del tipo (puede ser variante: "lamp", "luz", etc.)
+ * @returns {string} Color hex
+ */
+export function getDeviceColor(typeName) {
+  const t = (typeName || '').toLowerCase()
+  for (const [key, color] of Object.entries(DEVICE_COLORS)) {
+    if (t.includes(key)) return color
+  }
+  if (!dynamicColors[typeName]) {
+    dynamicColors[typeName] = FALLBACK_PALETTE[paletteIdx % FALLBACK_PALETTE.length]
+    paletteIdx++
+  }
+  return dynamicColors[typeName]
+}
+
+/**
+ * @param {string} type - Clave canonica del tipo
+ * @returns {{on: string, off: string, actionOn: string, actionOff: string, verbOn: string, verbOff: string}}
+ */
+export function getStatusMap(type) {
+  return STATUS_MAP[type] || DEFAULT_STATUS
+}
+
+/**
+ * @param {string} type - Clave canonica del tipo
+ * @param {boolean} isOn
+ * @returns {string} Texto localizado (ej: "Encendido", "Abierta", "Activada")
+ */
+export function getStatusText(type, isOn) {
+  const map = getStatusMap(type)
+  return isOn ? map.on : map.off
+}

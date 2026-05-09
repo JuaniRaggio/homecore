@@ -1,450 +1,363 @@
 <template>
-  <div class="new-routine">
-    <button class="new-routine__back" @click="$router.back()"><HcIcon name="arrowLeft" size="sm" /> Volver a rutinas</button>
-    <h2>Nueva rutina</h2>
+  <div class="new-routine-view">
+    <button class="btn-back" @click="router.push({ name: 'routines', params: { homeId } })">
+      <i class="fa-solid fa-arrow-left"></i> Volver a rutinas
+    </button>
+    <h1 class="view-title">Nueva rutina</h1>
 
-    <div class="new-routine__wizard">
-      <!-- Steps indicator -->
-      <div class="wizard-steps">
-        <div
-          v-for="(s, i) in steps"
-          :key="i"
-          class="wizard-step"
-          :class="{ 'wizard-step--active': step === i, 'wizard-step--done': step > i }"
-        >
-          <span class="wizard-step__number"><template v-if="step > i"><HcIcon name="check" size="xs" /></template><template v-else>{{ i + 1 }}</template></span>
-          <span class="wizard-step__label">{{ s }}</span>
-        </div>
+    <div class="wizard-card">
+      <!-- Stepper -->
+      <div class="stepper">
+        <template v-for="(label, i) in STEPS" :key="i">
+          <div class="step" :class="{ 'step--done': step > i + 1, 'step--active': step === i + 1 }">
+            <div class="step-circle">
+              <i v-if="step > i + 1" class="fa-solid fa-check"></i>
+              <span v-else>{{ i + 1 }}</span>
+            </div>
+            <span class="step-label">{{ label }}</span>
+          </div>
+          <div v-if="i < STEPS.length - 1" class="step-line"></div>
+        </template>
       </div>
 
+      <div class="wizard-divider"></div>
+
       <!-- Step 1: Nombre -->
-      <div v-if="step === 0" class="wizard-content">
-        <h3>Nombre y descripcion</h3>
-        <div class="wizard-form">
-          <HcInput v-model="routineName" label="Nombre de la rutina" placeholder="Ej: Buenos dias" :error="errors.name" />
-          <HcInput v-model="routineDesc" label="Descripcion (opcional)" placeholder="Ej: Abre persianas y enciende luces" />
+      <div v-if="step === 1" class="step-content">
+        <h2 class="step-title">Nombre y descripcion</h2>
+        <div class="form-group">
+          <label class="form-label">Nombre de la rutina</label>
+          <input v-model="form.name" class="form-input" type="text" placeholder="Ej: Buenos dias" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descripcion (opcional)</label>
+          <input v-model="form.description" class="form-input" type="text" placeholder="Ej: Abre persianas y enciende luces suaves" />
         </div>
       </div>
 
       <!-- Step 2: Dispositivos -->
-      <div v-if="step === 1" class="wizard-content">
-        <h3>Seleccionar dispositivos</h3>
-        <p class="wizard-hint">Selecciona los dispositivos que participan en esta rutina.</p>
-        <div class="wizard-devices">
-          <label
+      <div v-else-if="step === 2" class="step-content">
+        <h2 class="step-title">Seleccionar dispositivos</h2>
+        <p class="step-hint">Selecciona los dispositivos que participan en esta rutina.</p>
+        <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
+        <p v-else-if="devicesStore.devices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
+        <div v-else class="device-grid">
+          <button
             v-for="device in devicesStore.devices"
             :key="device.id"
-            class="wizard-device"
-            :class="{ 'wizard-device--selected': selectedDevices.includes(device.id) }"
+            class="device-tile"
+            :class="{ 'device-tile--selected': selectedIds.has(device.id) }"
+            @click="toggleDevice(device)"
           >
-            <input type="checkbox" :value="device.id" v-model="selectedDevices" class="sr-only" />
-            <span class="wizard-device__name">{{ device.name }}</span>
-            <span class="wizard-device__type">{{ devicesStore.typeLabels[device.type] }}</span>
-          </label>
+            <span class="device-tile__name">{{ device.name }}</span>
+            <span class="device-tile__type">{{ translateType(device.type) }}</span>
+          </button>
         </div>
-        <p v-if="errors.devices" class="wizard-error">{{ errors.devices }}</p>
       </div>
 
       <!-- Step 3: Acciones -->
-      <div v-if="step === 2" class="wizard-content">
-        <h3>Definir acciones</h3>
-        <p class="wizard-hint">Configura la accion para cada dispositivo seleccionado.</p>
-        <div class="wizard-actions">
-          <div v-for="deviceId in selectedDevices" :key="deviceId" class="wizard-action-item">
-            <h4>{{ getDeviceName(deviceId) }}</h4>
-            <div class="wizard-action-config">
-              <select v-model="actions[deviceId].action" class="wizard-select">
-                <option v-for="opt in getActionOptions(deviceId)" :key="opt.value" :value="opt.value">
-                  {{ opt.label }}
-                </option>
-              </select>
-              <input
-                v-if="needsValue(actions[deviceId].action)"
-                type="number"
-                v-model.number="actions[deviceId].value"
-                class="wizard-number"
-                min="0"
-                max="100"
-                placeholder="Valor"
-              />
-              <select v-else v-model="actions[deviceId].value" class="wizard-select">
-                <option :value="true">Si</option>
-                <option :value="false">No</option>
-              </select>
-            </div>
+      <div v-else-if="step === 3" class="step-content">
+        <h2 class="step-title">Definir acciones</h2>
+        <p class="step-hint">Configura la accion para cada dispositivo seleccionado.</p>
+        <p v-if="selectedDevices.length === 0" class="state-empty">No seleccionaste dispositivos.</p>
+        <div v-for="device in selectedDevices" :key="device.id" class="action-row">
+          <span class="action-device-name">{{ device.name }}</span>
+          <div class="action-controls">
+            <select
+              class="action-select"
+              :value="deviceActions[device.id]?.actionName ?? ''"
+              @change="onActionChange(device.id, device.type, $event.target.value)"
+            >
+              <option value="">Sin accion</option>
+              <option v-for="a in actionsFor(device.type)" :key="a.actionName" :value="a.actionName">
+                {{ a.label }}
+              </option>
+            </select>
+
+            <template v-if="deviceActions[device.id]?.actionName">
+              <template v-for="(param, pi) in paramsFor(device.type, deviceActions[device.id].actionName)" :key="pi">
+                <select
+                  v-if="param.type === 'select'"
+                  v-model="deviceActions[device.id].params[pi]"
+                  class="param-input"
+                >
+                  <option value="">{{ param.placeholder || 'Seleccionar' }}</option>
+                  <option v-for="opt in param.options" :key="opt" :value="opt">{{ opt }}</option>
+                </select>
+                <input
+                  v-else-if="param.type === 'color'"
+                  v-model="deviceActions[device.id].params[pi]"
+                  class="param-input param-input--color"
+                  type="color"
+                />
+                <input
+                  v-else
+                  v-model.number="deviceActions[device.id].params[pi]"
+                  class="param-input"
+                  type="number"
+                  :min="param.min"
+                  :max="param.max"
+                  :placeholder="param.placeholder"
+                />
+              </template>
+            </template>
           </div>
         </div>
       </div>
 
       <!-- Step 4: Horario -->
-      <div v-if="step === 3" class="wizard-content">
-        <h3>Planificacion</h3>
-        <div class="wizard-form">
-          <HcInput v-model="scheduleTime" type="time" label="Hora de ejecucion" />
-          <div class="wizard-days">
-            <label class="wizard-days__label">Dias de la semana</label>
-            <div class="wizard-days__options">
-              <label
-                v-for="day in allDays"
-                :key="day"
-                class="wizard-day"
-                :class="{ 'wizard-day--selected': scheduleDays.includes(day) }"
-              >
-                <input type="checkbox" :value="day" v-model="scheduleDays" class="sr-only" />
-                {{ day }}
-              </label>
-            </div>
+      <div v-else-if="step === 4" class="step-content">
+        <h2 class="step-title">Planificacion</h2>
+        <p v-if="!selectedDevices.some(d => deviceActions[d.id]?.actionName)" class="step-warning">
+          La API requiere al menos una accion. Volvé al paso anterior y configurá una.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Hora de ejecucion</label>
+          <input v-model="form.time" class="form-input form-input-time" type="time" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dias de la semana</label>
+          <div class="days-row">
+            <button
+              v-for="d in DAY_OPTIONS"
+              :key="d.value"
+              class="day-btn"
+              :class="{ 'day-btn--active': form.days.includes(d.value) }"
+              @click="toggleDay(d.value)"
+            >{{ d.label }}</button>
           </div>
         </div>
       </div>
 
-      <!-- Navigation -->
+      <div class="wizard-divider"></div>
+
+      <!-- Navegacion -->
       <div class="wizard-nav">
-        <HcButton v-if="step > 0" variant="secondary" @click="step--">Anterior</HcButton>
-        <div class="wizard-nav__spacer"></div>
-        <HcButton v-if="step < steps.length - 1" @click="nextStep">Siguiente</HcButton>
-        <HcButton v-else variant="success" @click="createRoutine">Crear rutina</HcButton>
+        <button class="btn-prev" :class="{ invisible: step === 1 }" @click="step--">Anterior</button>
+        <button v-if="step < 4" class="btn-next" :disabled="!canProceed" @click="step++">Siguiente</button>
+        <button v-else class="btn-create" :disabled="saving || !canCreate" @click="submit">
+          {{ saving ? 'Creando...' : 'Crear rutina' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, watch, inject, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useDevicesStore } from '../stores/devices'
-import { useRoutinesStore } from '../stores/routines'
-import { useAuthStore } from '../stores/auth'
-import HcButton from '../components/ui/HcButton.vue'
-import HcInput from '../components/ui/HcInput.vue'
-import HcIcon from '../components/ui/HcIcon.vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useDevicesStore } from '@/stores/devices'
+import { useRoutinesStore } from '@/stores/routines'
+import { useToastStore } from '@/stores/toast'
+import { actionError } from '@/utils/friendly-error'
+import { translateType } from '@/utils/device-helpers'
+import { actionsFor, paramsFor } from '@/config/routine-actions'
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 const devicesStore = useDevicesStore()
 const routinesStore = useRoutinesStore()
-const authStore = useAuthStore()
-const toast = inject('toast')
+const toast = useToastStore()
+
+const homeId = computed(() => route.params.homeId)
+
+const STEPS = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
+
+const DAY_OPTIONS = [
+  { value: 1, label: 'Lun' },
+  { value: 2, label: 'Mar' },
+  { value: 3, label: 'Mie' },
+  { value: 4, label: 'Jue' },
+  { value: 5, label: 'Vie' },
+  { value: 6, label: 'Sab' },
+  { value: 0, label: 'Dom' },
+]
+
+// State
+const step = ref(1)
+const saving = ref(false)
+const form = reactive({ name: '', description: '', time: '08:00', days: [] })
+const selectedIds = ref(new Set())
+const deviceActions = reactive({})
+
+const selectedDevices = computed(() =>
+  devicesStore.devices.filter(d => selectedIds.value.has(d.id))
+)
+
+function toggleDevice(device) {
+  const ids = new Set(selectedIds.value)
+  if (ids.has(device.id)) {
+    ids.delete(device.id)
+    delete deviceActions[device.id]
+  } else {
+    ids.add(device.id)
+    deviceActions[device.id] = { actionName: '', params: [] }
+  }
+  selectedIds.value = ids
+}
+
+function onActionChange(deviceId, typeName, actionName) {
+  deviceActions[deviceId] = { actionName, params: paramsFor(typeName, actionName).map(() => '') }
+}
+
+function toggleDay(value) {
+  const idx = form.days.indexOf(value)
+  if (idx === -1) form.days.push(value)
+  else form.days.splice(idx, 1)
+}
+
+const canProceed = computed(() => {
+  if (step.value === 1) return form.name.trim().length > 0
+  return true
+})
+
+const canCreate = computed(() =>
+  form.name.trim().length > 0 &&
+  selectedDevices.value.some(d => deviceActions[d.id]?.actionName)
+)
+
+async function submit() {
+  if (!canCreate.value || saving.value) return
+  saving.value = true
+  try {
+    const actions = selectedDevices.value
+      .filter(d => deviceActions[d.id]?.actionName)
+      .map(d => ({
+        device: { id: d.id },
+        actionName: deviceActions[d.id].actionName,
+        params: deviceActions[d.id].params.filter(p => p !== '' && p !== null && p !== undefined),
+      }))
+
+    await routinesStore.create({
+      name: form.name.trim(),
+      home: { id: homeId.value },
+      description: form.description.trim(),
+      actions,
+      time: form.time,
+      days: form.days,
+      metadata: {},
+    })
+
+    toast.show('Rutina creada', 'success')
+    router.push({ name: 'routines', params: { homeId: homeId.value } })
+  } catch (e) {
+    console.error('[NewRoutine] Error creando rutina:', e)
+    toast.show(e.message || actionError('crear la rutina'), 'error')
+  } finally {
+    saving.value = false
+  }
+}
 
 onMounted(() => {
-  if (!authStore.isAdmin) {
-    router.replace('/rutinas')
+  if (devicesStore.devices.length === 0) {
+    devicesStore.fetchAllForHome(homeId.value)
+    devicesStore.fetchDeviceTypes()
   }
 })
-
-const steps = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
-const step = ref(0)
-
-const routineName = ref('')
-const routineDesc = ref('')
-const selectedDevices = ref([])
-const actions = reactive({})
-const scheduleTime = ref('08:00')
-const scheduleDays = ref(['Lun', 'Mar', 'Mie', 'Jue', 'Vie'])
-const allDays = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
-const errors = ref({ name: null, devices: null })
-
-watch(selectedDevices, (newDevices) => {
-  newDevices.forEach(id => {
-    if (!actions[id]) {
-      const device = devicesStore.getById(id)
-      actions[id] = { action: 'on', value: true }
-      if (device?.type === 'blinds') actions[id] = { action: 'position', value: 100 }
-      if (device?.type === 'faucet') actions[id] = { action: 'flow', value: 60 }
-      if (device?.type === 'lamp') actions[id] = { action: 'brightness', value: 80 }
-    }
-  })
-})
-
-function getDeviceName(id) {
-  return devicesStore.getById(id)?.name || id
-}
-
-function getActionOptions(deviceId) {
-  const device = devicesStore.getById(deviceId)
-  if (!device) return []
-  const base = [{ value: 'on', label: 'Encender/Apagar' }]
-  if (device.type === 'lamp') {
-    base.push({ value: 'brightness', label: 'Brillo' })
-  }
-  if (device.type === 'door') {
-    base.push({ value: 'locked', label: 'Bloquear/Desbloquear' })
-  }
-  if (device.type === 'alarm') {
-    base.push({ value: 'armed', label: 'Armar/Desarmar' })
-  }
-  if (device.type === 'faucet') {
-    base.push({ value: 'flow', label: 'Caudal' })
-  }
-  if (device.type === 'blinds') {
-    base.push({ value: 'position', label: 'Posicion' })
-  }
-  return base
-}
-
-function needsValue(action) {
-  return ['brightness', 'flow', 'position'].includes(action)
-}
-
-function nextStep() {
-  errors.value = { name: null, devices: null }
-  if (step.value === 0 && !routineName.value.trim()) {
-    errors.value.name = 'El nombre es obligatorio'
-    return
-  }
-  if (step.value === 1 && selectedDevices.value.length === 0) {
-    errors.value.devices = 'Selecciona al menos un dispositivo'
-    return
-  }
-  step.value++
-}
-
-function createRoutine() {
-  const routineActions = selectedDevices.value.map(id => ({
-    deviceId: id,
-    action: actions[id].action,
-    value: actions[id].value
-  }))
-
-  routinesStore.addRoutine({
-    name: routineName.value.trim(),
-    description: routineDesc.value.trim(),
-    schedule: {
-      time: scheduleTime.value,
-      days: [...scheduleDays.value]
-    },
-    actions: routineActions
-  })
-
-  toast.value?.show('Rutina creada correctamente', 'success')
-  router.push(`/${route.params.houseId}/rutinas`)
-}
 </script>
 
 <style scoped>
-.new-routine {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.new-routine__back {
-  background: none;
-  border: none;
-  color: var(--hc-accent);
-  cursor: pointer;
-  font-size: var(--hc-font-size-sm);
+.new-routine-view {
   padding: 0;
-  margin-bottom: var(--hc-space-md);
 }
 
-.new-routine h2 {
-  margin-bottom: var(--hc-space-xl);
-}
+.view-title { margin-bottom: 20px; }
 
-.new-routine__wizard {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-xl);
-}
+.form-input-time { max-width: 200px; }
 
-.wizard-steps {
-  display: flex;
-  gap: var(--hc-space-md);
-  margin-bottom: var(--hc-space-xl);
-  padding-bottom: var(--hc-space-lg);
-  border-bottom: 1px solid var(--hc-border);
-}
-
-.wizard-step {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.5;
-}
-
-.wizard-step--active {
-  opacity: 1;
-}
-
-.wizard-step--done {
-  opacity: 0.8;
-}
-
-.wizard-step__number {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--hc-bg-tertiary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--hc-font-size-sm);
-  font-weight: 600;
-}
-
-.wizard-step--active .wizard-step__number {
-  background: var(--hc-accent);
-  color: white;
-}
-
-.wizard-step--done .wizard-step__number {
-  background: var(--hc-success);
-  color: white;
-}
-
-.wizard-step__label {
-  font-size: var(--hc-font-size-sm);
-  display: none;
-}
-
-@media (min-width: 600px) {
-  .wizard-step__label {
-    display: inline;
-  }
-}
-
-.wizard-content {
-  min-height: 200px;
-  animation: fadeIn 200ms ease;
-}
-
-.wizard-content h3 {
-  margin-bottom: var(--hc-space-md);
-}
-
-.wizard-hint {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
-  margin-bottom: var(--hc-space-md);
-}
-
-.wizard-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-lg);
-}
-
-.wizard-devices {
+/* Device grid */
+.device-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--hc-space-sm);
+  gap: 10px;
 }
 
-.wizard-device {
+.device-tile {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--hc-space-md);
-  background: var(--hc-bg-tertiary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
+  padding: 12px 16px;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--hc-transition-fast);
+  text-align: left;
+  transition: border-color 0.15s;
 }
 
-.wizard-device:hover {
-  border-color: var(--hc-accent);
+.device-tile:hover { border-color: var(--accent); }
+
+.device-tile--selected {
+  border-color: var(--accent);
+  background-color: rgba(79, 110, 247, 0.1);
 }
 
-.wizard-device--selected {
-  border-color: var(--hc-accent);
-  background: rgba(99, 102, 241, 0.1);
-}
+.device-tile__name { font-weight: 600; font-size: var(--font-base); color: var(--text-primary); }
+.device-tile__type { font-size: var(--font-sm); color: var(--text-muted); }
 
-.wizard-device__name {
-  font-size: var(--hc-font-size-sm);
-  font-weight: 500;
-}
-
-.wizard-device__type {
-  font-size: var(--hc-font-size-xs);
-  color: var(--hc-text-muted);
-}
-
-.wizard-error {
-  color: var(--hc-danger);
-  font-size: var(--hc-font-size-sm);
-  margin-top: var(--hc-space-sm);
-}
-
-.wizard-actions {
+/* Action rows */
+.action-row {
   display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-md);
-}
-
-.wizard-action-item {
-  padding: var(--hc-space-md);
-  background: var(--hc-bg-tertiary);
-  border-radius: var(--hc-radius-md);
-}
-
-.wizard-action-item h4 {
-  font-size: var(--hc-font-size-sm);
-  margin-bottom: var(--hc-space-sm);
-}
-
-.wizard-action-config {
-  display: flex;
-  gap: var(--hc-space-sm);
-}
-
-.wizard-select, .wizard-number {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  color: var(--hc-text-primary);
-  padding: 0.375rem 0.5rem;
-  font-size: var(--hc-font-size-sm);
-}
-
-.wizard-number {
-  width: 80px;
-}
-
-.wizard-days__label {
-  display: block;
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
-  margin-bottom: var(--hc-space-sm);
-}
-
-.wizard-days__options {
-  display: flex;
-  gap: 0.375rem;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
   flex-wrap: wrap;
 }
 
-.wizard-day {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  font-size: var(--hc-font-size-sm);
-  cursor: pointer;
-  transition: all var(--hc-transition-fast);
-  user-select: none;
+.action-device-name {
+  font-weight: 600;
+  font-size: var(--font-base);
+  min-width: 140px;
 }
 
-.wizard-day:hover {
-  border-color: var(--hc-accent);
-}
-
-.wizard-day--selected {
-  background: var(--hc-accent);
-  border-color: var(--hc-accent);
-  color: white;
-}
-
-.wizard-nav {
+.action-controls {
   display: flex;
-  gap: var(--hc-space-sm);
-  margin-top: var(--hc-space-xl);
-  padding-top: var(--hc-space-lg);
-  border-top: 1px solid var(--hc-border);
-}
-
-.wizard-nav__spacer {
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   flex: 1;
 }
+
+.action-select {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  padding: 8px 10px;
+  min-width: 160px;
+}
+
+.param-input {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  padding: 8px 10px;
+  width: 100px;
+}
+
+.param-input--color { width: 50px; height: 36px; padding: 4px; cursor: pointer; }
+
+/* Days */
+.days-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.day-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.day-btn:hover { border-color: var(--accent); }
+.day-btn--active { background-color: var(--accent); color: #fff; border-color: var(--accent); }
 </style>

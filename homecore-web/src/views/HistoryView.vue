@@ -1,189 +1,199 @@
 <template>
-  <div class="history-page">
-    <div class="history-page__header">
-      <h2>Historial de acciones</h2>
-      <div class="history-page__filters">
-        <input
-          v-model="search"
-          type="text"
-          placeholder="Buscar..."
-          class="history-page__search"
-        />
-        <select v-model="filterType" class="history-page__select">
-          <option value="">Todos los tipos</option>
-          <option value="lamp">Lampara</option>
-          <option value="door">Puerta</option>
-          <option value="alarm">Alarma</option>
-          <option value="faucet">Grifo</option>
-          <option value="blinds">Cortina</option>
-          <option value="routine">Rutina</option>
+  <div class="view-content">
+    <div class="view-header">
+      <h1 class="view-title">Historial</h1>
+      <div class="history-filters">
+        <select v-model="filterType" class="filter-select">
+          <option value="">Todos los eventos</option>
+          <option value="device">Dispositivos</option>
+          <option value="routine">Rutinas</option>
         </select>
       </div>
     </div>
 
-    <div class="history-page__table">
-      <div class="history-table__header">
-        <span class="history-table__col history-table__col--device">Dispositivo</span>
-        <span class="history-table__col history-table__col--action">Accion</span>
-        <span class="history-table__col history-table__col--type">Tipo</span>
-        <span class="history-table__col history-table__col--date">Fecha y hora</span>
+    <p v-if="loading" class="state-loading">Cargando historial...</p>
+    <p v-else-if="error" class="state-error">{{ error }}</p>
+    <p v-else-if="filteredEvents.length === 0" class="state-empty">Sin eventos registrados</p>
+    <template v-else>
+      <div class="timeline">
+        <div v-for="event in filteredEvents" :key="event.id" class="timeline-item">
+          <div class="timeline-dot" :class="`timeline-dot--${event.type}`"></div>
+          <div class="timeline-content">
+            <div class="timeline-row">
+              <span class="timeline-device">{{ event.deviceName }}</span>
+              <span class="timeline-time">{{ formatDate(event.timestamp) }}</span>
+            </div>
+            <span class="timeline-action">{{ event.action }}</span>
+          </div>
+        </div>
       </div>
-      <div
-        v-for="entry in filteredEntries"
-        :key="entry.id"
-        class="history-table__row"
-      >
-        <span class="history-table__col history-table__col--device">{{ entry.deviceName }}</span>
-        <span class="history-table__col history-table__col--action">{{ entry.action }}</span>
-        <span class="history-table__col history-table__col--type">
-          <HcBadge variant="primary" size="sm">{{ typeLabel(entry.type) }}</HcBadge>
-        </span>
-        <span class="history-table__col history-table__col--date">{{ formatDate(entry.date) }}</span>
+
+      <div v-if="hasMore" class="load-more">
+        <button class="btn-add" @click="loadMore" :disabled="loadingMore">
+          {{ loadingMore ? 'Cargando...' : 'Cargar mas' }}
+        </button>
       </div>
-      <div v-if="filteredEntries.length === 0" class="history-table__empty">
-        No se encontraron registros.
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useHistoryStore } from '../stores/history'
-import HcBadge from '../components/ui/HcBadge.vue'
+import { ref, computed, onMounted } from 'vue'
+import { useDevicesStore } from '@/stores/devices'
+import { friendlyError } from '@/utils/friendly-error'
+import * as api from '@/services/api'
 
-const historyStore = useHistoryStore()
-const search = ref('')
+const devicesStore = useDevicesStore()
 const filterType = ref('')
+const events = ref([])
+const loading = ref(true)
+const loadingMore = ref(false)
+const error = ref('')
+const offset = ref(0)
+const pageSize = 30
+const hasMore = ref(true)
 
-const typeLabels = {
-  lamp: 'Lampara',
-  door: 'Puerta',
-  alarm: 'Alarma',
-  faucet: 'Grifo',
-  blinds: 'Cortina',
-  routine: 'Rutina'
-}
-
-function typeLabel(type) {
-  return typeLabels[type] || type
-}
-
-const filteredEntries = computed(() => {
-  let result = historyStore.sorted
-  if (filterType.value) {
-    result = result.filter(e => e.type === filterType.value)
-  }
-  if (search.value.trim()) {
-    const s = search.value.toLowerCase()
-    result = result.filter(e =>
-      e.deviceName.toLowerCase().includes(s) ||
-      e.action.toLowerCase().includes(s)
-    )
-  }
-  return result
-})
-
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  return date.toLocaleString('es-AR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
+const filteredEvents = computed(() =>
+  events.value.filter(e => {
+    if (filterType.value && e.type !== filterType.value) return false
+    return true
   })
+)
+
+function getDeviceName(deviceId) {
+  const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+  return device?.name || 'Dispositivo eliminado'
 }
+
+function classifyEvent(log) {
+  const action = (log.actionName || '').toLowerCase()
+  if (action.includes('routine') || action.includes('execute')) return 'routine'
+  return 'device'
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const now = new Date()
+  const isToday = date.toDateString() === now.toDateString()
+  if (isToday) {
+    return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  }
+  return date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+function mapLogs(rawLogs) {
+  return rawLogs.map(log => ({
+    id: log.id,
+    deviceName: log.device?.name || getDeviceName(log.deviceId),
+    action: log.actionName || 'Accion',
+    timestamp: log.timestamp,
+    type: classifyEvent(log),
+  }))
+}
+
+async function fetchLogs() {
+  try {
+    const data = await api.getAllDeviceLogs(pageSize, offset.value)
+    const logs = Array.isArray(data) ? data : []
+    if (logs.length < pageSize) hasMore.value = false
+    events.value = [...events.value, ...mapLogs(logs)]
+    offset.value += logs.length
+  } catch (e) {
+    console.error('[History] Error cargando logs:', e)
+    error.value = friendlyError(e)
+  }
+}
+
+async function loadMore() {
+  loadingMore.value = true
+  await fetchLogs()
+  loadingMore.value = false
+}
+
+onMounted(async () => {
+  await fetchLogs()
+  loading.value = false
+})
 </script>
 
 <style scoped>
-.history-page {
+.history-filters {
   display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-xl);
+  gap: 8px;
 }
 
-.history-page__header {
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.2s;
+}
+
+.timeline-item:hover {
+  border-color: var(--accent);
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.timeline-dot--device {
+  background-color: var(--accent);
+}
+
+.timeline-dot--routine {
+  background-color: var(--success);
+}
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: var(--hc-space-md);
 }
 
-.history-page__filters {
-  display: flex;
-  gap: var(--hc-space-sm);
-}
-
-.history-page__search {
-  background: var(--hc-bg-tertiary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  color: var(--hc-text-primary);
-  padding: 0.5rem 0.75rem;
-  font-size: var(--hc-font-size-sm);
-  width: 200px;
-  outline: none;
-}
-
-.history-page__search:focus {
-  border-color: var(--hc-accent);
-}
-
-.history-page__search::placeholder {
-  color: var(--hc-text-muted);
-}
-
-.history-page__select {
-  background: var(--hc-bg-tertiary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-md);
-  color: var(--hc-text-primary);
-  padding: 0.5rem 0.75rem;
-  font-size: var(--hc-font-size-sm);
-  cursor: pointer;
-}
-
-.history-page__table {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  overflow: hidden;
-}
-
-.history-table__header {
-  display: flex;
-  padding: var(--hc-space-md) var(--hc-space-lg);
-  background: var(--hc-bg-tertiary);
-  font-size: var(--hc-font-size-sm);
+.timeline-device {
+  font-size: var(--font-md);
   font-weight: 600;
-  color: var(--hc-text-secondary);
-  border-bottom: 1px solid var(--hc-border);
+  color: var(--text-primary);
 }
 
-.history-table__row {
+.timeline-time {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.timeline-action {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+}
+
+.load-more {
   display: flex;
-  padding: var(--hc-space-md) var(--hc-space-lg);
-  border-bottom: 1px solid var(--hc-border);
-  font-size: var(--hc-font-size-sm);
-  transition: background var(--hc-transition-fast);
-}
-
-.history-table__row:last-child {
-  border-bottom: none;
-}
-
-.history-table__row:hover {
-  background: var(--hc-bg-tertiary);
-}
-
-.history-table__col--device { flex: 2; }
-.history-table__col--action { flex: 2; }
-.history-table__col--type { flex: 1; }
-.history-table__col--date { flex: 2; text-align: right; color: var(--hc-text-muted); }
-
-.history-table__empty {
-  padding: var(--hc-space-2xl);
-  text-align: center;
-  color: var(--hc-text-muted);
-  font-size: var(--hc-font-size-sm);
+  justify-content: center;
+  margin-top: 16px;
 }
 </style>

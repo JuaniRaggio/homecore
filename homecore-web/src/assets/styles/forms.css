@@ -1,0 +1,99 @@
+/* Grupo de formulario */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* Label de formulario */
+.form-label {
+  font-size: var(--font-base);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Input de formulario */
+.form-group input,
+.form-group select,
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--bg-auth-input);
+  color: var(--text-primary);
+  font-size: var(--font-md);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.form-group input::placeholder,
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-input:focus {
+  border-color: var(--accent);
+}
+
+/* Mensajes de estado */
+.error-msg {
+  font-size: var(--font-base);
+  color: var(--danger);
+  text-align: center;
+}
+
+.success-msg {
+  font-size: var(--font-base);
+  color: var(--success);
+  text-align: center;
+}
+
+/* Filtros/selects reutilizables */
+.filter-select {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  padding: 7px 28px 7px 12px;
+  cursor: pointer;
+  outline: none;
+  appearance: auto;
+}
+
+.filter-select:focus {
+  border-color: var(--accent);
+}
+
+/* Select para vincular dispositivos (habitaciones) */
+.link-device-select {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--font-base);
+  padding: 6px 10px;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.link-device-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Acciones de formulario (cancelar + guardar) */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

@@ -1,0 +1,130 @@
+/* Fila de control (dispositivos: brillo, cerradura, etc.) */
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.control-label {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+  min-width: 70px;
+}
+
+.control-value {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  min-width: 50px;
+}
+
+/* Slider (brillo, posicion) */
+.slider {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Boton de control (cerradura, alarma, grifo) */
+.btn-control {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: var(--font-base);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-control:hover {
+  border-color: var(--accent);
+}
+
+.btn-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-control--sm {
+  padding: 6px 12px;
+  font-size: var(--font-sm);
+}
+
+.btn-control--success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.btn-control--danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* Select de control (modo, velocidad, etc.) */
+.control-select {
+  flex: 1;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+/* Grupo de botones de accion (play, pause, etc.) */
+.control-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Color picker (luces) */
+.color-picker {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: none;
+  padding: 2px;
+}
+
+/* Input de control (alarma, etc.) */
+.control-input {
+  flex: 1;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* Playlist (speaker) */
+.control-playlist {
+  margin-top: var(--space-base);
+}
+
+.playlist-list {
+  margin: var(--space-xs) 0 0 0;
+  padding-left: var(--space-3xl);
+  list-style: decimal;
+}
+
+.playlist-item {
+  padding: var(--space-2xs) 0;
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+}
+
+.playlist-item--active {
+  font-weight: 600;
+  color: var(--accent);
+}

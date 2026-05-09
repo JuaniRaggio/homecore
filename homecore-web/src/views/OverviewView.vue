@@ -1,527 +1,284 @@
 <template>
-  <div class="overview">
-    <!-- Bienvenida -->
-    <div class="overview__welcome">
-      <h1 class="overview__greeting">Bienvenido, {{ userName }}</h1>
-      <p class="overview__subtitle">Resumen de tus propiedades</p>
-    </div>
+  <main class="page-content--full">
+    <!-- Saludo personalizado -->
+    <section class="overview-greeting">
+      <h1 class="greeting-text">Bienvenido {{ userName }}</h1>
+      <p class="greeting-sub">Bienvenido a HomeCore</p>
+    </section>
 
-    <!-- Propiedades -->
-    <section class="overview__homes">
-      <div class="overview__homes-grid">
-        <router-link
-          v-for="home in homeSummaries"
+    <!-- Grilla de casas -->
+    <section class="overview-section">
+      <h2 class="section-title">Mis propiedades</h2>
+      <p v-if="homesStore.loading" class="state-loading">Cargando propiedades...</p>
+      <p v-else-if="homesStore.error" class="state-error">{{ homesStore.error }}</p>
+      <p v-else-if="homesStore.homes.length === 0" class="state-empty">Sin propiedades</p>
+      <div v-else class="homes-grid">
+        <HomeCard
+          v-for="home in enrichedHomes"
           :key="home.id"
-          :to="`/${home.id}`"
-          class="overview__home-card"
+          :home="home"
+        />
+      </div>
+      <router-link to="/nueva-propiedad" class="btn-add">+ Nueva propiedad</router-link>
+    </section>
+
+    <!-- Dispositivos criticos (cross-home) -->
+    <section class="overview-section">
+      <h2 class="section-title">Dispositivos criticos</h2>
+      <p v-if="overview.loading.value" class="state-loading">Cargando...</p>
+      <p v-else-if="overview.criticalDevices.value.length === 0" class="state-empty">
+        Sin alertas activas
+      </p>
+      <div v-else class="critical-devices">
+        <div
+          v-for="device in overview.criticalDevices.value"
+          :key="device.id"
+          class="critical-device-item"
         >
-          <div class="overview__home-card-header">
-            <HcIcon name="home" size="md" />
-            <span class="overview__home-card-name">{{ home.name }}</span>
+          <i :class="device.type === 'alarm'
+            ? 'fa-solid fa-bell critical-icon critical-icon--alarm'
+            : 'fa-solid fa-door-open critical-icon critical-icon--door'"
+          ></i>
+          <div class="critical-device-info">
+            <span class="critical-device-name">{{ device.name }}</span>
+            <span class="critical-device-room">{{ device.room }}</span>
           </div>
-          <div class="overview__home-card-stats">
-            <span>{{ home.activeDevices }} / {{ home.totalDevices }} activos</span>
-            <span>{{ home.consumption }}W</span>
-          </div>
-        </router-link>
-        <router-link to="/nueva-propiedad" class="overview__home-card overview__home-card--add">
-          <div class="overview__home-card-add-content">
-            <span class="overview__home-card-add-icon">+</span>
-            <span class="overview__home-card-add-label">Nueva propiedad</span>
-          </div>
-        </router-link>
+          <span class="critical-device-status">{{ device.statusText }}</span>
+        </div>
       </div>
     </section>
 
-    <!-- Dispositivos criticos + Rutinas favoritas -->
-    <div class="overview__two-col">
-      <!-- Dispositivos criticos -->
-      <section class="overview__section">
-        <div class="overview__section-header">
-          <h3>Dispositivos criticos</h3>
-        </div>
-        <div v-if="criticalDevicesData.length > 0" class="overview__list">
-          <div
-            v-for="item in criticalDevicesData"
-            :key="item.device.id"
-            class="overview__list-item"
-          >
-            <div class="overview__list-item-info">
-              <HcIcon :name="item.device.type" size="sm" />
-              <div>
-                <p class="overview__list-item-name">{{ item.homeName }}::{{ item.device.name }}</p>
-                <p class="overview__list-item-status" :class="item.device.on ? 'text-success' : 'text-muted'">
-                  {{ getDeviceStatus(item.device) }}
-                </p>
-              </div>
-            </div>
-            <router-link
-              :to="`/${item.homeId}/dispositivos/${item.device.id}`"
-              class="overview__list-item-action"
-            >
-              Ver
-            </router-link>
+    <!-- Rutinas favoritas (cross-home) -->
+    <section class="overview-section">
+      <h2 class="section-title">Rutinas favoritas</h2>
+      <div v-if="favoriteRoutines.length > 0" class="fav-routines">
+        <div v-for="routine in favoriteRoutines" :key="routine.id" class="fav-routine-item">
+          <i class="fa-solid fa-star fav-routine-star"></i>
+          <div class="fav-routine-info">
+            <span class="fav-routine-name">{{ routine.name }}</span>
+            <span class="fav-routine-home">{{ routine.description || '' }}</span>
           </div>
-        </div>
-        <div v-else class="overview__empty">
-          No hay dispositivos marcados como criticos.
-        </div>
-      </section>
-
-      <!-- Rutinas favoritas -->
-      <section class="overview__section">
-        <div class="overview__section-header">
-          <h3>Rutinas favoritas</h3>
-        </div>
-        <div v-if="favoriteRoutinesData.length > 0" class="overview__list">
-          <div
-            v-for="item in favoriteRoutinesData"
-            :key="item.routine.id"
-            class="overview__list-item"
-          >
-            <div class="overview__list-item-info">
-              <HcIcon name="routines" size="sm" />
-              <div>
-                <p class="overview__list-item-name">{{ item.homeName }}::{{ item.routine.name }}</p>
-                <p class="overview__list-item-status text-muted">
-                  {{ item.routine.schedule?.time }} - {{ item.routine.schedule?.days?.join(', ') }}
-                </p>
-              </div>
-            </div>
-            <HcButton size="sm" @click="executeRoutine(item.routine.id)">Ejecutar</HcButton>
-          </div>
-        </div>
-        <div v-else class="overview__empty">
-          No hay rutinas favoritas.
-        </div>
-      </section>
-    </div>
-
-    <!-- Resumen energetico -->
-    <section class="overview__energy">
-      <div class="overview__section-header">
-        <h3>Resumen energetico</h3>
-      </div>
-      <div class="overview__metrics">
-        <div class="overview__metric-card">
-          <span class="overview__metric-value">{{ totalConsumption }}W</span>
-          <span class="overview__metric-label">Consumo total</span>
-        </div>
-        <div class="overview__metric-card">
-          <span class="overview__metric-value">{{ activeDevices }} / {{ totalDevices }}</span>
-          <span class="overview__metric-label">Dispositivos activos</span>
-        </div>
-        <div class="overview__metric-card">
-          <span class="overview__metric-value">{{ homesStore.homes.length }}</span>
-          <span class="overview__metric-label">Propiedades</span>
-        </div>
-        <div class="overview__metric-card">
-          <span class="overview__metric-value">{{ criticalCount }}</span>
-          <span class="overview__metric-label">Dispositivos criticos</span>
+          <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
+          <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
+            <i class="fa-solid fa-play"></i>
+          </button>
         </div>
       </div>
-      <div class="overview__charts">
-        <div class="overview__chart-card">
-          <h3>Consumo por propiedad</h3>
-          <canvas ref="houseChartEl"></canvas>
+      <p v-else class="state-empty">Sin rutinas favoritas</p>
+    </section>
+
+    <!-- Resumen energetico general -->
+    <section class="overview-section">
+      <h2 class="section-title">Resumen energetico</h2>
+      <p v-if="overview.loading.value" class="state-loading">Cargando...</p>
+      <div v-else class="summary-grid">
+        <div class="summary-card">
+          <i class="fa-solid fa-bolt summary-icon"></i>
+          <div class="summary-data">
+            <span class="summary-value">{{ overview.totalConsumption.value }} W</span>
+            <span class="summary-label">Consumo total actual</span>
+          </div>
         </div>
-        <div class="overview__chart-card">
-          <h3>Distribucion por tipo</h3>
-          <canvas ref="typeChartEl"></canvas>
+        <div class="summary-card">
+          <i class="fa-solid fa-plug summary-icon summary-icon--success"></i>
+          <div class="summary-data">
+            <span class="summary-value">{{ overview.totalActiveDevices.value }}</span>
+            <span class="summary-label">Dispositivos activos</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <i class="fa-solid fa-microchip summary-icon"></i>
+          <div class="summary-data">
+            <span class="summary-value">{{ overview.totalDeviceCount.value }}</span>
+            <span class="summary-label">Dispositivos totales</span>
+          </div>
         </div>
       </div>
     </section>
-  </div>
+  </main>
 </template>
 
 <script setup>
-import { computed, ref, onMounted, inject } from 'vue'
-import { Chart, registerables } from 'chart.js'
-import { useAuthStore } from '../stores/auth'
-import { useHomesStore } from '../stores/homes'
-import { useDevicesStore } from '../stores/devices'
-import { useRoutinesStore } from '../stores/routines'
-import HcIcon from '../components/ui/HcIcon.vue'
-import HcButton from '../components/ui/HcButton.vue'
+import { onMounted, computed } from 'vue'
+import HomeCard from '@/components/homes/HomeCard.vue'
+import { useHomesStore } from '@/stores/homes'
+import { useAuthStore } from '@/stores/auth'
+import { useRoutinesStore } from '@/stores/routines'
+import { useToastStore } from '@/stores/toast'
+import { useOverviewData } from '@/composables/useOverviewData'
+import { useRoutineActions } from '@/composables/useRoutineActions'
 
-Chart.register(...registerables)
-
-const authStore = useAuthStore()
 const homesStore = useHomesStore()
-const devicesStore = useDevicesStore()
+const authStore = useAuthStore()
 const routinesStore = useRoutinesStore()
-const toast = inject('toast')
+const toast = useToastStore()
+const overview = useOverviewData()
+const routineActions = useRoutineActions()
 
-const houseChartEl = ref(null)
-const typeChartEl = ref(null)
+const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
+const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
 
-const userName = computed(() => {
-  const name = authStore.user?.name
-  if (!name) return 'Usuario'
-  return name.split(' ')[0]
-})
+const enrichedHomes = computed(() =>
+  homesStore.homes.map(h => overview.enrichHome(h))
+)
 
-const totalDevices = computed(() => devicesStore.devices.length)
-const activeDevices = computed(() => devicesStore.devices.filter(d => d.on).length)
-const totalConsumption = computed(() => devicesStore.getTotalConsumption())
-const criticalCount = computed(() => devicesStore.criticalDevices.length)
-
-// For now all devices belong to the first home (mock).
-// In a real app, devices would be associated with a homeId.
-// We simulate distribution across homes for the overview.
-const devicesByHome = computed(() => {
-  const homes = homesStore.homes
-  const allDevices = devicesStore.devices
-  const perHome = Math.ceil(allDevices.length / homes.length)
-  const result = {}
-  homes.forEach((home, i) => {
-    result[home.id] = allDevices.slice(i * perHome, (i + 1) * perHome)
-  })
-  return result
-})
-
-const homeSummaries = computed(() => {
-  return homesStore.homes.map(home => {
-    const homeDevices = devicesByHome.value[home.id] || []
-    const active = homeDevices.filter(d => d.on)
-    return {
-      id: home.id,
-      name: home.name,
-      totalDevices: homeDevices.length,
-      activeDevices: active.length,
-      consumption: active.reduce((sum, d) => sum + (d.consumption || 0), 0)
+onMounted(async () => {
+  try {
+    await Promise.all([
+      homesStore.fetchHomes(),
+      routinesStore.fetchRoutines(),
+    ])
+    if (homesStore.homes.length > 0) {
+      await overview.fetchAllHomesDevices(homesStore.homes)
     }
-  })
-})
-
-const criticalDevicesData = computed(() => {
-  const result = []
-  homesStore.homes.forEach(home => {
-    const homeDevices = devicesByHome.value[home.id] || []
-    homeDevices.filter(d => d.critical).forEach(device => {
-      result.push({ device, homeId: home.id, homeName: home.name })
-    })
-  })
-  return result
-})
-
-const favoriteRoutinesData = computed(() => {
-  const result = []
-  const favRoutines = routinesStore.favorites
-  const homes = homesStore.homes
-  favRoutines.forEach((routine, i) => {
-    const home = homes[i % homes.length]
-    result.push({ routine, homeId: home.id, homeName: home.name })
-  })
-  return result
-})
-
-function getDeviceStatus(device) {
-  if (device.type === 'alarm') return device.armed ? 'Activada' : 'Desactivada'
-  if (device.type === 'door') return device.locked ? 'Bloqueada' : 'Desbloqueada'
-  return device.on ? 'Encendido' : 'Apagado'
-}
-
-function executeRoutine(id) {
-  routinesStore.executeRoutine(id)
-  toast.value?.show('Rutina ejecutada correctamente', 'success')
-}
-
-const typeColors = {
-  lamp: '#fbbf24',
-  door: '#818cf8',
-  alarm: '#ef4444',
-  faucet: '#34d399',
-  blinds: '#3b82f6'
-}
-
-function createCharts() {
-  if (houseChartEl.value) {
-    new Chart(houseChartEl.value, {
-      type: 'bar',
-      data: {
-        labels: homeSummaries.value.map(h => h.name),
-        datasets: [{
-          label: 'Consumo (W)',
-          data: homeSummaries.value.map(h => h.consumption),
-          backgroundColor: ['#818cf8', '#fbbf24', '#34d399'],
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: {
-            ticks: { color: '#b0bdd0', font: { family: 'Inter', size: 11 } },
-            grid: { color: '#3a3a4a' }
-          },
-          y: {
-            ticks: { color: '#b0bdd0', font: { family: 'Inter' } },
-            grid: { color: '#3a3a4a' }
-          }
-        },
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    })
+  } catch (e) {
+    console.error('[Overview] Error cargando datos:', e)
+    toast.show('No se pudieron cargar los datos. Verifica tu conexion e intenta recargar la pagina.', 'error')
   }
-
-  if (typeChartEl.value) {
-    const consumptionByType = devicesStore.getConsumptionByType()
-    new Chart(typeChartEl.value, {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(consumptionByType).map(t => devicesStore.typeLabels[t]),
-        datasets: [{
-          data: Object.values(consumptionByType),
-          backgroundColor: Object.keys(consumptionByType).map(t => typeColors[t] || '#818cf8')
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color: '#b0bdd0', font: { family: 'Inter' } }
-          }
-        }
-      }
-    })
-  }
-}
-
-onMounted(createCharts)
+})
 </script>
 
 <style scoped>
-.overview {
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-xl);
-  max-width: 1200px;
-  margin: 0 auto;
+.overview-greeting {
+  margin-bottom: 32px;
 }
 
-/* Welcome */
-.overview__welcome {
-  padding: var(--hc-space-lg) 0 0;
-}
-
-.overview__greeting {
-  font-size: var(--hc-font-size-2xl);
+.greeting-text {
+  font-size: var(--font-6xl);
   font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
 }
 
-.overview__subtitle {
-  color: var(--hc-text-secondary);
-  font-size: var(--hc-font-size-sm);
-  margin-top: var(--hc-space-xs);
+.greeting-sub {
+  font-size: var(--font-md);
+  color: var(--text-muted);
 }
 
-/* Energy section */
-.overview__energy {
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-md);
+.overview-section {
+  margin-bottom: 28px;
 }
 
-/* Metrics */
-.overview__metrics {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--hc-space-md);
+/* Override del global section-title para el overview (fuente mas grande) */
+.section-title {
+  font-size: var(--font-xl);
+  margin-bottom: 14px;
 }
 
-.overview__metric-card {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--hc-space-xs);
-}
-
-.overview__metric-value {
-  font-size: var(--hc-font-size-2xl);
-  font-weight: 700;
-  color: var(--hc-accent);
-}
-
-.overview__metric-label {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
-}
-
-/* Section header (shared) */
-.overview__section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--hc-space-lg);
-}
-
-.overview__section-header h3 {
-  font-size: var(--hc-font-size-lg);
-}
-
-/* Homes grid */
-.overview__homes-grid {
+/* -- Grilla de casas -- */
+.homes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--hc-space-md);
+  gap: 16px;
 }
 
-.overview__home-card {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-lg);
+.btn-add {
+  display: inline-block;
+  margin-top: 14px;
   text-decoration: none;
-  color: var(--hc-text-primary);
-  transition: all var(--hc-transition-fast);
+}
+
+/* -- Dispositivos criticos -- */
+.critical-devices {
   display: flex;
   flex-direction: column;
-  gap: var(--hc-space-md);
+  gap: 8px;
 }
 
-.overview__home-card:hover {
-  border-color: var(--hc-accent);
-}
-
-.overview__home-card--add {
-  border-style: dashed;
-  justify-content: center;
+.critical-device-item {
+  display: flex;
   align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.overview__home-card-add-content {
+.critical-icon { font-size: var(--font-xl); }
+.critical-icon--alarm { color: var(--danger); }
+.critical-icon--door { color: var(--amber); }
+
+.critical-device-info {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--hc-space-sm);
-  color: var(--hc-accent);
+  flex: 1;
 }
 
-.overview__home-card-add-icon {
-  font-size: 2rem;
-  font-weight: 300;
-  line-height: 1;
-}
-
-.overview__home-card-add-label {
-  font-size: var(--hc-font-size-sm);
-  font-weight: 500;
-}
-
-.overview__home-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--hc-space-sm);
-}
-
-.overview__home-card-name {
+.critical-device-name {
+  font-size: var(--font-base);
   font-weight: 600;
-  font-size: var(--hc-font-size-base);
+  color: var(--text-primary);
 }
 
-.overview__home-card-stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
+.critical-device-room {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
 }
 
-/* Two column layout */
-.overview__two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--hc-space-md);
+.critical-device-status {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--danger);
 }
 
-.overview__section {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-lg);
-}
-
-/* List items */
-.overview__list {
+/* -- Rutinas favoritas -- */
+.fav-routines {
   display: flex;
   flex-direction: column;
-  gap: var(--hc-space-sm);
+  gap: 8px;
 }
 
-.overview__list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--hc-space-md);
-  background: var(--hc-bg-tertiary);
-  border-radius: var(--hc-radius-md);
-}
-
-.overview__list-item-info {
+.fav-routine-item {
   display: flex;
   align-items: center;
-  gap: var(--hc-space-sm);
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.overview__list-item-name {
-  font-size: var(--hc-font-size-sm);
-  font-weight: 500;
+.fav-routine-star {
+  color: var(--amber);
+  font-size: var(--font-md);
 }
 
-.overview__list-item-status {
-  font-size: var(--hc-font-size-xs);
-  margin-top: 0.125rem;
+.fav-routine-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.overview__list-item-action {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-accent);
-  text-decoration: none;
-  font-weight: 500;
+.fav-routine-name {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.overview__list-item-action:hover {
-  color: var(--hc-accent-hover);
+.fav-routine-home {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
 }
 
-.overview__empty {
-  color: var(--hc-text-muted);
-  font-size: var(--hc-font-size-sm);
-  text-align: center;
-  padding: var(--hc-space-xl);
+.fav-routine-schedule {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
 }
 
-/* Charts */
-.overview__charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--hc-space-md);
+.fav-routine-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  font-size: var(--font-sm);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
-.overview__chart-card {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-lg);
-}
-
-.overview__chart-card h3 {
-  font-size: var(--hc-font-size-base);
-  margin-bottom: var(--hc-space-lg);
-}
-
-/* Utility text colors */
-.text-success {
-  color: var(--hc-success);
-}
-
-.text-muted {
-  color: var(--hc-text-muted);
+.fav-routine-btn:hover {
+  background-color: var(--card-hover);
+  border-color: var(--accent);
 }
 </style>

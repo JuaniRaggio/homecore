@@ -1,87 +1,83 @@
 <template>
-  <div class="routine-card" :class="{ 'routine-card--disabled': !routine.enabled }">
+  <div class="routine-card" :class="{ 'routine-card--inactive': !routine.isActive }">
     <div class="routine-card__header">
-      <div class="routine-card__info" @click="navigateToDetail">
-        <h4 class="routine-card__name">{{ routine.name }}</h4>
-        <p class="routine-card__desc">{{ routine.description }}</p>
+      <div class="routine-card__title-wrap">
+        <span class="routine-name">{{ routine.name }}</span>
+        <span class="routine-desc">{{ routine.description }}</span>
       </div>
-      <div class="routine-card__header-actions">
-        <button
-          class="routine-card__favorite-btn"
-          @click.stop="routinesStore.toggleFavorite(routine.id)"
-          :class="{ 'routine-card__favorite-btn--active': routine.favorite }"
-          title="Agregar a favoritos"
+      <div class="routine-card__controls">
+        <span
+          class="star"
+          :class="{ 'star--yellow': routine.isFavorite }"
+          @click="$emit('toggle-favorite', routine.id)"
         >
-          &#9733;
-        </button>
-        <HcToggle :modelValue="routine.enabled" @update:modelValue="routinesStore.toggleRoutine(routine.id)" :disabled="restrictExecute" />
+          <i :class="routine.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+        </span>
+        <ToggleSwitch
+          :model-value="routine.isActive"
+          @update:model-value="$emit('toggle-active', routine.id)"
+        />
       </div>
     </div>
 
-    <div class="routine-card__meta">
-      <div class="routine-card__schedule" v-if="routine.schedule">
-        <span class="routine-card__days">
-          <span class="routine-card__time"><HcIcon name="routines" size="sm" /> {{ routine.schedule.time }}</span>
-          {{ routine.schedule.days.join(', ') }}
-        </span>
+    <div class="routine-card__schedule">
+      <div class="schedule-left">
+        <div class="schedule-time">
+          <i class="fa-regular fa-clock"></i>
+          <span>{{ routine.time }}</span>
+        </div>
+        <div class="schedule-days">{{ routine.days }}</div>
       </div>
-      <div class="routine-card__actions-count">
-        {{ routine.actions.length }} {{ routine.actions.length === 1 ? 'accion' : 'acciones' }}
-      </div>
+      <div class="actions-count">{{ routine.actions.length }} acciones</div>
     </div>
 
     <div class="routine-card__footer">
-      <HcButton size="sm" variant="primary" @click="$emit('execute', routine.id)" :disabled="restrictExecute">
-        Ejecutar Ahora
-      </HcButton>
-      <HcButton size="sm" variant="ghost" @click="navigateToDetail">
-        Ver detalle
-      </HcButton>
+      <button class="btn-exec" @click="$emit('execute', routine.id)">Ejecutar Ahora</button>
+      <button class="btn-detail" @click="$emit('view-detail', routine.id)">Ver detalle</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
-import { useRoutinesStore } from '../../stores/routines'
-import HcButton from '../ui/HcButton.vue'
-import HcToggle from '../ui/HcToggle.vue'
-import HcIcon from '../ui/HcIcon.vue'
+import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 
-const props = defineProps({
-  routine: { type: Object, required: true },
-  restrictExecute: { type: Boolean, default: false }
+defineProps({
+  routine: {
+    type: Object,
+    required: true
+    // {
+    //   id: String,
+    //   name: String,
+    //   description: String,
+    //   time: String,       -- "07:30"
+    //   days: String,       -- "Lun, Mar, Mie, Jue, Vie"
+    //   isFavorite: Boolean,
+    //   isActive: Boolean,
+    //   actions: Array
+    // }
+  }
 })
 
-defineEmits(['execute'])
-
-const router = useRouter()
-const route = useRoute()
-const routinesStore = useRoutinesStore()
-
-function navigateToDetail() {
-  router.push(`/${route.params.houseId}/rutinas/${props.routine.id}`)
-}
+defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
 </script>
 
 <style scoped>
 .routine-card {
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-lg);
-  padding: var(--hc-space-lg);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: var(--hc-space-md);
-  transition: all var(--hc-transition-fast);
-  height: 100%;
+  gap: 14px;
+  transition: background-color 0.2s;
 }
 
 .routine-card:hover {
-  border-color: var(--hc-accent);
+  background-color: var(--card-hover);
 }
 
-.routine-card--disabled {
+.routine-card--inactive {
   opacity: 0.6;
 }
 
@@ -89,102 +85,72 @@ function navigateToDetail() {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--hc-space-md);
+  gap: 12px;
 }
 
-.routine-card__info {
-  flex: 1;
-  min-width: 0;
-  cursor: pointer;
-}
-
-.routine-card__info:hover .routine-card__name {
-  color: var(--hc-accent);
-}
-
-.routine-card__header-actions {
+.routine-card__title-wrap {
   display: flex;
-  gap: var(--hc-space-sm);
+  flex-direction: column;
+  gap: 4px;
+}
+
+.routine-name {
+  font-weight: 700;
+  font-size: var(--font-lg);
+  color: var(--text-primary);
+}
+
+.routine-desc {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.routine-card__controls {
+  display: flex;
   align-items: center;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.routine-card__favorite-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px 8px;
-  color: var(--hc-text-muted);
-  border-radius: var(--hc-radius-sm);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.routine-card__favorite-btn:hover {
-  background: var(--hc-bg-tertiary);
-  color: var(--hc-text-secondary);
-}
-
-.routine-card__favorite-btn--active {
-  color: #fbbf24;
-}
-
-.routine-card__name {
-  font-size: var(--hc-font-size-base);
-  font-weight: 600;
-  margin: 0;
-  transition: color var(--hc-transition-fast);
-}
-
-.routine-card__desc {
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
-  margin: 0.125rem 0 0 0;
-}
-
-.routine-card__meta {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--hc-space-lg);
-  align-items: center;
-  margin-top: auto;
-}
 
 .routine-card__schedule {
   display: flex;
-  gap: var(--hc-space-md);
-  font-size: var(--hc-font-size-sm);
-  color: var(--hc-text-secondary);
-  flex-wrap: nowrap;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
 }
 
-.routine-card__time {
-  font-weight: 500;
-  color: var(--hc-accent);
+.schedule-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.schedule-time {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 6px;
+  font-size: var(--font-base);
+  color: var(--accent);
+  font-weight: 600;
 }
 
-.routine-card__days {
-  font-size: var(--hc-font-size-xs);
-  color: var(--hc-text-muted);
+.schedule-days {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
 }
 
-.routine-card__actions-count {
-  font-size: var(--hc-font-size-xs);
-  color: var(--hc-text-muted);
-  text-align: right;
+.actions-count {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .routine-card__footer {
   display: flex;
-  gap: var(--hc-space-sm);
-  padding-top: var(--hc-space-sm);
-  border-top: 1px solid var(--hc-border);
+  align-items: center;
+  gap: 10px;
 }
+
 </style>

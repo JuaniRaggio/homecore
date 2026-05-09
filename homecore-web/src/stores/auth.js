@@ -1,150 +1,159 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
-const RESTRICTED_DEVICE_TYPES = {
-  teen: ['alarm', 'door']
-}
+import * as api from '@/services/api'
+import { connect as socketConnect, disconnect as socketDisconnect } from '@/services/socket'
 
 export const useAuthStore = defineStore('auth', () => {
-  const defaultUser = {
-    id: 1,
-    name: 'Juani Raggio',
-    email: 'juani@homecore.com',
-    password: 'Home1234',
-    avatar: null,
-    verified: true,
-    notificationsEnabled: true,
-    pinEnabled: false
-  }
-  const user = ref({ ...defaultUser })
-  const isAuthenticated = computed(() => !!user.value)
-  const pin = ref('1234')
+  const token = ref(localStorage.getItem('auth_token') || null)
+  const user = ref(null)
+  const pendingCredentials = ref(null)
+  const templateReady = ref(false)
 
-  const familyProfiles = ref([
-    { id: 'admin-1', name: 'Juani Raggio', role: 'admin', avatar: null },
-    { id: 'teen-1', name: 'Tomi Raggio', role: 'teen', avatar: null }
-  ])
-  const activeProfile = ref(familyProfiles.value[0])
-  const isAdmin = computed(() => activeProfile.value.role === 'admin')
+  const isAuthenticated = computed(() => !!token.value)
+  const pendingEmail = computed(() => pendingCredentials.value?.email || null)
 
-  function switchProfile(profileId) {
-    const profile = familyProfiles.value.find(p => p.id === profileId)
-    if (profile) {
-      activeProfile.value = profile
+  const userInitials = computed(() => {
+    if (!user.value?.name) return '?'
+    return user.value.name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(w => w[0].toUpperCase())
+      .join('')
+  })
+
+  async function fetchProfile() {
+    try {
+      const profile = await api.getUserProfile()
+      user.value = profile
+    } catch (e) {
+      console.error('[auth] Error cargando perfil (token invalido o expirado):', e)
     }
   }
 
-  function isRestricted(deviceType) {
-    const restricted = RESTRICTED_DEVICE_TYPES[activeProfile.value.role]
-    return restricted ? restricted.includes(deviceType) : false
-  }
-
-  const registeredUsers = ref([
-    {
-      id: 1,
-      name: 'Juani Raggio',
-      email: 'juani@homecore.com',
-      password: 'Home1234',
-      avatar: null,
-      verified: true,
-      notificationsEnabled: true,
-      pinEnabled: false
-    }
-  ])
-
-  function login(email, password) {
-    const found = registeredUsers.value.find(
-      u => u.email === email && u.password === password
-    )
-    if (found) {
-      if (!found.verified) {
-        return { success: false, error: 'Cuenta no verificada. Revisa tu correo electronico.' }
+  async function ensureRegistrationTemplate() {
+    if (templateReady.value) return
+    try {
+      const templates = await api.getAllMailerTemplates()
+      const exists = Array.isArray(templates) && templates.some(t => t.type === 'REGISTRATION')
+      if (!exists) {
+        await api.postMailerTemplate({
+          type: 'REGISTRATION',
+          subject: 'Código de verificación - HomeCore',
+          template: '<div><h1>Bienvenido <%FIRST_NAME%></h1><p>Tu código de verificación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
+        })
       }
-      user.value = { ...found }
-      return { success: true }
+      templateReady.value = true
+    } catch (e) {
+      console.error('[auth] Error configurando template de registro:', e)
     }
-    return { success: false, error: 'Credenciales incorrectas. Verifica tu email y contrasena.' }
   }
 
-  function register(name, email, password) {
-    const exists = registeredUsers.value.find(u => u.email === email)
-    if (exists) {
-      return { success: false, error: 'Ya existe una cuenta con ese email.' }
-    }
-    const newUser = {
-      id: registeredUsers.value.length + 1,
-      name,
-      email,
-      password,
-      avatar: null,
-      verified: false,
-      notificationsEnabled: true,
-      pinEnabled: false,
-    }
-    registeredUsers.value.push(newUser)
-    return { success: true }
-  }
-
-  function verifyAccount(code) {
-    if (code === '123456') {
-      const lastUser = registeredUsers.value[registeredUsers.value.length - 1]
-      if (lastUser) {
-        lastUser.verified = true
+  async function register(name, email, password) {
+    try {
+      await api.register(name, email, password)
+    } catch (error) {
+      if (error.status === 409) {
+        // Account exists — try sending verification to distinguish unverified vs already verified
+        try {
+          await ensureRegistrationTemplate()
+          await api.sendVerification(email)
+          pendingCredentials.value = { email, password }
+          return { success: true }
+        } catch (e) {
+          console.error('[auth] Error enviando verificacion para cuenta existente:', e)
+          return { success: false, conflict: true }
+        }
       }
+      return { success: false, error: error.message }
+    }
+    try {
+      await ensureRegistrationTemplate()
+      await api.sendVerification(email)
+      pendingCredentials.value = { email, password }
       return { success: true }
-    }
-    return { success: false, error: 'Codigo de verificacion incorrecto.' }
-  }
-
-  function recoverPassword(email) {
-    const found = registeredUsers.value.find(u => u.email === email)
-    if (found) {
-      return { success: true, message: 'Se envio un enlace de recuperacion a tu correo.' }
-    }
-    return { success: false, error: 'No existe una cuenta con ese email.' }
-  }
-
-  function changePassword(currentPassword, newPassword) {
-    if (!user.value) return { success: false, error: 'No hay sesion activa.' }
-    if (user.value.password !== currentPassword) {
-      return { success: false, error: 'La contrasena actual es incorrecta.' }
-    }
-    user.value.password = newPassword
-    const reg = registeredUsers.value.find(u => u.id === user.value.id)
-    if (reg) reg.password = newPassword
-    return { success: true }
-  }
-
-  function toggleNotifications() {
-    if (user.value) {
-      user.value.notificationsEnabled = !user.value.notificationsEnabled
+    } catch (error) {
+      return { success: false, error: error.message }
     }
   }
 
-  function verifyPin(inputPin) {
-    return inputPin === pin.value
+  async function login(email, password) {
+    try {
+      token.value = null
+      localStorage.removeItem('auth_token')
+      const response = await api.login(email, password)
+      token.value = response.token
+      localStorage.setItem('auth_token', response.token)
+      await fetchProfile()
+      socketConnect(response.token)
+      return { success: true }
+    } catch (error) {
+      console.error('[auth] Error de login:', error)
+      return { success: false, error: "Error de inicio de sesion" }
+    }
   }
 
   function logout() {
+    socketDisconnect()
+    token.value = null
     user.value = null
+    localStorage.removeItem('auth_token')
+  }
+
+  async function verifyAccount(code) {
+    try {
+      await api.verifyAccount(code)
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+    if (pendingCredentials.value) {
+      const { email, password } = pendingCredentials.value
+      pendingCredentials.value = null
+      return await login(email, password)
+    }
+    return { success: true, needsLogin: true }
+  }
+
+  async function recover(email) {
+    if (!email) {
+      return { success: false, error: 'Ingrese su email' }
+    }
+    try {
+      await api.forgotPassword(email)
+      return { success: true, message: 'Se envio un codigo de recuperacion a tu correo.' }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  async function resetPassword(code, newPassword) {
+    try {
+      await api.resetPassword(code, newPassword)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  async function changePassword(currentPassword, newPassword) {
+    try {
+      await api.changePassword(currentPassword, newPassword)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+  async function initializeAuth() {
+    if (token.value && !user.value) {
+      await fetchProfile()
+      socketConnect(token.value)
+    }
   }
 
   return {
-    user,
-    isAuthenticated,
-    pin,
-    familyProfiles,
-    activeProfile,
-    isAdmin,
-    switchProfile,
-    isRestricted,
-    login,
-    register,
-    verifyAccount,
-    recoverPassword,
-    changePassword,
-    toggleNotifications,
-    verifyPin,
-    logout
+    token, user, isAuthenticated, userInitials, pendingEmail,
+    register, login, logout, verifyAccount, recover, resetPassword, changePassword,
+    fetchProfile, initializeAuth
   }
 })

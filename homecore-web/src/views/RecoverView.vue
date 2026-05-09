@@ -1,35 +1,73 @@
 <template>
-  <div class="auth-page">
-    <div class="auth-card">
-      <div class="auth-card__header">
-        <div class="auth-logo">
-          <HcLogo size="lg" />
+  <div class="auth-bg">
+    <div class="auth-container">
+      <div class="auth-header">
+        <div class="icon-app">
+          <img src="@/assets/homecore-icono.svg" alt="HomeCore Icon" class="icon-image">
         </div>
-        <h1 class="auth-title">Recuperar contrasena</h1>
-        <p class="auth-subtitle">Ingresa tu correo y te enviaremos instrucciones</p>
+        <h1 class="auth-title">HomeCore</h1>
       </div>
 
-      <form v-if="!sent" @submit.prevent="handleRecover" class="auth-form">
-        <HcInput
-          v-model="email"
-          type="email"
-          label="Correo electronico"
-          placeholder="tu@email.com"
-          :error="error"
-        />
+      <!-- Paso 1: Enviar email -->
+      <div v-if="step === 'email'" class="auth-card">
+        <div class="card-top-row">
+          <h2 class="card-subtitle">Recuperar cuenta</h2>
+          <a class="back-link" @click.prevent="router.push('/login')">Volver</a>
+        </div>
 
-        <HcButton type="submit" block :loading="loading">
-          Enviar enlace
-        </HcButton>
-      </form>
+        <p class="card-description">
+          Ingresa tu email y te enviaremos un codigo para restablecer tu contrasena.
+        </p>
 
-      <div v-else class="auth-success">
-        <p>Se envio un enlace de recuperacion a <strong>{{ email }}</strong>.</p>
-        <p>Revisa tu bandeja de entrada.</p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input v-model="email" type="email" placeholder="Ingrese su email" @keyup.enter="handleRecover" />
+        </div>
+
+        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+
+        <button class="btn-primary" @click="handleRecover" :disabled="loading">
+          {{ loading ? 'Enviando...' : 'Enviar codigo' }}
+        </button>
       </div>
 
-      <div class="auth-links">
-        <router-link to="/login">Volver al login</router-link>
+      <!-- Paso 2: Ingresar codigo y nueva contrasena -->
+      <div v-else-if="step === 'reset'" class="auth-card">
+        <div class="card-top-row">
+          <h2 class="card-subtitle">Nueva contrasena</h2>
+          <a class="back-link" @click.prevent="step = 'email'">Volver</a>
+        </div>
+
+        <p class="card-description">
+          Ingresa el codigo de recuperacion y tu nueva contrasena.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Codigo de recuperacion</label>
+          <input v-model="code" type="text" placeholder="Ingrese el codigo" @keyup.enter="handleReset" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nueva contrasena</label>
+          <input v-model="newPassword" type="password" placeholder="Minimo 8 caracteres" @keyup.enter="handleReset" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmar contrasena</label>
+          <input v-model="confirmPassword" type="password" placeholder="Repita la contrasena" @keyup.enter="handleReset" />
+        </div>
+
+        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
+
+        <button class="btn-primary" @click="handleReset" :disabled="loading">
+          {{ loading ? 'Restableciendo...' : 'Restablecer contrasena' }}
+        </button>
+      </div>
+
+      <!-- Paso 3: Exito -->
+      <div v-else-if="step === 'done'" class="auth-card">
+        <p class="success-msg">Contrasena restablecida correctamente.</p>
+        <button class="btn-accent" @click="router.push('/login')">Iniciar sesion</button>
       </div>
     </div>
   </div>
@@ -37,65 +75,90 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
-import HcInput from '../components/ui/HcInput.vue'
-import HcButton from '../components/ui/HcButton.vue'
-import HcLogo from '../components/ui/HcLogo.vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
+const router = useRouter()
 const authStore = useAuthStore()
+
+const step = ref('email')
 const email = ref('')
-const error = ref(null)
+const code = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const errorMsg = ref('')
 const loading = ref(false)
-const sent = ref(false)
 
 async function handleRecover() {
-  error.value = null
+  errorMsg.value = ''
   if (!email.value) {
-    error.value = 'Ingresa tu correo electronico'
+    errorMsg.value = 'Ingrese su email'
     return
   }
-
   loading.value = true
-  await new Promise(r => setTimeout(r, 600))
-
-  const result = authStore.recoverPassword(email.value)
+  const result = await authStore.recover(email.value)
   loading.value = false
-
   if (result.success) {
-    sent.value = true
+    step.value = 'reset'
   } else {
-    error.value = result.error
+    errorMsg.value = result.error
+  }
+}
+
+async function handleReset() {
+  errorMsg.value = ''
+  if (!code.value) {
+    errorMsg.value = 'Ingrese el codigo de recuperacion'
+    return
+  }
+  if (newPassword.value.length < 8) {
+    errorMsg.value = 'La contrasena debe tener al menos 8 caracteres'
+    return
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    errorMsg.value = 'Las contrasenas no coinciden'
+    return
+  }
+  loading.value = true
+  const result = await authStore.resetPassword(code.value, newPassword.value)
+  loading.value = false
+  if (result.success) {
+    step.value = 'done'
+  } else {
+    errorMsg.value = result.error
   }
 }
 </script>
 
 <style scoped>
-.auth-page {
-  min-height: 100vh;
+.card-top-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--hc-bg-primary) 0%, #12121c 50%, #0d0d18 100%);
-  padding: var(--hc-space-xl);
+  justify-content: space-between;
+  margin-bottom: var(--space-2xs);
 }
 
-.auth-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--hc-bg-secondary);
-  border: 1px solid var(--hc-border);
-  border-radius: var(--hc-radius-xl);
-  padding: var(--hc-space-2xl);
-  box-shadow: var(--hc-shadow-lg);
+.card-subtitle {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.auth-card__header { text-align: center; margin-bottom: var(--hc-space-xl); }
-.auth-logo {
-  width: 56px; height: 66px; margin: 0 auto var(--hc-space-md);
+.back-link {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
 }
-.auth-title { font-size: var(--hc-font-size-2xl); font-weight: 700; }
-.auth-subtitle { color: var(--hc-text-secondary); font-size: var(--hc-font-size-sm); margin-top: var(--hc-space-xs); }
-.auth-form { display: flex; flex-direction: column; gap: var(--hc-space-lg); }
-.auth-success { text-align: center; color: var(--hc-success); font-size: var(--hc-font-size-sm); line-height: 1.6; }
-.auth-links { text-align: center; margin-top: var(--hc-space-lg); font-size: var(--hc-font-size-sm); }
+
+.back-link:hover {
+  color: var(--text-on-accent);
+}
+
+.card-description {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
 </style>

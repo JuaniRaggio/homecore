@@ -1,300 +1,220 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useHistoryStore } from './history'
+import * as api from '@/services/api'
+import pLimit from 'p-limit'
+import { normalizeDevice, calcConsumption, resolveTypeKey } from '@/utils/device-helpers'
+import { friendlyError } from '@/utils/friendly-error'
+import { getStatusMap, getStatusText } from '@/config/device-types'
+
+const MAX_CONCURRENT_REQUESTS = 3
 
 export const useDevicesStore = defineStore('devices', () => {
-  const devices = ref([
-    {
-      id: 'lamp-1',
-      name: 'Lampara principal',
-      type: 'lamp',
-      roomId: 'room-1',
-      on: true,
-      brightness: 80,
-      color: '#f59e0b',
-      consumption: 12,
-      favorite: true,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'lamp-2',
-      name: 'Velador izquierdo',
-      type: 'lamp',
-      roomId: 'room-2',
-      on: false,
-      brightness: 50,
-      color: '#ffffff',
-      consumption: 8,
-      favorite: false,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'lamp-3',
-      name: 'Lampara cocina',
-      type: 'lamp',
-      roomId: 'room-3',
-      on: true,
-      brightness: 100,
-      color: '#ffffff',
-      consumption: 15,
-      favorite: false,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'door-1',
-      name: 'Puerta principal',
-      type: 'door',
-      roomId: 'room-1',
-      on: false,
-      locked: true,
-      consumption: 2,
-      favorite: true,
-      critical: true,
-      password: '1234'
-    },
-    {
-      id: 'door-2',
-      name: 'Puerta cochera',
-      type: 'door',
-      roomId: null,
-      on: false,
-      locked: true,
-      consumption: 3,
-      favorite: false,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'alarm-1',
-      name: 'Alarma perimetral',
-      type: 'alarm',
-      roomId: null,
-      on: true,
-      armed: true,
-      zones: ['Frente', 'Fondo', 'Lateral'],
-      activeZones: ['Frente', 'Fondo', 'Lateral'],
-      alerts: [
-        { date: '2026-03-14 02:15', zone: 'Frente', type: 'Movimiento detectado' },
-        { date: '2026-03-13 23:45', zone: 'Fondo', type: 'Sensor activado' }
-      ],
-      consumption: 5,
-      favorite: true,
-      critical: true,
-      password: '1234'
-    },
-    {
-      id: 'faucet-1',
-      name: 'Grifo jardin',
-      type: 'faucet',
-      roomId: null,
-      on: false,
-      flow: 60,
-      consumption: 4,
-      favorite: false,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'faucet-2',
-      name: 'Grifo cocina inteligente',
-      type: 'faucet',
-      roomId: 'room-3',
-      on: false,
-      flow: 40,
-      consumption: 3,
-      favorite: false,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'blinds-1',
-      name: 'Cortina living',
-      type: 'blinds',
-      roomId: 'room-1',
-      on: false,
-      position: 75,
-      consumption: 6,
-      favorite: false,
-      critical: false,
-      password: null
-    },
-    {
-      id: 'blinds-2',
-      name: 'Cortina dormitorio',
-      type: 'blinds',
-      roomId: 'room-2',
-      on: false,
-      position: 0,
-      consumption: 6,
-      favorite: true,
-      critical: false,
-      password: null
-    }
-  ])
+  const devices = ref([])
+  const deviceTypes = ref([])
+  const loading = ref(false)
+  const error = ref(null)
 
-  const typeLabels = {
-    lamp: 'Lampara',
-    door: 'Puerta',
-    alarm: 'Alarma',
-    faucet: 'Grifo',
-    blinds: 'Cortina'
+  const favoriteDevices = computed(() => devices.value.filter(d => d.isFavorite))
+  const activeDevices = computed(() => devices.value.filter(d => d.isOn))
+
+  const totalConsumption = computed(() =>
+    calcConsumption(devices.value, deviceTypes.value)
+  )
+
+  function clear() {
+    devices.value = []
   }
 
-  const typeIcons = {
-    lamp: 'lightbulb',
-    door: 'door',
-    alarm: 'alarm',
-    faucet: 'faucet',
-    blinds: 'blinds'
-  }
-
-  const favorites = computed(() => devices.value.filter(d => d.favorite))
-
-  const criticalDevices = computed(() => devices.value.filter(d => d.critical))
-
-  const deviceTypes = computed(() => [...new Set(devices.value.map(d => d.type))])
-
-  function getById(id) {
-    return devices.value.find(d => d.id === id)
-  }
-
-  function getByRoom(roomId) {
-    return devices.value.filter(d => d.roomId === roomId)
-  }
-
-  function getByType(type) {
-    return devices.value.filter(d => d.type === type)
-  }
-
-  function toggleDevice(id) {
-    const device = getById(id)
+  function clearDeviceRoom(deviceId) {
+    const device = devices.value.find(d => String(d.id) === String(deviceId))
     if (device) {
-      device.on = !device.on
-      const history = useHistoryStore()
-      history.addEntry({
-        deviceId: id,
-        deviceName: device.name,
-        action: device.on ? 'Encendido' : 'Apagado',
-        type: device.type
-      })
+      device.room = ''
+      device.roomId = null
     }
   }
 
-  function updateDevice(id, updates) {
-    const device = getById(id)
-    if (device) {
-      Object.assign(device, updates)
-      const history = useHistoryStore()
-      const actionParts = []
-      if ('brightness' in updates) actionParts.push(`Brillo: ${updates.brightness}%`)
-      if ('color' in updates) actionParts.push(`Color: ${updates.color}`)
-      if ('locked' in updates) actionParts.push(updates.locked ? 'Bloqueado' : 'Desbloqueado')
-      if ('armed' in updates) actionParts.push(updates.armed ? 'Activada' : 'Desactivada')
-      if ('flow' in updates) actionParts.push(`Caudal: ${updates.flow}%`)
-      if ('position' in updates) actionParts.push(`Posicion: ${updates.position}%`)
-      if (actionParts.length > 0) {
-        history.addEntry({
-          deviceId: id,
-          deviceName: device.name,
-          action: actionParts.join(', '),
-          type: device.type
-        })
+  function removeDevice(deviceId) {
+    devices.value = devices.value.filter(d => String(d.id) !== String(deviceId))
+  }
+
+  function getDevicesByRoomId(roomId) {
+    return devices.value.filter(d => String(d.roomId) === String(roomId))
+  }
+
+  async function fetchDeviceTypes() {
+    try {
+      deviceTypes.value = await api.getDeviceTypes()
+    } catch (e) {
+      console.error('[devices] Error cargando tipos de dispositivo:', e)
+    }
+  }
+
+  function getPowerUsage(device) {
+    const typeId = device.typeId ?? device.type?.id ?? device.type
+    const dt = deviceTypes.value.find(t => String(t.id) === String(typeId))
+    return dt?.powerUsage ?? 0
+  }
+
+  /**
+   * Carga todos los dispositivos de un hogar recorriendo sus habitaciones en paralelo (max 3 concurrentes).
+   * @param {string} homeId
+   */
+  async function fetchAllForHome(homeId) {
+    loading.value = true
+    error.value = null
+    devices.value = []
+
+    const limit = pLimit(MAX_CONCURRENT_REQUESTS)
+    try {
+      const roomList = await api.getRooms(homeId)
+
+      const batches = await Promise.all(
+        roomList.map(room => limit(async () => {
+          try {
+            const roomDevices = await api.getDevices(room.id)
+            const normalized = []
+            for (const d of roomDevices) {
+              try {
+                normalized.push(normalizeDevice(d, room.name, room.id, deviceTypes.value))
+              } catch (e) {
+                console.error(`[devices] error normalizando device ${d.id ?? d.name ?? '?'} en room "${room.name}"`, e)
+              }
+            }
+            return normalized
+          } catch (e) {
+            console.error(`[devices] error cargando room "${room.name}" (id: ${room.id})`, e)
+            return []
+          }
+        }))
+      )
+
+      devices.value = batches.flat()
+    } catch (e) {
+      error.value = friendlyError(e)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Alterna el estado on/off de un dispositivo. Usa actionOn/actionOff segun el tipo.
+   * @param {string} id
+   */
+  async function toggleDevice(id) {
+    const device = devices.value.find(d => String(d.id) === String(id))
+    if (!device) return
+    const map = getStatusMap(device.type)
+    const action = device.isOn ? map.actionOff : map.actionOn
+    await api.executeAction(id, action, [])
+    device.isOn = !device.isOn
+    device.statusText = getStatusText(device.type, device.isOn)
+  }
+
+  async function toggleFavorite(id) {
+    const device = devices.value.find(d => String(d.id) === String(id))
+    if (!device) return
+    const newFavorite = !device.isFavorite
+    const body = {
+      name: device.name,
+      type: { id: device.typeId },
+      metadata: { ...(device.metadata || {}), favorite: newFavorite },
+    }
+    if (device.roomId) body.room = { id: device.roomId }
+    await api.updateDevice(id, body)
+    device.isFavorite = newFavorite
+  }
+
+  /**
+   * Agrega un dispositivo al store desde un evento del websocket. Ignora duplicados.
+   * @param {Object} rawDevice - Payload crudo del websocket
+   */
+  function addDeviceFromEvent(rawDevice) {
+    if (!rawDevice?.id) return
+    const exists = devices.value.some(d => String(d.id) === String(rawDevice.id))
+    if (exists) return
+    try {
+      const roomName = rawDevice.room?.name || ''
+      const roomId = rawDevice.room?.id || null
+      const normalized = normalizeDevice(rawDevice, roomName, roomId, deviceTypes.value)
+      devices.value.push(normalized)
+    } catch (e) {
+      console.error('[devices] error normalizando device del websocket', e)
+    }
+  }
+
+  /**
+   * Actualiza campos de un dispositivo existente desde un evento del websocket (sin re-fetch).
+   * @param {Object} rawDevice - Payload crudo del websocket
+   */
+  function updateDeviceFromEvent(rawDevice) {
+    if (!rawDevice?.id) return
+    const device = devices.value.find(d => String(d.id) === String(rawDevice.id))
+    if (!device) return
+    if (rawDevice.name) device.name = rawDevice.name
+    if (rawDevice.room?.id) {
+      device.roomId = rawDevice.room.id
+      device.room = rawDevice.room.name || device.room
+    }
+    if (rawDevice.type) {
+      const typeName = typeof rawDevice.type === 'string' ? rawDevice.type : rawDevice.type.name
+      if (typeName) {
+        device.type = resolveTypeKey(typeName)
+        device.typeId = (typeof rawDevice.type === 'object') ? rawDevice.type.id : rawDevice.typeId
       }
     }
   }
 
-  function toggleFavorite(id) {
-    const device = getById(id)
+  /**
+   * Aplica un cambio de estado desde un deviceEvent del websocket (isOn, statusText).
+   * @param {Object} event - Payload {id, data} donde data contiene el estado nuevo
+   */
+  function applyDeviceEvent(event) {
+    const deviceId = event.id ?? event.deviceId ?? event.device?.id
+    if (!deviceId) return
+    const device = devices.value.find(d => String(d.id) === String(deviceId))
+    if (!device) return
+
+    const state = event.data || {}
+
+    if (state.status !== undefined) {
+      device.isOn = state.status === 'on' || state.status === 'opened'
+        || state.status === 'active' || state.status === 'playing'
+    }
+
+    if (state.lock !== undefined) {
+      device.statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
+    } else if (state.status !== undefined) {
+      device.statusText = getStatusText(device.type, device.isOn)
+    }
+  }
+
+  async function updateDevice(id, data) {
+    await api.updateDevice(id, data)
+    const device = devices.value.find(d => String(d.id) === String(id))
     if (device) {
-      device.favorite = !device.favorite
+      if (data.name) device.name = data.name
+      if (data.type?.id) {
+        const dt = deviceTypes.value.find(t => String(t.id) === String(data.type.id))
+        if (dt) {
+          device.type = dt.name
+          device.typeId = dt.id
+        }
+      }
+      if (data.room?.id) {
+        device.roomId = data.room.id
+      } else if (data.room === null) {
+        device.room = ''
+        device.roomId = null
+      }
     }
-  }
-
-  function toggleCritical(id) {
-    const device = getById(id)
-    if (device) {
-      device.critical = !device.critical
-    }
-  }
-
-  function getTotalConsumption() {
-    return devices.value
-      .filter(d => d.on)
-      .reduce((sum, d) => sum + (d.consumption || 0), 0)
-  }
-
-  function getConsumptionByType() {
-    const result = {}
-    devices.value.forEach(d => {
-      if (!result[d.type]) result[d.type] = 0
-      if (d.on) result[d.type] += d.consumption || 0
-    })
-    return result
-  }
-
-  function addDevice(data) {
-    const id = `${data.type}-${Date.now()}`
-    const defaults = { on: false, favorite: false, critical: false, password: null }
-
-    if (data.type === 'lamp') {
-      Object.assign(defaults, { brightness: 80, color: '#ffffff' })
-    } else if (data.type === 'door') {
-      Object.assign(defaults, { locked: true })
-    } else if (data.type === 'alarm') {
-      Object.assign(defaults, { armed: false, zones: [], activeZones: [], alerts: [] })
-    } else if (data.type === 'faucet') {
-      Object.assign(defaults, { flow: 50 })
-    } else if (data.type === 'blinds') {
-      Object.assign(defaults, { position: 0 })
-    }
-
-    const device = {
-      id,
-      name: data.name,
-      type: data.type,
-      roomId: data.roomId || null,
-      consumption: data.consumption || 0,
-      ...defaults,
-      favorite: data.favorite || false,
-      critical: data.critical || false,
-      password: data.password || null
-    }
-    devices.value.push(device)
-    return id
-  }
-
-  function hasPassword(id) {
-    const device = getById(id)
-    return !!(device && device.password)
-  }
-
-  function verifyPassword(id, password) {
-    const device = getById(id)
-    if (!device || !device.password) return true
-    return device.password === password
   }
 
   return {
-    devices,
-    typeLabels,
-    typeIcons,
-    favorites,
-    criticalDevices,
-    deviceTypes,
-    getById,
-    getByRoom,
-    getByType,
-    toggleDevice,
-    updateDevice,
-    toggleFavorite,
-    toggleCritical,
-    getTotalConsumption,
-    getConsumptionByType,
-    addDevice,
-    hasPassword,
-    verifyPassword
+    devices, deviceTypes, loading, error,
+    favoriteDevices, activeDevices, totalConsumption,
+    clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
+    applyDeviceEvent, addDeviceFromEvent, updateDeviceFromEvent,
+    clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice,
   }
+
 })

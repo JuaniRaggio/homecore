@@ -1,0 +1,79 @@
+/* Layout principal: contenido con sidebar */
+.page-content {
+  margin-left: calc(var(--sidebar-w) + 20px);
+  margin-top: calc(var(--topbar-h) + 20px);
+  margin-right: 20px;
+  padding-bottom: 40px;
+}
+
+/* Layout full-width: vistas sin sidebar (overview) */
+.page-content--full {
+  margin-left: 20px;
+  margin-top: calc(var(--topbar-h) + 20px);
+  margin-right: 20px;
+  padding-bottom: 40px;
+}
+
+/* Vista centrada con ancho limitado (detalle, edicion) */
+.view-narrow {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Titulo de vista */
+.view-title {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 5px;
+}
+
+/* Titulo de seccion dentro de una vista */
+.section-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+/* Grilla de resumen (consumo, overview) */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* Grilla de 2 columnas (responsive) */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Header de vista: titulo + acciones a la derecha */
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Grilla responsive para items (dispositivos, rutinas) */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Wrapper de vista sin padding */
+.view-content {
+  padding: 0;
+}

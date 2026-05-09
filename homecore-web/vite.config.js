@@ -7,5 +7,13 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://hci.it.itba.edu.ar',
+        changeOrigin: true
+      }
+    }
   }
 })

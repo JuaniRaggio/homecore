@@ -1,0 +1,75 @@
+<template>
+  <label class="toggle" :class="{ 'toggle--disabled': disabled }">
+    <input
+      type="checkbox"
+      :checked="modelValue"
+      :disabled="disabled"
+      @change="$emit('update:modelValue', $event.target.checked)"
+    >
+    <span class="toggle-track">
+      <span class="toggle-thumb"></span>
+    </span>
+  </label>
+</template>
+
+<script setup>
+defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['update:modelValue'])
+</script>
+
+<style scoped>
+.toggle {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggle-track {
+  display: block;
+  width: 40px;
+  height: 22px;
+  background-color: var(--toggle-off);
+  border-radius: var(--radius-lg);
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.toggle input:checked + .toggle-track {
+  background-color: var(--toggle-on);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-on-accent);
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(18px);
+}
+
+.toggle--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+</style>
