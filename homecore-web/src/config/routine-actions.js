@@ -1,6 +1,3 @@
-// Acciones disponibles por tipo de dispositivo para la creacion de rutinas.
-// Cada entrada define el nombre de accion de la API, la etiqueta en espanol,
-// y los parametros que acepta.
 export const ACTIONS_MAP = {
   light: [
     { actionName: 'turnOn',        label: 'Encender',    params: [] },
@@ -73,10 +70,6 @@ export const ACTIONS_MAP = {
   ],
 }
 
-/**
- * Devuelve las acciones disponibles para un tipo de dispositivo.
- * Busca por nombre parcial para soportar variantes (luz, lamp, light, etc.)
- */
 export function actionsFor(typeName) {
   const t = (typeName || '').toLowerCase()
   if (t.includes('light') || t.includes('lamp') || t.includes('luz')) return ACTIONS_MAP.light
@@ -92,9 +85,6 @@ export function actionsFor(typeName) {
   return []
 }
 
-/**
- * Devuelve los parametros de una accion especifica de un tipo.
- */
 export function paramsFor(typeName, actionName) {
   return actionsFor(typeName).find(a => a.actionName === actionName)?.params ?? []
 }
@@ -102,9 +92,6 @@ export function paramsFor(typeName, actionName) {
 const DEGREE_SYMBOL = String.fromCharCode(176)
 const CELSIUS = DEGREE_SYMBOL + 'C'
 
-/**
- * Sufijos de unidad por accion para descripciones legibles.
- */
 const UNIT_SUFFIXES = {
   setBrightness: '%',
   setLevel: '%',
@@ -112,15 +99,6 @@ const UNIT_SUFFIXES = {
   setFreezerTemperature: CELSIUS,
 }
 
-/**
- * Genera una descripcion legible de una accion ejecutada.
- * Usada tanto para notificaciones (toasts) como para el historial.
- *
- * @param {string} typeName - Tipo de dispositivo (light, ac, speaker, etc.)
- * @param {string} actionName - Nombre de la accion de la API
- * @param {Array} [params] - Parametros enviados a la accion
- * @returns {string} Descripcion legible en espanol
- */
 export function describeAction(typeName, actionName, params) {
   const action = actionsFor(typeName).find(a => a.actionName === actionName)
   const label = action?.label ?? actionName

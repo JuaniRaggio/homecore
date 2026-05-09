@@ -4,7 +4,6 @@ import { useHomesStore } from '@/stores/homes'
 
 import HomeLayout from '@/components/layout/HomeLayout.vue'
 
-// Lazy-load de todas las vistas
 const LoginView = () => import('@/views/LoginView.vue')
 const RegisterView = () => import('@/views/RegisterView.vue')
 const VerifyView = () => import('@/views/VerifyView.vue')
@@ -133,15 +132,12 @@ const router = createRouter({
 router.beforeEach((to) => {
   const authStore = useAuthStore()
 
-  // Rutas publicas no requieren autenticacion
   if (to.meta.public) return
 
-  // Si no esta autenticado, redirigir a login
   if (!authStore.isAuthenticated) {
     return { name: 'login' }
   }
 
-  // Sincronizar home seleccionada desde la ruta
   if (to.params.homeId) {
     const homesStore = useHomesStore()
     homesStore.syncFromRoute(to.params.homeId)

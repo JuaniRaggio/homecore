@@ -41,8 +41,6 @@ export const DEVICE_COLORS = {
 // Paleta de fallback para tipos sin color definido
 export const FALLBACK_PALETTE = ['#9c59d1','#2ecc71','#e67e22','#1abc9c','#e91e63','#00bcd4']
 
-// Mapeo de acciones y etiquetas por tipo de dispositivo.
-// actionOn/actionOff deben coincidir con los nombres de accion de la API.
 export const STATUS_MAP = {
   door:    { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
   alarm:   { on: 'Activada',   off: 'Desactivada', actionOn: 'armAway', actionOff: 'disarm',  verbOn: 'activar',    verbOff: 'desactivar' },
@@ -60,7 +58,6 @@ export function getDeviceIcon(type) {
   return DEVICE_ICONS[type] || 'fa-solid fa-plug'
 }
 
-// Estado interno para asignacion consistente de colores de fallback
 const dynamicColors = {}
 let paletteIdx = 0
 
@@ -80,9 +77,6 @@ export function getStatusMap(type) {
   return STATUS_MAP[type] || DEFAULT_STATUS
 }
 
-/**
- * Devuelve el texto de estado (statusText) segun el tipo y si esta encendido/apagado.
- */
 export function getStatusText(type, isOn) {
   const map = getStatusMap(type)
   return isOn ? map.on : map.off

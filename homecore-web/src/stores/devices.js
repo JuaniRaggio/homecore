@@ -148,7 +148,6 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
-  // Payload del websocket: { id, data } donde id=deviceId, data=estado nuevo
   function applyDeviceEvent(event) {
     const deviceId = event.id ?? event.deviceId ?? event.device?.id
     if (!deviceId) return
@@ -157,13 +156,11 @@ export const useDevicesStore = defineStore('devices', () => {
 
     const state = event.data || {}
 
-    // Actualizar estado on/off segun el status recibido
     if (state.status !== undefined) {
       device.isOn = state.status === 'on' || state.status === 'opened'
         || state.status === 'active' || state.status === 'playing'
     }
 
-    // Actualizar statusText usando el mapeo centralizado
     if (state.lock !== undefined) {
       device.statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
     } else if (state.status !== undefined) {

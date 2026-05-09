@@ -9,16 +9,10 @@ export const ERROR_MESSAGES = {
   TIMEOUT: 'La operacion tardo demasiado. Intenta de nuevo.',
 }
 
-/**
- * Genera un mensaje de error estandar para una accion fallida.
- */
 export function actionError(actionVerb = 'ejecutar la accion') {
   return `No se pudo ${actionVerb}. Intenta de nuevo.`
 }
 
-/**
- * Convierte un error de la API o de red en un mensaje amigable para el usuario.
- */
 export function friendlyError(e) {
   if (!e) return 'Ocurrio un error inesperado.'
 

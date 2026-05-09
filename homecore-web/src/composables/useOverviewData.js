@@ -59,7 +59,6 @@ export function useOverviewData() {
       ])
       deviceTypes.value = types
 
-      // Agrupar rooms por homeId para evitar N llamadas a getRooms
       const roomsByHome = {}
       for (const room of allRooms) {
         const hid = String(room.home?.id)

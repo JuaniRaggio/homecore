@@ -12,7 +12,6 @@ function log(...args) {
   if (isDev) console.log('[Socket]', ...args)
 }
 
-// Mapeo de campos de estado del websocket a nombres de accion de la API
 const STATE_FIELD_TO_ACTION = {
   brightness: 'setBrightness',
   level: 'setLevel',
@@ -32,7 +31,6 @@ const STATE_FIELD_TO_ACTION = {
 function describeEvent(state, deviceType) {
   if (!state) return 'Estado actualizado'
 
-  // Estado on/off primero
   if (state.status === 'on') return 'Encendido'
   if (state.status === 'off') return 'Apagado'
   if (state.status === 'opened') return 'Abierta'
@@ -43,7 +41,6 @@ function describeEvent(state, deviceType) {
   if (state.lock === 'locked') return 'Bloqueada'
   if (state.lock === 'unlocked') return 'Desbloqueada'
 
-  // Describir cambios de estado especificos usando describeAction
   if (deviceType) {
     const parts = []
     if (state.song !== undefined) {
@@ -81,8 +78,6 @@ export function connect(token) {
     log('Error de conexion:', err.message)
   })
 
-  // Device events
-  // Payload: { device, timestamp }
   socket.on('deviceCreated', (data) => {
     log('deviceCreated', data)
     if (data.device) {
@@ -96,7 +91,6 @@ export function connect(token) {
     })
   })
 
-  // Payload: { device, changes, timestamp }
   socket.on('deviceUpdated', (data) => {
     log('deviceUpdated', data)
     if (data.device) {
@@ -110,7 +104,6 @@ export function connect(token) {
     })
   })
 
-  // Payload: { deviceId, device, timestamp }
   socket.on('deviceDeleted', (data) => {
     log('deviceDeleted', data)
     const deviceId = data.deviceId || data.device?.id
@@ -125,7 +118,6 @@ export function connect(token) {
     })
   })
 
-  // Payload: { id, data } - id es el deviceId, data es el estado nuevo
   socket.on('deviceEvent', (data) => {
     log('deviceEvent', data)
     const devicesStore = useDevicesStore()
@@ -140,7 +132,6 @@ export function connect(token) {
     })
   })
 
-  // Payload: { homeId, sharedBy, timestamp }
   socket.on('homeShared', (data) => {
     log('homeShared', data)
     useHomesStore().fetchHomes()
@@ -151,7 +142,6 @@ export function connect(token) {
     })
   })
 
-  // Payload: { homeId, unsharedBy, timestamp }
   socket.on('homeUnshared', (data) => {
     log('homeUnshared', data)
     useHomesStore().fetchHomes()

@@ -12,10 +12,6 @@ const TYPE_LABELS = {
   lock:    'Cerradura',
 }
 
-/**
- * Mapeo de patrones a claves canonicas de tipo.
- * Se evaluan en orden; el primer match gana.
- */
 const TYPE_PATTERNS = [
   { key: 'light',   patterns: ['light', 'lamp', 'luz'] },
   { key: 'door',    patterns: ['door', 'puerta'] },
@@ -29,11 +25,6 @@ const TYPE_PATTERNS = [
   { key: 'oven',    patterns: ['oven', 'horno'] },
 ]
 
-/**
- * Resuelve un nombre de tipo de dispositivo a su clave canonica
- * (light, door, ac, speaker, etc.).
- * Si no matchea ningun patron, devuelve el nombre original en lowercase.
- */
 export function resolveTypeKey(typeName) {
   if (!typeName) return ''
   if (typeof typeName !== 'string') return ''
@@ -45,20 +36,12 @@ export function resolveTypeKey(typeName) {
   return t
 }
 
-/**
- * Traduce el nombre de tipo de dispositivo (ingles de la API) a espanol.
- * Si no encuentra traduccion, devuelve el nombre original capitalizado.
- */
 export function translateType(typeName) {
   if (!typeName || typeof typeName !== 'string') return ''
   const key = resolveTypeKey(typeName)
   return TYPE_LABELS[key] || typeName.charAt(0).toUpperCase() + typeName.slice(1)
 }
 
-/**
- * Devuelve el nombre a mostrar del dispositivo.
- * Si hay otro dispositivo con el mismo nombre, desambigua con "habitacion::nombre".
- */
 export function getDisplayName(device, allDevices) {
   const hasDuplicate = allDevices.some(d =>
     d.id !== device.id && d.name === device.name
@@ -69,9 +52,6 @@ export function getDisplayName(device, allDevices) {
   return device.name
 }
 
-/**
- * Calcula el consumo total de una lista de dispositivos activos.
- */
 export function calcConsumption(devices, deviceTypes) {
   return devices
     .filter(d => d.isOn)
@@ -81,12 +61,6 @@ export function calcConsumption(devices, deviceTypes) {
     }, 0)
 }
 
-/**
- * Resuelve el nombre de tipo de un dispositivo usando type string, type.name o deviceTypes.
- * @param {Object} device - Dispositivo
- * @param {Array} deviceTypes - Lista de tipos de dispositivo del store
- * @returns {string} Nombre del tipo traducido, o 'Otro' si no se puede resolver
- */
 export function resolveTypeName(device, deviceTypes = []) {
   let name = ''
   if (typeof device.type === 'string' && device.type.trim()) name = device.type
@@ -101,24 +75,25 @@ export function resolveTypeName(device, deviceTypes = []) {
   return name ? translateType(name) : 'Otro'
 }
 
-/**
- * Normaliza un dispositivo de la API a un formato plano para la UI.
- */
+function extractTypeName(d, deviceTypes) {
+  if (typeof d.type === 'string') return d.type
+  if (d.type?.name) return d.type.name
+  if (d.type?.id && deviceTypes.length) {
+    const dt = deviceTypes.find(t => String(t.id) === String(d.type.id))
+    if (dt?.name) return dt.name
+  }
+  return ''
+}
+
+function extractTypeId(d) {
+  return (typeof d.type === 'object' && d.type !== null) ? d.type.id : d.type
+}
+
 export function normalizeDevice(d, roomName, roomId, deviceTypes = []) {
   const state = d.state || {}
-
-  // Extraer nombre de tipo: puede ser string, objeto con name, u objeto sin name
-  let rawType = ''
-  if (typeof d.type === 'string') rawType = d.type
-  else if (d.type?.name) rawType = d.type.name
-  else if (d.type?.id && deviceTypes.length) {
-    const dt = deviceTypes.find(t => String(t.id) === String(d.type.id))
-    if (dt?.name) rawType = dt.name
-  }
+  const rawType = extractTypeName(d, deviceTypes)
   const type = resolveTypeKey(rawType)
-
-  // Extraer typeId: puede ser string directo o campo id del objeto
-  const typeId = (typeof d.type === 'object' && d.type !== null) ? d.type.id : d.type
+  const typeId = extractTypeId(d)
 
   const isOn = state.status === 'on' || state.status === 'opened'
     || state.status === 'active' || state.status === 'playing' || false
