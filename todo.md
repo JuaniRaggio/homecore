@@ -31,7 +31,7 @@ _Work in progress by Maru_
 
 - [X] Consultar dispositivos
 
-- [ ] Controlar dispositivos
+- [X] Controlar dispositivos - *solcuionado*
 
 > [!NOTE]
 > Actualmente _Juani_ esta trabajando en esto para solucionar los problemas
