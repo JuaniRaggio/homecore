@@ -93,7 +93,7 @@ import {
 } from 'chart.js'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
-import { translateType } from '@/utils/device-helpers'
+import { resolveTypeName } from '@/utils/device-helpers'
 import { getDeviceColor } from '@/config/device-types'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
@@ -108,19 +108,8 @@ const activeDevices = computed(() =>
   devicesStore.devices.filter(d => d.isOn)
 )
 
-// Resuelve el nombre de tipo de un dispositivo usando type string o deviceTypes store
-function resolveTypeName(device) {
-  let name = ''
-  if (typeof device.type === 'string' && device.type.trim()) name = device.type
-  else if (device.type?.name) name = device.type.name
-  else {
-    const typeId = device.typeId ?? device.type?.id
-    if (typeId) {
-      const dt = devicesStore.deviceTypes.find(t => String(t.id) === String(typeId))
-      if (dt?.name) name = dt.name
-    }
-  }
-  return name ? translateType(name) : 'Otro'
+function getTypeName(device) {
+  return resolveTypeName(device, devicesStore.deviceTypes)
 }
 
 function deviceWh(device) {
@@ -141,7 +130,7 @@ const tableRows = computed(() =>
 const donutData = computed(() => {
   const groups = {}
   for (const d of activeDevices.value) {
-    const type = resolveTypeName(d)
+    const type = getTypeName(d)
     if (!groups[type]) groups[type] = 0
     groups[type] += deviceWh(d)
   }
@@ -183,7 +172,7 @@ const barData = computed(() => {
       data: rows.map(r => r.wh),
       backgroundColor: rows.map(r => {
         const d = activeDevices.value.find(d => d.id === r.id)
-        return getDeviceColor(resolveTypeName(d))
+        return getDeviceColor(getTypeName(d))
       }),
       borderRadius: 4,
     }],

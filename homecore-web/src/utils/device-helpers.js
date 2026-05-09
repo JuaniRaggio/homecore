@@ -49,6 +49,26 @@ export function calcConsumption(devices, deviceTypes) {
 }
 
 /**
+ * Resuelve el nombre de tipo de un dispositivo usando type string, type.name o deviceTypes.
+ * @param {Object} device - Dispositivo
+ * @param {Array} deviceTypes - Lista de tipos de dispositivo del store
+ * @returns {string} Nombre del tipo traducido, o 'Otro' si no se puede resolver
+ */
+export function resolveTypeName(device, deviceTypes = []) {
+  let name = ''
+  if (typeof device.type === 'string' && device.type.trim()) name = device.type
+  else if (device.type?.name) name = device.type.name
+  else {
+    const typeId = device.typeId ?? device.type?.id
+    if (typeId) {
+      const dt = deviceTypes.find(t => String(t.id) === String(typeId))
+      if (dt?.name) name = dt.name
+    }
+  }
+  return name ? translateType(name) : 'Otro'
+}
+
+/**
  * Normaliza un dispositivo de la API a un formato plano para la UI.
  */
 export function normalizeDevice(d, roomName, roomId) {
