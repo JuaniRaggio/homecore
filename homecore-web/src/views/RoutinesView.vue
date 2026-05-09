@@ -13,7 +13,7 @@
         v-for="routine in routines"
         :key="routine.id"
         :routine="routine"
-        @execute="handleExecute"
+        @execute="routineActions.executeRoutine"
         @toggle-favorite="handleToggleFavorite"
         @toggle-active="handleToggleActive"
         @view-detail="handleViewDetail"
@@ -69,24 +69,17 @@ import RoutineCard from '@/components/routines/RoutineCard.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
+import { useRoutineActions } from '@/composables/useRoutineActions'
 
 const route = useRoute()
 const router = useRouter()
 const routinesStore = useRoutinesStore()
 const toast = useToastStore()
+const routineActions = useRoutineActions()
 const routines = routinesStore.routines
 
 function openCreateModal() {
   router.push({ name: 'new-routine', params: { homeId: route.params.homeId } })
-}
-
-async function handleExecute(id) {
-  try {
-    await routinesStore.execute(id)
-    toast.show('Rutina ejecutada correctamente', 'success')
-  } catch {
-    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
-  }
 }
 
 async function handleToggleFavorite(id) {
@@ -161,12 +154,7 @@ async function confirmDeleteRoutine() {
 
 async function executeFromDetail() {
   if (!detailRoutine.value) return
-  try {
-    await routinesStore.execute(detailRoutine.value.id)
-    toast.show('Rutina ejecutada correctamente', 'success')
-  } catch {
-    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
-  }
+  await routineActions.executeRoutine(detailRoutine.value.id)
 }
 
 onMounted(() => {

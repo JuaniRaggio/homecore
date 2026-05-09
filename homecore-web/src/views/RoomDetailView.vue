@@ -14,8 +14,8 @@
         :key="device.id"
         :device="device"
         :show-room="false"
-        @toggle="handleToggle"
-        @toggle-favorite="handleToggleFavorite"
+        @toggle="deviceActions.toggleDevice"
+        @toggle-favorite="deviceActions.toggleFavorite"
         @open="handleOpenDevice"
       />
     </div>
@@ -51,6 +51,7 @@ import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
+import { useDeviceActions } from '@/composables/useDeviceActions'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -58,6 +59,7 @@ const router = useRouter()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
 const toast = useToastStore()
+const deviceActions = useDeviceActions()
 
 const homeId = computed(() => route.params.homeId)
 const roomId = computed(() => route.params.roomId)
@@ -75,22 +77,6 @@ const roomDevices = computed(() =>
 const availableDevices = computed(() =>
   devicesStore.devices.filter(d => !d.room)
 )
-
-async function handleToggle(id) {
-  try {
-    await devicesStore.toggleDevice(id)
-  } catch {
-    toast.show('No se pudo cambiar el estado del dispositivo. Verifica que este conectado.', 'error')
-  }
-}
-
-async function handleToggleFavorite(id) {
-  try {
-    await devicesStore.toggleFavorite(id)
-  } catch {
-    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
-  }
-}
 
 function handleOpenDevice(id) {
   router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })

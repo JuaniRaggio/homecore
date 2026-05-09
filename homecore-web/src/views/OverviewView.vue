@@ -59,7 +59,7 @@
             <span class="fav-routine-home">{{ routine.description || '' }}</span>
           </div>
           <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
-          <button class="fav-routine-btn" @click="executeRoutine(routine.id)">
+          <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
             <i class="fa-solid fa-play"></i>
           </button>
         </div>
@@ -106,12 +106,14 @@ import { useAuthStore } from '@/stores/auth'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
 import { useOverviewData } from '@/composables/useOverviewData'
+import { useRoutineActions } from '@/composables/useRoutineActions'
 
 const homesStore = useHomesStore()
 const authStore = useAuthStore()
 const routinesStore = useRoutinesStore()
 const toast = useToastStore()
 const overview = useOverviewData()
+const routineActions = useRoutineActions()
 
 const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
 const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
@@ -119,15 +121,6 @@ const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
 const enrichedHomes = computed(() =>
   homesStore.homes.map(h => overview.enrichHome(h))
 )
-
-async function executeRoutine(id) {
-  try {
-    await routinesStore.execute(id)
-    toast.show('Rutina ejecutada correctamente', 'success')
-  } catch {
-    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
-  }
-}
 
 onMounted(async () => {
   try {

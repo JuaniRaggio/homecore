@@ -29,8 +29,8 @@
         v-for="device in filteredDevices"
         :key="device.id"
         :device="device"
-        @toggle="handleToggle"
-        @toggle-favorite="handleToggleFavorite"
+        @toggle="deviceActions.toggleDevice"
+        @toggle-favorite="deviceActions.toggleFavorite"
         @open="handleOpenDevice"
       />
     </div>
@@ -53,14 +53,14 @@ import DeviceCard from '@/components/devices/DeviceCard.vue'
 import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
-import { useToastStore } from '@/stores/toast'
+import { useDeviceActions } from '@/composables/useDeviceActions'
 import { translateType } from '@/utils/device-helpers'
 
 const route = useRoute()
 const router = useRouter()
 const devicesStore = useDevicesStore()
 const roomsStore = useRoomsStore()
-const toast = useToastStore()
+const deviceActions = useDeviceActions()
 
 const filterType = ref('')
 const filterRoom = ref('')
@@ -74,22 +74,6 @@ const filteredDevices = computed(() =>
     return true
   })
 )
-
-async function handleToggle(id) {
-  try {
-    await devicesStore.toggleDevice(id)
-  } catch {
-    toast.show('No se pudo cambiar el estado del dispositivo. Verifica que este conectado.', 'error')
-  }
-}
-
-async function handleToggleFavorite(id) {
-  try {
-    await devicesStore.toggleFavorite(id)
-  } catch {
-    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
-  }
-}
 
 function handleOpenDevice(id) {
   router.push({ name: 'device-detail', params: { homeId: route.params.homeId, id } })
