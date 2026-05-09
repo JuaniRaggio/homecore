@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import * as api from '@/services/api'
+import { ERROR_MESSAGES } from '@/utils/friendly-error'
 
 /**
  * Encapsula el patron repetido de ejecutar una accion sobre un dispositivo:
@@ -34,14 +35,14 @@ export function useDeviceCommand() {
       return result ?? true
     } catch (e) {
       console.error(`[DeviceCommand] Error en "${actionName}" para dispositivo ${deviceId}:`, e)
-      
-      // Prioridad de mensajes: 
+
+      // Prioridad de mensajes:
       // 1. errorMsg pasado por parametro
       // 2. e.message si es un error descriptivo de la API
-      // 3. Fallback generico
-      const finalMsg = errorMsg || e.message || 'No se pudo ejecutar la accion. Intenta de nuevo.'
+      // 3. Fallback generico centralizado
+      const finalMsg = errorMsg || e.message || ERROR_MESSAGES.GENERIC_ACTION
       toast.show(finalMsg, 'error')
-      
+
       return false
     } finally {
       busy.value = false
