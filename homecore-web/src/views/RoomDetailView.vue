@@ -2,7 +2,7 @@
   <div class="room-detail-view">
     <div class="room-detail-header">
       <h1 class="view-title">{{ roomName }}</h1>
-      <button class="btn-add" @click="openCreateModal">+ Nuevo dispositivo</button>
+      <button class="btn-add" @click="createModal.open">+ Nuevo dispositivo</button>
     </div>
 
     <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
@@ -34,17 +34,17 @@
     </div>
 
     <CreateDeviceModal
-      :visible="showCreateModal"
+      :visible="createModal.visible.value"
       :room-id="String(roomId)"
       :home-id="String(homeId)"
-      @close="closeCreateModal"
-      @created="onDeviceCreated"
+      @close="createModal.close"
+      @created="createModal.close"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
@@ -52,6 +52,7 @@ import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 import { useDeviceActions } from '@/composables/useDeviceActions'
+import { useModal } from '@/composables/useModal'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -95,20 +96,7 @@ async function linkDevice(event) {
   }
 }
 
-// Crear dispositivo
-const showCreateModal = ref(false)
-
-function openCreateModal() {
-  showCreateModal.value = true
-}
-
-function closeCreateModal() {
-  showCreateModal.value = false
-}
-
-function onDeviceCreated() {
-  // fetchAllForHome is handled inside CreateDeviceModal
-}
+const createModal = useModal()
 
 onMounted(() => {
   if (homeId.value) {

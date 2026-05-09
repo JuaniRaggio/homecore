@@ -16,7 +16,7 @@
           <button class="icon-btn" @click="goToEdit" title="Editar dispositivo">
             <i class="fa-regular fa-pen-to-square"></i>
           </button>
-          <button class="icon-btn icon-btn--delete" @click="openDeleteConfirm" title="Eliminar dispositivo">
+          <button class="icon-btn icon-btn--delete" @click="deleteModal.open" title="Eliminar dispositivo">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
@@ -78,14 +78,14 @@
     </template>
 
     <ConfirmModal
-      :visible="showDeleteModal"
+      :visible="deleteModal.visible.value"
       title="Eliminar dispositivo"
       :description="deleteDescription"
       confirm-label="Eliminar"
       confirming-label="Eliminando..."
       :danger="true"
       :loading="saving"
-      @close="closeDeleteConfirm"
+      @close="deleteModal.close"
       @confirm="confirmDelete"
     />
   </div>
@@ -104,6 +104,7 @@ import WaterControls from '@/components/devices/WaterControls.vue'
 import DeviceHistory from '@/components/devices/DeviceHistory.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
+import { useModal } from '@/composables/useModal'
 import { friendlyError } from '@/utils/friendly-error'
 import * as api from '@/services/api'
 
@@ -126,7 +127,7 @@ const saving = ref(false)
 const busy = ref(false)
 
 // Delete modal
-const showDeleteModal = ref(false)
+const deleteModal = useModal()
 const deleteDescription = computed(() =>
   `Estas seguro de que queres eliminar "${device.value.name}"? Esta accion no se puede deshacer.`
 )
@@ -151,23 +152,15 @@ function goToEdit() {
   router.push({ name: 'edit-device', params: { homeId: route.params.homeId, id: device.value.id } })
 }
 
-function openDeleteConfirm() {
-  showDeleteModal.value = true
-}
-
-function closeDeleteConfirm() {
-  showDeleteModal.value = false
-}
-
 async function confirmDelete() {
   if (saving.value) return
   saving.value = true
   try {
     await api.deleteDevice(device.value.id)
     toast.show('Dispositivo eliminado', 'success')
-    showDeleteModal.value = false
+    deleteModal.close()
     router.back()
-  } catch (e) {
+  } catch {
     toast.show('No se pudo eliminar el dispositivo. Verifica tu conexion e intenta de nuevo.', 'error')
   } finally {
     saving.value = false

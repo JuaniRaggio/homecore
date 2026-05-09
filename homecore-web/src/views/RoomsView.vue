@@ -2,7 +2,7 @@
   <div class="rooms-view">
     <div class="rooms-header">
       <h1 class="view-title">Habitaciones</h1>
-      <button class="btn-add" @click="openNewRoomModal">+ Nueva Habitacion</button>
+      <button class="btn-add" @click="createRoomModal.open">+ Nueva Habitacion</button>
     </div>
 
 
@@ -20,7 +20,7 @@
             <button class="icon-btn" @click.stop="editRoom(room)" title="Editar">
               <i class="fa-regular fa-pen-to-square"></i>
             </button>
-            <button class="icon-btn icon-btn--delete" @click.stop="requestDeleteRoom(room.id)" title="Eliminar">
+            <button class="icon-btn icon-btn--delete" @click.stop="deleteRoomConfirm.request(room.id)" title="Eliminar">
               <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -35,7 +35,7 @@
               <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
-              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="requestUnlink(device.id)" title="Desvincular">
+              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="unlinkConfirm.request(device.id)" title="Desvincular">
                 <i class="fa-solid fa-link-slash"></i>
               </button>
             </div>
@@ -62,14 +62,14 @@
     </div>
 
     <CreateRoomModal
-      :visible="showModal"
+      :visible="createRoomModal.visible.value"
       :home-id="String(route.params.homeId)"
-      @close="closeModal"
-      @created="onRoomCreated"
+      @close="createRoomModal.close"
+      @created="createRoomModal.close"
     />
 
     <EditNameModal
-      :visible="showEditModal"
+      :visible="editRoomModal.visible.value"
       title="Editar habitacion"
       placeholder="Nombre de la habitacion"
       :current-name="editingRoom?.name || ''"
@@ -78,28 +78,27 @@
       @save="confirmEditRoom"
     />
 
-
     <ConfirmModal
-      :visible="showDeleteConfirm"
+      :visible="deleteRoomConfirm.visible.value"
       title="Eliminar habitacion"
       description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
       confirm-label="Eliminar"
       confirming-label="Eliminando..."
       :danger="true"
-      :loading="deleting"
-      @close="closeDeleteConfirm"
+      :loading="deleteRoomConfirm.loading.value"
+      @close="deleteRoomConfirm.close"
       @confirm="confirmDeleteRoom"
     />
 
     <ConfirmModal
-      :visible="showUnlinkConfirm"
+      :visible="unlinkConfirm.visible.value"
       title="Desvincular dispositivo"
       description="Estas seguro de que queres desvincular este dispositivo de la habitacion?"
       confirm-label="Desvincular"
       confirming-label="Desvinculando..."
       :danger="true"
-      :loading="deleting"
-      @close="closeUnlinkConfirm"
+      :loading="unlinkConfirm.loading.value"
+      @close="unlinkConfirm.close"
       @confirm="confirmUnlink"
     />
 
@@ -117,6 +116,8 @@ import { useRoomsStore } from '@/stores/rooms'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { useDeviceActions } from '@/composables/useDeviceActions'
+import { useModal } from '@/composables/useModal'
+import { useConfirmAction } from '@/composables/useConfirmAction'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -137,95 +138,49 @@ const availableDevices = computed(() =>
   devicesStore.devices.filter(d => !d.room)
 )
 
-// Loading states
+// Loading state for edit room
 const saving = ref(false)
-const deleting = ref(false)
 
 // Delete room confirmation
-const showDeleteConfirm = ref(false)
-const deletingRoomId = ref(null)
-
-function requestDeleteRoom(roomId) {
-  deletingRoomId.value = roomId
-  showDeleteConfirm.value = true
-}
-
-function closeDeleteConfirm() {
-  showDeleteConfirm.value = false
-}
+const deleteRoomConfirm = useConfirmAction()
 
 async function confirmDeleteRoom() {
-  if (deleting.value) return
-  deleting.value = true
-  try {
-    const room = rooms.value.find(r => String(r.id) === String(deletingRoomId.value))
+  await deleteRoomConfirm.confirm(async (roomId) => {
+    const room = rooms.value.find(r => String(r.id) === String(roomId))
     if (room?.devices?.length) {
       await Promise.all(room.devices.map(d => api.deleteDevice(d.id)))
       room.devices.forEach(d => devicesStore.removeDevice(d.id))
     }
-    await roomsStore.removeRoom(deletingRoomId.value)
+    await roomsStore.removeRoom(roomId)
     toast.show('Habitacion eliminada', 'success')
-    showDeleteConfirm.value = false
-  } catch {
-    toast.show('No se pudo eliminar la habitacion. Intenta de nuevo.', 'error')
-  } finally {
-    deleting.value = false
-  }
+  })
 }
 
 // Unlink device confirmation
-const showUnlinkConfirm = ref(false)
-const unlinkingDeviceId = ref(null)
-
-function requestUnlink(deviceId) {
-  unlinkingDeviceId.value = deviceId
-  showUnlinkConfirm.value = true
-}
-
-function closeUnlinkConfirm() {
-  showUnlinkConfirm.value = false
-}
+const unlinkConfirm = useConfirmAction()
 
 async function confirmUnlink() {
-  if (deleting.value) return
-  deleting.value = true
-  try {
-    await api.unlinkDeviceFromRoom(unlinkingDeviceId.value)
-    devicesStore.clearDeviceRoom(unlinkingDeviceId.value)
+  await unlinkConfirm.confirm(async (deviceId) => {
+    await api.unlinkDeviceFromRoom(deviceId)
+    devicesStore.clearDeviceRoom(deviceId)
     toast.show('Dispositivo desvinculado', 'success')
-    showUnlinkConfirm.value = false
-  } catch {
-    toast.show('No se pudo desvincular el dispositivo. Intenta de nuevo.', 'error')
-  } finally {
-    deleting.value = false
-  }
+  })
 }
 
-const showModal = ref(false)
-
-function openNewRoomModal() {
-  showModal.value = true
-}
-
-function closeModal() {
-  showModal.value = false
-}
-
-function onRoomCreated() {
-  // Room creation and toast handled inside CreateRoomModal
-}
+// Create room modal
+const createRoomModal = useModal()
 
 // Edit room modal
-const showEditModal = ref(false)
+const editRoomModal = useModal()
 const editingRoom = ref(null)
 
 function editRoom(room) {
   editingRoom.value = room
-  showEditModal.value = true
+  editRoomModal.open()
 }
 
 function closeEditModal() {
-  showEditModal.value = false
+  editRoomModal.close()
   editingRoom.value = null
 }
 

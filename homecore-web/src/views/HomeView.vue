@@ -17,7 +17,7 @@
         <span class="stat-sep">|</span>
         <span class="stat-item"><b>{{ stats.consumption }}W</b> consumo</span>
       </div>
-      <button class="icon-btn" @click="openEditHomeModal" title="Editar hogar">
+      <button class="icon-btn" @click="editHomeModal.open" title="Editar hogar">
         <i class="fa-regular fa-pen-to-square"></i>
       </button>
     </div>
@@ -40,7 +40,7 @@
           </li>
         </ul>
 
-        <button class="btn-add-room" @click="openNewRoomModal">
+        <button class="btn-add-room" @click="newRoomModal.open">
           <i class="fa-solid fa-plus"></i> Agregar habitacion
         </button>
       </div>
@@ -93,31 +93,31 @@
   </div>
 
   <EditNameModal
-    :visible="showEditHomeModal"
+    :visible="editHomeModal.visible.value"
     title="Editar hogar"
     placeholder="Nombre del hogar"
     :current-name="currentHome?.name || ''"
     :loading="saving"
-    @close="closeEditHomeModal"
+    @close="editHomeModal.close"
     @save="confirmEditHome"
   />
 
   <CreateRoomModal
-    :visible="showNewRoomModal"
+    :visible="newRoomModal.visible.value"
     :home-id="String(homeId)"
-    @close="closeNewRoomModal"
-    @created="onRoomCreated"
+    @close="newRoomModal.close"
+    @created="newRoomModal.close"
   />
 
   <ConfirmModal
-    :visible="showDeleteRoomConfirm"
+    :visible="deleteRoomConfirm.visible.value"
     title="Eliminar habitacion"
     description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
     confirm-label="Eliminar"
     confirming-label="Eliminando..."
     :danger="true"
-    :loading="deleting"
-    @close="closeDeleteRoomConfirm"
+    :loading="deleteRoomConfirm.loading.value"
+    @close="deleteRoomConfirm.close"
     @confirm="confirmDeleteRoom"
   />
   </template>
@@ -138,6 +138,8 @@ import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useRoutineActions } from '@/composables/useRoutineActions'
+import { useModal } from '@/composables/useModal'
+import { useConfirmAction } from '@/composables/useConfirmAction'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -165,74 +167,40 @@ const stats = computed(() => ({
   consumption: devicesStore.totalConsumption
 }))
 
-// Loading state for modals
+// Loading state for edit home modal
 const saving = ref(false)
 
 // Delete room confirmation
-const showDeleteRoomConfirm = ref(false)
-const deletingRoomId = ref(null)
-const deleting = ref(false)
+const deleteRoomConfirm = useConfirmAction()
 
 function requestDeleteRoom(roomId) {
-  deletingRoomId.value = roomId
-  showDeleteRoomConfirm.value = true
-}
-
-function closeDeleteRoomConfirm() {
-  showDeleteRoomConfirm.value = false
+  deleteRoomConfirm.request(roomId)
 }
 
 async function confirmDeleteRoom() {
-  if (deleting.value) return
-  deleting.value = true
-  try {
-    const roomDevices = devicesStore.getDevicesByRoomId(deletingRoomId.value)
+  await deleteRoomConfirm.confirm(async (roomId) => {
+    const roomDevices = devicesStore.getDevicesByRoomId(roomId)
     if (roomDevices.length) {
       await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
       roomDevices.forEach(d => devicesStore.removeDevice(d.id))
     }
-    await roomsStore.removeRoom(deletingRoomId.value)
+    await roomsStore.removeRoom(roomId)
     toast.show('Habitacion eliminada', 'success')
-    showDeleteRoomConfirm.value = false
-  } catch {
-    toast.show('No se pudo eliminar la habitacion. Intenta de nuevo.', 'error')
-  } finally {
-    deleting.value = false
-  }
+  })
 }
 
 // Modal nueva habitacion
-const showNewRoomModal = ref(false)
-
-function openNewRoomModal() {
-  showNewRoomModal.value = true
-}
-
-function closeNewRoomModal() {
-  showNewRoomModal.value = false
-}
-
-function onRoomCreated() {
-  // Room creation and toast handled inside CreateRoomModal
-}
+const newRoomModal = useModal()
 
 // Modal editar hogar
-const showEditHomeModal = ref(false)
-
-function openEditHomeModal() {
-  showEditHomeModal.value = true
-}
-
-function closeEditHomeModal() {
-  showEditHomeModal.value = false
-}
+const editHomeModal = useModal()
 
 async function confirmEditHome(name) {
   saving.value = true
   try {
     await homesStore.updateHome(homeId.value, { name })
     toast.show('Hogar actualizado', 'success')
-    closeEditHomeModal()
+    editHomeModal.close()
   } catch {
     toast.show('No se pudo actualizar el hogar. Intenta de nuevo.', 'error')
   } finally {
