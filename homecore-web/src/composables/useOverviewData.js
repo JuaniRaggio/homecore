@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
 import { normalizeDevice } from '@/utils/device-helpers'
+import { friendlyError } from '@/utils/friendly-error'
 
 const MAX_CONCURRENT = 3
 
@@ -93,7 +94,7 @@ export function useOverviewData() {
       )
       devicesByHome.value = result
     } catch (e) {
-      error.value = e.message
+      error.value = friendlyError(e)
     } finally {
       loading.value = false
     }
