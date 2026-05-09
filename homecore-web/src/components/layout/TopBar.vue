@@ -10,13 +10,15 @@
     </router-link>
 
 
-    <!-- Nombre de la propiedad activa (viene del store de homes) -->
-    <div  v-if="isHomeRoute" class="topbar__center_left">
-      <span class="topbar__house-name">{{ houseName }}</span>
-      <span class="topbar__separator">/</span>
-      <span class="topbar__page-name">{{ currentPageLabel }}</span>
-
-    </div>
+    <!-- Breadcrumbs de navegacion -->
+    <nav v-if="isHomeRoute" class="topbar__breadcrumbs">
+      <router-link :to="`/casa/${route.params.homeId}`" class="topbar__house-name">{{ houseName }}</router-link>
+      <template v-for="(crumb, i) in breadcrumbs" :key="i">
+        <span class="topbar__separator">/</span>
+        <router-link v-if="crumb.to" :to="crumb.to" class="topbar__crumb-link">{{ crumb.label }}</router-link>
+        <span v-else class="topbar__page-name">{{ crumb.label }}</span>
+      </template>
+    </nav>
     <div v-else class="topbar__center"></div>
 
     <div class="topbar__right">
@@ -86,12 +88,16 @@ import { useRoute, useRouter } from 'vue-router'
 import { useHomesStore } from '@/stores/homes'
 import { useNotificationsStore } from '@/stores/notifications'
 import { useAuthStore } from '@/stores/auth'
+import { useRoomsStore } from '@/stores/rooms'
+import { useDevicesStore } from '@/stores/devices'
 
 const route = useRoute()
 const router = useRouter()
 const homesStore = useHomesStore()
 const notificationsStore = useNotificationsStore()
 const authStore = useAuthStore()
+const roomsStore = useRoomsStore()
+const devicesStore = useDevicesStore()
 
 // Mostrar nombre de casa solo cuando estamos dentro de una ruta /casa/:homeId
 const isHomeRoute = computed(() => !!route.params.homeId)
@@ -111,7 +117,53 @@ const houseName = computed(() => {
   if (!id) return 'HomeCore'
   return homesStore.getById(id)?.name ?? 'Casa'
 })
-const currentPageLabel = computed(() => routeLabels[route.name] || '')
+
+const breadcrumbs = computed(() => {
+  const homeId = route.params.homeId
+  const name = route.name
+
+  // Rutas de primer nivel
+  if (routeLabels[name]) {
+    return [{ label: routeLabels[name] }]
+  }
+
+  // Subrutas de habitaciones
+  if (name === 'room-detail') {
+    const room = roomsStore.rooms.find(r => String(r.id) === String(route.params.roomId))
+    return [
+      { label: 'Habitaciones', to: `/casa/${homeId}/habitaciones` },
+      { label: room?.name || 'Habitacion' }
+    ]
+  }
+
+  // Subrutas de dispositivos
+  if (name === 'device-detail') {
+    const device = devicesStore.devices.find(d => String(d.id) === String(route.params.id))
+    return [
+      { label: 'Dispositivos', to: `/casa/${homeId}/dispositivos` },
+      { label: device?.name || 'Dispositivo' }
+    ]
+  }
+
+  if (name === 'edit-device') {
+    const device = devicesStore.devices.find(d => String(d.id) === String(route.params.id))
+    return [
+      { label: 'Dispositivos', to: `/casa/${homeId}/dispositivos` },
+      { label: device?.name || 'Dispositivo', to: `/casa/${homeId}/dispositivos/${route.params.id}` },
+      { label: 'Editar' }
+    ]
+  }
+
+  // Subrutas de rutinas
+  if (name === 'new-routine') {
+    return [
+      { label: 'Rutinas', to: `/casa/${homeId}/rutinas` },
+      { label: 'Nueva rutina' }
+    ]
+  }
+
+  return []
+})
 
 // Dropdowns
 const showNotifDropdown = ref(false)
@@ -192,27 +244,46 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   color: var(--text-primary);
 }
 
-.topbar__center_left {
+.topbar__breadcrumbs {
+  position: absolute;
+  left: calc(var(--sidebar-w) + 20px);
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 30px;
 }
 
 .topbar__house-name {
   font-size: var(--font-lg);
   font-weight: 700;
   color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.topbar__house-name:hover {
+  color: var(--accent-hover);
 }
 
 .topbar__separator {
   font-size: var(--font-lg);
-  color: var(--text-primary);
+  color: var(--text-muted);
+}
+
+.topbar__crumb-link {
+  font-size: var(--font-lg);
+  font-weight: 400;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.topbar__crumb-link:hover {
+  color: var(--accent);
 }
 
 .topbar__page-name {
   font-size: var(--font-lg);
-  font-weight: 400;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
