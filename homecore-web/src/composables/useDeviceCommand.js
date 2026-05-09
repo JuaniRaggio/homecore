@@ -28,12 +28,20 @@ export function useDeviceCommand() {
     if (busy.value) return false
     busy.value = true
     try {
-      await api.executeAction(deviceId, actionName, params)
+      const result = await api.executeAction(deviceId, actionName, params)
       if (successMsg) toast.show(successMsg, 'success')
-      if (onSuccess) onSuccess()
-      return true
-    } catch {
-      toast.show(errorMsg || 'No se pudo ejecutar la accion. Verifica que el dispositivo este conectado.', 'error')
+      if (onSuccess) onSuccess(result)
+      return result ?? true
+    } catch (e) {
+      console.error(`[DeviceCommand] Error en "${actionName}" para dispositivo ${deviceId}:`, e)
+      
+      // Prioridad de mensajes: 
+      // 1. errorMsg pasado por parametro
+      // 2. e.message si es un error descriptivo de la API
+      // 3. Fallback generico
+      const finalMsg = errorMsg || e.message || 'No se pudo ejecutar la accion. Intenta de nuevo.'
+      toast.show(finalMsg, 'error')
+      
       return false
     } finally {
       busy.value = false

@@ -14,7 +14,8 @@ export function useDeviceLimits() {
     try {
       const deviceType = await api.getDeviceType(typeId)
       actions.value = deviceType?.actions ?? null
-    } catch {
+    } catch (e) {
+      console.error(`[useDeviceLimits] Error cargando limites para tipo ${typeId}:`, e)
       actions.value = null
     }
   }

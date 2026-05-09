@@ -44,8 +44,8 @@ export const useDevicesStore = defineStore('devices', () => {
   async function fetchDeviceTypes() {
     try {
       deviceTypes.value = await api.getDeviceTypes()
-    } catch {
-      // no bloquear si falla
+    } catch (e) {
+      console.error('[devices] Error cargando tipos de dispositivo:', e)
     }
   }
 

@@ -8,16 +8,16 @@ export function useDeviceActions() {
   async function toggleDevice(id) {
     try {
       await devicesStore.toggleDevice(id)
-    } catch {
-      toast.show('No se pudo cambiar el estado del dispositivo. Verifica que este conectado.', 'error')
+    } catch (e) {
+      toast.show(e.message || 'No se pudo cambiar el estado del dispositivo.', 'error')
     }
   }
 
   async function toggleFavorite(id) {
     try {
       await devicesStore.toggleFavorite(id)
-    } catch {
-      toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
+    } catch (e) {
+      toast.show(e.message || 'No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
     }
   }
 

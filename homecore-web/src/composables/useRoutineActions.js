@@ -9,8 +9,8 @@ export function useRoutineActions() {
     try {
       await routinesStore.execute(id)
       toast.show('Rutina ejecutada correctamente', 'success')
-    } catch {
-      toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
+    } catch (e) {
+      toast.show(e.message || 'No se pudo ejecutar la rutina.', 'error')
     }
   }
 
