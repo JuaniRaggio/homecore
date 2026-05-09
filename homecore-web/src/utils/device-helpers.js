@@ -109,7 +109,7 @@ export function normalizeDevice(d, roomName, roomId) {
   const type = resolveTypeKey(rawType)
   const isOn = state.status === 'on' || state.status === 'opened'
     || state.status === 'active' || state.status === 'playing' || false
-  const room = roomName || d.room?.name || d.room || ''
+  const room = roomName || d.room?.name || (typeof d.room === 'string' ? d.room : '')
 
   let statusText = isOn ? 'Encendido' : 'Apagado'
   if (type === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
