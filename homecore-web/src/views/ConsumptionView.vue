@@ -93,6 +93,7 @@ import {
 } from 'chart.js'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
+import { translateType } from '@/utils/device-helpers'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
@@ -108,14 +109,17 @@ const activeDevices = computed(() =>
 
 // Resuelve el nombre de tipo de un dispositivo usando type string o deviceTypes store
 function resolveTypeName(device) {
-  if (typeof device.type === 'string' && device.type.trim()) return device.type
-  if (device.type?.name) return device.type.name
-  const typeId = device.typeId ?? device.type?.id
-  if (typeId) {
-    const dt = devicesStore.deviceTypes.find(t => String(t.id) === String(typeId))
-    if (dt?.name) return dt.name
+  let name = ''
+  if (typeof device.type === 'string' && device.type.trim()) name = device.type
+  else if (device.type?.name) name = device.type.name
+  else {
+    const typeId = device.typeId ?? device.type?.id
+    if (typeId) {
+      const dt = devicesStore.deviceTypes.find(t => String(t.id) === String(typeId))
+      if (dt?.name) name = dt.name
+    }
   }
-  return 'Otro'
+  return name ? translateType(name) : 'Otro'
 }
 
 function deviceWh(device) {
