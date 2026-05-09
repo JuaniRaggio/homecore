@@ -73,6 +73,24 @@
   border-color: var(--accent);
 }
 
+/* Select para vincular dispositivos (habitaciones) */
+.link-device-select {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--font-base);
+  padding: 6px 10px;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.link-device-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Acciones de formulario (cancelar + guardar) */
 .form-actions {
   display: flex;
