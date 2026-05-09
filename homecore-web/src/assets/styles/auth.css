@@ -42,19 +42,14 @@
 
 /* Icono de app */
 .icon-app {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background-color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 
 .icon-image {
-  width: 42px;
-  height: 42px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
 }
 
