@@ -55,3 +55,25 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Header de vista: titulo + acciones a la derecha */
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Grilla responsive para items (dispositivos, rutinas) */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Wrapper de vista sin padding */
+.view-content {
+  padding: 0;
+}
