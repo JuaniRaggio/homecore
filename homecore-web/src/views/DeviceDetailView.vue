@@ -43,6 +43,7 @@
           :brightness="brightness"
           :color="color"
           :disabled="cmd.busy.value"
+          :limits="lightLimits"
           @update:brightness="setBrightness"
           @update:color="setColor"
         />
@@ -56,6 +57,7 @@
           v-else-if="device.type === 'curtain'"
           :position="position"
           :disabled="cmd.busy.value"
+          :limits="curtainLimits"
           @update:position="setPositionTo"
         />
         <AlarmControls
@@ -70,10 +72,63 @@
           :disabled="cmd.busy.value"
           @toggle="togglePower"
         />
+        <AcControls
+          v-else-if="device.type === 'ac'"
+          :temperature="deviceState.acTemperature"
+          :mode="deviceState.acMode"
+          :fan-speed="deviceState.acFanSpeed"
+          :disabled="cmd.busy.value"
+          :limits="acLimits"
+          @update:temperature="setAcTemperature"
+          @update:mode="setAcMode"
+          @update:fan-speed="setAcFanSpeed"
+        />
+        <SpeakerControls
+          v-else-if="device.type === 'speaker'"
+          :volume="deviceState.volume"
+          :genre="deviceState.genre"
+          :disabled="cmd.busy.value"
+          :limits="speakerLimits"
+          @update:volume="setSpeakerVolume"
+          @update:genre="setSpeakerGenre"
+          @action="handleSpeakerAction"
+        />
+        <VacuumControls
+          v-else-if="device.type === 'vacuum'"
+          :mode="deviceState.vacuumMode"
+          :disabled="cmd.busy.value"
+          :limits="vacuumLimits"
+          @update:mode="setVacuumMode"
+          @action="handleVacuumAction"
+        />
+        <FridgeControls
+          v-else-if="device.type === 'fridge'"
+          :temperature="deviceState.fridgeTemp"
+          :freezer-temperature="deviceState.freezerTemp"
+          :mode="deviceState.fridgeMode"
+          :disabled="cmd.busy.value"
+          :limits="fridgeLimits"
+          @update:temperature="setFridgeTemperature"
+          @update:freezer-temperature="setFreezerTemperature"
+          @update:mode="setFridgeMode"
+        />
+        <OvenControls
+          v-else-if="device.type === 'oven'"
+          :temperature="deviceState.ovenTemp"
+          :heat-source="deviceState.heatSource"
+          :grill-mode="deviceState.grillMode"
+          :convection-mode="deviceState.convectionMode"
+          :disabled="cmd.busy.value"
+          :limits="ovenLimits"
+          @update:temperature="setOvenTemperature"
+          @update:heat-source="setOvenHeatSource"
+          @update:grill-mode="setOvenGrillMode"
+          @update:convection-mode="setOvenConvectionMode"
+        />
         <p v-else class="no-controls">Este dispositivo solo tiene encendido/apagado.</p>
       </div>
 
-      <DeviceHistory :device-id="String(device.id)" />
+      <DeviceHistory :device-id="String(device.id)" :device-type="device.type" />
     </div>
     </template>
 
@@ -92,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
@@ -101,14 +156,21 @@ import DoorControls from '@/components/devices/DoorControls.vue'
 import CurtainControls from '@/components/devices/CurtainControls.vue'
 import AlarmControls from '@/components/devices/AlarmControls.vue'
 import WaterControls from '@/components/devices/WaterControls.vue'
+import AcControls from '@/components/devices/AcControls.vue'
+import SpeakerControls from '@/components/devices/SpeakerControls.vue'
+import VacuumControls from '@/components/devices/VacuumControls.vue'
+import FridgeControls from '@/components/devices/FridgeControls.vue'
+import OvenControls from '@/components/devices/OvenControls.vue'
 import DeviceHistory from '@/components/devices/DeviceHistory.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { useModal } from '@/composables/useModal'
 import { useDeviceCommand } from '@/composables/useDeviceCommand'
+import { useDeviceLimits } from '@/composables/useDeviceLimits'
 import { friendlyError } from '@/utils/friendly-error'
 import { getStatusMap } from '@/config/device-types'
 import { normalizeDevice } from '@/utils/device-helpers'
+import { describeAction } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
 const router = useRouter()
@@ -116,6 +178,7 @@ const route = useRoute()
 const devicesStore = useDevicesStore()
 const toast = useToastStore()
 const cmd = useDeviceCommand()
+const deviceLimits = useDeviceLimits()
 
 const device = ref({})
 const loading = ref(true)
@@ -125,6 +188,14 @@ const brightness = ref(100)
 const color = ref('#ffffff')
 const locked = ref(false)
 const position = ref(0)
+
+const deviceState = reactive({
+  acTemperature: 24, acMode: 'frio', acFanSpeed: 'auto',
+  volume: 5, genre: 'pop',
+  vacuumMode: 'aspirar',
+  fridgeTemp: 5, freezerTemp: -18, fridgeMode: 'normal',
+  ovenTemp: 180, heatSource: 'convencional', grillMode: 'apagado', convectionMode: 'apagado',
+})
 
 // Loading state for delete
 const saving = ref(false)
@@ -139,6 +210,42 @@ const statusLabel = computed(() => {
   const map = getStatusMap(device.value.type)
   return device.value.isOn ? map.on : map.off
 })
+
+const lightLimits = computed(() => ({
+  brightness: deviceLimits.getNumericLimits(device.value.type, 'setBrightness'),
+}))
+
+const curtainLimits = computed(() => ({
+  position: deviceLimits.getNumericLimits(device.value.type, 'setLevel'),
+}))
+
+const acLimits = computed(() => ({
+  temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
+  modeOptions: deviceLimits.getSelectOptions(device.value.type, 'setMode'),
+  fanSpeedOptions: deviceLimits.getSelectOptions(device.value.type, 'setFanSpeed'),
+}))
+
+const speakerLimits = computed(() => ({
+  volume: deviceLimits.getNumericLimits(device.value.type, 'setVolume'),
+  genreOptions: deviceLimits.getSelectOptions(device.value.type, 'setGenre'),
+}))
+
+const vacuumLimits = computed(() => ({
+  modeOptions: deviceLimits.getSelectOptions(device.value.type, 'setMode'),
+}))
+
+const fridgeLimits = computed(() => ({
+  temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
+  freezerTemperature: deviceLimits.getNumericLimits(device.value.type, 'setFreezerTemperature'),
+  modeOptions: deviceLimits.getSelectOptions(device.value.type, 'setMode'),
+}))
+
+const ovenLimits = computed(() => ({
+  temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
+  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeatSource'),
+  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrillMode'),
+  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvectionMode'),
+}))
 
 function goToEdit() {
   router.push({ name: 'edit-device', params: { homeId: route.params.homeId, id: device.value.id } })
@@ -178,7 +285,7 @@ async function setBrightness(value) {
   brightness.value = value
   await cmd.execute(device.value.id, 'setBrightness', {
     params: [value],
-    successMsg: `Brillo ajustado a ${value}%`,
+    successMsg: describeAction(device.value.type, 'setBrightness', [value]),
     errorMsg: 'No se pudo cambiar el brillo. Verifica que el dispositivo este encendido.',
   })
 }
@@ -187,7 +294,7 @@ async function setColor(value) {
   color.value = value
   await cmd.execute(device.value.id, 'setColor', {
     params: [value],
-    successMsg: 'Color actualizado',
+    successMsg: describeAction(device.value.type, 'setColor', [value]),
     errorMsg: 'No se pudo cambiar el color. Verifica que el dispositivo este encendido.',
   })
 }
@@ -199,7 +306,7 @@ async function toggleLock() {
     errorMsg: `No se pudo ${actionLabel} la puerta. Verifica que este conectada.`,
     onSuccess() {
       locked.value = !locked.value
-      toast.show(locked.value ? 'Puerta bloqueada' : 'Puerta desbloqueada', 'success')
+      toast.show(describeAction(device.value.type, locked.value ? 'lock' : 'unlock'), 'success')
     },
   })
 }
@@ -208,8 +315,144 @@ async function setPositionTo(value) {
   position.value = value
   await cmd.execute(device.value.id, 'setLevel', {
     params: [value],
-    successMsg: `Posicion ajustada a ${value}%`,
+    successMsg: describeAction(device.value.type, 'setLevel', [value]),
     errorMsg: 'No se pudo cambiar la posicion. Verifica que el dispositivo este conectado.',
+  })
+}
+
+// --- AC ---
+async function setAcTemperature(value) {
+  deviceState.acTemperature = value
+  await cmd.execute(device.value.id, 'setTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setTemperature', [value]),
+    errorMsg: 'No se pudo cambiar la temperatura. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setAcMode(value) {
+  deviceState.acMode = value
+  await cmd.execute(device.value.id, 'setMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setMode', [value]),
+    errorMsg: 'No se pudo cambiar el modo. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setAcFanSpeed(value) {
+  deviceState.acFanSpeed = value
+  await cmd.execute(device.value.id, 'setFanSpeed', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setFanSpeed', [value]),
+    errorMsg: 'No se pudo cambiar la velocidad del ventilador. Verifica que el dispositivo este conectado.',
+  })
+}
+
+// --- Speaker ---
+async function setSpeakerVolume(value) {
+  deviceState.volume = value
+  await cmd.execute(device.value.id, 'setVolume', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setVolume', [value]),
+    errorMsg: 'No se pudo cambiar el volumen. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setSpeakerGenre(value) {
+  deviceState.genre = value
+  await cmd.execute(device.value.id, 'setGenre', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setGenre', [value]),
+    errorMsg: 'No se pudo cambiar el genero. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function handleSpeakerAction(actionName) {
+  await cmd.execute(device.value.id, actionName, {
+    successMsg: describeAction(device.value.type, actionName),
+    errorMsg: `No se pudo ejecutar la accion. Verifica que el dispositivo este conectado.`,
+  })
+}
+
+// --- Vacuum ---
+async function setVacuumMode(value) {
+  deviceState.vacuumMode = value
+  await cmd.execute(device.value.id, 'setMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setMode', [value]),
+    errorMsg: 'No se pudo cambiar el modo. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function handleVacuumAction(actionName) {
+  await cmd.execute(device.value.id, actionName, {
+    successMsg: describeAction(device.value.type, actionName),
+    errorMsg: `No se pudo ejecutar la accion. Verifica que el dispositivo este conectado.`,
+  })
+}
+
+// --- Fridge ---
+async function setFridgeTemperature(value) {
+  deviceState.fridgeTemp = value
+  await cmd.execute(device.value.id, 'setTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setTemperature', [value]),
+    errorMsg: 'No se pudo cambiar la temperatura. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setFreezerTemperature(value) {
+  deviceState.freezerTemp = value
+  await cmd.execute(device.value.id, 'setFreezerTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setFreezerTemperature', [value]),
+    errorMsg: 'No se pudo cambiar la temperatura del freezer. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setFridgeMode(value) {
+  deviceState.fridgeMode = value
+  await cmd.execute(device.value.id, 'setMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setMode', [value]),
+    errorMsg: 'No se pudo cambiar el modo. Verifica que el dispositivo este conectado.',
+  })
+}
+
+// --- Oven ---
+async function setOvenTemperature(value) {
+  deviceState.ovenTemp = value
+  await cmd.execute(device.value.id, 'setTemperature', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setTemperature', [value]),
+    errorMsg: 'No se pudo cambiar la temperatura. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setOvenHeatSource(value) {
+  deviceState.heatSource = value
+  await cmd.execute(device.value.id, 'setHeatSource', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
+    errorMsg: 'No se pudo cambiar la fuente de calor. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setOvenGrillMode(value) {
+  deviceState.grillMode = value
+  await cmd.execute(device.value.id, 'setGrillMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
+    errorMsg: 'No se pudo cambiar el modo grill. Verifica que el dispositivo este conectado.',
+  })
+}
+
+async function setOvenConvectionMode(value) {
+  deviceState.convectionMode = value
+  await cmd.execute(device.value.id, 'setConvectionMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
+    errorMsg: 'No se pudo cambiar el modo conveccion. Verifica que el dispositivo este conectado.',
   })
 }
 
@@ -221,7 +464,31 @@ async function loadDeviceState(id) {
       if (state.color !== undefined) color.value = state.color
       if (state.lock !== undefined) locked.value = state.lock === 'locked'
       if (state.level !== undefined) position.value = state.level
-      if (state.status !== undefined) device.value.isOn = state.status === 'on' || state.status === 'opened' || state.status === 'active'
+      if (state.status !== undefined) {
+        device.value.isOn = state.status === 'on' || state.status === 'opened'
+          || state.status === 'active' || state.status === 'playing'
+      }
+
+      const type = device.value.type
+      if (type === 'ac') {
+        if (state.temperature !== undefined) deviceState.acTemperature = state.temperature
+        if (state.mode !== undefined) deviceState.acMode = state.mode
+        if (state.fanSpeed !== undefined) deviceState.acFanSpeed = state.fanSpeed
+      } else if (type === 'speaker') {
+        if (state.volume !== undefined) deviceState.volume = state.volume
+        if (state.genre !== undefined) deviceState.genre = state.genre
+      } else if (type === 'vacuum') {
+        if (state.mode !== undefined) deviceState.vacuumMode = state.mode
+      } else if (type === 'fridge') {
+        if (state.temperature !== undefined) deviceState.fridgeTemp = state.temperature
+        if (state.freezerTemperature !== undefined) deviceState.freezerTemp = state.freezerTemperature
+        if (state.mode !== undefined) deviceState.fridgeMode = state.mode
+      } else if (type === 'oven') {
+        if (state.temperature !== undefined) deviceState.ovenTemp = state.temperature
+        if (state.heat !== undefined) deviceState.heatSource = state.heat
+        if (state.grill !== undefined) deviceState.grillMode = state.grill
+        if (state.convection !== undefined) deviceState.convectionMode = state.convection
+      }
     }
   } catch {
     // El state puede no estar disponible para todos los dispositivos
@@ -234,6 +501,9 @@ onMounted(async () => {
     const raw = await api.getDevice(deviceId)
     device.value = normalizeDevice(raw)
     await loadDeviceState(deviceId)
+    if (device.value.typeId) {
+      deviceLimits.fetchLimits(device.value.typeId)
+    }
   } catch (e) {
     loadError.value = friendlyError(e)
   }

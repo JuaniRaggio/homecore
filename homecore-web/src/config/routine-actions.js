@@ -96,14 +96,17 @@ export function paramsFor(typeName, actionName) {
   return actionsFor(typeName).find(a => a.actionName === actionName)?.params ?? []
 }
 
+const DEGREE_SYMBOL = String.fromCharCode(176)
+const CELSIUS = DEGREE_SYMBOL + 'C'
+
 /**
  * Sufijos de unidad por accion para descripciones legibles.
  */
 const UNIT_SUFFIXES = {
   setBrightness: '%',
   setLevel: '%',
-  setTemperature: '°C',
-  setFreezerTemperature: '°C',
+  setTemperature: CELSIUS,
+  setFreezerTemperature: CELSIUS,
 }
 
 /**
