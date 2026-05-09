@@ -4,8 +4,9 @@
       <span class="control-label">Brillo</span>
       <input
         type="range"
-        min="0"
-        max="100"
+        :min="brightnessLimits.min"
+        :max="brightnessLimits.max"
+        :step="brightnessLimits.step"
         :value="brightness"
         :disabled="disabled"
         class="slider"
@@ -30,13 +31,22 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   brightness: { type: Number, default: 100 },
   color: { type: String, default: '#ffffff' },
   disabled: { type: Boolean, default: false },
+  limits: { type: Object, default: () => ({}) },
 })
 
 defineEmits(['update:brightness', 'update:color'])
+
+const brightnessLimits = computed(() => ({
+  min: props.limits.brightness?.min ?? 0,
+  max: props.limits.brightness?.max ?? 100,
+  step: props.limits.brightness?.step ?? 1,
+}))
 </script>
 
 <!-- Estilos en controls.css global -->

@@ -15,9 +15,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import * as api from '@/services/api'
+import { describeAction } from '@/config/routine-actions'
 
 const props = defineProps({
   deviceId: { type: String, required: true },
+  deviceType: { type: String, default: '' },
 })
 
 const logs = ref([])
@@ -36,7 +38,7 @@ async function loadDeviceLogs() {
     const rawLogs = Array.isArray(data) ? data : []
     logs.value = rawLogs.map(log => ({
       id: log.id,
-      action: log.actionName || log.action || 'Accion',
+      action: describeAction(props.deviceType, log.actionName || log.action || '', log.params),
       timestamp: log.timestamp,
     }))
   } catch {
