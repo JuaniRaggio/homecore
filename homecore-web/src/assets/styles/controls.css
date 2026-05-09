@@ -66,6 +66,25 @@
   color: var(--danger);
 }
 
+/* Select de control (modo, velocidad, etc.) */
+.control-select {
+  flex: 1;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+/* Grupo de botones de accion (play, pause, etc.) */
+.control-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 /* Color picker (luces) */
 .color-picker {
   width: 36px;
