@@ -82,7 +82,7 @@
               <select v-model="newDeviceInputs[ri].typeId" class="form-input add-row__select">
                 <option value="">Tipo</option>
                 <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
-                  {{ dt.name }}
+                  {{ translateType(dt.name) }}
                 </option>
               </select>
               <button
@@ -166,6 +166,7 @@ import { useHomesStore } from '@/stores/homes'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
 import { friendlyError } from '@/utils/friendly-error'
+import { translateType } from '@/utils/device-helpers'
 import * as api from '@/services/api'
 
 const router = useRouter()
@@ -239,7 +240,7 @@ function addDeviceNoRoom() {
 
 function getTypeName(typeId) {
   const dt = devicesStore.deviceTypes.find(t => String(t.id) === String(typeId))
-  return dt?.name ?? ''
+  return translateType(dt?.name) || ''
 }
 
 const canProceed = computed(() => {

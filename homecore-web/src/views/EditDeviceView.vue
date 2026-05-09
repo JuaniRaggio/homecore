@@ -35,7 +35,7 @@
           <label class="form-label">Tipo</label>
           <select v-model="form.typeId">
             <option v-for="dt in deviceTypes" :key="dt.id" :value="dt.id">
-              {{ dt.name }}
+              {{ translateType(dt.name) }}
             </option>
           </select>
         </div>
@@ -62,6 +62,7 @@ import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 import { friendlyError } from '@/utils/friendly-error'
+import { translateType } from '@/utils/device-helpers'
 import * as api from '@/services/api'
 
 const router = useRouter()

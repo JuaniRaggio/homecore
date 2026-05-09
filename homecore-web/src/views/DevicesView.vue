@@ -7,7 +7,7 @@
         <select v-model="filterType" class="filter-select">
           <option value="">Todos los tipos</option>
           <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.name">
-            {{ dt.name }}
+            {{ translateType(dt.name) }}
           </option>
         </select>
 
@@ -48,7 +48,7 @@
         <select v-model="newDeviceType" class="modal-input">
           <option value="" disabled>Tipo de dispositivo</option>
           <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
-            {{ dt.name }}
+            {{ translateType(dt.name) }}
           </option>
         </select>
         <select v-model="newDeviceRoom" class="modal-input">
@@ -80,6 +80,7 @@ import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 import * as api from '@/services/api'
+import { translateType } from '@/utils/device-helpers'
 
 const route = useRoute()
 const router = useRouter()
