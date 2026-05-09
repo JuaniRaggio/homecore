@@ -104,9 +104,8 @@ const filteredDevices = computed(() =>
 async function handleToggle(id) {
   try {
     await devicesStore.toggleDevice(id)
-    toast.show('Dispositivo actualizado', 'success')
   } catch {
-    toast.show('Error al cambiar estado del dispositivo', 'error')
+    toast.show('No se pudo cambiar el estado del dispositivo. Verifica que este conectado.', 'error')
   }
 }
 
@@ -114,7 +113,7 @@ async function handleToggleFavorite(id) {
   try {
     await devicesStore.toggleFavorite(id)
   } catch {
-    toast.show('Error al cambiar favorito', 'error')
+    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
   }
 }
 
@@ -158,7 +157,7 @@ async function confirmCreateDevice() {
     if (homeId) await devicesStore.fetchAllForHome(homeId)
     closeCreateModal()
   } catch {
-    toast.show('Error al crear dispositivo', 'error')
+    toast.show('No se pudo crear el dispositivo. Verifica los datos e intenta de nuevo.', 'error')
   } finally {
     saving.value = false
   }

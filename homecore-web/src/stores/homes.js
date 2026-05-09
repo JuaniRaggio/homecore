@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
+import { friendlyError } from '@/utils/friendly-error'
 
 export const useHomesStore = defineStore('homes', () => {
   const homes = ref([])
@@ -38,7 +39,7 @@ export const useHomesStore = defineStore('homes', () => {
     try {
       homes.value = await api.getHomes()
     } catch (e) {
-      error.value = e.message
+      error.value = friendlyError(e)
     } finally {
       loading.value = false
     }
@@ -47,6 +48,7 @@ export const useHomesStore = defineStore('homes', () => {
   async function addHome(data) {
     const home = await api.createHome(data)
     homes.value.push(home)
+    return home
   }
 
   async function updateHome(id, data) {

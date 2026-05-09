@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
-import { useHistoryStore } from './history'
 import { normalizeDevice } from '@/utils/device-helpers'
+import { friendlyError } from '@/utils/friendly-error'
 
 const MAX_CONCURRENT_REQUESTS = 3
 
@@ -81,7 +81,7 @@ export const useDevicesStore = defineStore('devices', () => {
 
       devices.value = batches.flat()
     } catch (e) {
-      error.value = e.message
+      error.value = friendlyError(e)
     } finally {
       loading.value = false
     }
@@ -99,14 +99,6 @@ export const useDevicesStore = defineStore('devices', () => {
       device.statusText = device.isOn ? 'Encendido' : 'Apagado'
     }
 
-    const history = useHistoryStore()
-
-    history.addEntry({
-      deviceId: device.id,
-      deviceName: device.name,
-      action: device.statusText,
-      type: device.type === 'alarm' ? 'security' : 'device'
-    })
   }
 
   async function toggleFavorite(id) {

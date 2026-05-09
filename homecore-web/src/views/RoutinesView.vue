@@ -84,9 +84,9 @@ function openCreateModal() {
 async function handleExecute(id) {
   try {
     await routinesStore.execute(id)
-    toast.show('Rutina ejecutada', 'success')
+    toast.show('Rutina ejecutada correctamente', 'success')
   } catch {
-    toast.show('Error al ejecutar rutina', 'error')
+    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
   }
 }
 
@@ -94,7 +94,7 @@ async function handleToggleFavorite(id) {
   try {
     await routinesStore.toggleFavorite(id)
   } catch {
-    toast.show('Error al cambiar favorito', 'error')
+    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
   }
 }
 
@@ -104,7 +104,7 @@ async function handleToggleActive(id) {
       isActive: !routinesStore.getById(id)?.isActive
     })
   } catch {
-    toast.show('Error al cambiar estado de rutina', 'error')
+    toast.show('No se pudo cambiar el estado de la rutina. Intenta de nuevo.', 'error')
   }
 }
 
@@ -147,7 +147,7 @@ async function confirmDeleteRoutine() {
     showDeleteConfirm.value = false
     closeDetailModal()
   } catch {
-    toast.show('Error al eliminar rutina', 'error')
+    toast.show('No se pudo eliminar la rutina. Intenta de nuevo.', 'error')
   } finally {
     deleting.value = false
   }
@@ -157,9 +157,9 @@ async function executeFromDetail() {
   if (!detailRoutine.value) return
   try {
     await routinesStore.execute(detailRoutine.value.id)
-    toast.show('Rutina ejecutada', 'success')
+    toast.show('Rutina ejecutada correctamente', 'success')
   } catch {
-    toast.show('Error al ejecutar rutina', 'error')
+    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
   }
 }
 

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
+import { friendlyError } from '@/utils/friendly-error'
 
 export const useRoutinesStore = defineStore('routines', () => {
   const routines = ref([])
@@ -19,7 +20,7 @@ export const useRoutinesStore = defineStore('routines', () => {
     try {
       routines.value = await api.getRoutines()
     } catch (e) {
-      error.value = e.message
+      error.value = friendlyError(e)
     } finally {
       loading.value = false
     }

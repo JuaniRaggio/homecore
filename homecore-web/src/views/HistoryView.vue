@@ -40,6 +40,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useDevicesStore } from '@/stores/devices'
+import { friendlyError } from '@/utils/friendly-error'
 import * as api from '@/services/api'
 
 const devicesStore = useDevicesStore()
@@ -99,7 +100,7 @@ async function fetchLogs() {
     events.value = [...events.value, ...mapLogs(logs)]
     offset.value += logs.length
   } catch (e) {
-    error.value = e.message || 'Error al cargar historial'
+    error.value = friendlyError(e)
   }
 }
 

@@ -121,8 +121,8 @@ async function handleChangePassword() {
     newPassword.value = ''
     confirmPassword.value = ''
   } else {
-    passwordError.value = result.error || 'Error al cambiar la contraseña'
-    toast.show('Error al cambiar contraseña', 'error')
+    passwordError.value = result.error || 'No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.'
+    toast.show('No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.', 'error')
   }
 }
 </script>

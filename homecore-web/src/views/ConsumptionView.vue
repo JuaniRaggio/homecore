@@ -260,7 +260,7 @@ onMounted(async () => {
         devicesStore.fetchDeviceTypes(),
       ])
     } catch {
-      toast.show('Error al cargar datos de consumo', 'error')
+      toast.show('No se pudieron cargar los datos de consumo. Verifica tu conexion e intenta recargar la pagina.', 'error')
     }
   }
 })

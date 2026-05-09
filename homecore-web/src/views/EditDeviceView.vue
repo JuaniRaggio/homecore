@@ -61,6 +61,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
+import { friendlyError } from '@/utils/friendly-error'
 import * as api from '@/services/api'
 
 const router = useRouter()
@@ -98,7 +99,7 @@ onMounted(async () => {
     form.value.roomId = rawDevice.room?.id || ''
     form.value.typeId = rawDevice.type?.id || ''
   } catch (e) {
-    loadError.value = e.message || 'Error al cargar datos del dispositivo'
+    loadError.value = friendlyError(e)
   } finally {
     loadingData.value = false
   }
@@ -134,7 +135,7 @@ async function handleSave() {
     toast.show('Dispositivo actualizado', 'success')
     router.back()
   } catch (e) {
-    errorMsg.value = e.message || 'Error al actualizar el dispositivo'
+    errorMsg.value = friendlyError(e)
   } finally {
     saving.value = false
   }

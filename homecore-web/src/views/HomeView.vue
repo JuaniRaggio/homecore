@@ -187,9 +187,8 @@ const stats = computed(() => ({
 async function toggleDevice(id) {
   try {
     await devicesStore.toggleDevice(id)
-    toast.show('Dispositivo actualizado', 'success')
   } catch {
-    toast.show('Error al cambiar estado del dispositivo', 'error')
+    toast.show('No se pudo cambiar el estado del dispositivo. Verifica que este conectado.', 'error')
   }
 }
 
@@ -197,16 +196,16 @@ async function toggleFavorite(id) {
   try {
     await devicesStore.toggleFavorite(id)
   } catch {
-    toast.show('Error al cambiar favorito', 'error')
+    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
   }
 }
 
 async function executeRoutine(id) {
   try {
     await routinesStore.execute(id)
-    toast.show('Rutina ejecutada', 'success')
+    toast.show('Rutina ejecutada correctamente', 'success')
   } catch {
-    toast.show('Error al ejecutar rutina', 'error')
+    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
   }
 }
 
@@ -236,7 +235,7 @@ async function confirmDeleteRoom() {
     toast.show('Habitacion eliminada', 'success')
     showDeleteRoomConfirm.value = false
   } catch {
-    toast.show('Error al eliminar habitacion', 'error')
+    toast.show('No se pudo eliminar la habitacion. Intenta de nuevo.', 'error')
   } finally {
     deleting.value = false
   }
@@ -264,7 +263,7 @@ async function confirmNewRoom() {
     toast.show('Habitacion creada', 'success')
     closeNewRoomModal()
   } catch {
-    toast.show('Error al crear habitacion', 'error')
+    toast.show('No se pudo crear la habitacion. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false
   }
@@ -292,7 +291,7 @@ async function confirmEditHome() {
     toast.show('Hogar actualizado', 'success')
     closeEditHomeModal()
   } catch {
-    toast.show('Error al actualizar hogar', 'error')
+    toast.show('No se pudo actualizar el hogar. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false
   }

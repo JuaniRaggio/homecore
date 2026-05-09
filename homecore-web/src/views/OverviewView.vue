@@ -123,9 +123,9 @@ const enrichedHomes = computed(() =>
 async function executeRoutine(id) {
   try {
     await routinesStore.execute(id)
-    toast.show('Rutina ejecutada', 'success')
+    toast.show('Rutina ejecutada correctamente', 'success')
   } catch {
-    toast.show('Error al ejecutar rutina', 'error')
+    toast.show('No se pudo ejecutar la rutina. Verifica que los dispositivos esten conectados.', 'error')
   }
 }
 
@@ -139,7 +139,7 @@ onMounted(async () => {
       await overview.fetchAllHomesDevices(homesStore.homes)
     }
   } catch {
-    toast.show('Error al cargar datos del overview', 'error')
+    toast.show('No se pudieron cargar los datos. Verifica tu conexion e intenta recargar la pagina.', 'error')
   }
 })
 </script>

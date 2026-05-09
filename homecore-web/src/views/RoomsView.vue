@@ -185,7 +185,7 @@ async function confirmDeleteRoom() {
     toast.show('Habitacion eliminada', 'success')
     showDeleteConfirm.value = false
   } catch {
-    toast.show('Error al eliminar habitacion', 'error')
+    toast.show('No se pudo eliminar la habitacion. Intenta de nuevo.', 'error')
   } finally {
     deleting.value = false
   }
@@ -209,7 +209,7 @@ async function confirmUnlink() {
     toast.show('Dispositivo desvinculado', 'success')
     showUnlinkConfirm.value = false
   } catch {
-    toast.show('Error al desvincular dispositivo', 'error')
+    toast.show('No se pudo desvincular el dispositivo. Intenta de nuevo.', 'error')
   } finally {
     deleting.value = false
   }
@@ -236,7 +236,7 @@ async function confirmNewRoom() {
     toast.show('Habitacion creada', 'success')
     closeModal()
   } catch {
-    toast.show('Error al crear habitacion', 'error')
+    toast.show('No se pudo crear la habitacion. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false
   }
@@ -267,7 +267,7 @@ async function confirmEditRoom() {
     toast.show('Habitacion actualizada', 'success')
     closeEditModal()
   } catch {
-    toast.show('Error al actualizar habitacion', 'error')
+    toast.show('No se pudo renombrar la habitacion. Intenta de nuevo.', 'error')
   } finally {
     saving.value = false
   }
@@ -276,9 +276,8 @@ async function confirmEditRoom() {
 async function toggleDevice(device) {
   try {
     await devicesStore.toggleDevice(device.id)
-    toast.show('Dispositivo actualizado', 'success')
   } catch {
-    toast.show('Error al cambiar estado del dispositivo', 'error')
+    toast.show(`No se pudo cambiar el estado de "${device.name}". Verifica que este conectado.`, 'error')
   }
 }
 
@@ -296,7 +295,7 @@ async function linkDevice(room, event) {
     const homeId = route.params.homeId
     if (homeId) await devicesStore.fetchAllForHome(homeId)
   } catch {
-    toast.show('Error al vincular dispositivo', 'error')
+    toast.show('No se pudo vincular el dispositivo a la habitacion. Intenta de nuevo.', 'error')
   }
 }
 
