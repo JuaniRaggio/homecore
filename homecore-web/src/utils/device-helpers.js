@@ -39,7 +39,7 @@ export function getDisplayName(device, allDevices) {
 /**
  * Normaliza un dispositivo de la API a un formato plano para la UI.
  */
-export function normalizeDevice(d, roomName) {
+export function normalizeDevice(d, roomName, roomId) {
   const state = d.state || {}
   const typeName = d.type?.name || d.type || ''
   const isOn = state.status === 'on' || state.status === 'opened'
@@ -55,7 +55,7 @@ export function normalizeDevice(d, roomName) {
     type: typeName,
     typeId: d.type?.id || d.type,
     room,
-    roomId: d.room?.id || null,
+    roomId: roomId || d.room?.id || null,
     isOn,
     isFavorite: d.metadata?.favorite || d.meta?.favorite || d.isFavorite || false,
     statusText,

@@ -72,7 +72,7 @@ export const useDevicesStore = defineStore('devices', () => {
         roomList.map(room => limit(async () => {
           try {
             const roomDevices = await api.getDevices(room.id)
-            return roomDevices.map(d => normalizeDevice(d, room.name))
+            return roomDevices.map(d => normalizeDevice(d, room.name, room.id))
           } catch {
             return []
           }
