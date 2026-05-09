@@ -50,6 +50,7 @@ import RoutineDetailModal from '@/components/routines/RoutineDetailModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
+import { actionError } from '@/utils/friendly-error'
 import { useRoutineActions } from '@/composables/useRoutineActions'
 import { useModal } from '@/composables/useModal'
 import { useConfirmAction } from '@/composables/useConfirmAction'
@@ -72,7 +73,7 @@ async function handleToggleFavorite(id) {
     await routinesStore.toggleFavorite(id)
   } catch (e) {
     console.error(`[Routines] Error toggling favorito ${id}:`, e)
-    toast.show('No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
+    toast.show(e.message || actionError('actualizar el favorito'), 'error')
   }
 }
 
@@ -83,7 +84,7 @@ async function handleToggleActive(id) {
     })
   } catch (e) {
     console.error(`[Routines] Error cambiando estado de rutina ${id}:`, e)
-    toast.show('No se pudo cambiar el estado de la rutina. Intenta de nuevo.', 'error')
+    toast.show(e.message || actionError('cambiar el estado de la rutina'), 'error')
   }
 }
 

@@ -117,6 +117,7 @@ import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
 import { useConfirmAction } from '@/composables/useConfirmAction'
 import { useHomeData } from '@/composables/useHomeData'
+import { actionError } from '@/utils/friendly-error'
 import * as api from '@/services/api'
 
 const router = useRouter()
@@ -188,8 +189,8 @@ async function confirmEditRoom(name) {
     await roomsStore.updateRoom(editingRoom.value.id, { name })
     toast.show('Habitacion actualizada', 'success')
     closeEditModal()
-  } catch {
-    toast.show('No se pudo renombrar la habitacion. Intenta de nuevo.', 'error')
+  } catch (e) {
+    toast.show(e.message || actionError('renombrar la habitacion'), 'error')
   } finally {
     saving.value = false
   }
@@ -213,7 +214,7 @@ async function linkDevice(room, event) {
     if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
   } catch (e) {
     console.error(`[Rooms] Error vinculando dispositivo ${deviceId} a habitacion ${room.id}:`, e)
-    toast.show('No se pudo vincular el dispositivo a la habitacion. Intenta de nuevo.', 'error')
+    toast.show(e.message || actionError('vincular el dispositivo a la habitacion'), 'error')
   }
 }
 </script>

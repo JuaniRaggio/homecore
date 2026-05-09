@@ -22,6 +22,7 @@ import { ref, computed, watch } from 'vue'
 import ModalBase from '@/components/common/ModalBase.vue'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
+import { actionError } from '@/utils/friendly-error'
 
 const props = defineProps({
   visible: { type: Boolean, required: true },
@@ -58,7 +59,7 @@ async function confirmCreate() {
     emit('close')
   } catch (e) {
     console.error('[CreateRoomModal] Error creando habitacion:', e)
-    toast.show('No se pudo crear la habitacion. Intenta de nuevo.', 'error')
+    toast.show(e.message || actionError('crear la habitacion'), 'error')
   } finally {
     saving.value = false
   }

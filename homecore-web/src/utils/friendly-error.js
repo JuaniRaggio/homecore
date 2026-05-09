@@ -13,7 +13,7 @@ export const ERROR_MESSAGES = {
  * Genera un mensaje de error estandar para una accion fallida.
  */
 export function actionError(actionVerb = 'ejecutar la accion') {
-  return `No se pudo ${actionVerb}.`
+  return `No se pudo ${actionVerb}. Intenta de nuevo.`
 }
 
 /**

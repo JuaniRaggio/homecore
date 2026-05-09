@@ -149,6 +149,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
+import { actionError } from '@/utils/friendly-error'
 import { translateType } from '@/utils/device-helpers'
 import { actionsFor, paramsFor } from '@/config/routine-actions'
 
@@ -241,7 +242,7 @@ async function submit() {
     router.push({ name: 'routines', params: { homeId: homeId.value } })
   } catch (e) {
     console.error('[NewRoutine] Error creando rutina:', e)
-    toast.show('No se pudo crear la rutina. Verifica los datos e intenta de nuevo.', 'error')
+    toast.show(e.message || actionError('crear la rutina'), 'error')
   } finally {
     saving.value = false
   }

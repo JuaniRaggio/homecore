@@ -133,6 +133,7 @@ import EditNameModal from '@/components/common/EditNameModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
+import { actionError } from '@/utils/friendly-error'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useRoutineActions } from '@/composables/useRoutineActions'
 import { useModal } from '@/composables/useModal'
@@ -198,7 +199,7 @@ async function confirmEditHome(name) {
     editHomeModal.close()
   } catch (e) {
     console.error(`[Home] Error actualizando hogar ${homeId.value}:`, e)
-    toast.show('No se pudo actualizar el hogar. Intenta de nuevo.', 'error')
+    toast.show(e.message || actionError('actualizar el hogar'), 'error')
   } finally {
     saving.value = false
   }
