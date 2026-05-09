@@ -70,7 +70,9 @@ function closeHomeMenu() {
 function switchHome(newHomeId) {
   showHomeMenu.value = false
   const subPath = route.path.replace(`/casa/${homeId.value}`, '')
-  const safe = subPath.startsWith('/dispositivos/') ? '/dispositivos' : subPath
+  const safe = subPath.startsWith('/dispositivos/') ? '/dispositivos'
+    : subPath.startsWith('/habitaciones/') ? '/habitaciones'
+    : subPath
   router.push(`/casa/${newHomeId}${safe}`)
 }
 

@@ -50,7 +50,7 @@
             @click="toggleDevice(device)"
           >
             <span class="device-tile__name">{{ device.name }}</span>
-            <span class="device-tile__type">{{ device.type }}</span>
+            <span class="device-tile__type">{{ translateType(device.type) }}</span>
           </button>
         </div>
       </div>
@@ -149,6 +149,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
+import { translateType } from '@/utils/device-helpers'
 
 const route = useRoute()
 const router = useRouter()

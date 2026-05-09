@@ -21,6 +21,7 @@ const HistoryView = () => import('@/views/HistoryView.vue')
 const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
 const EditDeviceView = () => import('@/views/EditDeviceView.vue')
+const RoomDetailView = () => import('@/views/RoomDetailView.vue')
 
 const routes = [
   {
@@ -85,6 +86,11 @@ const routes = [
         path: 'habitaciones',
         name: 'rooms',
         component: RoomsView
+      },
+      {
+        path: 'habitaciones/:roomId',
+        name: 'room-detail',
+        component: RoomDetailView
       },
       {
         path: 'rutinas',

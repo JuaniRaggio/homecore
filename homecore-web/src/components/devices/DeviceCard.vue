@@ -16,7 +16,7 @@
       </span>
     </div>
 
-    <div class="device-name">{{ device.name }}</div>
+    <div class="device-name">{{ displayName }}</div>
     <div class="device-room">{{ device.room }}</div>
 
     <div class="device-status" :class="{ 'status--on': device.isOn }">
@@ -30,23 +30,27 @@
 <script setup>
 import { computed } from 'vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import { useDevicesStore } from '@/stores/devices'
+import { getDisplayName } from '@/utils/device-helpers'
+
+const devicesStore = useDevicesStore()
 
 const props = defineProps({
   device: {
     type: Object,
     required: true
-    // Estructura esperada:
-    // {
-    //   id: String,
-    //   name: String,        -- "Lampara principal"
-    //   room: String,        -- "Living"
-    //   type: String,        -- "light" | "door" | "ac" | "speaker" | "vacuum" | "fridge" | "oven"
-    //   status: Object,      -- datos crudos del estado desde la API
-    //   statusText: String,  -- texto formateado para mostrar ("Encendido - 80%")
-    //   isFavorite: Boolean,
-    //   isOn: Boolean
-    // }
+  },
+  showRoom: {
+    type: Boolean,
+    default: true
   }
+})
+
+const displayName = computed(() => {
+  if (props.showRoom) {
+    return getDisplayName(props.device, devicesStore.devices)
+  }
+  return props.device.name
 })
 
 defineEmits(['toggle', 'toggle-favorite', 'open'])
