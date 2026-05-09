@@ -11,16 +11,16 @@
     <p v-else-if="roomsStore.error" class="state-error">{{ roomsStore.error }}</p>
     <p v-else-if="roomsStore.rooms.length === 0" class="state-empty">Sin habitaciones</p>
     <div v-else class="rooms-grid">
-      <div v-for="room in rooms" :key="room.id" class="card card--xl room-card">
+      <div v-for="room in rooms" :key="room.id" class="card card--xl room-card" @click="openRoom(room.id)">
 
         <div class="room-card__header">
            <span class="room-name">{{ room.name }}</span>
            <div class="room-actions">
 
-            <button class="icon-btn" @click="editRoom(room)" title="Editar">
+            <button class="icon-btn" @click.stop="editRoom(room)" title="Editar">
               <i class="fa-regular fa-pen-to-square"></i>
             </button>
-            <button class="icon-btn icon-btn--delete" @click="requestDeleteRoom(room.id)" title="Eliminar">
+            <button class="icon-btn icon-btn--delete" @click.stop="requestDeleteRoom(room.id)" title="Eliminar">
               <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -31,11 +31,11 @@
           <div v-for="device in room.devices" :key="device.id" class="room-device">
             <span class="device-name">{{ device.name }}</span>
             <div class="device-row__controls">
-              <ToggleSwitch :model-value="device.isOn" @update:model-value="toggleDevice(device)" />
-              <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
+              <span @click.stop><ToggleSwitch :model-value="device.isOn" @update:model-value="toggleDevice(device)" /></span>
+              <button class="icon-btn icon-btn--sm" @click.stop="editDevice(device)" title="Ver detalle">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
-              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="requestUnlink(device.id)" title="Desvincular">
+              <button class="icon-btn icon-btn--sm icon-btn--delete" @click.stop="requestUnlink(device.id)" title="Desvincular">
                 <i class="fa-solid fa-link-slash"></i>
               </button>
             </div>
@@ -45,7 +45,7 @@
 
 
          <div class="room-card__footer">
-          <select class="link-device-select" @change="linkDevice(room, $event)">
+          <select class="link-device-select" @click.stop @change="linkDevice(room, $event)">
             <option value="" disabled selected>+ Vincular dispositivo</option>
             <option
               v-for="device in availableDevices"
@@ -285,6 +285,10 @@ function editDevice(device) {
   router.push({ name: 'device-detail', params: { homeId: route.params.homeId, id: device.id } })
 }
 
+function openRoom(roomId) {
+  router.push({ name: 'room-detail', params: { homeId: route.params.homeId, roomId } })
+}
+
 async function linkDevice(room, event) {
   const deviceId = event.target.value
   event.target.value = ''
@@ -332,6 +336,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  cursor: pointer;
 }
 
 .room-card__header {
