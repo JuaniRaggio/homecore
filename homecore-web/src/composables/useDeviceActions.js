@@ -9,6 +9,7 @@ export function useDeviceActions() {
     try {
       await devicesStore.toggleDevice(id)
     } catch (e) {
+      console.error(`[useDeviceActions] Error toggling dispositivo ${id}:`, e)
       toast.show(e.message || 'No se pudo cambiar el estado del dispositivo.', 'error')
     }
   }
@@ -17,6 +18,7 @@ export function useDeviceActions() {
     try {
       await devicesStore.toggleFavorite(id)
     } catch (e) {
+      console.error(`[useDeviceActions] Error toggling favorito ${id}:`, e)
       toast.show(e.message || 'No se pudo actualizar el favorito. Intenta de nuevo.', 'error')
     }
   }

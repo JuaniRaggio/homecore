@@ -10,6 +10,7 @@ export function useRoutineActions() {
       await routinesStore.execute(id)
       toast.show('Rutina ejecutada correctamente', 'success')
     } catch (e) {
+      console.error(`[useRoutineActions] Error ejecutando rutina ${id}:`, e)
       toast.show(e.message || 'No se pudo ejecutar la rutina.', 'error')
     }
   }
