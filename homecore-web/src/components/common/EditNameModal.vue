@@ -1,26 +1,25 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click.self="emitClose">
-    <div class="modal">
-      <h2 class="modal-title">{{ title }}</h2>
-      <input
-        v-model="name"
-        class="modal-input"
-        type="text"
-        :placeholder="placeholder"
-        @keyup.enter="emitSave"
-      />
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="emitClose" :disabled="loading">Cancelar</button>
-        <button class="btn-confirm" @click="emitSave" :disabled="loading || !canSave">
-          {{ loading ? 'Guardando...' : 'Guardar' }}
-        </button>
-      </div>
+  <ModalBase :visible="visible" @close="emit('close')">
+    <h2 class="modal-title">{{ title }}</h2>
+    <input
+      v-model="name"
+      class="modal-input"
+      type="text"
+      :placeholder="placeholder"
+      @keyup.enter="emitSave"
+    />
+    <div class="modal-actions">
+      <button class="btn-cancel" @click="emit('close')" :disabled="loading">Cancelar</button>
+      <button class="btn-confirm" @click="emitSave" :disabled="loading || !canSave">
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
     </div>
-  </div>
+  </ModalBase>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import ModalBase from '@/components/common/ModalBase.vue'
 
 const props = defineProps({
   visible: { type: Boolean, required: true },
@@ -41,10 +40,6 @@ watch(() => props.visible, (val) => {
     name.value = props.currentName
   }
 })
-
-function emitClose() {
-  emit('close')
-}
 
 function emitSave() {
   if (!canSave.value || props.loading) return

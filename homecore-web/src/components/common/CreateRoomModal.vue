@@ -1,26 +1,25 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click.self="emitClose">
-    <div class="modal">
-      <h2 class="modal-title">Nueva habitacion</h2>
-      <input
-        v-model="newRoomName"
-        class="modal-input"
-        type="text"
-        placeholder="Nombre de la habitacion"
-        @keyup.enter="confirmCreate"
-      />
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="emitClose" :disabled="saving">Cancelar</button>
-        <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !canCreate">
-          {{ saving ? 'Creando...' : 'Crear' }}
-        </button>
-      </div>
+  <ModalBase :visible="visible" @close="emitClose">
+    <h2 class="modal-title">Nueva habitacion</h2>
+    <input
+      v-model="newRoomName"
+      class="modal-input"
+      type="text"
+      placeholder="Nombre de la habitacion"
+      @keyup.enter="confirmCreate"
+    />
+    <div class="modal-actions">
+      <button class="btn-cancel" @click="emitClose" :disabled="saving">Cancelar</button>
+      <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !canCreate">
+        {{ saving ? 'Creando...' : 'Crear' }}
+      </button>
     </div>
-  </div>
+  </ModalBase>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import ModalBase from '@/components/common/ModalBase.vue'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
 

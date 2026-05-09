@@ -1,40 +1,39 @@
 <template>
-  <div v-if="visible" class="modal-overlay" @click.self="emitClose">
-    <div class="modal">
-      <h2 class="modal-title">Nuevo dispositivo</h2>
-      <input
-        v-model="newDeviceName"
-        class="modal-input"
-        type="text"
-        placeholder="Nombre del dispositivo"
-        @keyup.enter="confirmCreate"
-      />
-      <select v-model="newDeviceType" class="modal-input">
-        <option value="" disabled>Tipo de dispositivo</option>
-        <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
-          {{ translateType(dt.name) }}
-        </option>
-      </select>
-      <select v-if="!roomId" v-model="newDeviceRoom" class="modal-input">
-        <option value="" disabled>Seleccionar habitacion</option>
-        <option
-          v-for="room in roomsStore.rooms"
-          :key="room.id"
-          :value="room.id"
-        >{{ room.name }}</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn-cancel" @click="emitClose" :disabled="saving">Cancelar</button>
-        <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !canCreate">
-          {{ saving ? 'Creando...' : 'Crear' }}
-        </button>
-      </div>
+  <ModalBase :visible="visible" @close="emitClose">
+    <h2 class="modal-title">Nuevo dispositivo</h2>
+    <input
+      v-model="newDeviceName"
+      class="modal-input"
+      type="text"
+      placeholder="Nombre del dispositivo"
+      @keyup.enter="confirmCreate"
+    />
+    <select v-model="newDeviceType" class="modal-input">
+      <option value="" disabled>Tipo de dispositivo</option>
+      <option v-for="dt in devicesStore.deviceTypes" :key="dt.id" :value="dt.id">
+        {{ translateType(dt.name) }}
+      </option>
+    </select>
+    <select v-if="!roomId" v-model="newDeviceRoom" class="modal-input">
+      <option value="" disabled>Seleccionar habitacion</option>
+      <option
+        v-for="room in roomsStore.rooms"
+        :key="room.id"
+        :value="room.id"
+      >{{ room.name }}</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" @click="emitClose" :disabled="saving">Cancelar</button>
+      <button class="btn-confirm" @click="confirmCreate" :disabled="saving || !canCreate">
+        {{ saving ? 'Creando...' : 'Crear' }}
+      </button>
     </div>
-  </div>
+  </ModalBase>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import ModalBase from '@/components/common/ModalBase.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
