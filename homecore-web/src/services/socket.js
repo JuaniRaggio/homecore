@@ -28,6 +28,12 @@ const STATE_FIELD_TO_ACTION = {
   location: 'setLocation',
 }
 
+/**
+ * Genera texto legible a partir del payload de un evento del websocket.
+ * @param {Object|null} state - Campo `data` del evento (ej: {status: 'on', temperature: 24})
+ * @param {string} [deviceType] - Clave canonica del tipo para usar describeAction
+ * @returns {string} Descripcion en espanol para notificaciones
+ */
 function describeEvent(state, deviceType) {
   if (!state) return 'Estado actualizado'
 
@@ -58,6 +64,10 @@ function describeEvent(state, deviceType) {
   return 'Estado actualizado'
 }
 
+/**
+ * Conecta al websocket y registra handlers para eventos de dispositivos y hogares.
+ * @param {string} token - JWT de autenticacion
+ */
 export function connect(token) {
   if (socket) disconnect()
 

@@ -9,10 +9,19 @@ export const ERROR_MESSAGES = {
   TIMEOUT: 'La operacion tardo demasiado. Intenta de nuevo.',
 }
 
+/**
+ * @param {string} actionVerb - Verbo en infinitivo (ej: "crear la habitacion", "vincular el dispositivo")
+ * @returns {string} Mensaje estandar "No se pudo {verbo}. Intenta de nuevo."
+ */
 export function actionError(actionVerb = 'ejecutar la accion') {
   return `No se pudo ${actionVerb}. Intenta de nuevo.`
 }
 
+/**
+ * Clasifica el error por status code o keywords en el mensaje.
+ * @param {Error|string|null} e
+ * @returns {string} Mensaje amigable para mostrar en la UI
+ */
 export function friendlyError(e) {
   if (!e) return 'Ocurrio un error inesperado.'
 

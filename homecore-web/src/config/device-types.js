@@ -54,6 +54,10 @@ export const DEFAULT_STATUS = {
   on: 'Encendido', off: 'Apagado', actionOn: 'turnOn', actionOff: 'turnOff', verbOn: 'encender', verbOff: 'apagar'
 }
 
+/**
+ * @param {string} type - Clave canonica del tipo (ej: "light", "alarm")
+ * @returns {string} Clase CSS de Font Awesome. Fallback: "fa-solid fa-plug"
+ */
 export function getDeviceIcon(type) {
   return DEVICE_ICONS[type] || 'fa-solid fa-plug'
 }
@@ -61,6 +65,12 @@ export function getDeviceIcon(type) {
 const dynamicColors = {}
 let paletteIdx = 0
 
+/**
+ * Asigna colores persistentes: si un tipo no esta en DEVICE_COLORS, le asigna uno de FALLBACK_PALETTE
+ * y lo recuerda para toda la sesion.
+ * @param {string} typeName - Nombre del tipo (puede ser variante: "lamp", "luz", etc.)
+ * @returns {string} Color hex
+ */
 export function getDeviceColor(typeName) {
   const t = (typeName || '').toLowerCase()
   for (const [key, color] of Object.entries(DEVICE_COLORS)) {
@@ -73,10 +83,19 @@ export function getDeviceColor(typeName) {
   return dynamicColors[typeName]
 }
 
+/**
+ * @param {string} type - Clave canonica del tipo
+ * @returns {{on: string, off: string, actionOn: string, actionOff: string, verbOn: string, verbOff: string}}
+ */
 export function getStatusMap(type) {
   return STATUS_MAP[type] || DEFAULT_STATUS
 }
 
+/**
+ * @param {string} type - Clave canonica del tipo
+ * @param {boolean} isOn
+ * @returns {string} Texto localizado (ej: "Encendido", "Abierta", "Activada")
+ */
 export function getStatusText(type, isOn) {
   const map = getStatusMap(type)
   return isOn ? map.on : map.off

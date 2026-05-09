@@ -55,6 +55,10 @@ export const useDevicesStore = defineStore('devices', () => {
     return dt?.powerUsage ?? 0
   }
 
+  /**
+   * Carga todos los dispositivos de un hogar recorriendo sus habitaciones en paralelo (max 3 concurrentes).
+   * @param {string} homeId
+   */
   async function fetchAllForHome(homeId) {
     loading.value = true
     error.value = null
@@ -92,6 +96,10 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
+  /**
+   * Alterna el estado on/off de un dispositivo. Usa actionOn/actionOff segun el tipo.
+   * @param {string} id
+   */
   async function toggleDevice(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
@@ -116,6 +124,10 @@ export const useDevicesStore = defineStore('devices', () => {
     device.isFavorite = newFavorite
   }
 
+  /**
+   * Agrega un dispositivo al store desde un evento del websocket. Ignora duplicados.
+   * @param {Object} rawDevice - Payload crudo del websocket
+   */
   function addDeviceFromEvent(rawDevice) {
     if (!rawDevice?.id) return
     const exists = devices.value.some(d => String(d.id) === String(rawDevice.id))
@@ -130,6 +142,10 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
+  /**
+   * Actualiza campos de un dispositivo existente desde un evento del websocket (sin re-fetch).
+   * @param {Object} rawDevice - Payload crudo del websocket
+   */
   function updateDeviceFromEvent(rawDevice) {
     if (!rawDevice?.id) return
     const device = devices.value.find(d => String(d.id) === String(rawDevice.id))
@@ -148,6 +164,10 @@ export const useDevicesStore = defineStore('devices', () => {
     }
   }
 
+  /**
+   * Aplica un cambio de estado desde un deviceEvent del websocket (isOn, statusText).
+   * @param {Object} event - Payload {id, data} donde data contiene el estado nuevo
+   */
   function applyDeviceEvent(event) {
     const deviceId = event.id ?? event.deviceId ?? event.device?.id
     if (!deviceId) return

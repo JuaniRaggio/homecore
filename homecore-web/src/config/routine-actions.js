@@ -70,6 +70,11 @@ export const ACTIONS_MAP = {
   ],
 }
 
+/**
+ * Busca por nombre parcial para soportar variantes de la API (lamp, luz, light, etc.)
+ * @param {string} typeName - Nombre crudo o canonico del tipo
+ * @returns {Array<{actionName: string, label: string, params: Object[]}>} Acciones disponibles, o [] si el tipo no se reconoce
+ */
 export function actionsFor(typeName) {
   const t = (typeName || '').toLowerCase()
   if (t.includes('light') || t.includes('lamp') || t.includes('luz')) return ACTIONS_MAP.light
@@ -85,6 +90,11 @@ export function actionsFor(typeName) {
   return []
 }
 
+/**
+ * @param {string} typeName
+ * @param {string} actionName - Nombre de accion de la API (ej: "setTemperature")
+ * @returns {Object[]} Definiciones de parametros, o [] si la accion no existe
+ */
 export function paramsFor(typeName, actionName) {
   return actionsFor(typeName).find(a => a.actionName === actionName)?.params ?? []
 }
@@ -99,6 +109,13 @@ const UNIT_SUFFIXES = {
   setFreezerTemperature: CELSIUS,
 }
 
+/**
+ * Genera texto legible para notificaciones e historial.
+ * @param {string} typeName - Tipo de dispositivo (ej: "light", "ac")
+ * @param {string} actionName - Nombre de accion de la API
+ * @param {Array} [params] - Parametros enviados a la accion
+ * @returns {string} Descripcion en espanol (ej: "Temperatura ajustado a 24C")
+ */
 export function describeAction(typeName, actionName, params) {
   const action = actionsFor(typeName).find(a => a.actionName === actionName)
   const label = action?.label ?? actionName
