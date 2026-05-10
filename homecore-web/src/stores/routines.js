@@ -36,7 +36,10 @@ export const useRoutinesStore = defineStore('routines', () => {
   }
 
   async function update(id, data) {
-    const updated = await api.updateRoutine(id, data)
+    const current = getById(id)
+    const { id: _id, ...currentData } = current ?? {}
+    const payload = { ...currentData, ...data }
+    const updated = await api.updateRoutine(id, payload)
     const idx = routines.value.findIndex(r => String(r.id) === String(id))
     if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated }
   }
@@ -49,8 +52,7 @@ export const useRoutinesStore = defineStore('routines', () => {
   async function toggleFavorite(id) {
     const routine = routines.value.find(r => String(r.id) === String(id))
     if (!routine) return
-    await api.updateRoutine(id, { isFavorite: !routine.isFavorite })
-    routine.isFavorite = !routine.isFavorite
+    await update(id, { isFavorite: !routine.isFavorite })
   }
 
   return { routines, loading, error, favoriteRoutines, getById, fetchRoutines, execute, create, update, remove, toggleFavorite }

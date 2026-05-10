@@ -12,7 +12,7 @@
 
     <p v-if="loading" class="state-loading">Cargando dispositivos...</p>
     <p v-else-if="devices.length === 0" class="state-empty">Sin dispositivos en esta habitacion</p>
-    <div v-else class="grid-3 items-grid--narrow">
+    <div v-else class="items-grid items-grid--narrow">
       <DeviceCard
         v-for="device in devices"
         :key="device.id"
@@ -22,20 +22,6 @@
         @toggle-favorite="deviceActions.toggleFavorite"
         @open="id => router.push({ name: 'device-detail', params: { homeId, id } })"
       />
-    </div>
-
-    <div class="link-section card card--xl">
-      <h3 class="card-title">Vincular mas dispositivos</h3>
-      <select class="link-device-select" @change="linkDevice">
-        <option value="" disabled selected>Selecciona un dispositivo</option>
-        <option
-          v-for="device in availableDevices"
-          :key="device.id"
-          :value="device.id"
-        >
-          {{ device.name }}
-        </option>
-      </select>
     </div>
 
     <CreateDeviceModal
@@ -53,16 +39,12 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import CreateDeviceModal from '@/components/common/CreateDeviceModal.vue'
-import { useToastStore } from '@/stores/toast'
-import { actionError } from '@/utils/friendly-error'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
 import { useHomeData } from '@/composables/useHomeData'
-import * as api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
-const toast = useToastStore()
 const deviceActions = useDeviceActions()
 
 const roomId = computed(() => route.params.roomId)
@@ -79,24 +61,6 @@ const devices = computed(() =>
   devicesStore.devices.filter(d => String(d.roomId) === String(roomId.value))
 )
 
-const availableDevices = computed(() =>
-  devicesStore.devices.filter(d => !d.roomId)
-)
-
-async function linkDevice(event) {
-  const deviceId = event.target.value
-  event.target.value = ''
-  if (!deviceId) return
-  try {
-    await api.linkDeviceToRoom(roomId.value, deviceId)
-    toast.show('Dispositivo vinculado', 'success')
-    if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
-  } catch (e) {
-    console.error(`[RoomDetail] Error vinculando dispositivo ${deviceId}:`, e)
-    toast.show(e.message || actionError('vincular el dispositivo'), 'error')
-  }
-}
-
 const createModal = useModal()
 </script>
 
@@ -105,8 +69,5 @@ const createModal = useModal()
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
-.link-section {
-  margin-top: 24px;
-  max-width: 300px;
-}
+
 </style>

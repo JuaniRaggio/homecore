@@ -281,4 +281,14 @@ onMounted(async () => {
   background-color: var(--card-hover);
   border-color: var(--accent);
 }
+
+@media (max-width: 768px) {
+  .homes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .greeting-text {
+    font-size: var(--font-4xl);
+  }
+}
 </style>
