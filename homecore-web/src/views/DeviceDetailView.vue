@@ -599,6 +599,7 @@ async function loadDeviceState(id) {
       if (state.status !== undefined) {
         device.value.isOn = state.status === 'on' || state.status === 'opened'
           || state.status === 'active' || state.status === 'playing'
+          || state.status === 'armedStay' || state.status === 'armedAway'
       }
 
       const type = device.value.type
