@@ -1,3 +1,52 @@
+# Problemas Resueltos (Registro Historico)
+
+## [RESUELTO - 2025] Deadlock en carga de dispositivos en Overview
+
+### Sintoma
+- Los dispositivos no se mostraban en la vista Overview (OverviewView.vue)
+- Las tarjetas de casas mostraban "0 dispositivos", "0 activos", "0W consumo" aunque las casas tuvieran habitaciones y dispositivos configurados
+- Las rutinas globales tampoco cargaban dispositivos para seleccionar
+- Los logs mostraban que las habitaciones se agrupaban correctamente por casa, pero nunca aparecian logs de carga de dispositivos individuales
+
+### Causa raiz
+**Deadlock con `pLimit` en `useOverviewData.js`**
+
+El codigo usaba un unico limite de concurrencia (`pLimit(MAX_CONCURRENT)` con valor 3) para controlar llamadas paralelas a la API en DOS niveles:
+
+1. **Nivel externo:** Procesar casas en paralelo
+2. **Nivel interno:** Procesar habitaciones de cada casa en paralelo
+
+Ambos niveles usaban el MISMO `limit`, causando un deadlock:
+- Las 3 slots del `limit` se ocupaban procesando casas
+- Cada casa intentaba procesar sus habitaciones usando el mismo `limit`
+- Como no habia slots disponibles (todas ocupadas esperando que las casas terminen), las habitaciones nunca se procesaban
+- Las casas quedaban esperando que terminen las habitaciones, pero estas nunca empezaban
+- **Resultado:** Deadlock - nada se ejecutaba, los dispositivos nunca se cargaban
+
+### Solucion implementada
+Crear dos limites de concurrencia separados en `useOverviewData.js`:
+
+```javascript
+const MAX_CONCURRENT_HOMES = 3  // Procesar 3 casas en paralelo
+const MAX_CONCURRENT_ROOMS = 5  // Cada casa puede procesar 5 habitaciones en paralelo
+
+const limitHomes = pLimit(MAX_CONCURRENT_HOMES)
+const limitRooms = pLimit(MAX_CONCURRENT_ROOMS)
+```
+
+Esto permite que:
+- Multiples casas se procesen simultaneamente sin bloquearse entre si
+- Cada casa puede procesar sus habitaciones en paralelo sin interferir con el limite de casas
+- No hay competencia por slots entre diferentes niveles de paralelizacion
+
+### Archivos modificados
+- `src/composables/useOverviewData.js`: Separacion de limites de concurrencia
+
+### Leccion aprendida
+Cuando se usa `pLimit` con multiples niveles de paralelizacion anidados (Promise.all dentro de Promise.all), SIEMPRE usar limites separados para cada nivel. De lo contrario, el nivel externo consume todos los slots y el nivel interno nunca se ejecuta.
+
+---
+
 # Problemas de vista para solucionar
 
 ## Responsiveness

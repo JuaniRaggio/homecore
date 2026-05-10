@@ -8,7 +8,10 @@
 
     <!-- Grilla de casas -->
     <section class="overview-section">
-      <h2 class="section-title">Mis propiedades</h2>
+      <div class="section-header">
+        <h2 class="section-title">Mis propiedades</h2>
+        <router-link to="/nueva-propiedad" class="btn-add">+ Nueva propiedad</router-link>
+      </div>
       <p v-if="homesStore.loading" class="state-loading">Cargando propiedades...</p>
       <p v-else-if="homesStore.error" class="state-error">{{ homesStore.error }}</p>
       <p v-else-if="homesStore.homes.length === 0" class="state-empty">Sin propiedades</p>
@@ -19,7 +22,6 @@
           :home="home"
         />
       </div>
-      <router-link to="/nueva-propiedad" class="btn-add">+ Nueva propiedad</router-link>
     </section>
 
     <!-- Dispositivos criticos (cross-home) -->
@@ -259,7 +261,6 @@ onMounted(async () => {
 
 .btn-add {
   display: inline-block;
-  margin-top: 14px;
   text-decoration: none;
 }
 

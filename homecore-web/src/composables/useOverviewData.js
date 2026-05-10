@@ -4,7 +4,8 @@ import pLimit from 'p-limit'
 import { normalizeDevice, calcConsumption } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 
-const MAX_CONCURRENT = 3
+const MAX_CONCURRENT_HOMES = 3
+const MAX_CONCURRENT_ROOMS = 5
 
 export function useOverviewData() {
   const devicesByHome = ref({})
@@ -81,7 +82,8 @@ export function useOverviewData() {
   async function fetchAllHomesDevices(homes) {
     loading.value = true
     error.value = null
-    const limit = pLimit(MAX_CONCURRENT)
+    const limitHomes = pLimit(MAX_CONCURRENT_HOMES)
+    const limitRooms = pLimit(MAX_CONCURRENT_ROOMS)
 
     try {
       const [types, allRooms] = await Promise.all([
@@ -92,21 +94,24 @@ export function useOverviewData() {
 
       const roomsByHome = {}
       for (const room of allRooms) {
-        const hid = String(room.home?.id)
-        if (!roomsByHome[hid]) roomsByHome[hid] = []
-        roomsByHome[hid].push(room)
+        const hid = room.home?.id || room.homeId || (typeof room.home === 'string' ? room.home : null)
+        if (hid) {
+          const shid = String(hid)
+          if (!roomsByHome[shid]) roomsByHome[shid] = []
+          roomsByHome[shid].push(room)
+        }
       }
 
       const result = {}
       await Promise.all(
-        homes.map(home => limit(async () => {
+        homes.map(home => limitHomes(async () => {
           const rooms = roomsByHome[String(home.id)] || []
           const roomBatches = await Promise.all(
-            rooms.map(room => limit(async () => {
+            rooms.map(room => limitRooms(async () => {
               try {
                 const roomDevices = await api.getDevices(room.id)
                 return roomDevices.map(d => ({
-                  ...normalizeDevice(d, room.name),
+                  ...normalizeDevice(d, room.name, room.id, deviceTypes.value),
                   homeName: home.name,
                   homeId: home.id,
                 }))

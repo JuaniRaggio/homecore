@@ -1,5 +1,5 @@
 <template>
-  <div class="new-routine-view">
+  <div class="new-routine-view" :class="{ 'page-content--full': isCrossHome }">
     <button class="btn-back" @click="goBack">
       <i class="fa-solid fa-arrow-left"></i> {{ isCrossHome ? 'Volver al overview' : 'Volver a rutinas' }}
     </button>
