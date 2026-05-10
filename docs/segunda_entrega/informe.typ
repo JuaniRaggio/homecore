@@ -454,15 +454,24 @@ Las adaptaciones específicas por componente fueron:
 
 Durante la implementación se realizaron ajustes respecto al prototipo de la primera entrega. Los cambios más significativos son:
 
-// TODO: Completar con las diferencias reales que hayan encontrado.
-// Ejemplos:
-// -- El prototipo mostraba un mapa visual de la casa en el Overview.
-//    En la implementación se reemplazó por tarjetas de resumen con métricas,
-//    ya que la API no provee datos espaciales para generar el plano.
-//
-// -- El prototipo incluía perfiles de usuario (administrador, adolescente).
-//    Esta funcionalidad no se implementó ya que RF21 era opcional y se
-//    priorizaron otras funcionalidades.
+== Cambios en el Overview
+
+*Decisión:* Se reemplazó el mapa visual de la casa por tarjetas de resumen con métricas clave.
+
+*Justificación:* El prototipo original incluía un plano isométrico de la casa con habitaciones y dispositivos ubicados espacialmente. Sin embargo, la API provista no ofrece datos de ubicación ni dimensiones de los dispositivos, lo que imposibilitaba generar un mapa visual preciso. En su lugar, se optó por mostrar tarjetas de resumen que destacan los dispositivos favoritos, los dispositivos activos y rutinas recientes, manteniendo la función principal del Overview como punto de entrada rápido a la información más relevante.
+
+== Eliminación de perfiles de usuario
+
+*Decisión:* No se implementaron perfiles de usuario (administrador, adolescente).
+
+*Justificación:* El prototipo incluía la posibilidad de crear perfiles con permisos diferenciados (por ejemplo, un perfil adolescente sin acceso a la configuración). Sin embargo, el requisito RF21 que contemplaba esta funcionalidad era opcional y, dado el alcance de la implementación, se priorizaron otras funcionalidades consideradas más críticas para la experiencia general. La implementación actual asume un modelo de usuario único con acceso completo, lo cual simplifica la gestión de permisos y roles sin comprometer las funcionalidades principales de la aplicación.
+
+== Cambios en los botones de acción de dispositivos específicos 
+
+*Decisión:* Se cambiaron los controles de dispositivos como el parlante y la cortina. Anteriormente se tenía un toggle button para encender/apagar. En la implementación se optó por un panel de acciones contextuales compuesto por múltiples botones independientes.
+
+*Justificación:* En el prototipo, dispositivos como el parlante o la cortina tenían un toggle button que alternaba entre encendido y apagado. Sin embargo, durante la implementación se identificó que estos dispositivos tienen acciones discretas (por ejemplo, una cortina puede estar abierta, cerrada o en posición intermedia) que no se adaptan bien a un toggle binario. Por lo tanto, se diseñó un panel de acciones contextuales con botones independientes para cada acción relevante (subir, bajar para la cortina; reproducir, pausar, siguiente para el parlante), lo que mejora la correspondencia con las funcionalidades reales de los dispositivos y reduce la confusión del usuario. El diseño de cada control refleja el modelo de interacción familiar para dispositivos multimedia y automatización del hogar.
+
 
 // ====================================
 // 8. FEEDBACK DE LA PRIMERA ENTREGA
