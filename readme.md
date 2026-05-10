@@ -1,6 +1,6 @@
 # Problemas Resueltos (Registro Historico)
 
-## [RESUELTO - 2025] Deadlock en carga de dispositivos en Overview
+## [RESUELTO - 2026] Deadlock en carga de dispositivos en Overview
 
 ### Sintoma
 - Los dispositivos no se mostraban en la vista Overview (OverviewView.vue)
@@ -47,7 +47,7 @@ Cuando se usa `pLimit` con multiples niveles de paralelizacion anidados (Promise
 
 ---
 
-## [RESUELTO - 2025] Estado de alarmas no persiste entre vistas
+## [RESUELTO - 2026] Estado de alarmas no persiste entre vistas
 
 ### Sintoma
 - Al activar/desactivar una alarma en `DeviceDetailView`, el cambio se ve reflejado inmediatamente
@@ -105,7 +105,7 @@ Cuando se usa un store global (Pinia, Vuex, etc) para gestionar estado de entida
 
 ---
 
-## [RESUELTO - 2025] Desalineacion masiva de acciones entre frontend y backend (404 Not Found)
+## [RESUELTO - 2026] Desalineacion masiva de acciones entre frontend y backend (404 Not Found)
 
 ### Problema general
 Al migrar de acciones de toggle genericas a acciones especificas por tipo de dispositivo, varios dispositivos comenzaron a fallar con error 404 "action not found". El problema afecto a:
@@ -116,7 +116,7 @@ Este fue un problema sistemico causado por asumir nombres de acciones sin verifi
 
 ---
 
-## [RESUELTO - 2025] Acciones de alarma no existen en la API (404 Not Found)
+## [RESUELTO - 2026] Acciones de alarma no existen en la API (404 Not Found)
 
 ### Sintoma
 - Al intentar activar/desactivar una alarma, aparecia un error 404
@@ -164,7 +164,105 @@ Al crear `deviceTypes` personalizados en el backend con acciones especificas, SI
 
 ---
 
-## [RESUELTO - 2025] Estados de alarma no reconocidos al recargar
+## [RESUELTO - 2026] Acciones de cortinas no existen en la API (404 Not Found)
+
+### Sintoma
+- Al intentar abrir/cerrar cortinas, aparecia error 404
+- En consola: `Error: action with name 'open' for device with id 'xxx' not found`
+- Las acciones `open` y `close` fallaban con 404
+
+### Causa raiz
+**Mismo problema que alarmas: nombres de acciones no coinciden**
+
+El frontend esperaba:
+- `open` (Abrir)
+- `close` (Cerrar)
+- `setLevel` (Posicion) ✓
+
+El backend tenia:
+- **`up`** (Subir) ← Nombre diferente
+- **`down`** (Bajar) ← Nombre diferente
+- `setLevel` ✓
+
+### Solucion implementada
+Actualizar el frontend para usar `up`/`down` en vez de `open`/`close`:
+
+```javascript
+// device-types.js - STATUS_MAP
+curtain: {
+  on: 'Abierta', off: 'Cerrada',
+  actionOn: 'up',    // antes: 'open'
+  actionOff: 'down', // antes: 'close'
+  verbOn: 'subir',   verbOff: 'bajar'
+}
+
+// routine-actions.js - ACTIONS_MAP
+curtain: [
+  { actionName: 'up',   label: 'Subir', params: [] },  // antes: 'open'
+  { actionName: 'down', label: 'Bajar', params: [] },  // antes: 'close'
+  { actionName: 'setLevel', label: 'Posicion', params: [...] },
+]
+```
+
+### Archivos modificados
+- `src/config/device-types.js`: Cambio de acciones en STATUS_MAP
+- `src/config/routine-actions.js`: Cambio de acciones para rutinas
+
+---
+
+## Leccion aprendida general: Verificacion de acciones
+
+**Problema raiz comun:** El frontend asumia nombres de acciones estandar sin verificar contra los deviceTypes reales del backend.
+
+**Proceso correcto para agregar soporte a un nuevo tipo de dispositivo:**
+
+1. **Backend primero:**
+   ```bash
+   POST /devicetypes
+   {
+     "name": "tipo",
+     "actions": [
+       { "name": "accionReal", "params": [...] }
+     ]
+   }
+   ```
+
+2. **Verificar acciones disponibles:**
+   ```bash
+   GET /devicetypes/{typeId}
+   # Anotar los nombres EXACTOS de las acciones
+   ```
+
+3. **Frontend - actualizar configuraciones:**
+   - `device-types.js` → `STATUS_MAP` con acciones correctas
+   - `routine-actions.js` → `ACTIONS_MAP` con acciones correctas
+
+4. **Frontend - actualizar interpretacion de estados:**
+   - Si el deviceType usa estados personalizados (ej: `armedStay`, no solo `on`/`off`)
+   - Agregar esos estados a:
+     - `device-helpers.js` → `normalizeDevice()`
+     - `DeviceDetailView.vue` → `loadDeviceState()`
+     - `stores/devices.js` → `applyDeviceEvent()`
+
+5. **Probar:**
+   ```javascript
+   // En consola del navegador, despues de ejecutar accion:
+   fetch(`/devices/${id}/state`, {...})
+     .then(r => r.json())
+     .then(s => console.log('Estado:', s.status))
+   // Verificar que el estado se guardo correctamente
+   ```
+
+**Checklist de archivos a revisar al agregar un tipo de dispositivo:**
+- [ ] `device-types.js` - STATUS_MAP con acciones correctas
+- [ ] `routine-actions.js` - ACTIONS_MAP con acciones correctas
+- [ ] `device-helpers.js` - Estados personalizados en normalizeDevice
+- [ ] `DeviceDetailView.vue` - Estados personalizados en loadDeviceState
+- [ ] `stores/devices.js` - Estados personalizados en applyDeviceEvent
+
+---
+
+## [RESUELTO - 2026] Estados de alarma no reconocidos al recargar
 
 ### Sintoma (Parte 2 del problema de alarmas)
 - Al activar una alarma, funcionaba correctamente y se veia activada
