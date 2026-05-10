@@ -105,6 +105,17 @@ Cuando se usa un store global (Pinia, Vuex, etc) para gestionar estado de entida
 
 ---
 
+## [RESUELTO - 2025] Desalineacion masiva de acciones entre frontend y backend (404 Not Found)
+
+### Problema general
+Al migrar de acciones de toggle genericas a acciones especificas por tipo de dispositivo, varios dispositivos comenzaron a fallar con error 404 "action not found". El problema afecto a:
+- **Alarmas**: Frontend usaba `armHome`, backend tenia `armStay`
+- **Cortinas**: Frontend usaba `open`/`close`, backend tenia `up`/`down`
+
+Este fue un problema sistemico causado por asumir nombres de acciones sin verificar contra los deviceTypes reales del backend.
+
+---
+
 ## [RESUELTO - 2025] Acciones de alarma no existen en la API (404 Not Found)
 
 ### Sintoma
