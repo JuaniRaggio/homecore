@@ -45,7 +45,7 @@ export const STATUS_MAP = {
   door:    { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
   alarm:   { on: 'Activada',   off: 'Desactivada', actionOn: 'armAway', actionOff: 'disarm',  verbOn: 'activar',    verbOff: 'desactivar' },
   water:   { on: 'Abierto',    off: 'Cerrado',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
-  curtain: { on: 'Abierta',    off: 'Cerrada',     actionOn: 'open',    actionOff: 'close',   verbOn: 'abrir',      verbOff: 'cerrar' },
+  curtain: { on: 'Abierta',    off: 'Cerrada',     actionOn: 'up',      actionOff: 'down',    verbOn: 'subir',      verbOff: 'bajar' },
   vacuum:  { on: 'Activa',     off: 'Inactiva',    actionOn: 'start',   actionOff: 'dock',    verbOn: 'iniciar',    verbOff: 'detener' },
   speaker: { on: 'Reproduciendo', off: 'Detenido',  actionOn: 'play',    actionOff: 'stop',    verbOn: 'reproducir', verbOff: 'detener' },
 }

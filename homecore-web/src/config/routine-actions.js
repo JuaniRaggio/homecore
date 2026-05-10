@@ -26,8 +26,8 @@ export const ACTIONS_MAP = {
     ]},
   ],
   curtain: [
-    { actionName: 'open',     label: 'Abrir',    params: [] },
-    { actionName: 'close',    label: 'Cerrar',   params: [] },
+    { actionName: 'up',       label: 'Subir',    params: [] },
+    { actionName: 'down',     label: 'Bajar',    params: [] },
     { actionName: 'setLevel', label: 'Posicion', params: [{ type: 'number', min: 0, max: 100, step: 1, placeholder: '0-100' }] },
   ],
   ac: [
