@@ -26,26 +26,49 @@
     <section class="overview-section">
       <h2 class="section-title">Dispositivos criticos</h2>
       <p v-if="overview.loading.value" class="state-loading">Cargando...</p>
-      <p v-else-if="overview.criticalDevices.value.length === 0" class="state-empty">
+      <p v-else-if="overview.criticalDevices.value.length === 0 && alarmSummary.length === 0" class="state-empty">
         Sin alertas activas
       </p>
-      <div v-else class="critical-devices">
-        <div
-          v-for="device in overview.criticalDevices.value"
-          :key="device.id"
-          class="critical-device-item"
-        >
-          <i :class="device.type === 'alarm'
-            ? 'fa-solid fa-bell critical-icon critical-icon--alarm'
-            : 'fa-solid fa-door-open critical-icon critical-icon--door'"
-          ></i>
-          <div class="critical-device-info">
-            <span class="critical-device-name">{{ device.name }}</span>
-            <span class="critical-device-room">{{ device.room }}</span>
+      <template v-else>
+        <!-- Resumen de alarmas por casa -->
+        <div v-if="alarmSummary.length > 0" class="critical-devices alarm-summary">
+          <div v-for="home in alarmSummary" :key="home.homeId" class="critical-device-item">
+            <i class="fa-solid fa-shield-halved critical-icon" :class="home.allArmed ? 'critical-icon--armed' : 'critical-icon--alarm'"></i>
+            <div class="critical-device-info">
+              <span class="critical-device-name">{{ home.homeName }}</span>
+              <template v-if="home.allArmed">
+                <span class="alarm-status alarm-status--armed">Completamente armada</span>
+              </template>
+              <template v-else>
+                <span
+                  v-for="alarm in home.alarms"
+                  :key="alarm.name + alarm.room"
+                  class="alarm-status"
+                  :class="alarm.isOn ? 'alarm-status--armed' : 'alarm-status--disarmed'"
+                >
+                  {{ alarm.room }}::{{ alarm.isOn ? 'armada' : 'desarmada' }}
+                </span>
+              </template>
+            </div>
           </div>
-          <span class="critical-device-status">{{ device.statusText }}</span>
         </div>
-      </div>
+
+        <!-- Puertas abiertas -->
+        <div v-if="openDoors.length > 0" class="critical-devices">
+          <div
+            v-for="device in openDoors"
+            :key="device.id"
+            class="critical-device-item"
+          >
+            <i class="fa-solid fa-door-open critical-icon critical-icon--door"></i>
+            <div class="critical-device-info">
+              <span class="critical-device-name">{{ device.name }}</span>
+              <span class="critical-device-room">{{ device.room }}</span>
+            </div>
+            <span class="critical-device-status">{{ device.statusText }}</span>
+          </div>
+        </div>
+      </template>
     </section>
 
     <!-- Rutinas favoritas (cross-home) -->
@@ -120,6 +143,14 @@ const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
 
 const enrichedHomes = computed(() =>
   homesStore.homes.map(h => overview.enrichHome(h))
+)
+
+const alarmSummary = computed(() =>
+  overview.getAlarmSummary(homesStore.homes)
+)
+
+const openDoors = computed(() =>
+  overview.criticalDevices.value.filter(d => d.type === 'door')
 )
 
 onMounted(async () => {
@@ -197,6 +228,7 @@ onMounted(async () => {
 
 .critical-icon { font-size: var(--font-xl); }
 .critical-icon--alarm { color: var(--danger); }
+.critical-icon--armed { color: var(--success); }
 .critical-icon--door { color: var(--amber); }
 
 .critical-device-info {
@@ -219,6 +251,24 @@ onMounted(async () => {
 .critical-device-status {
   font-size: var(--font-sm);
   font-weight: 600;
+  color: var(--danger);
+}
+
+/* -- Resumen de alarmas -- */
+.alarm-summary {
+  margin-bottom: 8px;
+}
+
+.alarm-status {
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.alarm-status--armed {
+  color: var(--success);
+}
+
+.alarm-status--disarmed {
   color: var(--danger);
 }
 

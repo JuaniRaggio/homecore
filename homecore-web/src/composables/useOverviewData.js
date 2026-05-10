@@ -21,21 +21,52 @@ export function useOverviewData() {
     const active = devices.filter(d => d.isOn)
     const consumption = calcConsumption(devices, deviceTypes.value)
 
+    const alarms = devices.filter(d => d.type === 'alarm')
+    let alarmStatus = 'none'
+    if (alarms.length > 0) {
+      const armed = alarms.filter(a => a.isOn).length
+      if (armed === 0) alarmStatus = 'disarmed'
+      else if (armed === alarms.length) alarmStatus = 'armed'
+      else alarmStatus = 'partial'
+    }
+
     return {
       ...home,
       totalDevices: devices.length,
       activeDevices: active.length,
       consumption: Math.round(consumption),
+      alarmStatus,
     }
   }
 
   const criticalDevices = computed(() =>
     allDevices.value.filter(d => {
-      if (d.type === 'alarm' && d.isOn) return true
+      if (d.type === 'alarm') return true
       if (d.type === 'door' && d.statusText === 'Abierta') return true
       return false
     })
   )
+
+  /**
+   * Resumen de alarmas agrupadas por casa.
+   * Cada entrada: { homeId, homeName, allArmed, alarms: [{ name, room, isOn }] }
+   */
+  function getAlarmSummary(homes) {
+    return homes
+      .map(home => {
+        const devices = devicesByHome.value[home.id] || []
+        const alarms = devices.filter(d => d.type === 'alarm')
+        if (alarms.length === 0) return null
+        const allArmed = alarms.every(a => a.isOn)
+        return {
+          homeId: home.id,
+          homeName: home.name,
+          allArmed,
+          alarms: alarms.map(a => ({ name: a.name, room: a.room, isOn: a.isOn })),
+        }
+      })
+      .filter(Boolean)
+  }
 
   const totalConsumption = computed(() =>
     calcConsumption(allDevices.value, deviceTypes.value)
@@ -103,5 +134,6 @@ export function useOverviewData() {
     totalDeviceCount,
     enrichHome,
     fetchAllHomesDevices,
+    getAlarmSummary,
   }
 }

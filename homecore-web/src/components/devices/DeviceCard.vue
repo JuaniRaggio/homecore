@@ -24,7 +24,10 @@
     </div>
 
     <div class="device-card__footer">
-      <ToggleSwitch :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
+      <span v-if="device.type === 'alarm'" class="badge" :class="device.isOn ? 'badge--active' : 'badge--danger'">
+        {{ device.isOn ? 'Armada' : 'Desarmada' }}
+      </span>
+      <ToggleSwitch v-else :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
     </div>
   </div>
 </template>

@@ -32,7 +32,10 @@
             {{ statusLabel }}
           </span>
         </div>
-        <ToggleSwitch :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
+        <span v-if="device.type === 'alarm'" class="badge" :class="device.isOn ? 'badge--active' : 'badge--danger'">
+          {{ statusLabel }}
+        </span>
+        <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
       <div class="card card--xl controls-card">
@@ -160,6 +163,7 @@
       @close="deleteModal.close"
       @confirm="confirmDelete"
     />
+
   </div>
 </template>
 
