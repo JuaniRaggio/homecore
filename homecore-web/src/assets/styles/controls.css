@@ -128,3 +128,205 @@
   font-weight: 600;
   color: var(--accent);
 }
+
+/* Controles de cortina (DeviceCard) */
+.curtain-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.curtain-layout {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.curtain-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.curtain-window {
+  width: 50px;
+  height: 40px;
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1), var(--bg-card));
+  overflow: hidden;
+}
+
+.curtain-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.3s ease, background-color 0.3s ease;
+  background-color: var(--accent);
+  opacity: 0.85;
+}
+
+.curtain-percentage {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.curtain-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-curtain {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  min-width: 35px;
+}
+
+.btn-curtain:hover {
+  background-color: var(--card-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-curtain:active {
+  transform: scale(0.95);
+}
+
+.btn-curtain i {
+  font-size: var(--font-lg);
+}
+
+/* Controles de cortina (Vista detalle) */
+.curtain-controls-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.curtain-visual-large {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.curtain-window-large {
+  width: 80px;
+  height: 120px;
+  position: relative;
+  border: 3px solid var(--border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1), var(--bg-card));
+  overflow: hidden;
+}
+
+.curtain-overlay-large {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.3s ease, background-color 0.3s ease;
+  background-color: var(--accent);
+  opacity: 0.85;
+}
+
+.curtain-percentage-large {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.curtain-label {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+}
+
+.curtain-buttons-detail {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.btn-curtain-detail {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-base);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-curtain-detail:hover:not(:disabled) {
+  background-color: var(--card-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-curtain-detail:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-curtain-detail:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-curtain-detail i {
+  font-size: var(--font-lg);
+}
+
+.curtain-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.btn-preset {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-sm);
+  transition: all 0.2s;
+}
+
+.btn-preset:hover:not(:disabled) {
+  background-color: var(--card-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-preset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

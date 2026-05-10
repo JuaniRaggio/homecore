@@ -134,6 +134,7 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 </script>
 
 <style scoped>
+/* Estilos especificos de DeviceCard */
 .device-card {
   cursor: pointer;
   background-color: var(--bg-card);
@@ -156,14 +157,12 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   display: flex;
   justify-content: space-between;
   align-items: center;
-
 }
 
 .device-icon-wrap {
   font-size: var(--font-4xl);
   color: var(--accent);
 }
-
 
 .device-name {
   font-weight: 600;
@@ -188,89 +187,9 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   margin-top: auto;
 }
 
-/* Controles de cortina */
-.curtain-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+/* Los estilos de curtain-controls estan en src/assets/styles/controls.css */
 
-.curtain-layout {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-}
-
-.curtain-visual {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.curtain-window {
-  width: 50px;
-  height: 40px;
-  position: relative;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: linear-gradient(to bottom, rgba(255,255,255,0.1), var(--bg-card));
-  overflow: hidden;
-}
-
-.curtain-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  transition: height 0.3s ease, background-color 0.3s ease;
-  background-color: var(--accent);
-  opacity: 0.85;
-}
-
-.curtain-percentage {
-  font-size: var(--font-xs);
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.curtain-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.btn-curtain {
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  background-color: var(--bg-card);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: var(--font-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  min-width: 35px;
-}
-
-.btn-curtain:hover {
-  background-color: var(--card-hover);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.btn-curtain:active {
-  transform: scale(0.95);
-}
-
-.btn-curtain i {
-  font-size: var(--font-lg);
-}
-
-/* Controles de parlante */
+/* Controles de parlante (especificos de DeviceCard) */
 .speaker-controls {
   display: flex;
   flex-direction: column;
