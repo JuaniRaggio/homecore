@@ -265,6 +265,7 @@ Los colores de los gráficos se asignan por tipo de dispositivo de forma consist
   [3], [Resolución de 1280px a 1920px de ancho.], [Cumplido],
   [4], [Separación de estructura y presentación (HTML/CSS). Sin estilos inline en el HTML.], [Cumplido],
   [5], [Separación de estructura y comportamiento (HTML/JS). Sin handlers inline.], [Cumplido],
+  [8], [Diseño responsivo. Adaptación a distintos tamaños de pantalla.], [Cumplido],
 )
 
 *Nota sobre RNF4:* Se utilizó un sistema de CSS en capas: variables globales (design tokens), archivos de estilos compartidos por categoría (botones, formularios, tarjetas, tablas, controles) y estilos scoped en cada componente Vue para reglas específicas de la vista. Esta decisión se detalla en la sección de decisiones de diseño.
@@ -392,11 +393,58 @@ Los estilos de estos controles (`.control-row`, `.slider`, `.btn-control`, `.col
 
 *Justificación:* En las observaciones de la primera entrega, "la falta de feedback tras activar una acción generó mucha incertidumbre". El patrón de actualización optimista elimina el delay perceptible entre la acción y el resultado visual, mientras que la reversión en caso de error mantiene la consistencia del estado.
 
-== Navegación con sidebar colapsable y breadcrumbs
+== Navegación con sidebar fija y breadcrumbs
 
-*Decisión:* Se mantuvo la estructura de sidebar con 6 secciones principales, consistente con el prototipo. La barra superior muestra la ubicación actual (hogar / sección) como breadcrumb.
+*Decisión:* Se mantuvo la estructura de sidebar con 6 secciones principales, consistente con el prototipo. La barra superior muestra la ubicación actual (hogar / sección) como breadcrumb. Se eliminó la funcionalidad de colapsar la sidebar (reducirla de 220px a 60px) que estaba presente en una versión intermedia.
 
-*Justificación:* Consistente con la decisión de la primera entrega de aplicar la Ley de Hick (limitar opciones) y ofrecer orientación constante. La barra superior muestra `Casa Martinez / Dispositivos` para que el usuario sepa en todo momento dónde se encuentra, sirviendo como "salida de emergencia" (Nielsen \#3).
+*Justificación:* La sidebar colapsable presentaba un problema técnico: al reducir su ancho, el área de contenido (`page-content`) no ajustaba su `margin-left` correspondiente, dejando un espacio vacío entre la sidebar y el contenido. Más allá del bug, el collapse agregaba complejidad sin beneficio claro: en el rango obligatorio de 1280px a 1920px, la sidebar de 220px no compite con el espacio del contenido. Para pantallas angostas (menores a 768px), se adoptó un patrón de overlay mobile en lugar de collapse, como se detalla en la sección de diseño responsivo. La barra superior muestra `Casa Martinez / Dispositivos` para que el usuario sepa en todo momento dónde se encuentra, sirviendo como "salida de emergencia" (Nielsen \#3).
+
+== CSS manual vs. frameworks de componentes (Vuetify)
+
+*Decisión:* Se implementaron todos los estilos de la aplicación con CSS puro organizado en módulos (variables, botones, formularios, tarjetas, tablas, controles, layout) y estilos scoped por componente, sin utilizar frameworks de UI como Vuetify, Quasar o PrimeVue.
+
+*Justificación:* Esta decisión se fundamenta en criterios técnicos y pedagógicos:
+
+-- *Comprensión del modelo de caja y del flujo CSS:* Escribir las reglas de layout, flexbox, grid y media queries a mano obliga a entender cómo funciona el posicionamiento, el sizing y la respuesta a cambios de viewport. Un framework como Vuetify abstrae estos mecanismos detrás de props (`cols`, `sm`, `md`) y clases utilitarias, lo cual resuelve el problema pero no enseña el fundamento. Al implementar el responsive manualmente, cada decisión (cuándo apilar columnas, cuándo ocultar un elemento, cómo manejar overflow) es explícita y trazable en el código.
+
+-- *Control sobre el sistema de diseño:* HomeCore utiliza un sistema de design tokens propio (variables CSS para colores, tipografía, espaciado, radios) que define la identidad visual de la aplicación. Vuetify impone su propio sistema de diseño (Material Design) con tokens, componentes y convenciones que habría que sobrescribir extensivamente para lograr la estética definida en el prototipo. Esto introduce una capa de complejidad: se estaría trabajando _contra_ el framework en lugar de _con_ él.
+
+-- *Tamaño del bundle:* Vuetify agrega entre 200KB y 500KB al bundle comprimido, dependiendo de la configuración de tree-shaking. La aplicación actual, con CSS modular propio, tiene un CSS total de ~25KB gzip. Esta diferencia es significativa para la performance de carga inicial, especialmente relevante en el contexto de una aplicación de domotica donde los usuarios pueden acceder desde dispositivos con conectividad limitada.
+
+-- *Separación de responsabilidades (RNF4):* Al no depender de clases utilitarias mezcladas en el template (`<v-col cols="12" sm="6" md="4">`), la separación entre estructura HTML y presentación CSS se mantiene clara. Las reglas de layout viven en archivos CSS, no dispersas en atributos del template.
+
+-- *Responsabilidad del sizing en el componente correcto:* Al escribir CSS manual, se forzó una decisión arquitectónica importante: las grillas de layout (`items-grid`, `homes-grid`, `bottom-grid`) son las responsables de definir el tamaño de las celdas mediante `minmax()`, mientras que las tarjetas hijo (`DeviceCard`, `HomeCard`, `RoutineCard`) se adaptan al espacio disponible sin imponer anchos mínimos propios. En una versión intermedia, `DeviceCard` tenía `min-width: 240px` que hacía que las tarjetas desbordaran su contenedor cuando la grilla asignaba columnas más angostas. La corrección (cambiar a `min-width: 0`) ilustra el principio: el padre define el espacio, el hijo lo ocupa.
+
+== Diseño responsivo (RNF8)
+
+*Decisión:* Se implementó diseño responsivo con un breakpoint principal en 768px. Por debajo de ese ancho, la sidebar se oculta y el contenido ocupa el ancho completo. Se incorporó un botón de menú hamburguesa en la barra superior para acceder a la sidebar como overlay con backdrop semitransparente.
+
+*Justificación:* Si bien el RNF3 obligatorio solo exige soporte para resoluciones de 1280px a 1920px, se optó por implementar el RNF8 opcional (diseño responsivo) por las siguientes razones:
+
+-- *Perfil de usuario:* En la primera entrega se definieron modelos de persona que incluyen usuarios que gestionan su hogar desde dispositivos móviles (por ejemplo, verificar el estado de los dispositivos fuera de casa). Una aplicación de domotica que solo funciona en escritorio limita su utilidad al contexto del hogar, lo cual contradice uno de sus principales beneficios: el control remoto.
+
+-- *Principio de flexibilidad y eficiencia (Nielsen \#7):* La adaptación a distintos tamaños de pantalla permite que tanto usuarios novatos (que acceden desde el celular) como expertos (que usan un monitor de escritorio) tengan una experiencia funcional sin degradación.
+
+Las adaptaciones específicas por componente fueron:
+
+#table(
+  columns: (auto, 1fr),
+  align: (left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+  table.header([*Componente*], [*Adaptación en mobile (<=768px)*]),
+  [Sidebar], [Se oculta con `translateX(-100%)`. Aparece como overlay al tocar la hamburguesa. Un backdrop semitransparente permite cerrarla tocando fuera. Se cierra automáticamente al navegar.],
+  [TopBar], [Se muestra el botón hamburguesa. Se oculta el nombre de usuario (queda solo el avatar) para liberar espacio horizontal.],
+  [Layout general], [El `page-content` elimina el margen izquierdo de la sidebar y usa márgenes simétricos de 16px.],
+  [HomeView], [La grilla inferior (favoritos + rutinas) pasa de 2 columnas a 1. La sección de casa apila el panel de habitaciones y la isometría verticalmente.],
+  [OverviewView], [La grilla de propiedades pasa de auto-fill a 1 columna. Se reduce el tamaño del título de bienvenida.],
+  [DevicesView], [Los filtros de tipo y habitación se apilan verticalmente.],
+  [Wizard (rutinas)], [Los labels del stepper se ocultan y quedan solo los números. Las filas de acciones apilan sus elementos verticalmente. El stepper tiene `overflow: hidden` para que nunca desborde su contenedor independientemente del ancho.],
+  [Vistas existentes], [RoomsView, ConsumptionView, HistoryView, SettingsView, RoomDetailView ya eran responsivas por usar grillas con `auto-fill` o layouts naturalmente verticales.],
+)
+
+*Implementación técnica:* El estado de la sidebar mobile se maneja con un composable singleton (`useSidebar.js`) que expone un `ref` reactivo compartido entre la TopBar (que lo toglea) y la SideBar (que reacciona). Este patrón es consistente con otros composables de la aplicación (`useModal`, `useConfirmAction`) y evita acoplar los componentes mediante props o eventos.
 
 // ====================================
 // 7. DIFERENCIAS CON EL PROTOTIPO
