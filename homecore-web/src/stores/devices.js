@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
-import { normalizeDevice, calcConsumption, resolveTypeKey } from '@/utils/device-helpers'
+import { normalizeDevice, calcConsumption, resolveTypeKey, getCurtainLevelText } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 import { getStatusMap, getStatusText } from '@/config/device-types'
 
@@ -225,12 +225,7 @@ export const useDevicesStore = defineStore('devices', () => {
 
       // Update statusText for curtains based on level
       if (device.type === 'curtain') {
-        const level = state.level
-        if (level === 0) device.statusText = 'Cerrada'
-        else if (level <= 25) device.statusText = '25% abierta'
-        else if (level <= 50) device.statusText = '50% abierta'
-        else if (level <= 75) device.statusText = '75% abierta'
-        else device.statusText = 'Abierta'
+        device.statusText = getCurtainLevelText(state.level)
       }
     }
 

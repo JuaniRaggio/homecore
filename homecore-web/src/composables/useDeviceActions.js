@@ -33,7 +33,6 @@ export function useDeviceActions() {
 
     try {
       await api.executeAction(id, 'setLevel', [newLevel])
-      toast.show(`Cortina al ${newLevel}%`, 'success')
 
       devicesStore.applyDeviceEvent({
         id,
@@ -42,6 +41,11 @@ export function useDeviceActions() {
           level: newLevel
         }
       })
+
+      // Solo notificar cuando llega a totalmente abierta
+      if (newLevel === 100) {
+        toast.show('Cortina totalmente abierta', 'success')
+      }
     } catch (e) {
       console.error(`[useDeviceActions] Error subiendo cortina ${id}:`, e)
       toast.show(e.message || 'No se pudo subir la cortina.', 'error')
@@ -57,7 +61,6 @@ export function useDeviceActions() {
 
     try {
       await api.executeAction(id, 'setLevel', [newLevel])
-      toast.show(`Cortina al ${newLevel}%`, 'success')
 
       devicesStore.applyDeviceEvent({
         id,
@@ -66,6 +69,11 @@ export function useDeviceActions() {
           level: newLevel
         }
       })
+
+      // Solo notificar cuando llega a totalmente cerrada
+      if (newLevel === 0) {
+        toast.show('Cortina totalmente cerrada', 'success')
+      }
     } catch (e) {
       console.error(`[useDeviceActions] Error bajando cortina ${id}:`, e)
       toast.show(e.message || 'No se pudo bajar la cortina.', 'error')

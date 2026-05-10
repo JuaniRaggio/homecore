@@ -12,6 +12,42 @@ const TYPE_LABELS = {
   lock:    'Cerradura',
 }
 
+// Colores para niveles de cortina
+const CURTAIN_COLORS = {
+  CLOSED: '#ef4444',      // Rojo
+  LEVEL_20: '#ff6b6b',    // Rojo claro
+  LEVEL_40: '#f97316',    // Naranja
+  LEVEL_60: '#eab308',    // Amarillo
+  LEVEL_80: '#22c55e',    // Verde
+}
+
+/**
+ * Retorna el texto descriptivo del nivel de una cortina
+ * @param {number} level - Nivel de 0 a 100
+ * @returns {string}
+ */
+export function getCurtainLevelText(level) {
+  if (level === 0) return 'Cerrada'
+  if (level <= 20) return '20% abierta'
+  if (level <= 40) return '40% abierta'
+  if (level <= 60) return '60% abierta'
+  if (level <= 80) return '80% abierta'
+  return 'Abierta'
+}
+
+/**
+ * Retorna el color que corresponde al nivel de una cortina
+ * @param {number} level - Nivel de 0 a 100
+ * @returns {string} Color en formato hex
+ */
+export function getCurtainColor(level) {
+  if (level >= 80) return CURTAIN_COLORS.LEVEL_80
+  if (level >= 60) return CURTAIN_COLORS.LEVEL_60
+  if (level >= 40) return CURTAIN_COLORS.LEVEL_40
+  if (level >= 20) return CURTAIN_COLORS.LEVEL_20
+  return CURTAIN_COLORS.CLOSED
+}
+
 const TYPE_PATTERNS = [
   { key: 'light',   patterns: ['light', 'lamp', 'luz'] },
   { key: 'door',    patterns: ['door', 'puerta'] },
@@ -168,14 +204,7 @@ export function normalizeDevice(d, roomName, roomId, deviceTypes = []) {
   if (type === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
   if (type === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
   if (type === 'speaker') statusText = state.status === 'playing' ? 'Reproduciendo' : state.status === 'paused' ? 'Pausado' : 'Detenido'
-  if (type === 'curtain') {
-    const level = state.level ?? 0
-    if (level === 0) statusText = 'Cerrada'
-    else if (level <= 25) statusText = '25% abierta'
-    else if (level <= 50) statusText = '50% abierta'
-    else if (level <= 75) statusText = '75% abierta'
-    else statusText = 'Abierta'
-  }
+  if (type === 'curtain') statusText = getCurtainLevelText(state.level ?? 0)
 
   return {
     ...d,

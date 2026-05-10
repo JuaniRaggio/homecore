@@ -102,7 +102,7 @@
 import { computed } from 'vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import { useDevicesStore } from '@/stores/devices'
-import { getDisplayName } from '@/utils/device-helpers'
+import { getDisplayName, getCurtainLevelText, getCurtainColor } from '@/utils/device-helpers'
 import { getDeviceIcon } from '@/config/device-types'
 
 const devicesStore = useDevicesStore()
@@ -125,24 +125,8 @@ const displayName = computed(() => {
   return props.device.name
 })
 
-const curtainLevelText = computed(() => {
-  const level = props.device.level ?? 0
-  if (level === 0) return 'Cerrada'
-  if (level <= 25) return '25% abierta'
-  if (level <= 50) return '50% abierta'
-  if (level <= 75) return '75% abierta'
-  return 'Abierta'
-})
-
-const curtainColor = computed(() => {
-  const level = props.device.level ?? 0
-  // Verde (abierta) a rojo (cerrada)
-  // 100% = verde (#22c55e), 0% = rojo (#ef4444)
-  if (level >= 75) return '#22c55e'  // Verde
-  if (level >= 50) return '#eab308'  // Amarillo
-  if (level >= 25) return '#f97316'  // Naranja
-  return '#ef4444'  // Rojo
-})
+const curtainLevelText = computed(() => getCurtainLevelText(props.device.level ?? 0))
+const curtainColor = computed(() => getCurtainColor(props.device.level ?? 0))
 
 defineEmits(['toggle', 'toggle-favorite', 'open', 'curtain-up', 'curtain-down', 'speaker-power', 'speaker-previous', 'speaker-pause-resume', 'speaker-next'])
 
@@ -226,8 +210,8 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 }
 
 .curtain-window {
-  width: 35px;
-  height: 50px;
+  width: 50px;
+  height: 40px;
   position: relative;
   border: 2px solid var(--border);
   border-radius: var(--radius-sm);
