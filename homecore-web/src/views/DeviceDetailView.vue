@@ -583,23 +583,12 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Reutiliza globales: .view-narrow, .view-title, .detail-header, .detail-title-row,
+   .detail-actions, .detail-body, .btn-back, .icon-btn, .icon-btn--delete,
+   .card, .card--xl, .state-loading, .state-error */
+
 .device-detail {
   padding: 0;
-}
-
-.detail-header {
-  margin-bottom: 24px;
-}
-
-.detail-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.detail-actions {
-  display: flex;
-  gap: 6px;
 }
 
 .view-title {
@@ -609,12 +598,6 @@ onMounted(async () => {
 .device-room {
   font-size: var(--font-base);
   color: var(--text-muted);
-}
-
-.detail-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 /* Status card (layout sobre .card .card--xl) */

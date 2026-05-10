@@ -151,7 +151,7 @@ import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
 import { translateType, getDisplayName } from '@/utils/device-helpers'
-import { actionsFor, paramsFor } from '@/config/routine-actions'
+import { actionsFor, paramsFor, DAY_OPTIONS } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
 const route = useRoute()
@@ -165,16 +165,6 @@ const routineId = computed(() => route.params.routineId)
 const isEditMode = computed(() => !!routineId.value)
 
 const STEPS = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
-
-const DAY_OPTIONS = [
-  { value: 1, label: 'Lun' },
-  { value: 2, label: 'Mar' },
-  { value: 3, label: 'Mie' },
-  { value: 4, label: 'Jue' },
-  { value: 5, label: 'Vie' },
-  { value: 6, label: 'Sab' },
-  { value: 0, label: 'Dom' },
-]
 
 // State
 const step = ref(1)
@@ -361,12 +351,6 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 
-.action-device-name {
-  font-weight: 600;
-  font-size: var(--font-base);
-  min-width: 140px;
-}
-
 .action-controls {
   display: flex;
   align-items: center;
@@ -375,42 +359,6 @@ onMounted(async () => {
   flex: 1;
 }
 
-.action-select {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 8px 10px;
-  min-width: 160px;
-}
-
-.param-input {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 8px 10px;
-  width: 100px;
-}
-
-.param-input--color { width: 50px; height: 36px; padding: 4px; cursor: pointer; }
-
-/* Days */
-.days-row { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.day-btn {
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-
-.day-btn:hover { border-color: var(--accent); }
-.day-btn--active { background-color: var(--accent); color: #fff; border-color: var(--accent); }
+/* Reutiliza globales: .action-device-name, .action-select, .param-input,
+   .param-input--color, .days-row, .day-btn, .day-btn--active */
 </style>
