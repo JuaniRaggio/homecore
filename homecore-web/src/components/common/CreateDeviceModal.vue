@@ -16,6 +16,23 @@
         {{ translateType(dt.name) }}
       </option>
     </select>
+    <template v-if="isAlarm">
+      <input
+        v-model="newDeviceCode"
+        class="modal-input"
+        type="password"
+        placeholder="Codigo de seguridad (4 digitos)"
+        maxlength="4"
+      />
+      <input
+        v-model="newDeviceCodeConfirm"
+        class="modal-input"
+        type="password"
+        placeholder="Confirmar codigo"
+        maxlength="4"
+      />
+      <span v-if="codeError" class="modal-field-error">{{ codeError }}</span>
+    </template>
     <select v-if="!roomId" v-model="newDeviceRoom" class="modal-input">
       <option value="" disabled>Seleccionar habitacion</option>
       <option
@@ -39,7 +56,7 @@ import ModalBase from '@/components/common/ModalBase.vue'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoomsStore } from '@/stores/rooms'
 import { useToastStore } from '@/stores/toast'
-import { translateType } from '@/utils/device-helpers'
+import { translateType, resolveTypeKey } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 import * as api from '@/services/api'
 
@@ -60,7 +77,23 @@ const MIN_NAME_LENGTH = 3
 const newDeviceName = ref('')
 const newDeviceType = ref('')
 const newDeviceRoom = ref('')
+const newDeviceCode = ref('')
+const newDeviceCodeConfirm = ref('')
 const saving = ref(false)
+
+const isAlarm = computed(() => {
+  if (!newDeviceType.value) return false
+  const dt = devicesStore.deviceTypes.find(t => String(t.id) === String(newDeviceType.value))
+  return dt ? resolveTypeKey(dt.name) === 'alarm' : false
+})
+
+const codeError = computed(() => {
+  if (!newDeviceCode.value) return ''
+  if (!/^\d{4}$/.test(newDeviceCode.value)) return 'El codigo debe ser de 4 digitos numericos'
+  if (newDeviceCodeConfirm.value && newDeviceCode.value !== newDeviceCodeConfirm.value)
+    return 'Los codigos no coinciden'
+  return ''
+})
 
 const nameError = computed(() => {
   const name = newDeviceName.value.trim()
@@ -73,6 +106,10 @@ const canCreate = computed(() => {
   const name = newDeviceName.value.trim()
   if (!name || name.length < MIN_NAME_LENGTH || !newDeviceType.value) return false
   if (!props.roomId && !newDeviceRoom.value) return false
+  if (isAlarm.value) {
+    if (!newDeviceCode.value || !/^\d{4}$/.test(newDeviceCode.value)) return false
+    if (newDeviceCode.value !== newDeviceCodeConfirm.value) return false
+  }
   return true
 })
 
@@ -81,6 +118,8 @@ watch(() => props.visible, (val) => {
     newDeviceName.value = ''
     newDeviceType.value = ''
     newDeviceRoom.value = ''
+    newDeviceCode.value = ''
+    newDeviceCodeConfirm.value = ''
   }
 })
 
@@ -93,10 +132,14 @@ async function confirmCreate() {
   saving.value = true
   const targetRoom = props.roomId || newDeviceRoom.value
   try {
-    await api.createDevice(targetRoom, {
+    const payload = {
       name: newDeviceName.value.trim(),
       type: { id: newDeviceType.value },
-    })
+    }
+    if (isAlarm.value) {
+      payload.metadata = { securityCode: newDeviceCode.value }
+    }
+    await api.createDevice(targetRoom, payload)
     toast.show('Dispositivo creado', 'success')
     if (props.homeId) await devicesStore.fetchAllForHome(props.homeId)
     emit('created')

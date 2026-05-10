@@ -67,9 +67,11 @@
           v-else-if="device.type === 'alarm'"
           :is-on="device.isOn"
           :disabled="cmd.busy.value"
+          :has-code="!!device.metadata?.securityCode"
           @arm-away="handleArmAway"
           @arm-home="handleArmHome"
           @disarm="handleDisarm"
+          @change-code="handleChangeCode"
         />
         <WaterControls
           v-else-if="device.type === 'water'"
@@ -330,7 +332,17 @@ async function toggleLock() {
 }
 
 // --- Alarm ---
+function verifyAlarmCode(code) {
+  const stored = device.value.metadata?.securityCode
+  if (!stored) return true
+  return code === stored
+}
+
 async function handleArmAway(code) {
+  if (!verifyAlarmCode(code)) {
+    toast.show('Codigo de seguridad incorrecto', 'error')
+    return
+  }
   await cmd.execute(device.value.id, 'armAway', {
     params: [code],
     successMsg: describeAction(device.value.type, 'armAway'),
@@ -340,6 +352,10 @@ async function handleArmAway(code) {
 }
 
 async function handleArmHome(code) {
+  if (!verifyAlarmCode(code)) {
+    toast.show('Codigo de seguridad incorrecto', 'error')
+    return
+  }
   await cmd.execute(device.value.id, 'armHome', {
     params: [code],
     successMsg: describeAction(device.value.type, 'armHome'),
@@ -349,12 +365,36 @@ async function handleArmHome(code) {
 }
 
 async function handleDisarm(code) {
+  if (!verifyAlarmCode(code)) {
+    toast.show('Codigo de seguridad incorrecto', 'error')
+    return
+  }
   await cmd.execute(device.value.id, 'disarm', {
     params: [code],
     successMsg: describeAction(device.value.type, 'disarm'),
     errorMsg: actionError('desactivar la alarma'),
     onSuccess() { device.value.isOn = false },
   })
+}
+
+async function handleChangeCode(currentCode, newCode) {
+  if (!verifyAlarmCode(currentCode)) {
+    toast.show('Codigo actual incorrecto', 'error')
+    return
+  }
+  const body = {
+    name: device.value.name,
+    type: { id: device.value.typeId },
+    metadata: { ...(device.value.metadata || {}), securityCode: newCode },
+  }
+  if (device.value.roomId) body.room = { id: device.value.roomId }
+  try {
+    await devicesStore.updateDevice(device.value.id, body)
+    device.value.metadata = { ...device.value.metadata, securityCode: newCode }
+    toast.show('Codigo de seguridad actualizado', 'success')
+  } catch (e) {
+    toast.show(e.message || actionError('cambiar el codigo de seguridad'), 'error')
+  }
 }
 
 async function setPositionTo(value) {
