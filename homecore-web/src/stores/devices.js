@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as api from '@/services/api'
 import pLimit from 'p-limit'
-import { normalizeDevice, calcConsumption, resolveTypeKey } from '@/utils/device-helpers'
+import { normalizeDevice, calcConsumption, resolveTypeKey, getCurtainLevelText } from '@/utils/device-helpers'
 import { friendlyError } from '@/utils/friendly-error'
 import { getStatusMap, getStatusText } from '@/config/device-types'
 
@@ -213,12 +213,30 @@ export const useDevicesStore = defineStore('devices', () => {
       device.isOn = state.status === 'on' || state.status === 'opened'
         || state.status === 'active' || state.status === 'playing'
         || state.status === 'armedStay' || state.status === 'armedAway'
+
+      // Track playing state for speakers
+      if (device.type === 'speaker') {
+        device.isPlaying = state.status === 'playing'
+      }
+    }
+
+    if (state.level !== undefined) {
+      device.level = state.level
+
+      // Update statusText for curtains based on level
+      if (device.type === 'curtain') {
+        device.statusText = getCurtainLevelText(state.level)
+      }
     }
 
     if (state.lock !== undefined) {
       device.statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
     } else if (state.status !== undefined) {
-      device.statusText = getStatusText(device.type, device.isOn)
+      if (device.type === 'speaker') {
+        device.statusText = state.status === 'playing' ? 'Reproduciendo' : state.status === 'paused' ? 'Pausado' : 'Detenido'
+      } else {
+        device.statusText = getStatusText(device.type, device.isOn)
+      }
     }
   }
 

@@ -27,29 +27,7 @@
            </div>
         </div>
 
-        <div class="room-card__body">
-          <div v-for="device in room.devices" :key="device.id" class="room-device">
-            <span class="device-name">{{ device.name }}</span>
-            <div class="device-row__controls" @click.stop>
-              <ToggleSwitch :model-value="device.isOn" @update:model-value="deviceActions.toggleDevice(device.id)" />
-              <button class="icon-btn icon-btn--sm" @click="editDevice(device)" title="Ver detalle">
-                <i class="fa-regular fa-pen-to-square"></i>
-              </button>
-              <button class="icon-btn icon-btn--sm icon-btn--delete" @click="unlinkConfirm.request(device.id)" title="Desvincular">
-                <i class="fa-solid fa-link-slash"></i>
-              </button>
-            </div>
-          </div>
-          <p v-if="room.devices.length === 0" class="no-devices">Sin dispositivos vinculados</p>
-        </div>
-
-
-         <div class="room-card__footer" @click.stop>
-          <button class="btn-dashed" @click="openLinkModal(room)">
-            <i class="fa-solid fa-plus"></i> Vincular dispositivo
-          </button>
-        </div>
-
+        <p class="room-device-count">{{ room.devices.length }} dispositivo{{ room.devices.length !== 1 ? 's' : '' }}</p>
 
       </div>
     </div>
@@ -83,25 +61,6 @@
       @confirm="confirmDeleteRoom"
     />
 
-    <ConfirmModal
-      :visible="unlinkConfirm.visible.value"
-      title="Desvincular dispositivo"
-      description="Estas seguro de que queres desvincular este dispositivo de la habitacion?"
-      confirm-label="Desvincular"
-      confirming-label="Desvinculando..."
-      :danger="true"
-      :loading="unlinkConfirm.loading.value"
-      @close="unlinkConfirm.close"
-      @confirm="confirmUnlink"
-    />
-
-    <LinkDeviceModal
-      :visible="linkDeviceModal.visible.value"
-      :devices="availableDevices"
-      :loading="linking"
-      @close="closeLinkModal"
-      @link="confirmLinkDevice"
-    />
 
   </div>
 </template>
@@ -109,13 +68,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
-import LinkDeviceModal from '@/components/common/LinkDeviceModal.vue'
 import { useToastStore } from '@/stores/toast'
-import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
 import { useConfirmAction } from '@/composables/useConfirmAction'
 import { useHomeData } from '@/composables/useHomeData'
@@ -125,17 +81,12 @@ import * as api from '@/services/api'
 const router = useRouter()
 const { homeId, devicesStore, roomsStore } = useHomeData()
 const toast = useToastStore()
-const deviceActions = useDeviceActions()
 
 const rooms = computed(() =>
   roomsStore.rooms.map(room => ({
     ...room,
     devices: devicesStore.devices.filter(d => d.room === room.name)
   }))
-)
-
-const availableDevices = computed(() =>
-  devicesStore.devices.filter(d => !d.room)
 )
 
 // Loading state for edit room
@@ -156,16 +107,6 @@ async function confirmDeleteRoom() {
   })
 }
 
-// Unlink device confirmation
-const unlinkConfirm = useConfirmAction()
-
-async function confirmUnlink() {
-  await unlinkConfirm.confirm(async (deviceId) => {
-    await api.unlinkDeviceFromRoom(deviceId)
-    devicesStore.clearDeviceRoom(deviceId)
-    toast.show('Dispositivo desvinculado', 'success')
-  })
-}
 
 // Create room modal
 const createRoomModal = useModal()
@@ -198,44 +139,10 @@ async function confirmEditRoom(name) {
   }
 }
 
-function editDevice(device) {
-  router.push({ name: 'device-detail', params: { homeId: homeId.value, id: device.id } })
-}
-
 function openRoom(roomId) {
   router.push({ name: 'room-detail', params: { homeId: homeId.value, roomId } })
 }
 
-// Link device modal
-const linkDeviceModal = useModal()
-const linkingRoom = ref(null)
-const linking = ref(false)
-
-function openLinkModal(room) {
-  linkingRoom.value = room
-  linkDeviceModal.open()
-}
-
-function closeLinkModal() {
-  linkDeviceModal.close()
-  linkingRoom.value = null
-}
-
-async function confirmLinkDevice(deviceId) {
-  if (!linkingRoom.value || linking.value) return
-  linking.value = true
-  try {
-    await api.linkDeviceToRoom(linkingRoom.value.id, deviceId)
-    toast.show('Dispositivo vinculado', 'success')
-    if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
-    closeLinkModal()
-  } catch (e) {
-    console.error(`[Rooms] Error vinculando dispositivo ${deviceId} a habitacion ${linkingRoom.value.id}:`, e)
-    toast.show(e.message || actionError('vincular el dispositivo a la habitacion'), 'error')
-  } finally {
-    linking.value = false
-  }
-}
 </script>
 <style scoped>
 .rooms-grid {
@@ -276,32 +183,10 @@ async function confirmLinkDevice(deviceId) {
   align-items: center;
 }
 
-.room-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.room-device {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.device-row__controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.no-devices {
-  font-size: var(--font-base);
+.room-device-count {
+  font-size: var(--font-sm);
   color: var(--text-muted);
   margin: 0;
-}
-
-.room-card__footer {
-  margin-top: 4px;
 }
 
 

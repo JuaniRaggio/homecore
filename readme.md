@@ -129,12 +129,12 @@ Este fue un problema sistemico causado por asumir nombres de acciones sin verifi
 
 El frontend esperaba que las alarmas tuvieran estas acciones:
 - `armAway` (Activar modo regular)
-- **`armHome`** (Activar modo casa) ← **Problema**
+- **`armHome`** (Activar modo casa) <- **Problema**
 - `disarm` (Desactivar)
 
 Pero el `deviceType` de alarma en el backend tenia:
 - `armAway` ✓
-- **`armStay`** ← **Nombre diferente**
+- **`armStay`** <- **Nombre diferente**
 - `disarm` ✓
 
 La API devolvia 404 porque el frontend intentaba ejecutar `armHome`, pero esa accion no existia en el `deviceType` - se llamaba `armStay`.
@@ -180,8 +180,8 @@ El frontend esperaba:
 - `setLevel` (Posicion) ✓
 
 El backend tenia:
-- **`up`** (Subir) ← Nombre diferente
-- **`down`** (Bajar) ← Nombre diferente
+- **`up`** (Subir) <- Nombre diferente
+- **`down`** (Bajar) <- Nombre diferente
 - `setLevel` ✓
 
 ### Solucion implementada
@@ -234,15 +234,15 @@ curtain: [
    ```
 
 3. **Frontend - actualizar configuraciones:**
-   - `device-types.js` → `STATUS_MAP` con acciones correctas
-   - `routine-actions.js` → `ACTIONS_MAP` con acciones correctas
+   - `device-types.js` - `STATUS_MAP` con acciones correctas
+   - `routine-actions.js` - `ACTIONS_MAP` con acciones correctas
 
 4. **Frontend - actualizar interpretacion de estados:**
    - Si el deviceType usa estados personalizados (ej: `armedStay`, no solo `on`/`off`)
    - Agregar esos estados a:
-     - `device-helpers.js` → `normalizeDevice()`
-     - `DeviceDetailView.vue` → `loadDeviceState()`
-     - `stores/devices.js` → `applyDeviceEvent()`
+     - `device-helpers.js` - `normalizeDevice()`
+     - `DeviceDetailView.vue` - `loadDeviceState()`
+     - `stores/devices.js` - `applyDeviceEvent()`
 
 5. **Probar:**
    ```javascript
@@ -302,9 +302,9 @@ isOn = state.status === 'on' || state.status === 'opened'
 ```
 
 Y enviar los estados correctos al store:
-- `armAway` → `{ status: 'armedAway' }`
-- `armStay` → `{ status: 'armedStay' }`
-- `disarm` → `{ status: 'disarmed' }`
+- `armAway` - `{ status: 'armedAway' }`
+- `armStay` - `{ status: 'armedStay' }`
+- `disarm` - `{ status: 'disarmed' }`
 
 ### Archivos modificados
 - `src/utils/device-helpers.js`: Estado de alarma en `normalizeDevice()`
@@ -317,6 +317,73 @@ Cuando se usan tipos de dispositivos con estados especificos (no genericos como 
 - Funciones de carga de estado
 - Actualizaciones del store desde eventos
 - Callbacks de acciones exitosas
+
+---
+
+## [MEJORA UX - 2026] Experiencia de usuario mejorada para control de cortinas
+
+### Mejoras implementadas
+
+**1. Representación visual intuitiva**
+- Reemplazo del badge horizontal con texto por una ventana vertical que muestra físicamente la posición de la cortina
+- La ventana tiene un overlay que baja desde arriba, representando la cortina
+- Cuando level = 0%, el overlay cubre el 100% (totalmente cerrada)
+- Cuando level = 100%, el overlay cubre el 0% (totalmente abierta)
+- Código de colores progresivo:
+  - Rojo (#ef4444) - Cerrada (0%)
+  - Rojo claro (#ff6b6b) - 20%
+  - Naranja (#f97316) - 40%
+  - Amarillo (#eab308) - 60%
+  - Verde (#22c55e) - 80-100%
+
+**2. Controles incrementales**
+- Los botones suben/bajan la cortina de 20 en 20 puntos (no 0-100 directamente)
+- Permite ajuste gradual y preciso de la posición
+- Los niveles posibles son: 0%, 20%, 40%, 60%, 80%, 100%
+- Textos de estado alineados con los steps: "Cerrada", "20% abierta", "40% abierta", etc.
+
+**3. Feedback visual sin notificaciones molestas**
+- Eliminación de toasts en cada click (redundante con feedback visual)
+- Notificaciones solo en estados importantes:
+  - Toast cuando alcanza 100%: "Cortina totalmente abierta"
+  - Toast cuando alcanza 0%: "Cortina totalmente cerrada"
+- El feedback principal es visual: el dibujo se actualiza, el porcentaje cambia, y el texto de estado se actualiza
+- Reduce la fatiga de notificaciones cuando el usuario está ajustando la posición
+
+**4. Consistencia y mantenibilidad**
+- Centralización de lógica en funciones helper exportadas:
+  - `getCurtainLevelText(level)` - Calcula el texto descriptivo
+  - `getCurtainColor(level)` - Calcula el color correspondiente
+- Constantes de colores con nombres descriptivos (CURTAIN_COLORS)
+- Eliminación de duplicación de código en 4 lugares diferentes
+- Fuente única de verdad para rangos y textos
+
+**5. Dimensiones optimizadas por contexto**
+- **DeviceCard** (vista general): Ventana 50x40px (horizontal, compacta)
+- **CurtainControls** (vista detalle): Ventana 80x120px (vertical, clara)
+- Botones de preset adicionales en vista de detalle: 0%, 20%, 40%, 60%, 80%, 100%
+
+### Beneficios de UX
+
+1. **Feedback inmediato y claro**: El usuario ve exactamente dónde está la cortina sin necesidad de interpretar un porcentaje numérico
+2. **Menos ruido visual**: Notificaciones solo en momentos importantes
+3. **Control preciso**: Steps de 20% permiten ajuste granular
+4. **Diseño intuitivo**: La metáfora de la ventana es inmediatamente comprensible
+
+### Archivos modificados
+- `src/utils/device-helpers.js`: Funciones helper y constantes de colores
+- `src/stores/devices.js`: Uso de funciones centralizadas
+- `src/components/devices/DeviceCard.vue`: Representación visual compacta
+- `src/components/devices/CurtainControls.vue`: Representación visual detallada
+- `src/composables/useDeviceActions.js`: Lógica de incrementos de 20 y notificaciones selectivas
+
+### Principios de diseño aplicados
+
+1. **Progressive disclosure**: Información visual inmediata, detalles en hover/interacción
+2. **Feedback inmediato**: Cambios visuales instantáneos sin latencia perceptible
+3. **Mapeo natural**: La representación visual corresponde directamente al estado físico
+4. **Reducción de carga cognitiva**: No requiere interpretar números o textos, es visual
+5. **Notificaciones mínimas**: Solo alertar en momentos críticos
 
 ---
 
