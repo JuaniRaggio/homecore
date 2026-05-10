@@ -133,3 +133,17 @@ export function describeAction(typeName, actionName, params) {
 
   return `${label}: ${value}`
 }
+
+/* Opciones de dias de la semana (compartidas por NewRoutineView, EditRoutineView) */
+export const DAY_OPTIONS = [
+  { value: 1, label: 'Lun' },
+  { value: 2, label: 'Mar' },
+  { value: 3, label: 'Mie' },
+  { value: 4, label: 'Jue' },
+  { value: 5, label: 'Vie' },
+  { value: 6, label: 'Sab' },
+  { value: 0, label: 'Dom' },
+]
+
+export const DAY_LABELS = { 0: 'Dom', 1: 'Lun', 2: 'Mar', 3: 'Mie', 4: 'Jue', 5: 'Vie', 6: 'Sab' }
+export const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]
