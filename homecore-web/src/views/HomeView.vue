@@ -23,6 +23,9 @@
       <button class="icon-btn icon-btn--delete" @click="deleteHomeConfirm.request(homeId)" title="Eliminar hogar">
         <i class="fa-regular fa-trash-can"></i>
       </button>
+      <button class="btn-invite" @click="inviteModal.open">
+        <i class="fa-solid fa-user-plus"></i> Agregar invitado
+      </button>
     </div>
 
     <div class="house-inner">
@@ -135,6 +138,12 @@
     @close="deleteHomeConfirm.close"
     @confirm="confirmDeleteHome"
   />
+
+  <InviteGuestModal
+    :visible="inviteModal.visible.value"
+    :home-id="String(homeId)"
+    @close="inviteModal.close"
+  />
   </template>
 </template>
 
@@ -146,6 +155,7 @@ import RoutineRow from '@/components/routines/RoutineRow.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
+import InviteGuestModal from '@/components/common/InviteGuestModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
@@ -227,6 +237,9 @@ const newRoomModal = useModal()
 
 // Modal editar hogar
 const editHomeModal = useModal()
+
+// Modal invitar invitado
+const inviteModal = useModal()
 
 async function confirmEditHome(name) {
   saving.value = true
@@ -420,6 +433,26 @@ onMounted(() => {
 .routines-list {
   display: flex;
   flex-direction: column;
+}
+
+.btn-invite {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-invite:hover {
+  opacity: 0.85;
 }
 
 @media (max-width: 768px) {
