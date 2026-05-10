@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHomesStore } from '@/stores/homes'
 import { useSidebar } from '@/composables/useSidebar'
@@ -52,6 +52,12 @@ const homeId = computed(() => route.params.homeId)
 const showHomeMenu = ref(false)
 
 const { mobileOpen, closeMobile } = useSidebar()
+
+onMounted(() => {
+  if (homesStore.homes.length === 0) {
+    homesStore.fetchHomes()
+  }
+})
 
 const houseName = computed(() => {
   if (!homeId.value) return 'HomeCore'
