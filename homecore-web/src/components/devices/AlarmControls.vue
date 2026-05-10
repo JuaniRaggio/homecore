@@ -22,7 +22,7 @@
       </button>
     </div>
 
-    <div v-if="hasCode" class="control-divider"></div>
+    <div v-if="hasCode" class="card-divider"></div>
 
     <button
       v-if="hasCode && !showChangeCode"
@@ -32,7 +32,7 @@
       <i class="fa-solid fa-key"></i> Cambiar codigo de seguridad
     </button>
 
-    <div v-if="hasCode && showChangeCode" class="change-code-form">
+    <div v-if="hasCode && showChangeCode" class="form-group">
       <input
         type="password"
         class="control-input"
@@ -100,17 +100,4 @@ function emitChangeCode() {
 }
 </script>
 
-<style scoped>
-.control-divider {
-  border: none;
-  border-top: 1px solid var(--border-color);
-  margin: 16px 0;
-}
-
-.change-code-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-</style>
+<!-- Estilos en controls.css, cards.css, forms.css, buttons.css globales -->
