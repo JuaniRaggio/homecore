@@ -47,6 +47,64 @@ Cuando se usa `pLimit` con multiples niveles de paralelizacion anidados (Promise
 
 ---
 
+## [RESUELTO - 2025] Estado de alarmas no persiste entre vistas
+
+### Sintoma
+- Al activar/desactivar una alarma en `DeviceDetailView`, el cambio se ve reflejado inmediatamente
+- Al salir de la vista y volver a entrar, la alarma aparece en su estado anterior (desactivada)
+- El mismo problema afectaba potencialmente a otros dispositivos con acciones de encendido/apagado
+
+### Causa raiz
+**Falta de sincronizacion entre estado local y store global**
+
+Cuando se ejecutaba una accion sobre un dispositivo (ej: `armAway`, `disarm`, `togglePower`), el codigo solo actualizaba el estado local de `DeviceDetailView`:
+
+```javascript
+onSuccess() {
+  device.value.isOn = true  // Solo actualiza la vista actual
+}
+```
+
+El problema era que el store de dispositivos (`useDevicesStore`) NO se actualizaba, entonces:
+
+1. Si el dispositivo estaba en el store (cargado previamente en otra vista), el store mantenia el estado viejo
+2. Al salir y volver a la vista, `onMounted` recargaba el dispositivo, y si venia desde el store o cache, mostraba el estado desactualizado
+3. Otros componentes que mostraban el mismo dispositivo (ej: Overview) tampoco veian el cambio
+
+### Solucion implementada
+Actualizar tambien el store global despues de cada accion exitosa usando el metodo `applyDeviceEvent` que ya existia para eventos de websocket:
+
+```javascript
+onSuccess() {
+  device.value.isOn = true  // Actualiza vista local
+  // Actualiza el store tambien para que persista entre vistas
+  devicesStore.applyDeviceEvent({
+    id: device.value.id,
+    data: { status: 'on' }
+  })
+}
+```
+
+Esto garantiza que:
+- El estado se persiste en el store global
+- Otras vistas que muestren el mismo dispositivo ven el cambio
+- Al volver a la vista, el estado se mantiene correcto (si el dispositivo esta en el store)
+
+### Archivos modificados
+- `src/views/DeviceDetailView.vue`: Actualizacion del store en `handleArmAway`, `handleArmHome`, `handleDisarm`, y `togglePower`
+
+### Nota importante
+Esta solucion asume que:
+1. La API esta persistiendo correctamente el cambio de estado en el backend
+2. El dispositivo ya esta cargado en el store (si no lo esta, `applyDeviceEvent` no tiene efecto)
+
+Si el problema persiste despues de este fix, significa que **la API no esta guardando el estado** y hay que investigar el backend.
+
+### Leccion aprendida
+Cuando se usa un store global (Pinia, Vuex, etc) para gestionar estado de entidades, SIEMPRE actualizar el store despues de mutaciones locales exitosas. No basta con actualizar el estado local de la vista - otros componentes y navegacion entre vistas dependen del store como fuente de verdad.
+
+---
+
 # Problemas de vista para solucionar
 
 ## Responsiveness
