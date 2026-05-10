@@ -1,5 +1,5 @@
 <template>
-  <div class="routine-card" :class="{ 'routine-card--inactive': !routine.isActive }">
+  <div class="routine-card" :class="{ 'routine-card--inactive': !routine.isActive }" @click="$emit('open', routine.id)">
     <div class="routine-card__header">
       <div class="routine-card__title-wrap">
         <span class="routine-name">{{ routine.name }}</span>
@@ -9,14 +9,16 @@
         <span
           class="star"
           :class="{ 'star--yellow': routine.isFavorite }"
-          @click="$emit('toggle-favorite', routine.id)"
+          @click.stop="$emit('toggle-favorite', routine.id)"
         >
           <i :class="routine.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
         </span>
-        <ToggleSwitch
-          :model-value="routine.isActive"
-          @update:model-value="$emit('toggle-active', routine.id)"
-        />
+        <span @click.stop>
+          <ToggleSwitch
+            :model-value="routine.isActive"
+            @update:model-value="$emit('toggle-active', routine.id)"
+          />
+        </span>
       </div>
     </div>
 
@@ -32,9 +34,7 @@
     </div>
 
     <div class="routine-card__footer">
-      <button class="btn-exec" @click="$emit('execute', routine.id)">Ejecutar Ahora</button>
-      <button class="btn-detail" @click="$emit('edit', routine.id)">Editar</button>
-      <button class="btn-detail" @click="$emit('view-detail', routine.id)">Ver detalle</button>
+      <button class="btn-exec" @click.stop="$emit('execute', routine.id)">Ejecutar Ahora</button>
     </div>
   </div>
 </template>
@@ -59,7 +59,7 @@ defineProps({
   }
 })
 
-defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail', 'edit'])
+defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'open'])
 </script>
 
 <style scoped>
@@ -72,6 +72,7 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail', 'edit
   flex-direction: column;
   gap: 14px;
   transition: background-color 0.2s;
+  cursor: pointer;
 }
 
 .routine-card:hover {
