@@ -23,7 +23,9 @@
       {{ device.statusText }}
     </div>
 
-    <ToggleSwitch :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
+    <div class="device-card__footer">
+      <ToggleSwitch :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
+    </div>
   </div>
 </template>
 
@@ -108,5 +110,9 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 
 .status--on {
   color: var(--success);
+}
+
+.device-card__footer {
+  margin-top: auto;
 }
 </style>
