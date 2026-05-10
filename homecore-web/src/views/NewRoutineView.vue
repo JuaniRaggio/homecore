@@ -229,12 +229,11 @@ async function submit() {
   try {
     const payload = {
       name: form.name.trim(),
-      home: { id: homeId.value },
       description: form.description.trim(),
       actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
-      metadata: {},
+      metadata: { homeId: homeId.value },
     }
 
     if (isEditMode.value) {

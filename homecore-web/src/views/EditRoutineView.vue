@@ -261,7 +261,6 @@ async function handleSave() {
   try {
     const payload = {
       name: form.name.trim(),
-      home: { id: route.params.homeId },
       description: form.description.trim(),
       actions: actions.value
         .filter(a => a.actionName)
@@ -272,7 +271,7 @@ async function handleSave() {
         })),
       time: form.time,
       days: form.days,
-      metadata: {},
+      metadata: { homeId: route.params.homeId },
     }
 
     await routinesStore.update(route.params.routineId, payload)

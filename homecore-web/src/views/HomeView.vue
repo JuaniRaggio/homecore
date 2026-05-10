@@ -171,7 +171,12 @@ const routineActions = useRoutineActions()
 const currentHome = computed(() => homesStore.getById(homeId.value))
 
 const favoriteDevices = computed(() => devicesStore.favoriteDevices)
-const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
+const favoriteRoutines = computed(() =>
+  routinesStore.favoriteRoutines.filter(r => {
+    const rHomeId = r.metadata?.homeId
+    return rHomeId && String(rHomeId) === String(homeId.value)
+  })
+)
 const rooms = computed(() => roomsStore.rooms)
 
 const stats = computed(() => ({

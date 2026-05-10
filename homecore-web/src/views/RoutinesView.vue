@@ -7,7 +7,7 @@
 
     <p v-if="routinesStore.loading" class="state-loading">Cargando rutinas...</p>
     <p v-else-if="routinesStore.error" class="state-error">{{ routinesStore.error }}</p>
-    <p v-else-if="routinesStore.routines.length === 0" class="state-empty">Sin rutinas</p>
+    <p v-else-if="routines.length === 0" class="state-empty">Sin rutinas en esta propiedad</p>
     <div v-else class="items-grid">
       <RoutineCard
         v-for="routine in routines"
@@ -36,7 +36,13 @@ const router = useRouter()
 const routinesStore = useRoutinesStore()
 const toast = useToastStore()
 const routineActions = useRoutineActions()
-const routines = computed(() => routinesStore.routines)
+const homeId = computed(() => route.params.homeId)
+const routines = computed(() =>
+  routinesStore.routines.filter(r => {
+    const rHomeId = r.metadata?.homeId
+    return rHomeId && String(rHomeId) === String(homeId.value)
+  })
+)
 
 function openCreateModal() {
   router.push({ name: 'new-routine', params: { homeId: route.params.homeId } })
