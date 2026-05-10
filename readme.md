@@ -105,6 +105,54 @@ Cuando se usa un store global (Pinia, Vuex, etc) para gestionar estado de entida
 
 ---
 
+## [RESUELTO - 2025] Acciones de alarma no existen en la API (404 Not Found)
+
+### Sintoma
+- Al intentar activar/desactivar una alarma, aparecia un error 404
+- En consola: `Error: action with name 'armHome' for device with id 'xxx' not found`
+- Las acciones `armAway`, `armHome`, `disarm` fallaban con 404
+- Otros dispositivos (luces, puertas, etc.) funcionaban correctamente
+
+### Causa raiz
+**Desalineacion entre nombres de acciones en frontend y backend**
+
+El frontend esperaba que las alarmas tuvieran estas acciones:
+- `armAway` (Activar modo regular)
+- **`armHome`** (Activar modo casa) ← **Problema**
+- `disarm` (Desactivar)
+
+Pero el `deviceType` de alarma en el backend tenia:
+- `armAway` ✓
+- **`armStay`** ← **Nombre diferente**
+- `disarm` ✓
+
+La API devolvia 404 porque el frontend intentaba ejecutar `armHome`, pero esa accion no existia en el `deviceType` - se llamaba `armStay`.
+
+### Solucion implementada
+Actualizar el frontend para usar `armStay` en vez de `armHome`:
+
+```javascript
+// Antes
+await cmd.execute(device.value.id, 'armHome', { ... })
+
+// Despues
+await cmd.execute(device.value.id, 'armStay', { ... })
+```
+
+### Archivos modificados
+- `src/views/DeviceDetailView.vue`: Cambio de `armHome` a `armStay` en handler
+- `src/config/routine-actions.js`: Actualizacion de nombre de accion para rutinas
+
+### Leccion aprendida
+Al crear `deviceTypes` personalizados en el backend con acciones especificas, SIEMPRE verificar que los nombres de las acciones coincidan exactamente entre frontend y backend. La API devuelve 404 si la accion no existe en el `deviceType`, aunque el dispositivo este configurado correctamente.
+
+**Como verificar acciones disponibles:**
+1. Obtener el `typeId` del dispositivo: `GET /devices/{id}`
+2. Consultar las acciones del tipo: `GET /devicetypes/{typeId}`
+3. Verificar que `actions[].name` coincida con lo que el frontend intenta ejecutar
+
+---
+
 # Problemas de vista para solucionar
 
 ## Responsiveness
