@@ -167,6 +167,7 @@ export function normalizeDevice(d, roomName, roomId, deviceTypes = []) {
   let statusText = isOn ? 'Encendido' : 'Apagado'
   if (type === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
   if (type === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
+  if (type === 'speaker') statusText = state.status === 'playing' ? 'Reproduciendo' : state.status === 'paused' ? 'Pausado' : 'Detenido'
 
   return {
     ...d,
@@ -177,5 +178,7 @@ export function normalizeDevice(d, roomName, roomId, deviceTypes = []) {
     isOn,
     isFavorite: d.metadata?.favorite || d.meta?.favorite || d.isFavorite || false,
     statusText,
+    level: state.level !== undefined ? state.level : null,
+    isPlaying: type === 'speaker' && state.status === 'playing',
   }
 }

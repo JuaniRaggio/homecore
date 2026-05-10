@@ -20,6 +20,12 @@
         :show-room="false"
         @toggle="deviceActions.toggleDevice"
         @toggle-favorite="deviceActions.toggleFavorite"
+        @curtain-up="deviceActions.curtainUp"
+        @curtain-down="deviceActions.curtainDown"
+        @speaker-power="deviceActions.speakerPower"
+        @speaker-previous="deviceActions.speakerPrevious"
+        @speaker-pause-resume="deviceActions.speakerPauseResume"
+        @speaker-next="deviceActions.speakerNext"
         @open="id => router.push({ name: 'device-detail', params: { homeId, id } })"
       />
     </div>

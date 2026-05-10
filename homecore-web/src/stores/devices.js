@@ -213,12 +213,25 @@ export const useDevicesStore = defineStore('devices', () => {
       device.isOn = state.status === 'on' || state.status === 'opened'
         || state.status === 'active' || state.status === 'playing'
         || state.status === 'armedStay' || state.status === 'armedAway'
+
+      // Track playing state for speakers
+      if (device.type === 'speaker') {
+        device.isPlaying = state.status === 'playing'
+      }
+    }
+
+    if (state.level !== undefined) {
+      device.level = state.level
     }
 
     if (state.lock !== undefined) {
       device.statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
     } else if (state.status !== undefined) {
-      device.statusText = getStatusText(device.type, device.isOn)
+      if (device.type === 'speaker') {
+        device.statusText = state.status === 'playing' ? 'Reproduciendo' : state.status === 'paused' ? 'Pausado' : 'Detenido'
+      } else {
+        device.statusText = getStatusText(device.type, device.isOn)
+      }
     }
   }
 
