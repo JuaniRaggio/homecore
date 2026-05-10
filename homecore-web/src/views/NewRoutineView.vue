@@ -49,7 +49,7 @@
             :class="{ 'device-tile--selected': selectedIds.has(device.id) }"
             @click="toggleDevice(device)"
           >
-            <span class="device-tile__name">{{ device.name }}</span>
+            <span class="device-tile__name">{{ displayName(device) }}</span>
             <span class="device-tile__type">{{ translateType(device.type) }}</span>
           </button>
         </div>
@@ -61,7 +61,7 @@
         <p class="step-hint">Configura la accion para cada dispositivo seleccionado.</p>
         <p v-if="selectedDevices.length === 0" class="state-empty">No seleccionaste dispositivos.</p>
         <div v-for="device in selectedDevices" :key="device.id" class="action-row">
-          <span class="action-device-name">{{ device.name }}</span>
+          <span class="action-device-name">{{ displayName(device) }}</span>
           <div class="action-controls">
             <select
               class="action-select"
@@ -150,7 +150,7 @@ import { useDevicesStore } from '@/stores/devices'
 import { useRoutinesStore } from '@/stores/routines'
 import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
-import { translateType } from '@/utils/device-helpers'
+import { translateType, getDisplayName } from '@/utils/device-helpers'
 import { actionsFor, paramsFor } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
@@ -186,6 +186,10 @@ const deviceActions = reactive({})
 const selectedDevices = computed(() =>
   devicesStore.devices.filter(d => selectedIds.value.has(d.id))
 )
+
+function displayName(device) {
+  return getDisplayName(device, devicesStore.devices)
+}
 
 function toggleDevice(device) {
   const ids = new Set(selectedIds.value)
