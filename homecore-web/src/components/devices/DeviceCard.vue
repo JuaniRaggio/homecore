@@ -69,7 +69,7 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 240px;
+  min-width: 0;
   min-height: fit-content;
   transition: background-color 0.2s;
 }
