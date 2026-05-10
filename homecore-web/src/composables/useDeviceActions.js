@@ -87,12 +87,27 @@ export function useDeviceActions() {
     if (!device) return
 
     try {
-      const action = device.isPlaying ? 'pause' : 'resume'
+      let action, newStatus
+
+      if (!device.isOn) {
+        // Si está stopped, reproducir
+        action = 'play'
+        newStatus = 'playing'
+      } else if (device.isPlaying) {
+        // Si está playing, pausar
+        action = 'pause'
+        newStatus = 'paused'
+      } else {
+        // Si está paused, resumir
+        action = 'resume'
+        newStatus = 'playing'
+      }
+
       await api.executeAction(id, action)
 
       devicesStore.applyDeviceEvent({
         id,
-        data: { status: device.isPlaying ? 'paused' : 'playing' }
+        data: { status: newStatus }
       })
     } catch (e) {
       console.error(`[useDeviceActions] Error pausando/resumiendo parlante ${id}:`, e)

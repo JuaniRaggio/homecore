@@ -68,8 +68,7 @@
           <button
             class="btn-speaker btn-speaker--play"
             @click="$emit('speaker-pause-resume', device.id)"
-            :title="device.isPlaying ? 'Pausar' : 'Reanudar'"
-            :disabled="!device.isOn"
+            :title="!device.isOn ? 'Reproducir' : device.isPlaying ? 'Pausar' : 'Reanudar'"
           >
             <i :class="device.isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play'"></i>
           </button>
