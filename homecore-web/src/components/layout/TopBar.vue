@@ -230,6 +230,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   align-items: center;
   gap: 8px;
   text-decoration: none;
+  width: calc(var(--sidebar-w) + 20px - 24px - 24px);
+  flex-shrink: 0;
 }
 
 .logo-icon {
@@ -244,12 +246,18 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   color: var(--text-primary);
 }
 
+.topbar__center {
+  flex: 1;
+}
+
 .topbar__breadcrumbs {
-  position: absolute;
-  left: calc(var(--sidebar-w) + 20px);
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .topbar__house-name {
@@ -258,6 +266,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   color: var(--accent);
   text-decoration: none;
   transition: color 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topbar__house-name:hover {
@@ -285,6 +295,8 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topbar__right {
@@ -292,6 +304,7 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
   align-items: center;
   gap: 20px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .notif-wrap {
