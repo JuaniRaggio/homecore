@@ -422,4 +422,21 @@ onMounted(() => {
   flex-direction: column;
 }
 
+@media (max-width: 768px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .house-inner {
+    flex-direction: column;
+  }
+
+  .stats-bar {
+    flex-wrap: wrap;
+  }
+
+  .house-panel {
+    min-width: unset;
+  }
+}
 </style>

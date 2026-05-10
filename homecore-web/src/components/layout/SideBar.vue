@@ -1,12 +1,13 @@
 <template>
-  <nav class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
+  <div v-if="mobileOpen" class="sidebar-backdrop" @click="closeMobile"></div>
+  <nav class="sidebar" :class="{ 'sidebar--mobile-open': mobileOpen }">
 
     <div class="property-selector" @click="toggleHomeMenu" v-click-outside="closeHomeMenu">
       <span class="property-name">{{ houseName }}</span>
-      <i v-if="!collapsed" class="fa-solid fa-chevron-down" :class="{ 'chevron--open': showHomeMenu }"></i>
+      <i class="fa-solid fa-chevron-down" :class="{ 'chevron--open': showHomeMenu }"></i>
     </div>
 
-    <div v-if="showHomeMenu && !collapsed" class="home-menu">
+    <div v-if="showHomeMenu" class="home-menu">
       <button
         v-for="home in homesStore.homes"
         :key="home.id"
@@ -34,25 +35,23 @@
         <i class="fa-solid fa-gear"></i>
         <span class="nav-label">Configuracion</span>
       </router-link>
-
-      <button class="sidebar__btn" @click="collapsed = !collapsed" :title="collapsed ? 'Expandir' : 'Colapsar'">
-        <i :class="collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left'"></i>
-      </button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHomesStore } from '@/stores/homes'
+import { useSidebar } from '@/composables/useSidebar'
 
 const route = useRoute()
 const router = useRouter()
 const homesStore = useHomesStore()
 const homeId = computed(() => route.params.homeId)
-const collapsed = ref(false)
 const showHomeMenu = ref(false)
+
+const { mobileOpen, closeMobile } = useSidebar()
 
 const houseName = computed(() => {
   if (!homeId.value) return 'HomeCore'
@@ -86,6 +85,9 @@ const vClickOutside = {
   }
 }
 
+// Cerrar sidebar mobile al navegar
+watch(() => route.path, () => closeMobile())
+
 // Items de navegacion del sidebar
 // Las rutas se computan dinamicamente segun el homeId activo
 const navItems = computed(() => [
@@ -113,43 +115,6 @@ const navItems = computed(() => [
   z-index: 90;
   overflow-y: auto;
   transition: width 0.25s ease;
-}
-
-.sidebar--collapsed {
-  width: 60px;
-}
-
-.sidebar--collapsed .property-name,
-.sidebar--collapsed .nav-label {
-  display: none;
-}
-
-.sidebar--collapsed .property-selector {
-  justify-content: center;
-  padding: 12px 8px;
-}
-
-.sidebar--collapsed .nav-item a {
-  justify-content: center;
-  padding: 10px 0;
-}
-
-.sidebar--collapsed .nav-item a i {
-  margin-right: 0;
-}
-
-.sidebar--collapsed .sidebar__config {
-  justify-content: center;
-}
-
-.sidebar--collapsed .sidebar__config .nav-label {
-  display: none;
-}
-
-.sidebar--collapsed .sidebar__footer {
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
 }
 
 .property-selector {
@@ -265,7 +230,6 @@ const navItems = computed(() => [
   margin-top: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
 .sidebar__config {
@@ -278,11 +242,27 @@ const navItems = computed(() => [
   gap: 5px;
 }
 
-.sidebar__btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: var(--font-md);
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 200;
+  }
+
+  .sidebar--mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 199;
+  }
 }
 </style>

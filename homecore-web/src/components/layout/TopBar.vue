@@ -1,6 +1,10 @@
 <template>
   <header class="topbar">
 
+    <button class="btn-hamburger" @click="toggleMobile">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
     <!-- Logo de la app (clickeable, vuelve al overview) -->
     <router-link to="/" class="topbar__left">
      <img src="@/assets/homecore-icono.svg" alt="HomeCore" class="logo-icon">
@@ -90,6 +94,7 @@ import { useNotificationsStore } from '@/stores/notifications'
 import { useAuthStore } from '@/stores/auth'
 import { useRoomsStore } from '@/stores/rooms'
 import { useDevicesStore } from '@/stores/devices'
+import { useSidebar } from '@/composables/useSidebar'
 
 const route = useRoute()
 const router = useRouter()
@@ -98,6 +103,7 @@ const notificationsStore = useNotificationsStore()
 const authStore = useAuthStore()
 const roomsStore = useRoomsStore()
 const devicesStore = useDevicesStore()
+const { toggleMobile } = useSidebar()
 
 // Mostrar nombre de casa solo cuando estamos dentro de una ruta /casa/:homeId
 const isHomeRoute = computed(() => !!route.params.homeId)
@@ -492,5 +498,31 @@ onBeforeUnmount(() => document.removeEventListener('click', handleClickOutside))
 .dropdown__user-email {
   font-size: var(--font-sm);
   color: var(--text-muted);
+}
+
+.btn-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: var(--font-2xl);
+  cursor: pointer;
+  padding: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .btn-hamburger {
+    display: flex;
+  }
+
+  .topbar__left {
+    width: auto;
+  }
+
+  .topbar__user {
+    display: none;
+  }
 }
 </style>

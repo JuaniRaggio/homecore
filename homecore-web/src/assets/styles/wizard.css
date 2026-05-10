@@ -137,6 +137,17 @@
 .btn-create { background-color: var(--success); }
 .btn-next:disabled, .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
 
+@media (max-width: 768px) {
+  .action-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .action-device-name {
+    min-width: unset;
+  }
+}
+
 @media (max-width: 640px) {
   .wizard-card { padding: 16px; }
   .step-label { display: none; }
