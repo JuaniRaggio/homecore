@@ -16,8 +16,8 @@
       <div class="summary-card">
         <i class="fa-solid fa-calendar-day summary-icon"></i>
         <div class="summary-data">
-          <span class="summary-value">{{ totalWh }} Wh</span>
-          <span class="summary-label">Consumo del dia (proyeccion)</span>
+          <span class="summary-value">{{ Math.round(devicesStore.dailyConsumptionWh) }} Wh</span>
+          <span class="summary-label">Consumo del dia (acumulado)</span>
         </div>
       </div>
       <div class="summary-card">
@@ -115,10 +115,6 @@ function getTypeName(device) {
 function deviceWh(device) {
   return Math.round(devicesStore.getPowerUsage(device) * HOURS_PER_DAY)
 }
-
-const totalWh = computed(() =>
-  activeDevices.value.reduce((sum, d) => sum + deviceWh(d), 0)
-)
 
 const tableRows = computed(() =>
   activeDevices.value

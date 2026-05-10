@@ -7,12 +7,28 @@ import { friendlyError } from '@/utils/friendly-error'
 import { getStatusMap, getStatusText } from '@/config/device-types'
 
 const MAX_CONCURRENT_REQUESTS = 3
+const DAILY_KEY = 'homecore_daily_consumption'
+const SAMPLE_INTERVAL_MS = 60_000
+
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function loadDailyWh() {
+  try {
+    const data = JSON.parse(localStorage.getItem(DAILY_KEY))
+    if (data?.date === getTodayStr()) return data.wh
+  } catch {}
+  return 0
+}
 
 export const useDevicesStore = defineStore('devices', () => {
   const devices = ref([])
   const deviceTypes = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const dailyConsumptionWh = ref(loadDailyWh())
+  let _samplingTimer = null
 
   const favoriteDevices = computed(() => devices.value.filter(d => d.isFavorite))
   const activeDevices = computed(() => devices.value.filter(d => d.isOn))
@@ -20,6 +36,22 @@ export const useDevicesStore = defineStore('devices', () => {
   const totalConsumption = computed(() =>
     calcConsumption(devices.value, deviceTypes.value)
   )
+
+  function _saveDailyWh(wh) {
+    localStorage.setItem(DAILY_KEY, JSON.stringify({ date: getTodayStr(), wh }))
+  }
+
+  function startDailySampling() {
+    if (_samplingTimer !== null) return
+    _samplingTimer = setInterval(() => {
+      try {
+        const stored = JSON.parse(localStorage.getItem(DAILY_KEY))
+        if (stored?.date !== getTodayStr()) dailyConsumptionWh.value = 0
+      } catch {}
+      dailyConsumptionWh.value += totalConsumption.value * (SAMPLE_INTERVAL_MS / 3_600_000)
+      _saveDailyWh(dailyConsumptionWh.value)
+    }, SAMPLE_INTERVAL_MS)
+  }
 
   function clear() {
     devices.value = []
@@ -89,6 +121,7 @@ export const useDevicesStore = defineStore('devices', () => {
       )
 
       devices.value = batches.flat()
+      startDailySampling()
     } catch (e) {
       error.value = friendlyError(e)
     } finally {
@@ -211,7 +244,7 @@ export const useDevicesStore = defineStore('devices', () => {
 
   return {
     devices, deviceTypes, loading, error,
-    favoriteDevices, activeDevices, totalConsumption,
+    favoriteDevices, activeDevices, totalConsumption, dailyConsumptionWh,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
     applyDeviceEvent, addDeviceFromEvent, updateDeviceFromEvent,
     clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice,
