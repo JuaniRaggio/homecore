@@ -222,6 +222,16 @@ export const useDevicesStore = defineStore('devices', () => {
 
     if (state.level !== undefined) {
       device.level = state.level
+
+      // Update statusText for curtains based on level
+      if (device.type === 'curtain') {
+        const level = state.level
+        if (level === 0) device.statusText = 'Cerrada'
+        else if (level <= 25) device.statusText = '25% abierta'
+        else if (level <= 50) device.statusText = '50% abierta'
+        else if (level <= 75) device.statusText = '75% abierta'
+        else device.statusText = 'Abierta'
+      }
     }
 
     if (state.lock !== undefined) {

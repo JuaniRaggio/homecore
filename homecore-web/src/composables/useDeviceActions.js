@@ -25,13 +25,22 @@ export function useDeviceActions() {
   }
 
   async function curtainUp(id) {
+    const device = devicesStore.devices.find(d => String(d.id) === String(id))
+    if (!device) return
+
+    const currentLevel = device.level ?? 0
+    const newLevel = Math.min(currentLevel + 20, 100)
+
     try {
-      await api.executeAction(id, 'up')
-      toast.show('Cortina subiendo', 'success')
-      // Actualizar el estado local
+      await api.executeAction(id, 'setLevel', [newLevel])
+      toast.show(`Cortina al ${newLevel}%`, 'success')
+
       devicesStore.applyDeviceEvent({
         id,
-        data: { status: 'opened', level: 100 }
+        data: {
+          status: newLevel === 100 ? 'opened' : newLevel === 0 ? 'closed' : 'active',
+          level: newLevel
+        }
       })
     } catch (e) {
       console.error(`[useDeviceActions] Error subiendo cortina ${id}:`, e)
@@ -40,13 +49,22 @@ export function useDeviceActions() {
   }
 
   async function curtainDown(id) {
+    const device = devicesStore.devices.find(d => String(d.id) === String(id))
+    if (!device) return
+
+    const currentLevel = device.level ?? 0
+    const newLevel = Math.max(currentLevel - 20, 0)
+
     try {
-      await api.executeAction(id, 'down')
-      toast.show('Cortina bajando', 'success')
-      // Actualizar el estado local
+      await api.executeAction(id, 'setLevel', [newLevel])
+      toast.show(`Cortina al ${newLevel}%`, 'success')
+
       devicesStore.applyDeviceEvent({
         id,
-        data: { status: 'closed', level: 0 }
+        data: {
+          status: newLevel === 100 ? 'opened' : newLevel === 0 ? 'closed' : 'active',
+          level: newLevel
+        }
       })
     } catch (e) {
       console.error(`[useDeviceActions] Error bajando cortina ${id}:`, e)

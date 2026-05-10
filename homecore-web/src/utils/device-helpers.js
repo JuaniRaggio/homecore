@@ -168,6 +168,14 @@ export function normalizeDevice(d, roomName, roomId, deviceTypes = []) {
   if (type === 'alarm') statusText = isOn ? 'Activada' : 'Desactivada'
   if (type === 'door') statusText = state.lock === 'locked' ? 'Cerrada' : 'Abierta'
   if (type === 'speaker') statusText = state.status === 'playing' ? 'Reproduciendo' : state.status === 'paused' ? 'Pausado' : 'Detenido'
+  if (type === 'curtain') {
+    const level = state.level ?? 0
+    if (level === 0) statusText = 'Cerrada'
+    else if (level <= 25) statusText = '25% abierta'
+    else if (level <= 50) statusText = '50% abierta'
+    else if (level <= 75) statusText = '75% abierta'
+    else statusText = 'Abierta'
+  }
 
   return {
     ...d,

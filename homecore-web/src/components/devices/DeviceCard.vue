@@ -29,20 +29,29 @@
         {{ device.isOn ? 'Armada' : 'Desarmada' }}
       </span>
 
-      <!-- Cortina: indicador de nivel + botones -->
+      <!-- Cortina: representacion visual + botones -->
       <div v-else-if="device.type === 'curtain'" class="curtain-controls" @click.stop>
-        <div class="curtain-level">
-          <span class="curtain-level-badge" :style="{ backgroundColor: curtainColor }">
-            {{ curtainLevelText }}
-          </span>
-        </div>
-        <div class="curtain-buttons">
-          <button class="btn-curtain btn-curtain--up" @click="$emit('curtain-up', device.id)" title="Subir">
-            <i class="fa-solid fa-chevron-up"></i>
-          </button>
-          <button class="btn-curtain btn-curtain--down" @click="$emit('curtain-down', device.id)" title="Bajar">
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
+        <div class="curtain-layout">
+          <div class="curtain-visual">
+            <div class="curtain-window">
+              <div
+                class="curtain-overlay"
+                :style="{
+                  height: `${100 - (device.level ?? 0)}%`,
+                  backgroundColor: curtainColor
+                }"
+              ></div>
+            </div>
+            <span class="curtain-percentage">{{ device.level ?? 0 }}%</span>
+          </div>
+          <div class="curtain-buttons">
+            <button class="btn-curtain btn-curtain--up" @click="$emit('curtain-up', device.id)" title="Subir">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+            <button class="btn-curtain btn-curtain--down" @click="$emit('curtain-down', device.id)" title="Bajar">
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -202,40 +211,65 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   gap: 8px;
 }
 
-.curtain-level {
+.curtain-layout {
   display: flex;
+  gap: 8px;
+  align-items: center;
   justify-content: center;
 }
 
-.curtain-level-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  color: white;
-  font-size: var(--font-sm);
+.curtain-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.curtain-window {
+  width: 35px;
+  height: 50px;
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1), var(--bg-card));
+  overflow: hidden;
+}
+
+.curtain-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.3s ease, background-color 0.3s ease;
+  background-color: var(--accent);
+  opacity: 0.85;
+}
+
+.curtain-percentage {
+  font-size: var(--font-xs);
   font-weight: 600;
-  text-align: center;
+  color: var(--text-muted);
 }
 
 .curtain-buttons {
   display: flex;
-  gap: 8px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .btn-curtain {
-  flex: 1;
-  padding: 8px 16px;
+  padding: 6px 10px;
   border: 1px solid var(--border);
   background-color: var(--bg-card);
   color: var(--text-primary);
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: var(--font-base);
+  font-size: var(--font-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  min-width: 35px;
 }
 
 .btn-curtain:hover {
