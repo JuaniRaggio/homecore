@@ -24,7 +24,7 @@
         <button class="btn-primary" @click="handleLogin" :disabled="loading">
           {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </button>
-        <a class="auth-link" @click.prevent="router.push('/recover')">Perdiste tu contrasena</a>
+        <a class="auth-link" @click.prevent="router.push('/recuperar')">Perdiste tu contrasena</a>
       </div>
 
       <button class="btn-accent" @click="handleRegister">Crear Cuenta</button>

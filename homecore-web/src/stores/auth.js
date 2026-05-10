@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const pendingCredentials = ref(null)
   const templateReady = ref(false)
+  const recoveryTemplateReady = ref(false)
   const mailerConfigReady = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
@@ -52,6 +53,24 @@ export const useAuthStore = defineStore('auth', () => {
       } catch (err) {
         console.error('[auth] Error configurando mailer:', err)
       }
+    }
+  }
+
+  async function ensurePasswordRecoveryTemplate() {
+    if (recoveryTemplateReady.value) return
+    try {
+      const templates = await api.getAllMailerTemplates()
+      const exists = Array.isArray(templates) && templates.some(t => t.type === 'RECOVERY')
+      if (!exists) {
+        await api.postMailerTemplate({
+          type: 'RECOVERY',
+          subject: 'Código de recuperación - HomeCore',
+          template: '<div><h1>Hola <%FIRST_NAME%></h1><p>Tu código de recuperación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
+        })
+      }
+      recoveryTemplateReady.value = true
+    } catch (e) {
+      console.error('[auth] Error configurando template de recuperacion:', e)
     }
   }
 
@@ -145,6 +164,8 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: false, error: 'Ingrese su email' }
     }
     try {
+      await ensureMailerConfig()
+      await ensurePasswordRecoveryTemplate()
       await api.forgotPassword(email)
       return { success: true, message: 'Se envio un codigo de recuperacion a tu correo.' }
     } catch (error) {
