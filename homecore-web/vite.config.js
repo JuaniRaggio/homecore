@@ -12,7 +12,8 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'https://hci.it.itba.edu.ar',
-        changeOrigin: true
+        changeOrigin: true,
+        secure: false
       }
     }
   }
