@@ -78,7 +78,7 @@
         <div v-for="routine in favoriteRoutines" :key="routine.id" class="fav-routine-item">
           <i class="fa-solid fa-star fav-routine-star"></i>
           <div class="fav-routine-info">
-            <span class="fav-routine-name">{{ routine.name }}</span>
+            <span class="fav-routine-name">{{ routine.displayName || routine.name }}</span>
             <span class="fav-routine-home">{{ routine.description || '' }}</span>
           </div>
           <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
@@ -139,7 +139,21 @@ const overview = useOverviewData()
 const routineActions = useRoutineActions()
 
 const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
-const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
+const favoriteRoutines = computed(() => {
+  const favs = routinesStore.favoriteRoutines
+  const nameCount = {}
+  for (const r of favs) {
+    nameCount[r.name] = (nameCount[r.name] || 0) + 1
+  }
+  return favs.map(r => {
+    const isDuplicate = nameCount[r.name] > 1
+    if (!isDuplicate) return r
+    const homeId = r.metadata?.homeId
+    const home = homeId ? homesStore.getById(homeId) : null
+    const homeName = home?.name || 'Sin casa'
+    return { ...r, displayName: `${homeName}::${r.name}` }
+  })
+})
 
 const enrichedHomes = computed(() =>
   homesStore.homes.map(h => overview.enrichHome(h))
