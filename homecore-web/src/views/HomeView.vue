@@ -378,6 +378,8 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .panel {
@@ -385,6 +387,8 @@ onMounted(() => {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 20px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .panel-header {
@@ -409,6 +413,7 @@ onMounted(() => {
 .devices-flex {
   display: flex;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .routines-list {

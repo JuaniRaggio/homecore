@@ -82,36 +82,26 @@
       <!-- Rutinas globales -->
       <template v-if="globalRoutines.length > 0">
         <h3 class="subsection-title">Globales</h3>
-        <div class="fav-routines">
-          <div v-for="routine in globalRoutines" :key="routine.id" class="fav-routine-item">
-            <i class="fa-solid fa-globe fav-routine-star"></i>
-            <div class="fav-routine-info">
-              <span class="fav-routine-name">{{ routine.displayName || routine.name }}</span>
-              <span class="fav-routine-home">{{ routine.description || '' }}</span>
-            </div>
-            <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
-            <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
-              <i class="fa-solid fa-play"></i>
-            </button>
-          </div>
+        <div class="routines-list">
+          <RoutineRow
+            v-for="routine in globalRoutines"
+            :key="routine.id"
+            :routine="{ ...routine, name: routine.displayName || routine.name, schedule: 'Global', isFavorite: true }"
+            @execute="routineActions.executeRoutine"
+          />
         </div>
       </template>
 
       <!-- Rutinas de casas especificas -->
       <template v-if="homeRoutines.length > 0">
         <h3 class="subsection-title">Por propiedad</h3>
-        <div class="fav-routines">
-          <div v-for="routine in homeRoutines" :key="routine.id" class="fav-routine-item">
-            <i class="fa-solid fa-star fav-routine-star"></i>
-            <div class="fav-routine-info">
-              <span class="fav-routine-name">{{ routine.displayName || routine.name }}</span>
-              <span class="fav-routine-home">{{ getRoutineHomeName(routine) }}</span>
-            </div>
-            <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
-            <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
-              <i class="fa-solid fa-play"></i>
-            </button>
-          </div>
+        <div class="routines-list">
+          <RoutineRow
+            v-for="routine in homeRoutines"
+            :key="routine.id"
+            :routine="{ ...routine, name: routine.displayName || routine.name, schedule: getRoutineHomeName(routine), isFavorite: true }"
+            @execute="routineActions.executeRoutine"
+          />
         </div>
       </template>
 
@@ -154,6 +144,7 @@
 <script setup>
 import { onMounted, computed } from 'vue'
 import HomeCard from '@/components/homes/HomeCard.vue'
+import RoutineRow from '@/components/routines/RoutineRow.vue'
 import { useHomesStore } from '@/stores/homes'
 import { useAuthStore } from '@/stores/auth'
 import { useRoutinesStore } from '@/stores/routines'
@@ -349,63 +340,9 @@ onMounted(async () => {
 }
 
 /* -- Rutinas favoritas -- */
-.fav-routines {
+.routines-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.fav-routine-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.fav-routine-star {
-  color: var(--amber);
-  font-size: var(--font-md);
-}
-
-.fav-routine-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.fav-routine-name {
-  font-size: var(--font-base);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.fav-routine-home {
-  font-size: var(--font-sm);
-  color: var(--text-muted);
-}
-
-.fav-routine-schedule {
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-}
-
-.fav-routine-btn {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--accent);
-  border-radius: var(--radius-md);
-  padding: 6px 10px;
-  font-size: var(--font-sm);
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-
-.fav-routine-btn:hover {
-  background-color: var(--card-hover);
-  border-color: var(--accent);
 }
 
 @media (max-width: 768px) {

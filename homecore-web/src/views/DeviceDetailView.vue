@@ -294,13 +294,19 @@ async function togglePower() {
   const map = getStatusMap(device.value.type)
   const action = device.value.isOn ? map.actionOff : map.actionOn
   const verb = device.value.isOn ? map.verbOff : map.verbOn
+  const newIsOn = !device.value.isOn
   await cmd.execute(device.value.id, action, {
     successMsg: null,
     errorMsg: actionError(`${verb} el dispositivo`),
     onSuccess() {
-      device.value.isOn = !device.value.isOn
+      device.value.isOn = newIsOn
       const newMap = getStatusMap(device.value.type)
       toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: newIsOn ? 'on' : 'off' }
+      })
     },
   })
 }
@@ -351,7 +357,14 @@ async function handleArmAway(code) {
     params: [code],
     successMsg: describeAction(device.value.type, 'armAway'),
     errorMsg: actionError('activar la alarma'),
-    onSuccess() { device.value.isOn = true },
+    onSuccess() {
+      device.value.isOn = true
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: 'on' }
+      })
+    },
   })
 }
 
@@ -364,7 +377,14 @@ async function handleArmHome(code) {
     params: [code],
     successMsg: describeAction(device.value.type, 'armHome'),
     errorMsg: actionError('activar la alarma'),
-    onSuccess() { device.value.isOn = true },
+    onSuccess() {
+      device.value.isOn = true
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: 'on' }
+      })
+    },
   })
 }
 
@@ -377,7 +397,14 @@ async function handleDisarm(code) {
     params: [code],
     successMsg: describeAction(device.value.type, 'disarm'),
     errorMsg: actionError('desactivar la alarma'),
-    onSuccess() { device.value.isOn = false },
+    onSuccess() {
+      device.value.isOn = false
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: 'off' }
+      })
+    },
   })
 }
 
