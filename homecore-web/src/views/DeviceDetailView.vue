@@ -362,7 +362,7 @@ async function handleArmAway(code) {
       // Actualizar el store tambien para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
-        data: { status: 'on' }
+        data: { status: 'armedAway' }
       })
     },
   })
