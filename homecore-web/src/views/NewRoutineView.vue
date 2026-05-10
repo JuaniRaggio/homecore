@@ -45,12 +45,12 @@
           <button
             v-for="device in devicesStore.devices"
             :key="device.id"
-            class="device-tile"
-            :class="{ 'device-tile--selected': selectedIds.has(device.id) }"
+            class="selectable-tile"
+            :class="{ 'selectable-tile--selected': selectedIds.has(device.id) }"
             @click="toggleDevice(device)"
           >
-            <span class="device-tile__name">{{ displayName(device) }}</span>
-            <span class="device-tile__type">{{ translateType(device.type) }}</span>
+            <span class="selectable-tile__name">{{ displayName(device) }}</span>
+            <span class="selectable-tile__type">{{ translateType(device.type) }}</span>
           </button>
         </div>
       </div>
@@ -315,28 +315,6 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.device-tile {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background-color: var(--bg-main);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s;
-}
-
-.device-tile:hover { border-color: var(--accent); }
-
-.device-tile--selected {
-  border-color: var(--accent);
-  background-color: rgba(79, 110, 247, 0.1);
-}
-
-.device-tile__name { font-weight: 600; font-size: var(--font-base); color: var(--text-primary); }
-.device-tile__type { font-size: var(--font-sm); color: var(--text-muted); }
 
 /* Action rows */
 .action-row {

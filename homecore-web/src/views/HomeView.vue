@@ -43,7 +43,7 @@
           </li>
         </ul>
 
-        <button class="btn-add-room" @click="newRoomModal.open">
+        <button class="btn-dashed" @click="newRoomModal.open">
           <i class="fa-solid fa-plus"></i> Agregar habitacion
         </button>
       </div>
@@ -356,22 +356,6 @@ onMounted(() => {
   opacity: 1;
 }
 
-.btn-add-room {
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-muted);
-  border-radius: var(--radius-md);
-  padding: 8px 14px;
-  font-size: var(--font-base);
-  cursor: pointer;
-  width: 100%;
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.btn-add-room:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 .isometry-placeholder {
   flex: 1;
