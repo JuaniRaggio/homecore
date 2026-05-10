@@ -41,7 +41,7 @@ export const useRoutinesStore = defineStore('routines', () => {
     const payload = { ...currentData, ...data }
     const updated = await api.updateRoutine(id, payload)
     const idx = routines.value.findIndex(r => String(r.id) === String(id))
-    if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated }
+    if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated, ...data }
   }
 
   async function remove(id) {
