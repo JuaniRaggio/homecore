@@ -207,7 +207,8 @@ const deleteHomeConfirm = useConfirmAction()
 
 async function confirmDeleteHome() {
   await deleteHomeConfirm.confirm(async () => {
-    for (const room of rooms.value) {
+    const roomsSnapshot = [...rooms.value]
+    for (const room of roomsSnapshot) {
       const roomDevices = devicesStore.getDevicesByRoomId(room.id)
       if (roomDevices.length) {
         await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
