@@ -1,9 +1,9 @@
 <template>
-  <div class="new-routine-view">
-    <button class="btn-back" @click="router.push({ name: 'routines', params: { homeId } })">
-      <i class="fa-solid fa-arrow-left"></i> Volver a rutinas
+  <div class="new-routine-view" :class="{ 'page-content--full': isCrossHome }">
+    <button class="btn-back" @click="goBack">
+      <i class="fa-solid fa-arrow-left"></i> {{ isCrossHome ? 'Volver al overview' : 'Volver a rutinas' }}
     </button>
-    <h1 class="view-title">Nueva rutina</h1>
+    <h1 class="view-title">{{ isEditMode ? 'Editar rutina' : (isCrossHome ? 'Nueva rutina global' : 'Nueva rutina') }}</h1>
 
     <div class="wizard-card">
       <!-- Stepper -->
@@ -39,18 +39,18 @@
       <div v-else-if="step === 2" class="step-content">
         <h2 class="step-title">Seleccionar dispositivos</h2>
         <p class="step-hint">Selecciona los dispositivos que participan en esta rutina.</p>
-        <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
-        <p v-else-if="devicesStore.devices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
+        <p v-if="isDevicesLoading" class="state-loading">Cargando dispositivos...</p>
+        <p v-else-if="wizardDevices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
         <div v-else class="device-grid">
           <button
-            v-for="device in devicesStore.devices"
+            v-for="device in wizardDevices"
             :key="device.id"
-            class="device-tile"
-            :class="{ 'device-tile--selected': selectedIds.has(device.id) }"
+            class="selectable-tile"
+            :class="{ 'selectable-tile--selected': selectedIds.has(device.id) }"
             @click="toggleDevice(device)"
           >
-            <span class="device-tile__name">{{ device.name }}</span>
-            <span class="device-tile__type">{{ translateType(device.type) }}</span>
+            <span class="selectable-tile__name">{{ displayName(device) }}</span>
+            <span class="selectable-tile__type">{{ translateType(device.type) }}</span>
           </button>
         </div>
       </div>
@@ -61,7 +61,7 @@
         <p class="step-hint">Configura la accion para cada dispositivo seleccionado.</p>
         <p v-if="selectedDevices.length === 0" class="state-empty">No seleccionaste dispositivos.</p>
         <div v-for="device in selectedDevices" :key="device.id" class="action-row">
-          <span class="action-device-name">{{ device.name }}</span>
+          <span class="action-device-name">{{ displayName(device) }}</span>
           <div class="action-controls">
             <select
               class="action-select"
@@ -136,7 +136,7 @@
         <button class="btn-prev" :class="{ invisible: step === 1 }" @click="step--">Anterior</button>
         <button v-if="step < 4" class="btn-next" :disabled="!canProceed" @click="step++">Siguiente</button>
         <button v-else class="btn-create" :disabled="saving || !canCreate" @click="submit">
-          {{ saving ? 'Creando...' : 'Crear rutina' }}
+          {{ saving ? (isEditMode ? 'Guardando...' : 'Creando...') : (isEditMode ? 'Guardar cambios' : 'Crear rutina') }}
         </button>
       </div>
     </div>
@@ -148,30 +148,28 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoutinesStore } from '@/stores/routines'
+import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
-import { translateType } from '@/utils/device-helpers'
-import { actionsFor, paramsFor } from '@/config/routine-actions'
+import { translateType, getDisplayName, getCrossHomeDisplayName } from '@/utils/device-helpers'
+import { useOverviewData } from '@/composables/useOverviewData'
+import { actionsFor, paramsFor, DAY_OPTIONS } from '@/config/routine-actions'
+import * as api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
 const devicesStore = useDevicesStore()
 const routinesStore = useRoutinesStore()
+const homesStore = useHomesStore()
 const toast = useToastStore()
+const overview = useOverviewData()
 
 const homeId = computed(() => route.params.homeId)
+const routineId = computed(() => route.params.routineId)
+const isEditMode = computed(() => !!routineId.value)
+const isCrossHome = computed(() => !route.params.homeId)
 
 const STEPS = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
-
-const DAY_OPTIONS = [
-  { value: 1, label: 'Lun' },
-  { value: 2, label: 'Mar' },
-  { value: 3, label: 'Mie' },
-  { value: 4, label: 'Jue' },
-  { value: 5, label: 'Vie' },
-  { value: 6, label: 'Sab' },
-  { value: 0, label: 'Dom' },
-]
 
 // State
 const step = ref(1)
@@ -180,9 +178,32 @@ const form = reactive({ name: '', description: '', time: '08:00', days: [] })
 const selectedIds = ref(new Set())
 const deviceActions = reactive({})
 
-const selectedDevices = computed(() =>
-  devicesStore.devices.filter(d => selectedIds.value.has(d.id))
+const wizardDevices = computed(() =>
+  isCrossHome.value ? overview.allDevices.value : devicesStore.devices
 )
+
+const isDevicesLoading = computed(() =>
+  isCrossHome.value ? overview.loading.value : devicesStore.loading
+)
+
+const selectedDevices = computed(() =>
+  wizardDevices.value.filter(d => selectedIds.value.has(d.id))
+)
+
+function displayName(device) {
+  if (isCrossHome.value) {
+    return getCrossHomeDisplayName(device, wizardDevices.value)
+  }
+  return getDisplayName(device, wizardDevices.value)
+}
+
+function goBack() {
+  if (isCrossHome.value) {
+    router.push({ name: 'overview' })
+  } else {
+    router.push({ name: 'routines', params: { homeId: homeId.value } })
+  }
+}
 
 function toggleDevice(device) {
   const ids = new Set(selectedIds.value)
@@ -216,42 +237,98 @@ const canCreate = computed(() =>
   selectedDevices.value.some(d => deviceActions[d.id]?.actionName)
 )
 
+function buildActionsPayload() {
+  return selectedDevices.value
+    .filter(d => deviceActions[d.id]?.actionName)
+    .map(d => ({
+      device: { id: d.id },
+      actionName: deviceActions[d.id].actionName,
+      params: deviceActions[d.id].params.filter(p => p !== '' && p !== null && p !== undefined),
+    }))
+}
+
 async function submit() {
   if (!canCreate.value || saving.value) return
   saving.value = true
   try {
-    const actions = selectedDevices.value
-      .filter(d => deviceActions[d.id]?.actionName)
-      .map(d => ({
-        device: { id: d.id },
-        actionName: deviceActions[d.id].actionName,
-        params: deviceActions[d.id].params.filter(p => p !== '' && p !== null && p !== undefined),
-      }))
-
-    await routinesStore.create({
+    const payload = {
       name: form.name.trim(),
-      home: { id: homeId.value },
       description: form.description.trim(),
-      actions,
+      actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
-      metadata: {},
-    })
+      metadata: isCrossHome.value ? { crossHome: true } : { homeId: homeId.value },
+    }
 
-    toast.show('Rutina creada', 'success')
-    router.push({ name: 'routines', params: { homeId: homeId.value } })
+    if (isEditMode.value) {
+      await routinesStore.update(routineId.value, payload)
+      toast.show('Rutina actualizada', 'success')
+    } else {
+      await routinesStore.create(payload)
+      toast.show('Rutina creada', 'success')
+    }
+
+    if (isCrossHome.value) {
+      router.push({ name: 'overview' })
+    } else {
+      router.push({ name: 'routines', params: { homeId: homeId.value } })
+    }
   } catch (e) {
-    console.error('[NewRoutine] Error creando rutina:', e)
-    toast.show(e.message || actionError('crear la rutina'), 'error')
+    const action = isEditMode.value ? 'actualizar la rutina' : 'crear la rutina'
+    console.error(`[NewRoutine] Error:`, e)
+    toast.show(e.message || actionError(action), 'error')
   } finally {
     saving.value = false
   }
 }
 
-onMounted(() => {
-  if (devicesStore.devices.length === 0) {
-    devicesStore.fetchAllForHome(homeId.value)
-    devicesStore.fetchDeviceTypes()
+onMounted(async () => {
+  if (isCrossHome.value) {
+    await homesStore.fetchHomes()
+    if (homesStore.homes.length > 0) {
+      await overview.fetchAllHomesDevices(homesStore.homes)
+    }
+  } else {
+    if (devicesStore.devices.length === 0) {
+      await devicesStore.fetchAllForHome(homeId.value)
+      devicesStore.fetchDeviceTypes()
+    }
+  }
+
+  if (isEditMode.value) {
+    let routine = routinesStore.getById(routineId.value)
+    if (!routine) {
+      try {
+        routine = await api.getRoutine(routineId.value)
+      } catch (e) {
+        console.error('[EditRoutine] Error cargando rutina:', e)
+        toast.show(e.message || actionError('cargar la rutina'), 'error')
+        return
+      }
+    }
+
+    form.name = routine.name || ''
+    form.description = routine.description || ''
+    form.time = routine.time || '08:00'
+    form.days = Array.isArray(routine.days) ? [...routine.days] : []
+
+    if (Array.isArray(routine.actions)) {
+      const ids = new Set()
+      for (const action of routine.actions) {
+        const deviceId = action.device?.id
+        if (!deviceId) continue
+        ids.add(deviceId)
+
+        const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+        const typeName = device?.type || ''
+        const paramDefs = paramsFor(typeName, action.actionName)
+        const params = paramDefs.map((_, i) =>
+          Array.isArray(action.params) && action.params[i] !== undefined ? action.params[i] : ''
+        )
+        deviceActions[deviceId] = { actionName: action.actionName, params }
+      }
+      selectedIds.value = ids
+    }
   }
 })
 </script>
@@ -272,28 +349,6 @@ onMounted(() => {
   gap: 10px;
 }
 
-.device-tile {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background-color: var(--bg-main);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s;
-}
-
-.device-tile:hover { border-color: var(--accent); }
-
-.device-tile--selected {
-  border-color: var(--accent);
-  background-color: rgba(79, 110, 247, 0.1);
-}
-
-.device-tile__name { font-weight: 600; font-size: var(--font-base); color: var(--text-primary); }
-.device-tile__type { font-size: var(--font-sm); color: var(--text-muted); }
 
 /* Action rows */
 .action-row {
@@ -308,12 +363,6 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.action-device-name {
-  font-weight: 600;
-  font-size: var(--font-base);
-  min-width: 140px;
-}
-
 .action-controls {
   display: flex;
   align-items: center;
@@ -322,42 +371,6 @@ onMounted(() => {
   flex: 1;
 }
 
-.action-select {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 8px 10px;
-  min-width: 160px;
-}
-
-.param-input {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 8px 10px;
-  width: 100px;
-}
-
-.param-input--color { width: 50px; height: 36px; padding: 4px; cursor: pointer; }
-
-/* Days */
-.days-row { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.day-btn {
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-
-.day-btn:hover { border-color: var(--accent); }
-.day-btn--active { background-color: var(--accent); color: #fff; border-color: var(--accent); }
+/* Reutiliza globales: .action-device-name, .action-select, .param-input,
+   .param-input--color, .days-row, .day-btn, .day-btn--active */
 </style>

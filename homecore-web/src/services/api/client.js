@@ -15,7 +15,8 @@ export async function request(method, path, body = null) {
   const options = { method, headers: headers() }
   if (body !== null) options.body = JSON.stringify(body)
 
-  const res = await fetch(`${BASE_URL}${path}`, options)
+  const url = `${BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
+  const res = await fetch(url, options)
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}))
     const err = new Error(errorData.error?.description || errorData.message || 'API request failed')

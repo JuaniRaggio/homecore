@@ -77,3 +77,62 @@
 .view-content {
   padding: 0;
 }
+
+/* Detail view layout (DeviceDetailView, RoutineDetailView) */
+.detail-header {
+  margin-bottom: 24px;
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Edit view layout (EditDeviceView, EditRoutineView) */
+.edit-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.edit-header .btn-back {
+  margin-bottom: 0;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: calc(var(--topbar-h) + 12px);
+  }
+
+  .page-content--full {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .view-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

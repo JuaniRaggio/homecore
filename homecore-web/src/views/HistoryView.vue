@@ -41,6 +41,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useDevicesStore } from '@/stores/devices'
 import { friendlyError } from '@/utils/friendly-error'
+import { describeAction, ACTIONS_MAP } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
 const devicesStore = useDevicesStore()
@@ -60,9 +61,24 @@ const filteredEvents = computed(() =>
   })
 )
 
-function getDeviceName(deviceId) {
+function getDeviceInfo(log) {
+  const deviceId = log.deviceId || log.device?.id
   const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
-  return device?.name || 'Dispositivo eliminado'
+  const name = device?.name || log.device?.name || 'Dispositivo eliminado'
+  const type = device?.type || log.device?.type?.name || log.device?.type || ''
+  return { name, type }
+}
+
+function describeLogAction(actionName, deviceType, params) {
+  if (!actionName) return 'Accion'
+  const desc = describeAction(deviceType, actionName, params)
+  if (desc !== actionName) return desc
+  // Tipo desconocido: buscar en todos los tipos como fallback
+  for (const type of Object.keys(ACTIONS_MAP)) {
+    const match = ACTIONS_MAP[type].find(a => a.actionName === actionName)
+    if (match) return describeAction(type, actionName, params)
+  }
+  return actionName
 }
 
 function classifyEvent(log) {
@@ -83,13 +99,16 @@ function formatDate(timestamp) {
 }
 
 function mapLogs(rawLogs) {
-  return rawLogs.map(log => ({
-    id: log.id,
-    deviceName: log.device?.name || getDeviceName(log.deviceId),
-    action: log.actionName || 'Accion',
-    timestamp: log.timestamp,
-    type: classifyEvent(log),
-  }))
+  return rawLogs.map(log => {
+    const info = getDeviceInfo(log)
+    return {
+      id: log.id,
+      deviceName: info.name,
+      action: describeLogAction(log.actionName || log.action || '', info.type, log.params),
+      timestamp: log.timestamp,
+      type: classifyEvent(log),
+    }
+  })
 }
 
 async function fetchLogs() {

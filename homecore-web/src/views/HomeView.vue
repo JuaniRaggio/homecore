@@ -20,6 +20,12 @@
       <button class="icon-btn" @click="editHomeModal.open" title="Editar hogar">
         <i class="fa-regular fa-pen-to-square"></i>
       </button>
+      <button class="icon-btn icon-btn--delete" @click="deleteHomeConfirm.request(homeId)" title="Eliminar hogar">
+        <i class="fa-regular fa-trash-can"></i>
+      </button>
+      <button class="btn-invite" @click="inviteModal.open">
+        <i class="fa-solid fa-user-plus"></i> Agregar invitado
+      </button>
     </div>
 
     <div class="house-inner">
@@ -40,7 +46,7 @@
           </li>
         </ul>
 
-        <button class="btn-add-room" @click="newRoomModal.open">
+        <button class="btn-dashed" @click="newRoomModal.open">
           <i class="fa-solid fa-plus"></i> Agregar habitacion
         </button>
       </div>
@@ -68,6 +74,7 @@
           :device="device"
           @toggle="deviceActions.toggleDevice"
           @toggle-favorite="deviceActions.toggleFavorite"
+          @open="handleOpenDevice"
         />
         <p v-if="favoriteDevices.length === 0" class="empty-msg">Sin dispositivos favoritos</p>
       </div>
@@ -120,16 +127,36 @@
     @close="deleteRoomConfirm.close"
     @confirm="confirmDeleteRoom"
   />
+
+  <ConfirmModal
+    :visible="deleteHomeConfirm.visible.value"
+    title="Eliminar hogar"
+    description="Estas seguro de que queres eliminar este hogar? Se eliminaran todas las habitaciones y dispositivos asociados. Esta accion no se puede deshacer."
+    confirm-label="Eliminar hogar"
+    confirming-label="Eliminando..."
+    :danger="true"
+    :loading="deleteHomeConfirm.loading.value"
+    @close="deleteHomeConfirm.close"
+    @confirm="confirmDeleteHome"
+  />
+
+  <InviteGuestModal
+    :visible="inviteModal.visible.value"
+    :home-id="String(homeId)"
+    @close="inviteModal.close"
+  />
   </template>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
+import InviteGuestModal from '@/components/common/InviteGuestModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
@@ -141,6 +168,7 @@ import { useConfirmAction } from '@/composables/useConfirmAction'
 import { useHomeData } from '@/composables/useHomeData'
 import * as api from '@/services/api'
 
+const router = useRouter()
 const { homeId, devicesStore, roomsStore } = useHomeData()
 
 const routinesStore = useRoutinesStore()
@@ -153,7 +181,12 @@ const routineActions = useRoutineActions()
 const currentHome = computed(() => homesStore.getById(homeId.value))
 
 const favoriteDevices = computed(() => devicesStore.favoriteDevices)
-const favoriteRoutines = computed(() => routinesStore.favoriteRoutines)
+const favoriteRoutines = computed(() =>
+  routinesStore.favoriteRoutines.filter(r => {
+    const rHomeId = r.metadata?.homeId
+    return rHomeId && String(rHomeId) === String(homeId.value)
+  })
+)
 const rooms = computed(() => roomsStore.rooms)
 
 const stats = computed(() => ({
@@ -185,11 +218,34 @@ async function confirmDeleteRoom() {
   })
 }
 
+// Delete home confirmation
+const deleteHomeConfirm = useConfirmAction()
+
+async function confirmDeleteHome() {
+  await deleteHomeConfirm.confirm(async () => {
+    const roomsSnapshot = [...rooms.value]
+    for (const room of roomsSnapshot) {
+      const roomDevices = devicesStore.getDevicesByRoomId(room.id)
+      if (roomDevices.length) {
+        await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
+        roomDevices.forEach(d => devicesStore.removeDevice(d.id))
+      }
+      await roomsStore.removeRoom(room.id)
+    }
+    await homesStore.removeHome(homeId.value)
+    toast.show('Hogar eliminado', 'success')
+    router.push({ name: 'overview' })
+  })
+}
+
 // Modal nueva habitacion
 const newRoomModal = useModal()
 
 // Modal editar hogar
 const editHomeModal = useModal()
+
+// Modal invitar invitado
+const inviteModal = useModal()
 
 async function confirmEditHome(name) {
   saving.value = true
@@ -203,6 +259,10 @@ async function confirmEditHome(name) {
   } finally {
     saving.value = false
   }
+}
+
+function handleOpenDevice(id) {
+  router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })
 }
 
 // Fetch routines additionally (useHomeData already fetches devices + rooms)
@@ -314,22 +374,6 @@ onMounted(() => {
   opacity: 1;
 }
 
-.btn-add-room {
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-muted);
-  border-radius: var(--radius-md);
-  padding: 8px 14px;
-  font-size: var(--font-base);
-  cursor: pointer;
-  width: 100%;
-  transition: border-color 0.2s, color 0.2s;
-}
-
-.btn-add-room:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
 
 .isometry-placeholder {
   flex: 1;
@@ -347,6 +391,8 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .panel {
@@ -354,6 +400,8 @@ onMounted(() => {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 20px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .panel-header {
@@ -378,6 +426,7 @@ onMounted(() => {
 .devices-flex {
   display: flex;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .routines-list {
@@ -385,4 +434,41 @@ onMounted(() => {
   flex-direction: column;
 }
 
+.btn-invite {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-invite:hover {
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .house-inner {
+    flex-direction: column;
+  }
+
+  .stats-bar {
+    flex-wrap: wrap;
+  }
+
+  .house-panel {
+    min-width: unset;
+  }
+}
 </style>

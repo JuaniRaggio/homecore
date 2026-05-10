@@ -23,7 +23,12 @@
       {{ device.statusText }}
     </div>
 
-    <ToggleSwitch :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
+    <div class="device-card__footer">
+      <span v-if="device.type === 'alarm'" class="badge" :class="device.isOn ? 'badge--active' : 'badge--danger'">
+        {{ device.isOn ? 'Armada' : 'Desarmada' }}
+      </span>
+      <ToggleSwitch v-else :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
+    </div>
   </div>
 </template>
 
@@ -69,7 +74,7 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 240px;
+  min-width: 0;
   min-height: fit-content;
   transition: background-color 0.2s;
 }
@@ -108,5 +113,9 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 
 .status--on {
   color: var(--success);
+}
+
+.device-card__footer {
+  margin-top: auto;
 }
 </style>

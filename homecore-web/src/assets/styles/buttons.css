@@ -200,3 +200,21 @@
 .btn-confirm--danger {
   background-color: var(--danger);
 }
+
+/* Boton dashed (agregar habitacion, vincular dispositivo) */
+.btn-dashed {
+  width: 100%;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--font-base);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-dashed:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

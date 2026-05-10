@@ -10,7 +10,7 @@ export const changePassword = (oldPassword, newPassword) =>
   request('POST', '/users/change-password', { oldPassword, newPassword })
 export const forgotPassword = (email) => request('POST', '/users/forgot-password', { email })
 export const resetPassword = (code, newPassword) =>
-  request('POST', '/users/reset-password', { code, newPassword })
+  request('POST', '/users/reset-password', { code, password: newPassword })
 export const logout = () => request('POST', '/users/logout')
 
 /* Mailer Config */

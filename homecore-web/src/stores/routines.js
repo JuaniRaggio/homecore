@@ -14,11 +14,20 @@ export const useRoutinesStore = defineStore('routines', () => {
     return routines.value.find(r => String(r.id) === String(id))
   }
 
+  function normalizeRoutine(r) {
+    return {
+      ...r,
+      isFavorite: r.metadata?.favorite || r.isFavorite || false,
+      isActive: r.isActive ?? true,
+    }
+  }
+
   async function fetchRoutines() {
     loading.value = true
     error.value = null
     try {
-      routines.value = await api.getRoutines()
+      const raw = await api.getRoutines()
+      routines.value = raw.map(normalizeRoutine)
     } catch (e) {
       error.value = friendlyError(e)
     } finally {
@@ -32,13 +41,16 @@ export const useRoutinesStore = defineStore('routines', () => {
 
   async function create(data) {
     const routine = await api.createRoutine(data)
-    routines.value.push(routine)
+    routines.value.push(normalizeRoutine(routine))
   }
 
   async function update(id, data) {
-    const updated = await api.updateRoutine(id, data)
+    const current = getById(id)
+    const { id: _id, ...currentData } = current ?? {}
+    const payload = { ...currentData, ...data }
+    const updated = await api.updateRoutine(id, payload)
     const idx = routines.value.findIndex(r => String(r.id) === String(id))
-    if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated }
+    if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated, ...data }
   }
 
   async function remove(id) {
@@ -49,8 +61,11 @@ export const useRoutinesStore = defineStore('routines', () => {
   async function toggleFavorite(id) {
     const routine = routines.value.find(r => String(r.id) === String(id))
     if (!routine) return
-    await api.updateRoutine(id, { isFavorite: !routine.isFavorite })
-    routine.isFavorite = !routine.isFavorite
+    const newFavorite = !routine.isFavorite
+    await update(id, {
+      isFavorite: newFavorite,
+      metadata: { ...(routine.metadata || {}), favorite: newFavorite },
+    })
   }
 
   return { routines, loading, error, favoriteRoutines, getById, fetchRoutines, execute, create, update, remove, toggleFavorite }

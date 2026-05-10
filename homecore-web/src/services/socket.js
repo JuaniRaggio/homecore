@@ -12,6 +12,21 @@ function log(...args) {
   if (isDev) console.log('[Socket]', ...args)
 }
 
+// Deduplicacion de notificaciones: evita duplicados cuando el servidor
+// emite deviceEvent + deviceUpdated por la misma accion del usuario.
+const DEDUP_WINDOW_MS = 2000
+const recentDeviceNotifs = new Map()
+
+function shouldNotify(deviceId) {
+  if (!deviceId) return true
+  const key = String(deviceId)
+  const now = Date.now()
+  const last = recentDeviceNotifs.get(key)
+  if (last && now - last < DEDUP_WINDOW_MS) return false
+  recentDeviceNotifs.set(key, now)
+  return true
+}
+
 const STATE_FIELD_TO_ACTION = {
   brightness: 'setBrightness',
   level: 'setLevel',
@@ -106,12 +121,15 @@ export function connect(token) {
     if (data.device) {
       useDevicesStore().updateDeviceFromEvent(data.device)
     }
-    const name = data.device?.name || 'Un dispositivo'
-    useNotificationsStore().addNotification({
-      title: 'Dispositivo actualizado',
-      message: `"${name}" fue modificado.`,
-      type: 'info'
-    })
+    const deviceId = data.device?.id || data.deviceId
+    if (shouldNotify(deviceId)) {
+      const name = data.device?.name || 'Un dispositivo'
+      useNotificationsStore().addNotification({
+        title: 'Dispositivo actualizado',
+        message: `"${name}" fue modificado.`,
+        type: 'info'
+      })
+    }
   })
 
   socket.on('deviceDeleted', (data) => {
@@ -132,14 +150,17 @@ export function connect(token) {
     log('deviceEvent', data)
     const devicesStore = useDevicesStore()
     devicesStore.applyDeviceEvent(data)
-    const device = devicesStore.devices.find(d => String(d.id) === String(data.id))
-    const name = device?.name || data.device?.name || 'Dispositivo'
-    const description = describeEvent(data.data, device?.type)
-    useNotificationsStore().addNotification({
-      title: name,
-      message: description,
-      type: 'info'
-    })
+    const deviceId = data.id ?? data.deviceId ?? data.device?.id
+    if (shouldNotify(deviceId)) {
+      const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+      const name = device?.name || data.device?.name || 'Dispositivo'
+      const description = describeEvent(data.data, device?.type)
+      useNotificationsStore().addNotification({
+        title: name,
+        message: description,
+        type: 'info'
+      })
+    }
   })
 
   socket.on('homeShared', (data) => {

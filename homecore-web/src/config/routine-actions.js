@@ -13,7 +13,7 @@ export const ACTIONS_MAP = {
   ],
   alarm: [
     { actionName: 'armAway',  label: 'Activar (modo regular)', params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
-    { actionName: 'armHome',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
+    { actionName: 'armStay',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
     { actionName: 'disarm',   label: 'Desactivar',            params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
     { actionName: 'changeSecurityCode', label: 'Cambiar codigo', params: [{ type: 'text', placeholder: 'Codigo nuevo' }] },
   ],
@@ -26,8 +26,8 @@ export const ACTIONS_MAP = {
     ]},
   ],
   curtain: [
-    { actionName: 'open',     label: 'Abrir',    params: [] },
-    { actionName: 'close',    label: 'Cerrar',   params: [] },
+    { actionName: 'up',       label: 'Subir',    params: [] },
+    { actionName: 'down',     label: 'Bajar',    params: [] },
     { actionName: 'setLevel', label: 'Posicion', params: [{ type: 'number', min: 0, max: 100, step: 1, placeholder: '0-100' }] },
   ],
   ac: [
@@ -133,3 +133,17 @@ export function describeAction(typeName, actionName, params) {
 
   return `${label}: ${value}`
 }
+
+/* Opciones de dias de la semana (compartidas por NewRoutineView, EditRoutineView) */
+export const DAY_OPTIONS = [
+  { value: 1, label: 'Lun' },
+  { value: 2, label: 'Mar' },
+  { value: 3, label: 'Mie' },
+  { value: 4, label: 'Jue' },
+  { value: 5, label: 'Vie' },
+  { value: 6, label: 'Sab' },
+  { value: 0, label: 'Dom' },
+]
+
+export const DAY_LABELS = { 0: 'Dom', 1: 'Lun', 2: 'Mar', 3: 'Mie', 4: 'Jue', 5: 'Vie', 6: 'Sab' }
+export const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]

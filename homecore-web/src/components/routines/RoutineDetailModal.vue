@@ -20,6 +20,7 @@
 
     <div class="modal-actions">
       <button class="btn-cancel btn-cancel--danger" @click="emit('delete')">Eliminar</button>
+      <button class="btn-confirm" @click="emit('edit')">Editar</button>
       <button class="btn-confirm" @click="emit('execute')">Ejecutar</button>
       <button class="btn-cancel" @click="emit('close')">Cerrar</button>
     </div>
@@ -34,7 +35,7 @@ defineProps({
   routine: { type: Object, default: null },
 })
 
-const emit = defineEmits(['close', 'delete', 'execute'])
+const emit = defineEmits(['close', 'delete', 'execute', 'edit'])
 </script>
 
 <style scoped>

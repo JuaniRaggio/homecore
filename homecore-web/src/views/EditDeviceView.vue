@@ -145,20 +145,7 @@ async function handleSave() {
 </script>
 
 <style scoped>
-.edit-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.edit-header .btn-back {
-  margin-bottom: 0;
-}
-
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+/* Reutiliza globales: .view-narrow, .view-title, .edit-header, .edit-form,
+   .btn-back, .btn-cancel, .btn-confirm, .form-card, .form-group, .form-label,
+   .form-actions, .error-msg, .state-loading, .state-error */
 </style>

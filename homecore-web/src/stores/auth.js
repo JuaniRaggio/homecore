@@ -8,6 +8,8 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const pendingCredentials = ref(null)
   const templateReady = ref(false)
+  const recoveryTemplateReady = ref(false)
+  const mailerConfigReady = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
   const pendingEmail = computed(() => pendingCredentials.value?.email || null)
@@ -28,6 +30,47 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = profile
     } catch (e) {
       console.error('[auth] Error cargando perfil (token invalido o expirado):', e)
+    }
+  }
+
+  async function ensureMailerConfig() {
+    if (mailerConfigReady.value) return
+    const config = {
+      host: import.meta.env.VITE_MAILER_HOST,
+      port: Number(import.meta.env.VITE_MAILER_PORT),
+      secure: false,
+      user: import.meta.env.VITE_MAILER_USER,
+      password: import.meta.env.VITE_MAILER_PASS,
+    }
+    try {
+      await api.getMailerConfig()
+      await api.updateMailerConfig(config)
+      mailerConfigReady.value = true
+    } catch (e) {
+      try {
+        await api.createMailerConfig(config)
+        mailerConfigReady.value = true
+      } catch (err) {
+        console.error('[auth] Error configurando mailer:', err)
+      }
+    }
+  }
+
+  async function ensurePasswordRecoveryTemplate() {
+    if (recoveryTemplateReady.value) return
+    try {
+      const templates = await api.getAllMailerTemplates()
+      const exists = Array.isArray(templates) && templates.some(t => t.type === 'RESET_PASSWORD')
+      if (!exists) {
+        await api.postMailerTemplate({
+          type: 'RESET_PASSWORD',
+          subject: 'Código de recuperación - HomeCore',
+          template: '<div><h1>Hola <%FIRST_NAME%></h1><p>Tu código de recuperación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
+        })
+      }
+      recoveryTemplateReady.value = true
+    } catch (e) {
+      console.error('[auth] Error configurando template de recuperacion:', e)
     }
   }
 
@@ -56,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (error.status === 409) {
         // Account exists — try sending verification to distinguish unverified vs already verified
         try {
+          await ensureMailerConfig()
           await ensureRegistrationTemplate()
           await api.sendVerification(email)
           pendingCredentials.value = { email, password }
@@ -68,6 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: false, error: error.message }
     }
     try {
+      await ensureMailerConfig()
       await ensureRegistrationTemplate()
       await api.sendVerification(email)
       pendingCredentials.value = { email, password }
@@ -119,6 +164,8 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: false, error: 'Ingrese su email' }
     }
     try {
+      await ensureMailerConfig()
+      await ensurePasswordRecoveryTemplate()
       await api.forgotPassword(email)
       return { success: true, message: 'Se envio un codigo de recuperacion a tu correo.' }
     } catch (error) {
