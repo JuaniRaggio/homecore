@@ -19,6 +19,7 @@
   --border:       #a8a8a844;
   --danger-bg:    rgba(248, 113, 113, 0.1);
   --success-bg:   rgba(58, 139, 113, 0.1);
+  --accent-bg:    rgba(79, 110, 247, 0.1);
 
   /* Texto */
   --text-primary:   #d0d3db;

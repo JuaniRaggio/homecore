@@ -45,16 +45,9 @@
 
 
          <div class="room-card__footer" @click.stop>
-          <select class="link-device-select" @change="linkDevice(room, $event)">
-            <option value="" disabled selected>+ Vincular dispositivo</option>
-            <option
-              v-for="device in availableDevices"
-              :key="device.id"
-              :value="device.id"
-            >
-              {{ device.name }}
-            </option>
-          </select>
+          <button class="btn-dashed" @click="openLinkModal(room)">
+            <i class="fa-solid fa-plus"></i> Vincular dispositivo
+          </button>
         </div>
 
 
@@ -102,6 +95,14 @@
       @confirm="confirmUnlink"
     />
 
+    <LinkDeviceModal
+      :visible="linkDeviceModal.visible.value"
+      :devices="availableDevices"
+      :loading="linking"
+      @close="closeLinkModal"
+      @link="confirmLinkDevice"
+    />
+
   </div>
 </template>
 
@@ -112,6 +113,7 @@ import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
+import LinkDeviceModal from '@/components/common/LinkDeviceModal.vue'
 import { useToastStore } from '@/stores/toast'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useModal } from '@/composables/useModal'
@@ -204,17 +206,34 @@ function openRoom(roomId) {
   router.push({ name: 'room-detail', params: { homeId: homeId.value, roomId } })
 }
 
-async function linkDevice(room, event) {
-  const deviceId = event.target.value
-  event.target.value = ''
-  if (!deviceId) return
+// Link device modal
+const linkDeviceModal = useModal()
+const linkingRoom = ref(null)
+const linking = ref(false)
+
+function openLinkModal(room) {
+  linkingRoom.value = room
+  linkDeviceModal.open()
+}
+
+function closeLinkModal() {
+  linkDeviceModal.close()
+  linkingRoom.value = null
+}
+
+async function confirmLinkDevice(deviceId) {
+  if (!linkingRoom.value || linking.value) return
+  linking.value = true
   try {
-    await api.linkDeviceToRoom(room.id, deviceId)
+    await api.linkDeviceToRoom(linkingRoom.value.id, deviceId)
     toast.show('Dispositivo vinculado', 'success')
     if (homeId.value) await devicesStore.fetchAllForHome(homeId.value)
+    closeLinkModal()
   } catch (e) {
-    console.error(`[Rooms] Error vinculando dispositivo ${deviceId} a habitacion ${room.id}:`, e)
+    console.error(`[Rooms] Error vinculando dispositivo ${deviceId} a habitacion ${linkingRoom.value.id}:`, e)
     toast.show(e.message || actionError('vincular el dispositivo a la habitacion'), 'error')
+  } finally {
+    linking.value = false
   }
 }
 </script>
@@ -284,6 +303,7 @@ async function linkDevice(room, event) {
 .room-card__footer {
   margin-top: 4px;
 }
+
 
 @media (max-width: 900px) {
   .rooms-grid {

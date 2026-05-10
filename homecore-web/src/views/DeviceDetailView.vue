@@ -32,7 +32,10 @@
             {{ statusLabel }}
           </span>
         </div>
-        <ToggleSwitch :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
+        <span v-if="device.type === 'alarm'" class="badge" :class="device.isOn ? 'badge--active' : 'badge--danger'">
+          {{ statusLabel }}
+        </span>
+        <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
       <div class="card card--xl controls-card">
@@ -67,9 +70,11 @@
           v-else-if="device.type === 'alarm'"
           :is-on="device.isOn"
           :disabled="cmd.busy.value"
+          :has-code="!!device.metadata?.securityCode"
           @arm-away="handleArmAway"
           @arm-home="handleArmHome"
           @disarm="handleDisarm"
+          @change-code="handleChangeCode"
         />
         <WaterControls
           v-else-if="device.type === 'water'"
@@ -158,6 +163,7 @@
       @close="deleteModal.close"
       @confirm="confirmDelete"
     />
+
   </div>
 </template>
 
@@ -288,13 +294,19 @@ async function togglePower() {
   const map = getStatusMap(device.value.type)
   const action = device.value.isOn ? map.actionOff : map.actionOn
   const verb = device.value.isOn ? map.verbOff : map.verbOn
+  const newIsOn = !device.value.isOn
   await cmd.execute(device.value.id, action, {
     successMsg: null,
     errorMsg: actionError(`${verb} el dispositivo`),
     onSuccess() {
-      device.value.isOn = !device.value.isOn
+      device.value.isOn = newIsOn
       const newMap = getStatusMap(device.value.type)
       toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: newIsOn ? 'on' : 'off' }
+      })
     },
   })
 }
@@ -330,31 +342,90 @@ async function toggleLock() {
 }
 
 // --- Alarm ---
+function verifyAlarmCode(code) {
+  const stored = device.value.metadata?.securityCode
+  if (!stored) return true
+  return code === stored
+}
+
 async function handleArmAway(code) {
+  if (!verifyAlarmCode(code)) {
+    toast.show('Codigo de seguridad incorrecto', 'error')
+    return
+  }
   await cmd.execute(device.value.id, 'armAway', {
     params: [code],
     successMsg: describeAction(device.value.type, 'armAway'),
     errorMsg: actionError('activar la alarma'),
-    onSuccess() { device.value.isOn = true },
+    onSuccess() {
+      device.value.isOn = true
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: 'armedAway' }
+      })
+    },
   })
 }
 
 async function handleArmHome(code) {
-  await cmd.execute(device.value.id, 'armHome', {
+  if (!verifyAlarmCode(code)) {
+    toast.show('Codigo de seguridad incorrecto', 'error')
+    return
+  }
+  await cmd.execute(device.value.id, 'armStay', {
     params: [code],
-    successMsg: describeAction(device.value.type, 'armHome'),
+    successMsg: describeAction(device.value.type, 'armStay'),
     errorMsg: actionError('activar la alarma'),
-    onSuccess() { device.value.isOn = true },
+    onSuccess() {
+      device.value.isOn = true
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: 'armedStay' }
+      })
+    },
   })
 }
 
 async function handleDisarm(code) {
+  if (!verifyAlarmCode(code)) {
+    toast.show('Codigo de seguridad incorrecto', 'error')
+    return
+  }
   await cmd.execute(device.value.id, 'disarm', {
     params: [code],
     successMsg: describeAction(device.value.type, 'disarm'),
     errorMsg: actionError('desactivar la alarma'),
-    onSuccess() { device.value.isOn = false },
+    onSuccess() {
+      device.value.isOn = false
+      // Actualizar el store tambien para que persista entre vistas
+      devicesStore.applyDeviceEvent({
+        id: device.value.id,
+        data: { status: 'disarmed' }
+      })
+    },
   })
+}
+
+async function handleChangeCode(currentCode, newCode) {
+  if (!verifyAlarmCode(currentCode)) {
+    toast.show('Codigo actual incorrecto', 'error')
+    return
+  }
+  const body = {
+    name: device.value.name,
+    type: { id: device.value.typeId },
+    metadata: { ...(device.value.metadata || {}), securityCode: newCode },
+  }
+  if (device.value.roomId) body.room = { id: device.value.roomId }
+  try {
+    await devicesStore.updateDevice(device.value.id, body)
+    device.value.metadata = { ...device.value.metadata, securityCode: newCode }
+    toast.show('Codigo de seguridad actualizado', 'success')
+  } catch (e) {
+    toast.show(e.message || actionError('cambiar el codigo de seguridad'), 'error')
+  }
 }
 
 async function setPositionTo(value) {
@@ -528,6 +599,7 @@ async function loadDeviceState(id) {
       if (state.status !== undefined) {
         device.value.isOn = state.status === 'on' || state.status === 'opened'
           || state.status === 'active' || state.status === 'playing'
+          || state.status === 'armedStay' || state.status === 'armedAway'
       }
 
       const type = device.value.type
@@ -583,23 +655,12 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Reutiliza globales: .view-narrow, .view-title, .detail-header, .detail-title-row,
+   .detail-actions, .detail-body, .btn-back, .icon-btn, .icon-btn--delete,
+   .card, .card--xl, .state-loading, .state-error */
+
 .device-detail {
   padding: 0;
-}
-
-.detail-header {
-  margin-bottom: 24px;
-}
-
-.detail-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.detail-actions {
-  display: flex;
-  gap: 6px;
 }
 
 .view-title {
@@ -609,12 +670,6 @@ onMounted(async () => {
 .device-room {
   font-size: var(--font-base);
   color: var(--text-muted);
-}
-
-.detail-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 /* Status card (layout sobre .card .card--xl) */

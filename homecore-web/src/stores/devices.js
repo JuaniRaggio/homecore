@@ -212,6 +212,7 @@ export const useDevicesStore = defineStore('devices', () => {
     if (state.status !== undefined) {
       device.isOn = state.status === 'on' || state.status === 'opened'
         || state.status === 'active' || state.status === 'playing'
+        || state.status === 'armedStay' || state.status === 'armedAway'
     }
 
     if (state.lock !== undefined) {

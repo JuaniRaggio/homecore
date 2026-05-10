@@ -1,9 +1,9 @@
 <template>
-  <div class="new-routine-view">
-    <button class="btn-back" @click="router.push({ name: 'routines', params: { homeId } })">
-      <i class="fa-solid fa-arrow-left"></i> Volver a rutinas
+  <div class="new-routine-view" :class="{ 'page-content--full': isCrossHome }">
+    <button class="btn-back" @click="goBack">
+      <i class="fa-solid fa-arrow-left"></i> {{ isCrossHome ? 'Volver al overview' : 'Volver a rutinas' }}
     </button>
-    <h1 class="view-title">{{ isEditMode ? 'Editar rutina' : 'Nueva rutina' }}</h1>
+    <h1 class="view-title">{{ isEditMode ? 'Editar rutina' : (isCrossHome ? 'Nueva rutina global' : 'Nueva rutina') }}</h1>
 
     <div class="wizard-card">
       <!-- Stepper -->
@@ -39,18 +39,18 @@
       <div v-else-if="step === 2" class="step-content">
         <h2 class="step-title">Seleccionar dispositivos</h2>
         <p class="step-hint">Selecciona los dispositivos que participan en esta rutina.</p>
-        <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
-        <p v-else-if="devicesStore.devices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
+        <p v-if="isDevicesLoading" class="state-loading">Cargando dispositivos...</p>
+        <p v-else-if="wizardDevices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
         <div v-else class="device-grid">
           <button
-            v-for="device in devicesStore.devices"
+            v-for="device in wizardDevices"
             :key="device.id"
-            class="device-tile"
-            :class="{ 'device-tile--selected': selectedIds.has(device.id) }"
+            class="selectable-tile"
+            :class="{ 'selectable-tile--selected': selectedIds.has(device.id) }"
             @click="toggleDevice(device)"
           >
-            <span class="device-tile__name">{{ displayName(device) }}</span>
-            <span class="device-tile__type">{{ translateType(device.type) }}</span>
+            <span class="selectable-tile__name">{{ displayName(device) }}</span>
+            <span class="selectable-tile__type">{{ translateType(device.type) }}</span>
           </button>
         </div>
       </div>
@@ -148,33 +148,28 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoutinesStore } from '@/stores/routines'
+import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
-import { translateType, getDisplayName } from '@/utils/device-helpers'
-import { actionsFor, paramsFor } from '@/config/routine-actions'
+import { translateType, getDisplayName, getCrossHomeDisplayName } from '@/utils/device-helpers'
+import { useOverviewData } from '@/composables/useOverviewData'
+import { actionsFor, paramsFor, DAY_OPTIONS } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
 const devicesStore = useDevicesStore()
 const routinesStore = useRoutinesStore()
+const homesStore = useHomesStore()
 const toast = useToastStore()
+const overview = useOverviewData()
 
 const homeId = computed(() => route.params.homeId)
 const routineId = computed(() => route.params.routineId)
 const isEditMode = computed(() => !!routineId.value)
+const isCrossHome = computed(() => !route.params.homeId)
 
 const STEPS = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
-
-const DAY_OPTIONS = [
-  { value: 1, label: 'Lun' },
-  { value: 2, label: 'Mar' },
-  { value: 3, label: 'Mie' },
-  { value: 4, label: 'Jue' },
-  { value: 5, label: 'Vie' },
-  { value: 6, label: 'Sab' },
-  { value: 0, label: 'Dom' },
-]
 
 // State
 const step = ref(1)
@@ -183,12 +178,31 @@ const form = reactive({ name: '', description: '', time: '08:00', days: [] })
 const selectedIds = ref(new Set())
 const deviceActions = reactive({})
 
+const wizardDevices = computed(() =>
+  isCrossHome.value ? overview.allDevices.value : devicesStore.devices
+)
+
+const isDevicesLoading = computed(() =>
+  isCrossHome.value ? overview.loading.value : devicesStore.loading
+)
+
 const selectedDevices = computed(() =>
-  devicesStore.devices.filter(d => selectedIds.value.has(d.id))
+  wizardDevices.value.filter(d => selectedIds.value.has(d.id))
 )
 
 function displayName(device) {
-  return getDisplayName(device, devicesStore.devices)
+  if (isCrossHome.value) {
+    return getCrossHomeDisplayName(device, wizardDevices.value)
+  }
+  return getDisplayName(device, wizardDevices.value)
+}
+
+function goBack() {
+  if (isCrossHome.value) {
+    router.push({ name: 'overview' })
+  } else {
+    router.push({ name: 'routines', params: { homeId: homeId.value } })
+  }
 }
 
 function toggleDevice(device) {
@@ -239,12 +253,11 @@ async function submit() {
   try {
     const payload = {
       name: form.name.trim(),
-      home: { id: homeId.value },
       description: form.description.trim(),
       actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
-      metadata: {},
+      metadata: isCrossHome.value ? { crossHome: true } : { homeId: homeId.value },
     }
 
     if (isEditMode.value) {
@@ -255,7 +268,11 @@ async function submit() {
       toast.show('Rutina creada', 'success')
     }
 
-    router.push({ name: 'routines', params: { homeId: homeId.value } })
+    if (isCrossHome.value) {
+      router.push({ name: 'overview' })
+    } else {
+      router.push({ name: 'routines', params: { homeId: homeId.value } })
+    }
   } catch (e) {
     const action = isEditMode.value ? 'actualizar la rutina' : 'crear la rutina'
     console.error(`[NewRoutine] Error:`, e)
@@ -266,9 +283,16 @@ async function submit() {
 }
 
 onMounted(async () => {
-  if (devicesStore.devices.length === 0) {
-    await devicesStore.fetchAllForHome(homeId.value)
-    devicesStore.fetchDeviceTypes()
+  if (isCrossHome.value) {
+    await homesStore.fetchHomes()
+    if (homesStore.homes.length > 0) {
+      await overview.fetchAllHomesDevices(homesStore.homes)
+    }
+  } else {
+    if (devicesStore.devices.length === 0) {
+      await devicesStore.fetchAllForHome(homeId.value)
+      devicesStore.fetchDeviceTypes()
+    }
   }
 
   if (isEditMode.value) {
@@ -325,28 +349,6 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.device-tile {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background-color: var(--bg-main);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s;
-}
-
-.device-tile:hover { border-color: var(--accent); }
-
-.device-tile--selected {
-  border-color: var(--accent);
-  background-color: rgba(79, 110, 247, 0.1);
-}
-
-.device-tile__name { font-weight: 600; font-size: var(--font-base); color: var(--text-primary); }
-.device-tile__type { font-size: var(--font-sm); color: var(--text-muted); }
 
 /* Action rows */
 .action-row {
@@ -361,12 +363,6 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 
-.action-device-name {
-  font-weight: 600;
-  font-size: var(--font-base);
-  min-width: 140px;
-}
-
 .action-controls {
   display: flex;
   align-items: center;
@@ -375,42 +371,6 @@ onMounted(async () => {
   flex: 1;
 }
 
-.action-select {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 8px 10px;
-  min-width: 160px;
-}
-
-.param-input {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  padding: 8px 10px;
-  width: 100px;
-}
-
-.param-input--color { width: 50px; height: 36px; padding: 4px; cursor: pointer; }
-
-/* Days */
-.days-row { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.day-btn {
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-
-.day-btn:hover { border-color: var(--accent); }
-.day-btn--active { background-color: var(--accent); color: #fff; border-color: var(--accent); }
+/* Reutiliza globales: .action-device-name, .action-select, .param-input,
+   .param-input--color, .days-row, .day-btn, .day-btn--active */
 </style>
