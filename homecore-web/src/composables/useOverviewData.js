@@ -105,7 +105,11 @@ export function useOverviewData() {
             rooms.map(room => limit(async () => {
               try {
                 const roomDevices = await api.getDevices(room.id)
-                return roomDevices.map(d => normalizeDevice(d, room.name))
+                return roomDevices.map(d => ({
+                  ...normalizeDevice(d, room.name),
+                  homeName: home.name,
+                  homeId: home.id,
+                }))
               } catch (e) {
                 console.error(`[overview] Error cargando dispositivos de habitacion ${room.name}:`, e)
                 return []

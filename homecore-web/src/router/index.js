@@ -60,6 +60,11 @@ const routes = [
     component: NewPropertyView
   },
   {
+    path: '/rutinas/nueva',
+    name: 'new-routine-global',
+    component: NewRoutineView
+  },
+  {
     path: '/casa/:homeId',
     component: HomeLayout,
     children: [

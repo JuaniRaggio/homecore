@@ -51,6 +51,28 @@ export function translateType(typeName) {
 }
 
 /**
+ * Resolucion de colisiones de 3 niveles para modo cross-home: casa::habitacion::nombre.
+ * @param {Object} device
+ * @param {Object[]} allDevices
+ * @returns {string}
+ */
+export function getCrossHomeDisplayName(device, allDevices) {
+  const sameName = allDevices.filter(d => d.id !== device.id && d.name === device.name)
+  if (sameName.length === 0) return device.name
+
+  const sameRoomAndName = sameName.filter(d => d.room === device.room)
+  if (sameRoomAndName.length === 0 && device.room) {
+    return `${device.room}::${device.name}`
+  }
+
+  if (device.homeName && device.room) {
+    return `${device.homeName}::${device.room}::${device.name}`
+  }
+  if (device.room) return `${device.room}::${device.name}`
+  return device.name
+}
+
+/**
  * Si hay otro dispositivo con el mismo nombre, desambigua con "habitacion::nombre".
  * @param {Object} device
  * @param {Object[]} allDevices
