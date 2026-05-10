@@ -71,6 +71,7 @@
           :device="device"
           @toggle="deviceActions.toggleDevice"
           @toggle-favorite="deviceActions.toggleFavorite"
+          @open="handleOpenDevice"
         />
         <p v-if="favoriteDevices.length === 0" class="empty-msg">Sin dispositivos favoritos</p>
       </div>
@@ -240,6 +241,10 @@ async function confirmEditHome(name) {
   } finally {
     saving.value = false
   }
+}
+
+function handleOpenDevice(id) {
+  router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })
 }
 
 // Fetch routines additionally (useHomeData already fetches devices + rooms)
