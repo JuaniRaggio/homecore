@@ -13,7 +13,7 @@ export const ACTIONS_MAP = {
   ],
   alarm: [
     { actionName: 'armAway',  label: 'Activar (modo regular)', params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
-    { actionName: 'armHome',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
+    { actionName: 'armStay',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
     { actionName: 'disarm',   label: 'Desactivar',            params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
     { actionName: 'changeSecurityCode', label: 'Cambiar codigo', params: [{ type: 'text', placeholder: 'Codigo nuevo' }] },
   ],

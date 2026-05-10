@@ -373,9 +373,9 @@ async function handleArmHome(code) {
     toast.show('Codigo de seguridad incorrecto', 'error')
     return
   }
-  await cmd.execute(device.value.id, 'armHome', {
+  await cmd.execute(device.value.id, 'armStay', {
     params: [code],
-    successMsg: describeAction(device.value.type, 'armHome'),
+    successMsg: describeAction(device.value.type, 'armStay'),
     errorMsg: actionError('activar la alarma'),
     onSuccess() {
       device.value.isOn = true
