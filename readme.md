@@ -109,4 +109,27 @@ _Work in progress by Maru_
 > "error" de implementacion sino que es lo que nosotros consideramos que
 > tiene sentido
 
+# Requisitos funcionales por la catedra
+
+1. RF1 Registrar cuenta: Check RegisterView.vue - does it have a registration form? Does it call an API to register?
+2. RF2 Verificar cuenta: Check VerifyView.vue - does it have a verification code input? Does it call an API?
+3. RF3 Recuperar contrasena: Check RecoverView.vue - does it have password recovery flow? (email input, code, new password)
+4. RF4 Cambiar contrasena: Search for password change functionality - is there a form/modal in SettingsView or elsewhere?
+5. RF5 Iniciar sesion: Check LoginView.vue
+6. RF6 Cerrar sesion: Search for logout button/functionality in the UI - check sidebar, topbar, settings, any component that renders a logout button. Check if there's a logout route or button anywhere in templates.
+7. RF7 Gestionar dispositivos: Check if you can create, edit, delete devices (CreateDeviceModal, EditDeviceView, delete functionality)
+8. RF8 Consultar dispositivos: Check DevicesView.vue, DeviceDetailView.vue
+9. RF9 Controlar dispositivos: Check device control components (AlarmControls, SpeakerControls, VacuumControls, etc.)
+10. RF10 Gestionar rutinas: Check if you can create, edit, delete routines (NewRoutineView, delete in RoutinesView)
+11. RF11 Consultar rutinas: Check RoutinesView.vue, RoutineDetailModal
+12. RF12 Ejecutar rutinas: Check if there's an execute button/action for routines
+13. RF13 Consultar acciones realizadas: Check HistoryView.vue
+14. RF14 Gestionar habitaciones: Check if you can create, edit, delete rooms
+15. RF15 Consultar habitaciones: Check RoomsView.vue, RoomDetailView.vue
+16. RF16 Vincular dispositivos a habitaciones: Check RoomDetailView for linking functionality
+17. RF17 Gestionar hogares: Check if you can create, edit, delete homes
+18. RF18 Consultar hogares: Check OverviewView or similar
+19. RF19 Vincular habitaciones a hogares: Check if rooms are linked to homes when created
+20. RF20 Enviar notificaciones: Check notifications store/component
+21. RF22 Consultar consumo electrico: Check ConsumptionView.vue
 
