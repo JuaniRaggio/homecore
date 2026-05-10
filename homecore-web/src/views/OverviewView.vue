@@ -24,91 +24,96 @@
       </div>
     </section>
 
-    <!-- Dispositivos criticos (cross-home) -->
-    <section class="overview-section">
-      <h2 class="section-title">Dispositivos criticos</h2>
-      <p v-if="!overview.loading.value && overview.criticalDevices.value.length === 0 && alarmSummary.length === 0" class="state-empty">
-        Sin alertas activas
-      </p>
-      <template v-if="!overview.loading.value && (overview.criticalDevices.value.length > 0 || alarmSummary.length > 0)">
-        <!-- Resumen de alarmas por casa -->
-        <div v-if="alarmSummary.length > 0" class="critical-devices alarm-summary">
-          <div v-for="home in alarmSummary" :key="home.homeId" class="critical-device-item">
-            <i class="fa-solid fa-shield-halved critical-icon" :class="home.allArmed ? 'critical-icon--armed' : 'critical-icon--alarm'"></i>
-            <div class="critical-device-info">
-              <span class="critical-device-name">{{ home.homeName }}</span>
-              <template v-if="home.allArmed">
-                <span class="alarm-status alarm-status--armed">Completamente armada</span>
-              </template>
-              <template v-else>
-                <span
-                  v-for="alarm in home.alarms"
-                  :key="alarm.name + alarm.room"
-                  class="alarm-status"
-                  :class="alarm.isOn ? 'alarm-status--armed' : 'alarm-status--disarmed'"
-                >
-                  {{ alarm.room }}::{{ alarm.isOn ? 'armada' : 'desarmada' }}
-                </span>
-              </template>
+    <!-- Grilla: Dispositivos criticos + Rutinas favoritas -->
+    <div class="overview-grid">
+      <!-- Dispositivos criticos (cross-home) -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Dispositivos criticos</h2>
+        </div>
+        <p v-if="!overview.loading.value && overview.criticalDevices.value.length === 0 && alarmSummary.length === 0" class="state-empty">
+          Sin alertas activas
+        </p>
+        <template v-if="!overview.loading.value && (overview.criticalDevices.value.length > 0 || alarmSummary.length > 0)">
+          <!-- Resumen de alarmas por casa -->
+          <div v-if="alarmSummary.length > 0" class="critical-devices alarm-summary">
+            <div v-for="home in alarmSummary" :key="home.homeId" class="critical-device-item">
+              <i class="fa-solid fa-shield-halved critical-icon" :class="home.allArmed ? 'critical-icon--armed' : 'critical-icon--alarm'"></i>
+              <div class="critical-device-info">
+                <span class="critical-device-name">{{ home.homeName }}</span>
+                <template v-if="home.allArmed">
+                  <span class="alarm-status alarm-status--armed">Completamente armada</span>
+                </template>
+                <template v-else>
+                  <span
+                    v-for="alarm in home.alarms"
+                    :key="alarm.name + alarm.room"
+                    class="alarm-status"
+                    :class="alarm.isOn ? 'alarm-status--armed' : 'alarm-status--disarmed'"
+                  >
+                    {{ alarm.room }}::{{ alarm.isOn ? 'armada' : 'desarmada' }}
+                  </span>
+                </template>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Puertas abiertas -->
-        <div v-if="openDoors.length > 0" class="critical-devices">
-          <div
-            v-for="device in openDoors"
-            :key="device.id"
-            class="critical-device-item"
-          >
-            <i class="fa-solid fa-door-open critical-icon critical-icon--door"></i>
-            <div class="critical-device-info">
-              <span class="critical-device-name">{{ device.name }}</span>
-              <span class="critical-device-room">{{ device.room }}</span>
+          <!-- Puertas abiertas -->
+          <div v-if="openDoors.length > 0" class="critical-devices">
+            <div
+              v-for="device in openDoors"
+              :key="device.id"
+              class="critical-device-item"
+            >
+              <i class="fa-solid fa-door-open critical-icon critical-icon--door"></i>
+              <div class="critical-device-info">
+                <span class="critical-device-name">{{ device.name }}</span>
+                <span class="critical-device-room">{{ device.room }}</span>
+              </div>
+              <span class="critical-device-status">{{ device.statusText }}</span>
             </div>
-            <span class="critical-device-status">{{ device.statusText }}</span>
           </div>
+        </template>
+      </section>
+
+      <!-- Rutinas favoritas (cross-home) -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Rutinas favoritas</h2>
+          <router-link :to="{ name: 'new-routine-global' }" class="btn-add">+ Nueva rutina global</router-link>
         </div>
-      </template>
-    </section>
 
-    <!-- Rutinas favoritas (cross-home) -->
-    <section class="overview-section">
-      <div class="section-header">
-        <h2 class="section-title">Rutinas favoritas</h2>
-        <router-link :to="{ name: 'new-routine-global' }" class="btn-add">+ Nueva rutina global</router-link>
-      </div>
+        <!-- Rutinas globales -->
+        <template v-if="globalRoutines.length > 0">
+          <h3 class="subsection-title">Globales</h3>
+          <div class="routines-list">
+            <RoutineRow
+              v-for="routine in globalRoutines"
+              :key="routine.id"
+              :routine="{ ...routine, name: routine.displayName || routine.name, schedule: 'Global', isFavorite: true }"
+              @execute="routineActions.executeRoutine"
+            />
+          </div>
+        </template>
 
-      <!-- Rutinas globales -->
-      <template v-if="globalRoutines.length > 0">
-        <h3 class="subsection-title">Globales</h3>
-        <div class="routines-list">
-          <RoutineRow
-            v-for="routine in globalRoutines"
-            :key="routine.id"
-            :routine="{ ...routine, name: routine.displayName || routine.name, schedule: 'Global', isFavorite: true }"
-            @execute="routineActions.executeRoutine"
-          />
-        </div>
-      </template>
+        <!-- Rutinas de casas especificas -->
+        <template v-if="homeRoutines.length > 0">
+          <h3 class="subsection-title">Por propiedad</h3>
+          <div class="routines-list">
+            <RoutineRow
+              v-for="routine in homeRoutines"
+              :key="routine.id"
+              :routine="{ ...routine, name: routine.displayName || routine.name, schedule: getRoutineHomeName(routine), isFavorite: true }"
+              @execute="routineActions.executeRoutine"
+            />
+          </div>
+        </template>
 
-      <!-- Rutinas de casas especificas -->
-      <template v-if="homeRoutines.length > 0">
-        <h3 class="subsection-title">Por propiedad</h3>
-        <div class="routines-list">
-          <RoutineRow
-            v-for="routine in homeRoutines"
-            :key="routine.id"
-            :routine="{ ...routine, name: routine.displayName || routine.name, schedule: getRoutineHomeName(routine), isFavorite: true }"
-            @execute="routineActions.executeRoutine"
-          />
-        </div>
-      </template>
-
-      <p v-if="globalRoutines.length === 0 && homeRoutines.length === 0" class="state-empty">
-        Sin rutinas favoritas
-      </p>
-    </section>
+        <p v-if="globalRoutines.length === 0 && homeRoutines.length === 0" class="state-empty">
+          Sin rutinas favoritas
+        </p>
+      </section>
+    </div>
 
     <!-- Resumen energetico general -->
     <section class="overview-section">
@@ -237,7 +242,6 @@ onMounted(async () => {
   margin-bottom: 28px;
 }
 
-/* Override del global section-title para el overview (fuente mas grande) */
 .section-title {
   font-size: var(--font-xl);
   margin-bottom: 14px;
@@ -250,9 +254,28 @@ onMounted(async () => {
   gap: 16px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+}
+
 .btn-add {
   display: inline-block;
   text-decoration: none;
+}
+
+/* -- Grilla: criticos + rutinas -- */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
 }
 
 /* -- Dispositivos criticos -- */
@@ -267,9 +290,9 @@ onMounted(async () => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background-color: var(--bg-card);
+  background-color: var(--bg-main);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
 }
 
 .critical-icon { font-size: var(--font-xl); }
@@ -318,17 +341,6 @@ onMounted(async () => {
   color: var(--danger);
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.section-header .section-title {
-  margin-bottom: 0;
-}
-
 .subsection-title {
   font-size: var(--font-base);
   font-weight: 600;
@@ -339,14 +351,13 @@ onMounted(async () => {
   margin-top: 16px;
 }
 
-/* -- Rutinas favoritas -- */
-.routines-list {
-  display: flex;
-  flex-direction: column;
-}
 
 @media (max-width: 768px) {
   .homes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-grid {
     grid-template-columns: 1fr;
   }
 
