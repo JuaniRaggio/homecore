@@ -3,7 +3,7 @@
     <button class="btn-back" @click="router.push({ name: 'routines', params: { homeId } })">
       <i class="fa-solid fa-arrow-left"></i> Volver a rutinas
     </button>
-    <h1 class="view-title">Nueva rutina</h1>
+    <h1 class="view-title">{{ isEditMode ? 'Editar rutina' : 'Nueva rutina' }}</h1>
 
     <div class="wizard-card">
       <!-- Stepper -->
@@ -136,7 +136,7 @@
         <button class="btn-prev" :class="{ invisible: step === 1 }" @click="step--">Anterior</button>
         <button v-if="step < 4" class="btn-next" :disabled="!canProceed" @click="step++">Siguiente</button>
         <button v-else class="btn-create" :disabled="saving || !canCreate" @click="submit">
-          {{ saving ? 'Creando...' : 'Crear rutina' }}
+          {{ saving ? (isEditMode ? 'Guardando...' : 'Creando...') : (isEditMode ? 'Guardar cambios' : 'Crear rutina') }}
         </button>
       </div>
     </div>
@@ -152,6 +152,7 @@ import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
 import { translateType } from '@/utils/device-helpers'
 import { actionsFor, paramsFor } from '@/config/routine-actions'
+import * as api from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -160,6 +161,8 @@ const routinesStore = useRoutinesStore()
 const toast = useToastStore()
 
 const homeId = computed(() => route.params.homeId)
+const routineId = computed(() => route.params.routineId)
+const isEditMode = computed(() => !!routineId.value)
 
 const STEPS = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
 
@@ -216,42 +219,88 @@ const canCreate = computed(() =>
   selectedDevices.value.some(d => deviceActions[d.id]?.actionName)
 )
 
+function buildActionsPayload() {
+  return selectedDevices.value
+    .filter(d => deviceActions[d.id]?.actionName)
+    .map(d => ({
+      device: { id: d.id },
+      actionName: deviceActions[d.id].actionName,
+      params: deviceActions[d.id].params.filter(p => p !== '' && p !== null && p !== undefined),
+    }))
+}
+
 async function submit() {
   if (!canCreate.value || saving.value) return
   saving.value = true
   try {
-    const actions = selectedDevices.value
-      .filter(d => deviceActions[d.id]?.actionName)
-      .map(d => ({
-        device: { id: d.id },
-        actionName: deviceActions[d.id].actionName,
-        params: deviceActions[d.id].params.filter(p => p !== '' && p !== null && p !== undefined),
-      }))
-
-    await routinesStore.create({
+    const payload = {
       name: form.name.trim(),
       home: { id: homeId.value },
       description: form.description.trim(),
-      actions,
+      actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
       metadata: {},
-    })
+    }
 
-    toast.show('Rutina creada', 'success')
+    if (isEditMode.value) {
+      await routinesStore.update(routineId.value, payload)
+      toast.show('Rutina actualizada', 'success')
+    } else {
+      await routinesStore.create(payload)
+      toast.show('Rutina creada', 'success')
+    }
+
     router.push({ name: 'routines', params: { homeId: homeId.value } })
   } catch (e) {
-    console.error('[NewRoutine] Error creando rutina:', e)
-    toast.show(e.message || actionError('crear la rutina'), 'error')
+    const action = isEditMode.value ? 'actualizar la rutina' : 'crear la rutina'
+    console.error(`[NewRoutine] Error:`, e)
+    toast.show(e.message || actionError(action), 'error')
   } finally {
     saving.value = false
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (devicesStore.devices.length === 0) {
-    devicesStore.fetchAllForHome(homeId.value)
+    await devicesStore.fetchAllForHome(homeId.value)
     devicesStore.fetchDeviceTypes()
+  }
+
+  if (isEditMode.value) {
+    let routine = routinesStore.getById(routineId.value)
+    if (!routine) {
+      try {
+        routine = await api.getRoutine(routineId.value)
+      } catch (e) {
+        console.error('[EditRoutine] Error cargando rutina:', e)
+        toast.show(e.message || actionError('cargar la rutina'), 'error')
+        return
+      }
+    }
+
+    form.name = routine.name || ''
+    form.description = routine.description || ''
+    form.time = routine.time || '08:00'
+    form.days = Array.isArray(routine.days) ? [...routine.days] : []
+
+    if (Array.isArray(routine.actions)) {
+      const ids = new Set()
+      for (const action of routine.actions) {
+        const deviceId = action.device?.id
+        if (!deviceId) continue
+        ids.add(deviceId)
+
+        const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+        const typeName = device?.type || ''
+        const paramDefs = paramsFor(typeName, action.actionName)
+        const params = paramDefs.map((_, i) =>
+          Array.isArray(action.params) && action.params[i] !== undefined ? action.params[i] : ''
+        )
+        deviceActions[deviceId] = { actionName: action.actionName, params }
+      }
+      selectedIds.value = ids
+    }
   }
 })
 </script>

@@ -33,6 +33,7 @@
 
     <div class="routine-card__footer">
       <button class="btn-exec" @click="$emit('execute', routine.id)">Ejecutar Ahora</button>
+      <button class="btn-detail" @click="$emit('edit', routine.id)">Editar</button>
       <button class="btn-detail" @click="$emit('view-detail', routine.id)">Ver detalle</button>
     </div>
   </div>
@@ -58,7 +59,7 @@ defineProps({
   }
 })
 
-defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail'])
+defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'view-detail', 'edit'])
 </script>
 
 <style scoped>

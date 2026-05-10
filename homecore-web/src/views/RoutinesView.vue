@@ -17,6 +17,7 @@
         @toggle-favorite="handleToggleFavorite"
         @toggle-active="handleToggleActive"
         @view-detail="handleViewDetail"
+        @edit="handleEdit"
       />
     </div>
 
@@ -26,6 +27,7 @@
       @close="closeDetailModal"
       @delete="deleteFromDetail"
       @execute="executeFromDetail"
+      @edit="editFromDetail"
     />
 
     <ConfirmModal
@@ -123,6 +125,16 @@ async function confirmDeleteRoutine() {
 async function executeFromDetail() {
   if (!detailRoutine.value) return
   await routineActions.executeRoutine(detailRoutine.value.id)
+}
+
+function handleEdit(id) {
+  router.push({ name: 'edit-routine', params: { homeId: route.params.homeId, routineId: id } })
+}
+
+function editFromDetail() {
+  if (!detailRoutine.value) return
+  closeDetailModal()
+  handleEdit(detailRoutine.value.id)
 }
 
 onMounted(() => {

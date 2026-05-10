@@ -102,6 +102,11 @@ const routes = [
         component: NewRoutineView
       },
       {
+        path: 'rutinas/:routineId/editar',
+        name: 'edit-routine',
+        component: NewRoutineView
+      },
+      {
         path: 'historial',
         name: 'history',
         component: HistoryView

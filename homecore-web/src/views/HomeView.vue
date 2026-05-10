@@ -20,6 +20,9 @@
       <button class="icon-btn" @click="editHomeModal.open" title="Editar hogar">
         <i class="fa-regular fa-pen-to-square"></i>
       </button>
+      <button class="icon-btn icon-btn--delete" @click="deleteHomeConfirm.request(homeId)" title="Eliminar hogar">
+        <i class="fa-regular fa-trash-can"></i>
+      </button>
     </div>
 
     <div class="house-inner">
@@ -120,11 +123,24 @@
     @close="deleteRoomConfirm.close"
     @confirm="confirmDeleteRoom"
   />
+
+  <ConfirmModal
+    :visible="deleteHomeConfirm.visible.value"
+    title="Eliminar hogar"
+    description="Estas seguro de que queres eliminar este hogar? Se eliminaran todas las habitaciones y dispositivos asociados. Esta accion no se puede deshacer."
+    confirm-label="Eliminar hogar"
+    confirming-label="Eliminando..."
+    :danger="true"
+    :loading="deleteHomeConfirm.loading.value"
+    @close="deleteHomeConfirm.close"
+    @confirm="confirmDeleteHome"
+  />
   </template>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
 import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
@@ -141,6 +157,7 @@ import { useConfirmAction } from '@/composables/useConfirmAction'
 import { useHomeData } from '@/composables/useHomeData'
 import * as api from '@/services/api'
 
+const router = useRouter()
 const { homeId, devicesStore, roomsStore } = useHomeData()
 
 const routinesStore = useRoutinesStore()
@@ -182,6 +199,25 @@ async function confirmDeleteRoom() {
     }
     await roomsStore.removeRoom(roomId)
     toast.show('Habitacion eliminada', 'success')
+  })
+}
+
+// Delete home confirmation
+const deleteHomeConfirm = useConfirmAction()
+
+async function confirmDeleteHome() {
+  await deleteHomeConfirm.confirm(async () => {
+    for (const room of rooms.value) {
+      const roomDevices = devicesStore.getDevicesByRoomId(room.id)
+      if (roomDevices.length) {
+        await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
+        roomDevices.forEach(d => devicesStore.removeDevice(d.id))
+      }
+      await roomsStore.removeRoom(room.id)
+    }
+    await homesStore.removeHome(homeId.value)
+    toast.show('Hogar eliminado', 'success')
+    router.push({ name: 'overview' })
   })
 }
 
