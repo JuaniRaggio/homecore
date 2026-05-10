@@ -11,12 +11,19 @@
   display: flex;
   align-items: center;
   gap: 0;
+  overflow: hidden;
 }
 
 .step {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.step:last-child {
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .step-circle {
@@ -50,6 +57,8 @@
   font-size: var(--font-base);
   color: var(--text-muted);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .step--active .step-label { color: var(--text-primary); font-weight: 600; }
@@ -138,6 +147,9 @@
 .btn-next:disabled, .btn-create:disabled { opacity: 0.5; cursor: not-allowed; }
 
 @media (max-width: 768px) {
+  .step-label { display: none; }
+  .step-line { min-width: 12px; margin: 0 6px; }
+
   .action-row {
     flex-direction: column;
     align-items: flex-start;
@@ -150,8 +162,6 @@
 
 @media (max-width: 640px) {
   .wizard-card { padding: 16px; }
-  .step-label { display: none; }
-  .step-line { min-width: 12px; margin: 0 6px; }
   .wizard-divider { margin: 16px 0; }
   .btn-prev, .btn-next, .btn-create { padding: 10px 16px; }
 }
