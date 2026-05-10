@@ -60,10 +60,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (recoveryTemplateReady.value) return
     try {
       const templates = await api.getAllMailerTemplates()
-      const exists = Array.isArray(templates) && templates.some(t => t.type === 'RECOVERY')
+      const exists = Array.isArray(templates) && templates.some(t => t.type === 'RESET_PASSWORD')
       if (!exists) {
         await api.postMailerTemplate({
-          type: 'RECOVERY',
+          type: 'RESET_PASSWORD',
           subject: 'Código de recuperación - HomeCore',
           template: '<div><h1>Hola <%FIRST_NAME%></h1><p>Tu código de recuperación es: <strong><%VERIFICATION_CODE%></strong></p></div>',
         })
