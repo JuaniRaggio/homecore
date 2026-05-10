@@ -1,9 +1,9 @@
 <template>
   <div class="new-routine-view">
-    <button class="btn-back" @click="router.push({ name: 'routines', params: { homeId } })">
-      <i class="fa-solid fa-arrow-left"></i> Volver a rutinas
+    <button class="btn-back" @click="goBack">
+      <i class="fa-solid fa-arrow-left"></i> {{ isCrossHome ? 'Volver al overview' : 'Volver a rutinas' }}
     </button>
-    <h1 class="view-title">{{ isEditMode ? 'Editar rutina' : 'Nueva rutina' }}</h1>
+    <h1 class="view-title">{{ isEditMode ? 'Editar rutina' : (isCrossHome ? 'Nueva rutina global' : 'Nueva rutina') }}</h1>
 
     <div class="wizard-card">
       <!-- Stepper -->
@@ -39,11 +39,11 @@
       <div v-else-if="step === 2" class="step-content">
         <h2 class="step-title">Seleccionar dispositivos</h2>
         <p class="step-hint">Selecciona los dispositivos que participan en esta rutina.</p>
-        <p v-if="devicesStore.loading" class="state-loading">Cargando dispositivos...</p>
-        <p v-else-if="devicesStore.devices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
+        <p v-if="isDevicesLoading" class="state-loading">Cargando dispositivos...</p>
+        <p v-else-if="wizardDevices.length === 0" class="state-empty">Sin dispositivos disponibles.</p>
         <div v-else class="device-grid">
           <button
-            v-for="device in devicesStore.devices"
+            v-for="device in wizardDevices"
             :key="device.id"
             class="selectable-tile"
             :class="{ 'selectable-tile--selected': selectedIds.has(device.id) }"
@@ -148,9 +148,11 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDevicesStore } from '@/stores/devices'
 import { useRoutinesStore } from '@/stores/routines'
+import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
-import { translateType, getDisplayName } from '@/utils/device-helpers'
+import { translateType, getDisplayName, getCrossHomeDisplayName } from '@/utils/device-helpers'
+import { useOverviewData } from '@/composables/useOverviewData'
 import { actionsFor, paramsFor, DAY_OPTIONS } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
@@ -158,11 +160,14 @@ const route = useRoute()
 const router = useRouter()
 const devicesStore = useDevicesStore()
 const routinesStore = useRoutinesStore()
+const homesStore = useHomesStore()
 const toast = useToastStore()
+const overview = useOverviewData()
 
 const homeId = computed(() => route.params.homeId)
 const routineId = computed(() => route.params.routineId)
 const isEditMode = computed(() => !!routineId.value)
+const isCrossHome = computed(() => !route.params.homeId)
 
 const STEPS = ['Nombre', 'Dispositivos', 'Acciones', 'Horario']
 
@@ -173,12 +178,31 @@ const form = reactive({ name: '', description: '', time: '08:00', days: [] })
 const selectedIds = ref(new Set())
 const deviceActions = reactive({})
 
+const wizardDevices = computed(() =>
+  isCrossHome.value ? overview.allDevices.value : devicesStore.devices
+)
+
+const isDevicesLoading = computed(() =>
+  isCrossHome.value ? overview.loading.value : devicesStore.loading
+)
+
 const selectedDevices = computed(() =>
-  devicesStore.devices.filter(d => selectedIds.value.has(d.id))
+  wizardDevices.value.filter(d => selectedIds.value.has(d.id))
 )
 
 function displayName(device) {
-  return getDisplayName(device, devicesStore.devices)
+  if (isCrossHome.value) {
+    return getCrossHomeDisplayName(device, wizardDevices.value)
+  }
+  return getDisplayName(device, wizardDevices.value)
+}
+
+function goBack() {
+  if (isCrossHome.value) {
+    router.push({ name: 'overview' })
+  } else {
+    router.push({ name: 'routines', params: { homeId: homeId.value } })
+  }
 }
 
 function toggleDevice(device) {
@@ -233,7 +257,7 @@ async function submit() {
       actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
-      metadata: { homeId: homeId.value },
+      metadata: isCrossHome.value ? { crossHome: true } : { homeId: homeId.value },
     }
 
     if (isEditMode.value) {
@@ -244,7 +268,11 @@ async function submit() {
       toast.show('Rutina creada', 'success')
     }
 
-    router.push({ name: 'routines', params: { homeId: homeId.value } })
+    if (isCrossHome.value) {
+      router.push({ name: 'overview' })
+    } else {
+      router.push({ name: 'routines', params: { homeId: homeId.value } })
+    }
   } catch (e) {
     const action = isEditMode.value ? 'actualizar la rutina' : 'crear la rutina'
     console.error(`[NewRoutine] Error:`, e)
@@ -255,9 +283,16 @@ async function submit() {
 }
 
 onMounted(async () => {
-  if (devicesStore.devices.length === 0) {
-    await devicesStore.fetchAllForHome(homeId.value)
-    devicesStore.fetchDeviceTypes()
+  if (isCrossHome.value) {
+    await homesStore.fetchHomes()
+    if (homesStore.homes.length > 0) {
+      await overview.fetchAllHomesDevices(homesStore.homes)
+    }
+  } else {
+    if (devicesStore.devices.length === 0) {
+      await devicesStore.fetchAllForHome(homeId.value)
+      devicesStore.fetchDeviceTypes()
+    }
   }
 
   if (isEditMode.value) {

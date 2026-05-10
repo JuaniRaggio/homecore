@@ -25,11 +25,10 @@
     <!-- Dispositivos criticos (cross-home) -->
     <section class="overview-section">
       <h2 class="section-title">Dispositivos criticos</h2>
-      <p v-if="overview.loading.value" class="state-loading">Cargando...</p>
-      <p v-else-if="overview.criticalDevices.value.length === 0 && alarmSummary.length === 0" class="state-empty">
+      <p v-if="!overview.loading.value && overview.criticalDevices.value.length === 0 && alarmSummary.length === 0" class="state-empty">
         Sin alertas activas
       </p>
-      <template v-else>
+      <template v-if="!overview.loading.value && (overview.criticalDevices.value.length > 0 || alarmSummary.length > 0)">
         <!-- Resumen de alarmas por casa -->
         <div v-if="alarmSummary.length > 0" class="critical-devices alarm-summary">
           <div v-for="home in alarmSummary" :key="home.homeId" class="critical-device-item">
@@ -73,21 +72,50 @@
 
     <!-- Rutinas favoritas (cross-home) -->
     <section class="overview-section">
-      <h2 class="section-title">Rutinas favoritas</h2>
-      <div v-if="favoriteRoutines.length > 0" class="fav-routines">
-        <div v-for="routine in favoriteRoutines" :key="routine.id" class="fav-routine-item">
-          <i class="fa-solid fa-star fav-routine-star"></i>
-          <div class="fav-routine-info">
-            <span class="fav-routine-name">{{ routine.displayName || routine.name }}</span>
-            <span class="fav-routine-home">{{ routine.description || '' }}</span>
-          </div>
-          <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
-          <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
-            <i class="fa-solid fa-play"></i>
-          </button>
-        </div>
+      <div class="section-header">
+        <h2 class="section-title">Rutinas favoritas</h2>
+        <router-link :to="{ name: 'new-routine-global' }" class="btn-add">+ Nueva rutina global</router-link>
       </div>
-      <p v-else class="state-empty">Sin rutinas favoritas</p>
+
+      <!-- Rutinas globales -->
+      <template v-if="globalRoutines.length > 0">
+        <h3 class="subsection-title">Globales</h3>
+        <div class="fav-routines">
+          <div v-for="routine in globalRoutines" :key="routine.id" class="fav-routine-item">
+            <i class="fa-solid fa-globe fav-routine-star"></i>
+            <div class="fav-routine-info">
+              <span class="fav-routine-name">{{ routine.displayName || routine.name }}</span>
+              <span class="fav-routine-home">{{ routine.description || '' }}</span>
+            </div>
+            <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
+            <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <!-- Rutinas de casas especificas -->
+      <template v-if="homeRoutines.length > 0">
+        <h3 class="subsection-title">Por propiedad</h3>
+        <div class="fav-routines">
+          <div v-for="routine in homeRoutines" :key="routine.id" class="fav-routine-item">
+            <i class="fa-solid fa-star fav-routine-star"></i>
+            <div class="fav-routine-info">
+              <span class="fav-routine-name">{{ routine.displayName || routine.name }}</span>
+              <span class="fav-routine-home">{{ getRoutineHomeName(routine) }}</span>
+            </div>
+            <span class="fav-routine-schedule">{{ routine.actions?.length ?? 0 }} acciones</span>
+            <button class="fav-routine-btn" @click="routineActions.executeRoutine(routine.id)">
+              <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <p v-if="globalRoutines.length === 0 && homeRoutines.length === 0" class="state-empty">
+        Sin rutinas favoritas
+      </p>
     </section>
 
     <!-- Resumen energetico general -->
@@ -139,8 +167,13 @@ const overview = useOverviewData()
 const routineActions = useRoutineActions()
 
 const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
-const favoriteRoutines = computed(() => {
-  const favs = routinesStore.favoriteRoutines
+
+const globalRoutines = computed(() =>
+  routinesStore.favoriteRoutines.filter(r => r.metadata?.crossHome)
+)
+
+const homeRoutines = computed(() => {
+  const favs = routinesStore.favoriteRoutines.filter(r => !r.metadata?.crossHome)
   const nameCount = {}
   for (const r of favs) {
     nameCount[r.name] = (nameCount[r.name] || 0) + 1
@@ -148,12 +181,19 @@ const favoriteRoutines = computed(() => {
   return favs.map(r => {
     const isDuplicate = nameCount[r.name] > 1
     if (!isDuplicate) return r
-    const homeId = r.metadata?.homeId
-    const home = homeId ? homesStore.getById(homeId) : null
+    const hid = r.metadata?.homeId
+    const home = hid ? homesStore.getById(hid) : null
     const homeName = home?.name || 'Sin casa'
     return { ...r, displayName: `${homeName}::${r.name}` }
   })
 })
+
+function getRoutineHomeName(routine) {
+  const hid = routine.metadata?.homeId
+  if (!hid) return ''
+  const home = homesStore.getById(hid)
+  return home?.name || ''
+}
 
 const enrichedHomes = computed(() =>
   homesStore.homes.map(h => overview.enrichHome(h))
@@ -284,6 +324,27 @@ onMounted(async () => {
 
 .alarm-status--disarmed {
   color: var(--danger);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+}
+
+.subsection-title {
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  margin-top: 16px;
 }
 
 /* -- Rutinas favoritas -- */
