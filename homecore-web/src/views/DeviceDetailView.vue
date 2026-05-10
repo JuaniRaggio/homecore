@@ -382,7 +382,7 @@ async function handleArmHome(code) {
       // Actualizar el store tambien para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
-        data: { status: 'on' }
+        data: { status: 'armedStay' }
       })
     },
   })
@@ -402,7 +402,7 @@ async function handleDisarm(code) {
       // Actualizar el store tambien para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
-        data: { status: 'off' }
+        data: { status: 'disarmed' }
       })
     },
   })

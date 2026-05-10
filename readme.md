@@ -153,6 +153,64 @@ Al crear `deviceTypes` personalizados en el backend con acciones especificas, SI
 
 ---
 
+## [RESUELTO - 2025] Estados de alarma no reconocidos al recargar
+
+### Sintoma (Parte 2 del problema de alarmas)
+- Al activar una alarma, funcionaba correctamente y se veia activada
+- Al salir de la vista y volver, la alarma aparecia desactivada
+- La API SI estaba guardando el estado (`armedStay`, `armedAway`)
+- Pero el frontend no lo reconocia al recargar
+
+### Causa raiz
+**Estados especificos de alarma no incluidos en la logica de interpretacion**
+
+El frontend tenia tres lugares donde interpretaba `state.status` para determinar si un dispositivo esta "ON":
+
+1. `normalizeDevice()` en `device-helpers.js`
+2. `loadDeviceState()` en `DeviceDetailView.vue`
+3. `applyDeviceEvent()` en `stores/devices.js`
+
+Todos usaban la misma condicion:
+```javascript
+isOn = state.status === 'on' || state.status === 'opened'
+    || state.status === 'active' || state.status === 'playing'
+```
+
+Pero las alarmas usan estados especificos:
+- `'armedStay'` (activada modo casa)
+- `'armedAway'` (activada modo regular)
+- `'disarmed'` (desactivada)
+
+Como `'armedStay'` y `'armedAway'` no estaban en la lista, el frontend los interpretaba como "OFF", aunque la API los guardaba correctamente.
+
+### Solucion implementada
+Agregar los estados de alarma a las tres condiciones:
+
+```javascript
+isOn = state.status === 'on' || state.status === 'opened'
+    || state.status === 'active' || state.status === 'playing'
+    || state.status === 'armedStay' || state.status === 'armedAway'  // <- Agregado
+```
+
+Y enviar los estados correctos al store:
+- `armAway` → `{ status: 'armedAway' }`
+- `armStay` → `{ status: 'armedStay' }`
+- `disarm` → `{ status: 'disarmed' }`
+
+### Archivos modificados
+- `src/utils/device-helpers.js`: Estado de alarma en `normalizeDevice()`
+- `src/views/DeviceDetailView.vue`: Estado de alarma en `loadDeviceState()` y callbacks de acciones
+- `src/stores/devices.js`: Estado de alarma en `applyDeviceEvent()`
+
+### Leccion aprendida
+Cuando se usan tipos de dispositivos con estados especificos (no genericos como `'on'`/`'off'`), TODOS los lugares donde se interpreta `state.status` deben incluir esos estados. Buscar en el codigo:
+- Funciones de normalizacion
+- Funciones de carga de estado
+- Actualizaciones del store desde eventos
+- Callbacks de acciones exitosas
+
+---
+
 # Problemas de vista para solucionar
 
 ## Responsiveness
