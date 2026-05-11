@@ -15,10 +15,16 @@ export const useRoutinesStore = defineStore('routines', () => {
   }
 
   function normalizeRoutine(r) {
+    const days = Array.isArray(r.days) && r.days.length > 0
+      ? r.days.map(Number)
+      : Array.isArray(r.metadata?.days) ? r.metadata.days.map(Number) : []
     return {
       ...r,
       isFavorite: r.metadata?.favorite || r.isFavorite || false,
-      isActive: r.isActive ?? true,
+      isActive: r.isActive ?? r.metadata?.active ?? true,
+      description: r.description || r.metadata?.description || '',
+      time: r.time || r.metadata?.time || '',
+      days,
     }
   }
 
@@ -41,7 +47,7 @@ export const useRoutinesStore = defineStore('routines', () => {
 
   async function create(data) {
     const routine = await api.createRoutine(data)
-    routines.value.push(normalizeRoutine(routine))
+    routines.value.push(normalizeRoutine({ ...data, ...routine }))
   }
 
   async function update(id, data) {
@@ -50,7 +56,7 @@ export const useRoutinesStore = defineStore('routines', () => {
     const payload = { ...currentData, ...data }
     const updated = await api.updateRoutine(id, payload)
     const idx = routines.value.findIndex(r => String(r.id) === String(id))
-    if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated, ...data }
+    if (idx !== -1) routines.value[idx] = normalizeRoutine({ ...routines.value[idx], ...updated, ...data })
   }
 
   async function remove(id) {

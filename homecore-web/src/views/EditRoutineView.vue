@@ -286,8 +286,8 @@ async function handleSave() {
       time: form.time,
       days: form.days,
       metadata: isGlobal.value
-        ? { crossHome: true }
-        : { homeId: route.params.homeId },
+        ? { crossHome: true, description: form.description.trim(), time: form.time, days: form.days }
+        : { homeId: route.params.homeId, description: form.description.trim(), time: form.time, days: form.days },
     }
 
     await routinesStore.update(route.params.routineId, payload)
@@ -325,7 +325,7 @@ onMounted(async () => {
     form.name = routine.name || ''
     form.description = routine.description || ''
     form.time = routine.time || '08:00'
-    form.days = Array.isArray(routine.days) ? [...routine.days] : []
+    form.days = Array.isArray(routine.days) ? routine.days.map(Number) : []
 
     if (Array.isArray(routine.actions)) {
       const allDevices = availableDevices.value

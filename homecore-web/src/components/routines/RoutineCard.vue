@@ -28,7 +28,7 @@
           <i class="fa-regular fa-clock"></i>
           <span>{{ routine.time }}</span>
         </div>
-        <div class="schedule-days">{{ routine.days }}</div>
+        <div class="schedule-days">{{ formattedDays }}</div>
       </div>
       <div class="actions-count">{{ routine.actions.length }} acciones</div>
     </div>
@@ -40,9 +40,11 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import { DAY_LABELS, DAY_ORDER } from '@/config/routine-actions'
 
-defineProps({
+const props = defineProps({
   routine: {
     type: Object,
     required: true
@@ -57,6 +59,12 @@ defineProps({
     //   actions: Array
     // }
   }
+})
+
+const formattedDays = computed(() => {
+  const days = props.routine.days
+  if (!Array.isArray(days) || days.length === 0) return 'Sin días'
+  return DAY_ORDER.filter(d => days.map(Number).includes(d)).map(d => DAY_LABELS[d]).join(', ')
 })
 
 defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'open'])
@@ -153,6 +161,9 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'open'])
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 
 </style>

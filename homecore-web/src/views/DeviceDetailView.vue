@@ -35,6 +35,34 @@
         <span v-if="device.type === 'alarm'" class="badge" :class="device.isOn ? 'badge--active' : 'badge--danger'">
           {{ statusLabel }}
         </span>
+        <div v-else-if="device.type === 'fridge'" class="device-state-info">
+          <div class="state-info-row">
+            <span class="state-info-label">Temperatura:</span>
+            <span class="state-info-value">{{ deviceState.fridgeTemp }}°C</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Freezer:</span>
+            <span class="state-info-value">{{ deviceState.freezerTemp }}°C</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Modo:</span>
+            <span class="state-info-value">{{ deviceState.fridgeMode }}</span>
+          </div>
+        </div>
+        <div v-else-if="device.type === 'oven'" class="device-state-info">
+          <div class="state-info-row">
+            <span class="state-info-label">Temperatura:</span>
+            <span class="state-info-value">{{ deviceState.ovenTemp }}°C</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Fuente:</span>
+            <span class="state-info-value">{{ deviceState.heatSource }}</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Grill:</span>
+            <span class="state-info-value">{{ deviceState.grillMode }}</span>
+          </div>
+        </div>
         <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
@@ -265,9 +293,9 @@ const fridgeLimits = computed(() => ({
 
 const ovenLimits = computed(() => ({
   temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
-  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeatSource'),
-  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrillMode'),
-  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvectionMode'),
+  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeat'),
+  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrill'),
+  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvection'),
 }))
 
 function goToEdit() {
@@ -563,27 +591,27 @@ async function setOvenTemperature(value) {
 
 async function setOvenHeatSource(value) {
   deviceState.heatSource = value
-  await cmd.execute(device.value.id, 'setHeatSource', {
+  await cmd.execute(device.value.id, 'setHeat', {
     params: [value],
-    successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
+    successMsg: describeAction(device.value.type, 'setHeat', [value]),
     errorMsg: actionError('cambiar la fuente de calor'),
   })
 }
 
 async function setOvenGrillMode(value) {
   deviceState.grillMode = value
-  await cmd.execute(device.value.id, 'setGrillMode', {
+  await cmd.execute(device.value.id, 'setGrill', {
     params: [value],
-    successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
+    successMsg: describeAction(device.value.type, 'setGrill', [value]),
     errorMsg: actionError('cambiar el modo grill'),
   })
 }
 
 async function setOvenConvectionMode(value) {
   deviceState.convectionMode = value
-  await cmd.execute(device.value.id, 'setConvectionMode', {
+  await cmd.execute(device.value.id, 'setConvection', {
     params: [value],
-    successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
+    successMsg: describeAction(device.value.type, 'setConvection', [value]),
     errorMsg: actionError('cambiar el modo convección'),
   })
 }
@@ -709,5 +737,29 @@ onMounted(async () => {
 .no-controls {
   font-size: var(--font-base);
   color: var(--text-muted);
+}
+
+/* Device state info (para fridge, oven, etc.) */
+.device-state-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.state-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.state-info-label {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+}
+
+.state-info-value {
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  font-weight: 600;
 }
 </style>
