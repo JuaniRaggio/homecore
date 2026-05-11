@@ -244,8 +244,7 @@ Vista dedicada que muestra el consumo actual del hogar con tres métricas resumi
 
 Los colores de los gráficos se asignan por tipo de dispositivo de forma consistente, con una paleta de fallback para tipos no previstos.
 
-// TODO: Agregar captura de consumo
-// #figure(image("assets/consumption.png", width: 100%), caption: [Vista de consumo energético])
+#figure(image("hci_before_and_after/consumo/consumoactual.png", width: 100%), caption: [Vista de consumo energético])
 
 // ====================================
 // 4. REQUISITOS NO FUNCIONALES
@@ -268,7 +267,52 @@ Los colores de los gráficos se asignan por tipo de dispositivo de forma consist
   [8], [Diseño responsivo. Adaptación a distintos tamaños de pantalla.], [Cumplido],
 )
 
+== Tecnologías utilizadas (RNF1)
+
+El frontend de HomeCore fue desarrollado con Vue.js, utilizando la Composition API y una arquitectura basada en componentes para lograr una estructura modular. La navegación entre vistas se implementó mediante Vue Router, mientras que el manejo del estado global se realizó con Pinia. 
+El proyecto emplea Vite como herramienta de construcción y desarrollo, permitiendo tiempos de compilación y recarga rápida. La comunicación en tiempo real con el servidor se resolvió mediante Socket.IO, y las solicitudes HTTP al backend se realizaron utilizando la Fetch API. 
+Para la visualización de datos en la vista ‘Consumo’  se integró Chart.js junto con vue-chartjs. Finalmente, la interfaz utiliza Font Awesome para los íconos y la librería p-limit para controlar la concurrencia en la carga paralela de datos. 
+
+== Compatibilidad con navegadores (RNF2)
+
+HomeCore es compatible con las últimas versiones de los navegadores Chromium (Google Chrome, Microsoft Edge), Firefox y Safari.
+
+== Adaptación a resoluciones de pantalla (RNF3)
+
+La interfaz fue diseñada y optimizada principalmente para su uso en pantallas de escritorio y laptops, priorizando una experiencia clara y estable en resoluciones de monitor estándar. El layout general, compuesto por una barra lateral de navegación y un área principal de contenido, mantiene un comportamiento adecuado para el entorno de uso previsto.
+Si bien la aplicación puede presentar algunas limitaciones de adaptación en resoluciones más reducidas, como tablets o dispositivos móviles, estos casos no formaron parte del foco principal de desarrollo en la presente entrega.
+
+== Separación de estructura y presentación (RNF4)
+
+La aplicación respeta la separación entre la estructura del contenido y su presentación visual. Cada componente de Vue define su marcado HTML de forma independiente a los estilos que lo afectan, los cuales se declaran en bloques de CSS dedicados dentro del mismo componente o en hojas de estilo globales separadas. 
+
 *Nota sobre RNF4:* Se utilizó un sistema de CSS en capas: variables globales (design tokens), archivos de estilos compartidos por categoría (botones, formularios, tarjetas, tablas, controles) y estilos scoped en cada componente Vue para reglas específicas de la vista. Esta decisión se detalla en la sección de decisiones de diseño.
+
+== Separación de estructura y comportamiento (RNF5)
+
+La aplicación mantiene una clara separación entre el marcado HTML y la lógica de comportamiento. En el modelo de componentes de Vue 3, cada unidad de la interfaz divide explícitamente su template (estructura), sus estilos (presentación) y su script (comportamiento) en bloques diferenciados. La lógica de negocio compleja —como la comunicación con el backend, el manejo del estado global y las operaciones sobre dispositivos o rutinas— se extrae de los componentes hacia capas independientes: servicios, stores y composables. 
+Esto evita la mezcla de responsabilidades dentro de los componentes, facilitando su mantenimiento y escalabilidad. Por ejemplo, el componente `DeviceCard` se encarga únicamente de renderizar la información del dispositivo y manejar eventos de interacción, mientras que la lógica de actualización del estado global y las llamadas a la API se delegan a Pinia y a servicios específicos.
+
+== Validación de HTML (RNF6)
+
+La aplicación fue validada utilizando el W3C Markup Validation Service, asegurando que el HTML generado cumple con los estándares web (validator.w3.org). El análisis arrojó un resultado sin errores ni advertencias, confirmado por la respuesta del validador:
+
+{"version":"26.5.9","messages":[]}
+
+El arreglo messages vacío indica que el documento HTML cumple plenamente con el estándar, sin ninguna observación por parte del validador.
+
+== Validación de CSS (RNF7)
+
+La validación de estilos correspondiente al requerimiento RNF7 se realizó utilizando el servicio W3C CSS Validation Service, configurado con el perfil CSS Level 3. Cada hoja de estilos del proyecto fue analizada de manera individual mediante carga multipart. La aplicación organiza sus estilos en doce archivos especializados, entre ellos variables.css, reset.css, utilities.css, layout.css y forms.css.
+Como resultado general, los doce archivos CSS del proyecto superaron la validación sin presentar errores.
+Las advertencias restantes detectadas por el validador se relacionan con limitaciones conocidas de la herramienta frente a características modernas de CSS. Por un lado, se generaron advertencias sobre expresiones var(--nombre) debido a que las CSS Custom Properties son dinámicas y su valor solo puede resolverse en tiempo de ejecución en el navegador. Por otro lado, la importación de Google Fonts mediante `@import` produjo advertencias porque el validador no analiza recursos externos cargados desde URLs.
+
+== Wave (RNF)
+
+La validación de accesibilidad correspondiente al requerimiento RNF se realizó utilizando herramientas basadas en axe-core y criterios WCAG 2.x nivel AA. Inicialmente se detectaron problemas relacionados con la ausencia del elemento semántico `<main>`, contenido fuera de regiones accesibles y contrastes insuficientes en algunos componentes de interfaz.
+Las correcciones aplicadas incluyeron la incorporación de landmarks semánticos en todas las vistas de autenticación y el ajuste de colores para garantizar relaciones de contraste adecuadas según las pautas de accesibilidad.
+Como resultado final, las cuatro páginas públicas del sistema (/login, /registro, /verificar y /recuperar) superaron exitosamente la validación de accesibilidad, obteniendo un estado de “0 violations found”, sin errores ni advertencias reportadas por las herramientas de análisis.
+
 
 // ====================================
 // 5. CAPTURAS DE PANTALLA
