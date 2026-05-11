@@ -147,8 +147,6 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 - *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
 
 
-=* 1. Requisitos funcionales y no funcionales implementados.*
-
 == Requisitos funcionales
 
 === RF1 — Registrar cuenta
@@ -387,36 +385,14 @@ Como resultado final, las cuatro páginas públicas del sistema (`/login`, `/reg
 
 
 // ====================================
-// 5. CAPTURAS DE PANTALLA
+// 5. SISTEMA DE NOTIFICACIONES
 // ====================================
 
-= Capturas de pantalla
+= Sistema de notificaciones
 
-En esta sección se presenta la comparación entre el prototipo de alta fidelidad (primera entrega) y la implementación funcional definitiva, destacando la evolución estética y técnica del sistema.
+El sistema de notificaciones responde al feedback de la primera entrega, donde se identificó la necesidad de mejorar la visibilidad del estado del sistema y proporcionar retroalimentación clara al usuario. Se implementaron tipos de notificaciones diferenciadas según su propósito y urgencia.
 
-== Habitaciones
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/habitaciones/haold.png", width: 100%),
-    image("hci_before_and_after/habitaciones/hanew.png", width: 100%),
-  ),
-  caption: [Gestión de habitaciones: prototipo (izq.) vs. implementación (der.)],
-)
-
-== Configuración de usuario
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/config/coold.png", width: 100%),
-    image("hci_before_and_after/config/conew.png", width: 100%),
-  ),
-  caption: [Ajustes de perfil: prototipo (izq.) vs. implementación (der.)],
-)
-
-== Notificaciones
-
-El sistema de notificaciones responde al feedback de la primera entrega, donde se identificó la necesidad de mejorar la visibilidad del estado del sistema y proporcionar retroalimentación clara al usuario. Se implementaron dos tipos de notificaciones diferenciadas:
-
-=== Notificaciones de éxito (_toasts_)
+== Notificaciones de éxito (_toasts_)
 
 Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *Heurística de Nielsen #1: Visibilidad del estado del sistema*.
 
@@ -431,7 +407,7 @@ Las notificaciones temporales confirman acciones del usuario inmediatamente, pro
 
 El color verde y el mensaje conciso eliminan la incertidumbre sin requerir acciones adicionales del usuario. Este tipo de retroalimentación inmediata es fundamental para cualquier interfaz, ya que confirma que la acción se registró correctamente y el sistema respondió como se esperaba.
 
-=== Notificaciones de error
+== Notificaciones de error
 
 Los mensajes de error proporcionan información clara sobre qué salió mal y cómo proceder, cumpliendo con la *Heurística #9: Ayudar a los usuarios a reconocer, diagnosticar y recuperarse de errores*.
 
@@ -442,7 +418,7 @@ Los mensajes de error proporcionan información clara sobre qué salió mal y c�
 
 El mensaje claro evita frustración y guía al usuario hacia la recuperación del error, proporcionando información específica sobre qué falló sin exponer detalles sensibles del sistema.
 
-=== Confirmaciones preventivas
+== Confirmaciones preventivas
 
 Los diálogos de confirmación implementan la *Heurística #5: Prevención de errores*, solicitando confirmación antes de acciones destructivas.
 
@@ -453,7 +429,7 @@ Los diálogos de confirmación implementan la *Heurística #5: Prevención de er
 
 El diálogo explica claramente las consecuencias de la acción ("y todos sus dispositivos serán eliminados") y ofrece la opción de cancelar, previniendo errores irreversibles y dando tiempo al usuario para reconsiderar acciones destructivas.
 
-=== Notificaciones de eventos externos
+== Notificaciones de eventos externos
 
 Las notificaciones persistentes (accesibles desde el menú superior) informan sobre eventos del sistema que ocurren independientemente de las acciones del usuario.
 
@@ -490,11 +466,15 @@ En esta sección se detallan las decisiones adoptadas durante el desarrollo, fun
 
 Los componentes de UI se reservaron exclusivamente para casos que requieren lógica de estado o comportamiento interactivo, como `ToggleSwitch` o `DeviceCard`.
 
+*Beneficia especialmente a:* Valentina (rendimiento optimizado para operaciones rápidas con múltiples dispositivos) y desarrolladores futuros (mantenibilidad y escalabilidad del código).
+
 == Sistema de design tokens
 
 *Decisión:* Todos los colores, tamaños, espacios y radios se centralizaron en variables CSS (`variables.css`), eliminando valores hardcoded en los componentes.
 
 *Justificación:* Esto garantiza consistencia visual de forma técnica: un cambio de color se propaga a toda la aplicación. Durante la implementación se detectaron valores hardcoded (por ejemplo, `#d32f2f` en vez de `var(--danger)`) que fueron corregidos en una pasada de auditoría. Se agregaron las variables `--warning`, `--danger-bg` y `--success-bg` que no estaban previstas en el prototipo original pero resultaron necesarias para estados intermedios.
+
+*Beneficia especialmente a:* Todos los usuarios mediante consistencia visual. Particularmente útil para usuarios con necesidades de accesibilidad al garantizar ratios de contraste estables.
 
 === Paleta de colores implementada
 
@@ -562,23 +542,13 @@ La paleta de colores definida en la primera entrega se mantuvo fielmente en la i
   swatch("#8494a7", "Muted", "#8494a7"),
 )
 
-== Controles específicos por tipo de dispositivo
-
-*Decisión:* Cada tipo de dispositivo cuenta con un componente de controles dedicado (`LightControls`, `DoorControls`, `CurtainControls`, `AlarmControls`, `WaterControls`) que se renderiza condicionalmente en la vista de detalle.
-
-*Justificación:* Los dispositivos domésticos requieren interacciones diversas: una luminaria se gestiona mediante niveles de brillo y selección de color, mientras que una puerta requiere acciones directas (abrir, cerrar o bloquear). Unificar estos controles en un componente genérico podría afectar la claridad del modelo mental del usuario al presentar opciones irrelevantes para el dispositivo en uso, rompiendo la correspondencia entre el sistema y el mundo real.
-
-== Notificaciones: persistentes vs. temporales
-
-*Decisión:* Se diferenciaron las notificaciones persistentes (eventos del sistema) de los avisos temporales o _toasts_ (confirmación de acciones).
-
-*Justificación:* Mezclar ambos tipos podría generar confusión sobre la naturaleza de la información. Los _toasts_ confirman una acción inmediata ("Dispositivo guardado") y desaparecen automáticamente, minimizando la interrupción. Las notificaciones del menú informan sobre eventos externos y persisten hasta ser gestionadas por el usuario. Esta separación prioriza la visibilidad del estado del sistema sin sobrecargar la interfaz con información irrelevante, manteniendo un diseño estético y minimalista.
-
 == Asistente de rutinas en pasos
 
 *Decisión:* La creación de rutinas se organizó en un asistente de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen.
 
 *Justificación:* En la etapa de prototipado, se observó que la configuración de rutinas podía resultar compleja. El asistente fragmenta la tarea en etapas simples con una progresión clara, reduciendo la carga cognitiva. El paso final de resumen permite verificar la configuración antes de confirmarla, funcionando como un mecanismo de prevención de errores.
+
+*Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria).
 
 == Confirmación de acciones irreversibles
 
@@ -586,11 +556,15 @@ La paleta de colores definida en la primera entrega se mantuvo fielmente en la i
 
 *Justificación:* Esta medida busca prevenir errores accidentales. En el caso de las habitaciones, se informa adicionalmente sobre el impacto en los dispositivos vinculados para que el usuario tome una decisión informada.
 
+*Beneficia especialmente a:* Marta (prevención de errores por confusión con la interfaz) y Carolina (protección de configuraciones de seguridad críticas).
+
 == Vista Overview como punto de acceso rápido
 
 *Decisión:* Se diseñó la vista Overview para ofrecer un resumen del hogar con dispositivos favoritos, consumo y estado de actividad.
 
 *Justificación:* Esta vista centraliza la información más consultada, permitiendo al usuario realizar acciones frecuentes sin necesidad de navegar por las distintas secciones. Esto favorece el reconocimiento sobre el recuerdo al presentar el estado general de forma inmediata.
+
+*Beneficia especialmente a:* Carolina (monitoreo rápido del estado de seguridad del hogar) y Valentina (acceso directo a dispositivos y rutinas frecuentes sin navegación).
 
 == Respuesta inmediata en el control de dispositivos
 
@@ -598,11 +572,15 @@ La paleta de colores definida en la primera entrega se mantuvo fielmente en la i
 
 *Justificación:* La falta de respuesta inmediata puede generar incertidumbre sobre si la acción fue registrada. Esta técnica de "actualización optimista" mejora la percepción de control y visibilidad del estado, mientras que el manejo de errores asegura la consistencia entre la interfaz y el estado real del sistema.
 
+*Beneficia especialmente a:* Todos los usuarios. Marta obtiene confirmación visual inmediata reduciendo incertidumbre, Valentina percibe mayor control directo, y Carolina confía en que las acciones de seguridad se ejecutaron correctamente.
+
 == Navegación y ubicación
 
 *Decisión:* Se mantuvo la estructura de barra lateral consistente con el diseño original. La barra superior incluye _breadcrumbs_ para indicar la ubicación actual.
 
 *Justificación:* Informar claramente al usuario sobre su ubicación dentro de la jerarquía de la aplicación facilita la navegación y proporciona libertad de movimiento con salidas de emergencia claras.
+
+*Beneficia especialmente a:* Marta (orientación clara en la jerarquía de hogares/habitaciones/dispositivos) y Carolina (navegación eficiente entre múltiples hogares y secciones de seguridad).
 
 == CSS manual vs. frameworks de componentes (Vuetify)
 
@@ -638,6 +616,8 @@ Las adaptaciones específicas por componente fueron:
 
 *Implementación técnica:* El estado de la sidebar mobile se maneja con un composable singleton (`useSidebar.js`) que expone un `ref` reactivo compartido entre la TopBar (que lo toglea) y la SideBar (que reacciona). Este patrón es consistente con otros composables de la aplicación (`useModal`, `useConfirmAction`) y evita acoplar los componentes mediante props o eventos.
 
+*Beneficia especialmente a:* Carolina (acceso remoto desde dispositivos móviles para verificar seguridad) y Valentina (control desde cualquier dispositivo cuando está fuera de casa).
+
 #nota[
   Se tiene un detalle en el overview que en el breakpoint principal, se
   muestra el boton de menu de la sidebar, pero siendo que nuestra 
@@ -653,17 +633,23 @@ Las adaptaciones específicas por componente fueron:
 
 *Justificación:* Los tokens JWT tienen fecha de expiración. Sin manejo explícito, cuando el token expira todas las requests fallan silenciosamente, dejando al usuario en un estado inconsistente donde la aplicación parece funcionar pero ninguna acción se ejecuta. El interceptor global previene errores al detectar el problema de forma centralizada y guiar al usuario hacia la solución (volver a iniciar sesión). El mensaje "Tu sesión ha expirado. Por favor, inicia sesión nuevamente" informa claramente qué ocurrió y qué debe hacer, reforzando la visibilidad del estado del sistema.
 
+*Beneficia especialmente a:* Marta (mensaje claro sin terminología técnica sobre qué hacer) y Carolina (protección automática de sesión expirada antes de realizar acciones críticas).
+
 == Actualización optimista con rollback
 
 *Decisión:* Los controles de dispositivos (toggle on/off, favoritos) aplican el cambio visual inmediatamente y envían la petición a la API en paralelo. Si la API falla, el estado se revierte y se muestra un toast de error.
 
 *Justificación:* En las observaciones de la primera entrega se identificó que "la falta de feedback tras activar una acción generó mucha incertidumbre". El patrón de actualización optimista elimina el delay perceptible entre la acción del usuario y la respuesta visual, mejorando la sensación de control directo y la visibilidad del estado. Sin embargo, aplicar el cambio sin validación podría generar inconsistencias si la API falla. Por eso se implementó rollback: si la petición falla, el estado visual se revierte al original y se notifica al usuario del error, manteniendo la coherencia entre el modelo y la vista. Este patrón se implementó en `toggleDevice()` y `toggleFavorite()` del store de dispositivos.
 
+*Beneficia especialmente a:* Valentina (respuesta instantánea para operaciones rápidas en múltiples dispositivos) y Marta (confirmación visual inmediata de que el sistema respondió a su acción).
+
 == Consolidación de vistas de rutinas globales y específicas
 
 *Decisión:* Se unificaron las vistas de detalle y edición de rutinas en componentes únicos que manejan tanto rutinas específicas de un hogar como rutinas globales (compartidas entre hogares), detectando el tipo mediante metadata.
 
 *Justificación:* En una versión intermedia existían cuatro vistas separadas: `RoutineDetailView`, `GlobalRoutineDetailView`, `EditRoutineView` y `GlobalRoutineEditView`. Las vistas globales y específicas compartían ~90% del código, difiriendo solo en el origen de los datos (store local vs. composable de overview) y la navegación post-guardado. Mantener cuatro archivos generaba duplicación de lógica, incrementando el riesgo de bugs por inconsistencia y dificultando el mantenimiento. La consolidación aplica el principio DRY (Don't Repeat Yourself): un computed `isGlobal` detecta el tipo de rutina y condiciona el comportamiento específico (carga de dispositivos, nombres con resolución de colisión, rutas de navegación). Esto redujo ~700 líneas de código duplicado sin comprometer la funcionalidad.
+
+*Beneficia especialmente a:* Valentina (interfaz consistente para gestionar rutinas complejas en múltiples hogares) y desarrolladores futuros (mantenimiento simplificado).
 
 == Prevención de memory leaks en stores y WebSocket
 
@@ -676,17 +662,23 @@ Las adaptaciones específicas por componente fueron:
 
 Esta decisión aplica principios de gestión de recursos: el código que crea un recurso debe ser responsable de liberarlo. Memory leaks degradan el rendimiento progresivamente y pueden causar fallos en sesiones largas, violando la expectativa de estabilidad y la estética minimalista del sistema al acumular datos innecesarios.
 
+*Beneficia especialmente a:* Valentina (sesiones largas con múltiples hogares sin degradación de rendimiento) y Carolina (estabilidad del sistema para monitoreo continuo).
+
 == Manejo de errores con try/catch/finally en formularios
 
 *Decisión:* Todos los formularios (login, registro, cambio de contraseña) envuelven las peticiones asíncronas en bloques `try/catch/finally` que garantizan restablecer el estado de carga (`loading = false`) incluso si la petición falla.
 
 *Justificación:* En una versión intermedia sin `finally`, si la petición de login fallaba por timeout de red, el botón quedaba en estado "Iniciando sesión..." permanentemente, bloqueando al usuario sin posibilidad de reintentar. El patrón `try { acción } catch { error } finally { loading = false }` garantiza que el estado de carga siempre se restablece, permitiendo reintentos y evitando bloqueos de UI. Esto previene errores y ayuda a los usuarios a reconocer, diagnosticar y recuperarse de fallos.
 
+*Beneficia especialmente a:* Marta (recuperación clara de errores sin bloqueos confusos) y todos los usuarios en general al evitar estados de interfaz inconsistentes.
+
 == Deduplicación de notificaciones WebSocket
 
 *Decisión:* Se implementó un sistema de ventana deslizante de 2 segundos para evitar notificaciones duplicadas cuando el backend emite múltiples eventos para la misma acción del usuario (por ejemplo, `deviceEvent` + `deviceUpdated` por el mismo cambio de estado).
 
 *Justificación:* En la implementación inicial del WebSocket, cada acción del usuario generaba múltiples notificaciones redundantes: al encender una lámpara, el backend emitía `deviceEvent` (cambio de estado) y `deviceUpdated` (actualización del dispositivo) casi simultáneamente, generando dos toasts diciendo "Lámpara sala fue modificada". Esto sobrecargaba al usuario con información repetida, afectando la estética minimalista del sistema. La deduplicación basada en un Map con timestamp por dispositivo (`shouldNotify()`) filtra eventos redundantes dentro de la ventana de 2 segundos, mostrando solo la primera notificación. Este patrón es transparente para el usuario y no afecta la reactividad del sistema.
+
+*Beneficia especialmente a:* Todos los usuarios al reducir ruido informativo. Particularmente útil para Marta (evita confusión por mensajes repetidos) y Valentina (interfaz limpia durante operaciones rápidas en múltiples dispositivos).
 
 // ====================================
 // 7. DIFERENCIAS CON EL PROTOTIPO
