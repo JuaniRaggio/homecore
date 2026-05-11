@@ -12,15 +12,15 @@
     <p v-else-if="loadError" class="state-error">{{ loadError }}</p>
 
     <form v-else class="edit-form" @submit.prevent="handleSave">
-      <!-- Nombre y descripcion -->
+      <!-- Nombre y descripción -->
       <div class="form-card">
         <div class="form-group">
           <label class="form-label">Nombre</label>
           <input v-model="form.name" type="text" placeholder="Nombre de la rutina" />
         </div>
         <div class="form-group">
-          <label class="form-label">Descripcion</label>
-          <input v-model="form.description" type="text" placeholder="Descripcion (opcional)" />
+          <label class="form-label">Descripción</label>
+          <input v-model="form.description" type="text" placeholder="Descripción (opcional)" />
         </div>
       </div>
 
@@ -31,7 +31,7 @@
           <input v-model="form.time" type="time" class="form-input-time" />
         </div>
         <div class="form-group">
-          <label class="form-label">Dias</label>
+          <label class="form-label">Días</label>
           <div class="days-row">
             <button
               v-for="d in DAY_OPTIONS"
@@ -58,7 +58,7 @@
             class="action-select"
             @change="onExistingActionChange(idx, $event.target.value)"
           >
-            <option value="">Sin accion</option>
+            <option value="">Sin acción</option>
             <option v-for="a in actionsForDevice(act.deviceId)" :key="a.actionName" :value="a.actionName">
               {{ a.label }}
             </option>
@@ -92,12 +92,12 @@
             </template>
           </template>
 
-          <button type="button" class="btn-remove" @click="removeAction(idx)" title="Quitar accion">
+          <button type="button" class="btn-remove" @click="removeAction(idx)" title="Quitar acción">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <!-- Agregar accion nueva -->
+        <!-- Agregar acción nueva -->
         <div class="add-action-section">
           <select v-model="newAction.deviceId" class="action-select">
             <option value="">Seleccionar dispositivo</option>
@@ -108,7 +108,7 @@
 
           <template v-if="newAction.deviceId">
             <select v-model="newAction.actionName" class="action-select" @change="onNewActionChange">
-              <option value="">Seleccionar accion</option>
+              <option value="">Seleccionar acción</option>
               <option v-for="a in actionsForDevice(newAction.deviceId)" :key="a.actionName" :value="a.actionName">
                 {{ a.label }}
               </option>

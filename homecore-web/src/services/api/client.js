@@ -24,7 +24,7 @@ export async function request(method, path, body = null) {
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login'
       }
-      const err = new Error('Tu sesion ha expirado. Por favor, inicia sesion nuevamente.')
+      const err = new Error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.')
       err.status = 401
       throw err
     }

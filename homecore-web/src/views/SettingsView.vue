@@ -1,6 +1,6 @@
 <template>
   <div class="settings-view">
-    <h1 class="view-title">Configuracion</h1>
+    <h1 class="view-title">Configuración</h1>
 
     <!-- Perfil -->
     <section class="settings-section">
@@ -18,19 +18,19 @@
       </div>
     </section>
 
-    <!-- Cambiar contrasena -->
+    <!-- Cambiar contraseña -->
     <section class="settings-section">
       <div class="form-card settings-card">
-        <h2 class="card-title">Cambiar contrasena</h2>
+        <h2 class="card-title">Cambiar contraseña</h2>
         <div class="card-divider" />
 
         <div class="field-group">
-          <label class="field-label">Contrasena actual</label>
+          <label class="field-label">Contraseña actual</label>
           <div class="input-wrap">
             <input
               v-model="currentPassword"
               :type="showCurrent ? 'text' : 'password'"
-              placeholder="Tu contrasena actual"
+              placeholder="Tu contraseña actual"
               class="field-input"
             />
             <button class="btn-show" @click="showCurrent = !showCurrent">Mostrar</button>
@@ -38,12 +38,12 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Nueva contrasena</label>
+          <label class="field-label">Nueva contraseña</label>
           <div class="input-wrap">
             <input
               v-model="newPassword"
               :type="showNew ? 'text' : 'password'"
-              placeholder="Minimo 8 caracteres"
+              placeholder="Mínimo 8 caracteres"
               class="field-input"
             />
             <button class="btn-show" @click="showNew = !showNew">Mostrar</button>
@@ -51,12 +51,12 @@
         </div>
 
         <div class="field-group">
-          <label class="field-label">Confirmar nueva contrasena</label>
+          <label class="field-label">Confirmar nueva contraseña</label>
           <div class="input-wrap">
             <input
               v-model="confirmPassword"
               :type="showConfirm ? 'text' : 'password'"
-              placeholder="Repite tu nueva contrasena"
+              placeholder="Repite tu nueva contraseña"
               class="field-input"
             />
             <button class="btn-show" @click="showConfirm = !showConfirm">Mostrar</button>
@@ -102,11 +102,11 @@ async function handleChangePassword() {
     return
   }
   if (newPassword.value.length < 8) {
-    passwordError.value = 'La nueva contrasena debe tener al menos 8 caracteres'
+    passwordError.value = 'La nueva contraseña debe tener al menos 8 caracteres'
     return
   }
   if (newPassword.value !== confirmPassword.value) {
-    passwordError.value = 'Las contrasenas no coinciden'
+    passwordError.value = 'Las contraseñas no coinciden'
     return
   }
 
@@ -121,8 +121,8 @@ async function handleChangePassword() {
       newPassword.value = ''
       confirmPassword.value = ''
     } else {
-      passwordError.value = result.error || 'No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.'
-      toast.show('No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.', 'error')
+      passwordError.value = result.error || 'No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta.'
+      toast.show('No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta.', 'error')
     }
   } catch (e) {
     passwordError.value = 'Error inesperado al cambiar la contraseña'
@@ -174,7 +174,7 @@ async function handleChangePassword() {
   color: var(--text-primary);
 }
 
-/* Form fields (Cambiar contrasena) */
+/* Form fields (Cambiar contraseña) */
 .field-group {
   display: flex;
   flex-direction: column;

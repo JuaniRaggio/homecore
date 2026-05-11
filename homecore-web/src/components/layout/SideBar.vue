@@ -31,9 +31,9 @@
 
     <!-- Footer del sidebar -->
     <div class="sidebar__footer">
-      <router-link :to="`/casa/${homeId}/configuracion`" active-class="active" class="sidebar__config" title="Configuracion">
+      <router-link :to="`/casa/${homeId}/configuracion`" active-class="active" class="sidebar__config" title="Configuración">
         <i class="fa-solid fa-gear"></i>
-        <span class="nav-label">Configuracion</span>
+        <span class="nav-label">Configuración</span>
       </router-link>
     </div>
   </nav>

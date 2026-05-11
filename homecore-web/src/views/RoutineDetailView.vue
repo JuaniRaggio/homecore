@@ -46,9 +46,9 @@
             <span class="info-value">{{ routine.time || '--:--' }}</span>
           </div>
           <div class="info-row">
-            <span class="info-label">Dias</span>
+            <span class="info-label">Días</span>
             <div class="days-chips">
-              <span v-if="!routine.days || routine.days.length === 0" class="info-value">Sin dias configurados</span>
+              <span v-if="!routine.days || routine.days.length === 0" class="info-value">Sin días configurados</span>
               <span v-for="day in sortedDays" :key="day" class="day-chip">{{ dayLabel(day) }}</span>
             </div>
           </div>
@@ -131,7 +131,7 @@ function dayLabel(day) {
 
 const deleteDescription = computed(() => {
   const type = isGlobal.value ? 'rutina global' : 'rutina'
-  return `Estas seguro de que queres eliminar la ${type} "${routine.value.name}"? Esta accion no se puede deshacer.`
+  return `¿Estás seguro de que querés eliminar la ${type} "${routine.value.name}"? Esta acción no se puede deshacer.`
 })
 
 function findDevice(action) {

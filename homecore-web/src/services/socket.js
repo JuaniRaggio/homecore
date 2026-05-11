@@ -13,7 +13,7 @@ function log(...args) {
 }
 
 // Deduplicacion de notificaciones: evita duplicados cuando el servidor
-// emite deviceEvent + deviceUpdated por la misma accion del usuario.
+// emite deviceEvent + deviceUpdated por la misma acción del usuario.
 const DEDUP_WINDOW_MS = 2000
 const CLEANUP_THRESHOLD = 100
 const recentDeviceNotifs = new Map()
@@ -60,7 +60,7 @@ const STATE_FIELD_TO_ACTION = {
  * Genera texto legible a partir del payload de un evento del websocket.
  * @param {Object|null} state - Campo `data` del evento (ej: {status: 'on', temperature: 24})
  * @param {string} [deviceType] - Clave canonica del tipo para usar describeAction
- * @returns {string} Descripcion en espanol para notificaciones
+ * @returns {string} Descripción en espanol para notificaciones
  */
 function describeEvent(state, deviceType) {
   if (!state) return 'Estado actualizado'
@@ -113,7 +113,7 @@ export function connect(token) {
   })
 
   socket.on('connect_error', (err) => {
-    log('Error de conexion:', err.message)
+    log('Error de conexión:', err.message)
   })
 
   socket.on('deviceCreated', (data) => {
@@ -201,6 +201,6 @@ export function disconnect() {
   if (socket) {
     socket.disconnect()
     socket = null
-    log('Conexion cerrada manualmente')
+    log('Conexión cerrada manualmente')
   }
 }

@@ -105,7 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
           pendingCredentials.value = { email, password }
           return { success: true }
         } catch (e) {
-          console.error('[auth] Error enviando verificacion para cuenta existente:', e)
+          console.error('[auth] Error enviando verificación para cuenta existente:', e)
           return { success: false, conflict: true }
         }
       }
@@ -134,7 +134,7 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: true }
     } catch (error) {
       console.error('[auth] Error de login:', error)
-      return { success: false, error: "Error de inicio de sesion" }
+      return { success: false, error: "Error de inicio de sesión" }
     }
   }
 
@@ -167,7 +167,7 @@ export const useAuthStore = defineStore('auth', () => {
       await ensureMailerConfig()
       await ensurePasswordRecoveryTemplate()
       await api.forgotPassword(email)
-      return { success: true, message: 'Se envio un codigo de recuperacion a tu correo.' }
+      return { success: true, message: 'Se envió un código de recuperación a tu correo.' }
     } catch (error) {
       return { success: false, error: error.message }
     }

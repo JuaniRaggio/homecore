@@ -116,7 +116,7 @@ export function useOverviewData() {
                   homeId: home.id,
                 }))
               } catch (e) {
-                console.error(`[overview] Error cargando dispositivos de habitacion ${room.name}:`, e)
+                console.error(`[overview] Error cargando dispositivos de habitación ${room.name}:`, e)
                 return []
               }
             }))

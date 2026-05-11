@@ -113,7 +113,7 @@
   <ConfirmModal
     :visible="deleteHomeConfirm.visible.value"
     title="Eliminar hogar"
-    description="Estas seguro de que queres eliminar este hogar? Se eliminaran todas las habitaciones y dispositivos asociados. Esta accion no se puede deshacer."
+    description="¿Estás seguro de que querés eliminar este hogar? Se eliminarán todas las habitaciones y dispositivos asociados. Esta acción no se puede deshacer."
     confirm-label="Eliminar hogar"
     confirming-label="Eliminando..."
     :danger="true"
@@ -240,7 +240,7 @@ function getDeviceInfo(log) {
 }
 
 function describeLogAction(actionName, deviceType) {
-  if (!actionName) return 'Accion'
+  if (!actionName) return 'Acción'
   const desc = describeAction(deviceType, actionName, [])
   if (desc !== actionName) return desc
   for (const type of Object.keys(ACTIONS_MAP)) {

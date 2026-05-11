@@ -2,7 +2,7 @@
   <div class="view-content">
     <div class="view-header">
       <h1 class="view-title">Habitaciones</h1>
-      <button class="btn-add" @click="createRoomModal.open">+ Nueva Habitacion</button>
+      <button class="btn-add" @click="createRoomModal.open">+ Nueva Habitación</button>
     </div>
 
 
@@ -41,8 +41,8 @@
 
     <EditNameModal
       :visible="editRoomModal.visible.value"
-      title="Editar habitacion"
-      placeholder="Nombre de la habitacion"
+      title="Editar habitación"
+      placeholder="Nombre de la habitación"
       :current-name="editingRoom?.name || ''"
       :loading="saving"
       @close="closeEditModal"
@@ -51,8 +51,8 @@
 
     <ConfirmModal
       :visible="deleteRoomConfirm.visible.value"
-      title="Eliminar habitacion"
-      description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
+      title="Eliminar habitación"
+      description="¿Estás seguro de que querés eliminar esta habitación? Los dispositivos vinculados también serán eliminados."
       confirm-label="Eliminar"
       confirming-label="Eliminando..."
       :danger="true"
@@ -103,7 +103,7 @@ async function confirmDeleteRoom() {
       room.devices.forEach(d => devicesStore.removeDevice(d.id))
     }
     await roomsStore.removeRoom(roomId)
-    toast.show('Habitacion eliminada', 'success')
+    toast.show('Habitación eliminada', 'success')
   })
 }
 
@@ -130,10 +130,10 @@ async function confirmEditRoom(name) {
   saving.value = true
   try {
     await roomsStore.updateRoom(editingRoom.value.id, { name })
-    toast.show('Habitacion actualizada', 'success')
+    toast.show('Habitación actualizada', 'success')
     closeEditModal()
   } catch (e) {
-    toast.show(e.message || actionError('renombrar la habitacion'), 'error')
+    toast.show(e.message || actionError('renombrar la habitación'), 'error')
   } finally {
     saving.value = false
   }

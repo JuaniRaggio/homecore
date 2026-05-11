@@ -12,7 +12,7 @@
       </select>
     </div>
     <div class="control-row">
-      <span class="control-label">Habitacion</span>
+      <span class="control-label">Habitación</span>
       <select
         class="control-select"
         :value="currentRoom || ''"

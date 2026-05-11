@@ -1,7 +1,7 @@
 <template>
   <ModalBase :visible="visible" :wide="true" @close="emit('close')">
     <h2 class="modal-title">{{ routine?.name }}</h2>
-    <p class="modal-desc">{{ routine?.description || 'Sin descripcion' }}</p>
+    <p class="modal-desc">{{ routine?.description || 'Sin descripción' }}</p>
 
     <div class="detail-row">
       <span class="detail-label">Horario</span>

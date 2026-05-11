@@ -11,7 +11,7 @@
     </div>
 
     <p v-if="loading" class="state-loading">Cargando dispositivos...</p>
-    <p v-else-if="devices.length === 0" class="state-empty">Sin dispositivos en esta habitacion</p>
+    <p v-else-if="devices.length === 0" class="state-empty">Sin dispositivos en esta habitación</p>
     <div v-else class="items-grid items-grid--narrow">
       <DeviceCard
         v-for="device in devices"
@@ -60,7 +60,7 @@ const loading = computed(() => devicesStore.loading || roomsStore.loading)
 
 const roomName = computed(() => {
   const room = roomsStore.rooms.find(r => String(r.id) === String(roomId.value))
-  return room ? room.name : 'Habitacion'
+  return room ? room.name : 'Habitación'
 })
 
 const devices = computed(() =>

@@ -3,7 +3,7 @@
     <h2 class="modal-title">Vincular dispositivo</h2>
     <p v-if="devices.length === 0" class="modal-desc">No hay dispositivos disponibles para vincular.</p>
     <template v-else>
-      <p class="modal-desc">Selecciona un dispositivo para vincular a la habitacion.</p>
+      <p class="modal-desc">Selecciona un dispositivo para vincular a la habitación.</p>
       <div class="link-device-list">
         <button
           v-for="device in devices"

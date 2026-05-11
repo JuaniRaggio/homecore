@@ -27,13 +27,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Contrasena</label>
-          <input v-model="password" type="password" placeholder="Ingrese su contrasena" />
+          <label class="form-label">Contraseña</label>
+          <input v-model="password" type="password" placeholder="Ingrese su contraseña" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Confirme su contrasena</label>
-          <input v-model="confirmPassword" type="password" placeholder="Confirme su contrasena" />
+          <label class="form-label">Confirme su contraseña</label>
+          <input v-model="confirmPassword" type="password" placeholder="Confirme su contraseña" />
         </div>
 
         <button class="btn-primary" @click="handleRegister" :disabled="loading">

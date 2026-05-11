@@ -26,18 +26,18 @@
     <div v-else class="topbar__center"></div>
 
     <div class="topbar__right">
-      <!-- Boton de notificaciones -->
+      <!-- Boton de notificaciónes -->
       <div class="notif-wrap" ref="notifRef">
         <button class="btn-notif" @click="showNotifDropdown = !showNotifDropdown">
           <i class="fa-regular fa-bell"></i>
         </button>
         <span v-if="notificationsStore.unreadCount > 0" class="notif-badge">{{ notificationsStore.unreadCount }}</span>
 
-        <!-- Dropdown de notificaciones -->
+        <!-- Dropdown de notificaciónes -->
         <div v-if="showNotifDropdown" class="dropdown dropdown--notif">
           <div class="dropdown__header">
             <span class="dropdown__title">Notificaciones</span>
-            <button class="dropdown__action" @click="markAllRead">Marcar todas como leidas</button>
+            <button class="dropdown__action" @click="markAllRead">Marcar todas como leídas</button>
           </div>
           <ul class="dropdown__list">
             <li
@@ -73,10 +73,10 @@
           </div>
           <ul class="dropdown__list">
             <li v-if="isHomeRoute" class="dropdown__item" @click="goToSettings">
-              <i class="fa-solid fa-gear"></i> Configuracion
+              <i class="fa-solid fa-gear"></i> Configuración
             </li>
             <li class="dropdown__item dropdown__item--danger" @click="handleLogout">
-              <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesion
+              <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
             </li>
           </ul>
         </div>
@@ -116,7 +116,7 @@ const routeLabels = {
   'routines': 'Rutinas',
   'history': 'Historial',
   'consumption': 'Consumo',
-  'settings': 'Configuracion'
+  'settings': 'Configuración'
 }
 const houseName = computed(() => {
   const id = route.params.homeId
@@ -138,7 +138,7 @@ const breadcrumbs = computed(() => {
     const room = roomsStore.rooms.find(r => String(r.id) === String(route.params.roomId))
     return [
       { label: 'Habitaciones', to: `/casa/${homeId}/habitaciones` },
-      { label: room?.name || 'Habitacion' }
+      { label: room?.name || 'Habitación' }
     ]
   }
 

@@ -30,28 +30,28 @@
           <input v-model="property.name" class="form-input" type="text" placeholder="Ej: Casa Martinez" />
         </div>
         <div class="form-group">
-          <label class="form-label">Direccion (opcional)</label>
+          <label class="form-label">Dirección (opcional)</label>
           <input v-model="property.address" class="form-input" type="text" placeholder="Ej: Av. Siempreviva 742" />
         </div>
       </div>
 
-      <!-- Paso 2: Habitaciones -->
+      <!-- Paso 2: Habitaciónes -->
       <div v-else-if="step === 2" class="step-content">
         <h2 class="step-title">Habitaciones</h2>
-        <p class="step-hint">Agrega las habitaciones de tu propiedad. Podes saltear este paso.</p>
+        <p class="step-hint">Agrega las habitaciones de tu propiedad. Podés saltear este paso.</p>
 
         <div class="add-row">
           <input
             v-model="newRoomName"
             class="form-input add-row__input"
             type="text"
-            placeholder="Nombre de la habitacion"
+            placeholder="Nombre de la habitación"
             @keyup.enter="addRoom"
           />
           <button class="btn-add" :disabled="!newRoomName.trim()" @click="addRoom">Agregar</button>
         </div>
 
-        <p v-if="rooms.length === 0" class="state-empty">No agregaste habitaciones todavia.</p>
+        <p v-if="rooms.length === 0" class="state-empty">No agregaste habitaciones todavía.</p>
         <ul v-else class="item-list">
           <li v-for="(room, i) in rooms" :key="i" class="item-list__row">
             <span class="item-list__name">{{ room.name }}</span>
@@ -65,9 +65,9 @@
       <!-- Paso 3: Dispositivos -->
       <div v-else-if="step === 3" class="step-content">
         <h2 class="step-title">Dispositivos</h2>
-        <p class="step-hint">Agrega dispositivos a cada habitacion. Podes saltear este paso.</p>
+        <p class="step-hint">Agrega dispositivos a cada habitación. Podés saltear este paso.</p>
 
-        <!-- Dispositivos por habitacion -->
+        <!-- Dispositivos por habitación -->
         <template v-if="rooms.length > 0">
           <div v-for="(room, ri) in rooms" :key="ri" class="room-section">
             <h3 class="room-section__title">{{ room.name }}</h3>
@@ -105,10 +105,10 @@
           </div>
         </template>
 
-        <!-- Dispositivos sin habitacion -->
+        <!-- Dispositivos sin habitación -->
         <div v-else class="room-section">
           <h3 class="room-section__title">Dispositivos generales</h3>
-          <p class="step-hint">No hay habitaciones. Los dispositivos se crearan sin habitacion asignada.</p>
+          <p class="step-hint">No hay habitaciones. Los dispositivos se crearán sin habitación asignada.</p>
 
           <div class="add-row">
             <input
@@ -275,18 +275,18 @@ async function submit() {
           }
         }
       } catch (e) {
-        console.error(`[NewProperty] Error creando habitacion "${rooms.value[i].name}":`, e)
-        errorMsg.value = `No se pudo crear la habitacion "${rooms.value[i].name}". La propiedad fue creada, podes agregar habitaciones desde la vista del hogar.`
+        console.error(`[NewProperty] Error creando habitación "${rooms.value[i].name}":`, e)
+        errorMsg.value = `No se pudo crear la habitación "${rooms.value[i].name}". La propiedad fue creada, podés agregar habitaciones desde la vista del hogar.`
       }
     }
 
-    // 3. Crear dispositivos sin habitacion
+    // 3. Crear dispositivos sin habitación
     for (const dev of devicesWithoutRoom.value) {
       try {
         await api.createDevice(null, { name: dev.name, type: { id: dev.typeId } })
       } catch (e) {
-        console.error(`[NewProperty] Error creando dispositivo sin habitacion "${dev.name}":`, e)
-        errorMsg.value = `No se pudo crear el dispositivo "${dev.name}". Podes agregarlo despues desde la vista de dispositivos.`
+        console.error(`[NewProperty] Error creando dispositivo sin habitación "${dev.name}":`, e)
+        errorMsg.value = `No se pudo crear el dispositivo "${dev.name}". Podés agregarlo después desde la vista de dispositivos.`
       }
     }
 
@@ -371,7 +371,7 @@ onMounted(() => {
   background-color: rgba(229, 62, 62, 0.1);
 }
 
-/* Secciones por habitacion */
+/* Secciones por habitación */
 .room-section {
   margin-bottom: 24px;
   padding: 16px;

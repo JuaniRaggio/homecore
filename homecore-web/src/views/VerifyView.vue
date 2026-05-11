@@ -12,7 +12,7 @@
         <template v-if="!success">
           <p class="verify-instruction">
             Te enviamos un código de verificación{{ authStore.pendingEmail ? ` a ${authStore.pendingEmail}` : ' a tu correo' }}.
-            Ingresalo para activar tu cuenta.
+            Ingrésalo para activar tu cuenta.
           </p>
           <form @submit.prevent="submit">
             <input

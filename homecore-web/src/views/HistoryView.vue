@@ -70,7 +70,7 @@ function getDeviceInfo(log) {
 }
 
 function describeLogAction(actionName, deviceType, params) {
-  if (!actionName) return 'Accion'
+  if (!actionName) return 'Acción'
   const desc = describeAction(deviceType, actionName, params)
   if (desc !== actionName) return desc
   // Tipo desconocido: buscar en todos los tipos como fallback

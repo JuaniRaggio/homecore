@@ -21,20 +21,20 @@
         v-model="newDeviceCode"
         class="modal-input"
         type="password"
-        placeholder="Codigo de seguridad (4 digitos)"
+        placeholder="Código de seguridad (4 dígitos)"
         maxlength="4"
       />
       <input
         v-model="newDeviceCodeConfirm"
         class="modal-input"
         type="password"
-        placeholder="Confirmar codigo"
+        placeholder="Confirmar código"
         maxlength="4"
       />
       <span v-if="codeError" class="modal-field-error">{{ codeError }}</span>
     </template>
     <select v-if="!roomId" v-model="newDeviceRoom" class="modal-input">
-      <option value="" disabled>Seleccionar habitacion</option>
+      <option value="" disabled>Seleccionar habitación</option>
       <option
         v-for="room in roomsStore.rooms"
         :key="room.id"
@@ -89,9 +89,9 @@ const isAlarm = computed(() => {
 
 const codeError = computed(() => {
   if (!newDeviceCode.value) return ''
-  if (!/^\d{4}$/.test(newDeviceCode.value)) return 'El codigo debe ser de 4 digitos numericos'
+  if (!/^\d{4}$/.test(newDeviceCode.value)) return 'El código debe ser de 4 dígitos numéricos'
   if (newDeviceCodeConfirm.value && newDeviceCode.value !== newDeviceCodeConfirm.value)
-    return 'Los codigos no coinciden'
+    return 'Los códigos no coinciden'
   return ''
 })
 

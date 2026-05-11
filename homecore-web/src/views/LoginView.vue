@@ -17,14 +17,14 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Contrasena</label>
-          <input v-model="password" type="password" placeholder="Ingrese su contrasena" />
+          <label class="form-label">Contraseña</label>
+          <input v-model="password" type="password" placeholder="Ingrese su contraseña" />
         </div>
 
         <button class="btn-primary" @click="handleLogin" :disabled="loading">
           {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
         </button>
-        <a class="auth-link" @click.prevent="router.push('/recuperar')">Perdiste tu contrasena</a>
+        <a class="auth-link" @click.prevent="router.push('/recuperar')">Perdiste tu contraseña</a>
       </div>
 
       <button class="btn-accent" @click="handleRegister">Crear Cuenta</button>
@@ -57,10 +57,10 @@ async function handleLogin() {
     if (result.success) {
       router.push('/overview')
     } else {
-      error.value = result.error || 'Error al iniciar sesion'
+      error.value = result.error || 'Error al iniciar sesión'
     }
   } catch (e) {
-    error.value = 'Error inesperado al iniciar sesion'
+    error.value = 'Error inesperado al iniciar sesión'
   } finally {
     loading.value = false
   }
