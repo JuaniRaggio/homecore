@@ -69,6 +69,7 @@
           :key="routine.id"
           :routine="routine"
           @execute="routineActions.executeRoutine"
+          @open="handleOpenRoutine"
         />
         <p v-if="favoriteRoutines.length === 0" class="empty-msg">Sin rutinas favoritas</p>
       </div>
@@ -220,6 +221,10 @@ async function confirmEditHome(name) {
 
 function handleOpenDevice(id) {
   router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })
+}
+
+function handleOpenRoutine(routineId) {
+  router.push({ name: 'routine-detail', params: { homeId: homeId.value, routineId } })
 }
 
 // Historial reciente
