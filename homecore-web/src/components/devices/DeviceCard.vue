@@ -239,8 +239,8 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 
 /* Mayor especificidad sin !important */
 .badge--door.badge--locked {
-  background: var(--color-text-secondary);
-  border-color: var(--color-text-secondary);
+  background: var(--text-muted);
+  border-color: var(--text-muted);
 }
 
 /* Los estilos de curtain-controls estan en src/assets/styles/controls.css */
@@ -320,22 +320,22 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 .fridge-info {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--space-xs);
 }
 
 .fridge-info-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: var(--text-sm);
+  font-size: var(--font-sm);
 }
 
 .fridge-label {
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
 }
 
 .fridge-value {
-  font-weight: var(--font-medium);
-  color: var(--color-text-primary);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 </style>

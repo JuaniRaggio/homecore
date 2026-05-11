@@ -775,54 +775,53 @@ onMounted(async () => {
 .device-state-info {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--space-md);
 }
 
 .state-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-xs) 0;
+  padding: var(--space-xs) 0;
 }
 
 .state-info-label {
-  font-size: var(--text-md);
-  color: var(--color-text-secondary);
+  font-size: var(--font-md);
+  color: var(--text-secondary);
 }
 
 .state-info-value {
-  font-size: var(--text-md);
-  font-weight: var(--font-medium);
-  color: var(--color-text-primary);
+  font-size: var(--font-md);
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* Door controls - especifico de esta vista */
 .door-state-controls {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--space-sm);
 }
 
 .btn-door {
-  padding: var(--spacing-md);
-  border: 2px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text-primary);
+  padding: var(--space-md);
+  border: 2px solid var(--border);
+  background: var(--bg-main);
+  color: var(--text-primary);
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: var(--text-md);
-  font-weight: var(--font-medium);
+  font-size: var(--font-md);
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
+  gap: var(--space-sm);
   transition: all 0.2s;
 }
 
 .btn-door:hover:not(:disabled) {
-  background: var(--color-card-hover);
-  border-color: var(--color-primary);
+  background: var(--card-hover);
+  border-color: var(--accent);
 }
 
 .btn-door:disabled {
@@ -831,9 +830,9 @@ onMounted(async () => {
 }
 
 .btn-door--active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
 }
 
 .btn-door--active:hover:not(:disabled) {
@@ -844,9 +843,9 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  padding: var(--spacing-xs) 0;
+  gap: var(--space-xs);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  padding: var(--space-xs) 0;
 }
 </style>
