@@ -1,10 +1,11 @@
 <template>
+  <div :class="isGlobal ? 'page-content--full' : ''">
   <main class="edit-routine view-narrow">
     <section class="edit-header">
       <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i> Volver
       </button>
-      <h1 class="view-title">Editar rutina</h1>
+      <h1 class="view-title">{{ isGlobal ? 'Editar rutina global' : 'Editar rutina' }}</h1>
     </section>
 
     <p v-if="loadingData" class="state-loading">Cargando datos...</p>
@@ -163,6 +164,7 @@
       </div>
     </form>
   </main>
+  </div>
 </template>
 
 <script setup>
@@ -171,8 +173,9 @@ import { useRouter, useRoute } from 'vue-router'
 import { useRoutinesStore } from '@/stores/routines'
 import { useDevicesStore } from '@/stores/devices'
 import { useToastStore } from '@/stores/toast'
+import { useOverviewData } from '@/composables/useOverviewData'
 import { friendlyError, actionError } from '@/utils/friendly-error'
-import { getDisplayName } from '@/utils/device-helpers'
+import { getDisplayName, getCrossHomeDisplayName } from '@/utils/device-helpers'
 import { actionsFor, paramsFor, DAY_OPTIONS } from '@/config/routine-actions'
 import * as api from '@/services/api'
 
@@ -181,6 +184,7 @@ const route = useRoute()
 const routinesStore = useRoutinesStore()
 const devicesStore = useDevicesStore()
 const toast = useToastStore()
+const overview = useOverviewData()
 
 const loadingData = ref(true)
 const loadError = ref('')
@@ -191,24 +195,34 @@ const form = reactive({ name: '', description: '', time: '08:00', days: [] })
 const actions = ref([])
 const newAction = reactive({ deviceId: '', actionName: '', params: [] })
 
-const availableDevices = computed(() => devicesStore.devices)
+const isGlobal = computed(() => route.name === 'edit-routine-global')
+
+const availableDevices = computed(() =>
+  isGlobal.value ? overview.allDevices.value : devicesStore.devices
+)
 
 const canSave = computed(() =>
   form.name.trim().length > 0 && actions.value.some(a => a.actionName)
 )
 
 function displayName(device) {
+  if (isGlobal.value) {
+    return getCrossHomeDisplayName(device, overview.allDevices.value)
+  }
   return getDisplayName(device, devicesStore.devices)
 }
 
 function getDeviceName(deviceId) {
-  const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+  const allDevices = availableDevices.value
+  const device = allDevices.find(d => String(d.id) === String(deviceId))
   if (!device) return 'Dispositivo desconocido'
-  return getDisplayName(device, devicesStore.devices)
+  return isGlobal.value
+    ? getCrossHomeDisplayName(device, allDevices)
+    : getDisplayName(device, allDevices)
 }
 
 function getDeviceType(deviceId) {
-  const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+  const device = availableDevices.value.find(d => String(d.id) === String(deviceId))
   return device?.type || ''
 }
 
@@ -271,14 +285,23 @@ async function handleSave() {
         })),
       time: form.time,
       days: form.days,
-      metadata: { homeId: route.params.homeId },
+      metadata: isGlobal.value
+        ? { crossHome: true }
+        : { homeId: route.params.homeId },
     }
 
     await routinesStore.update(route.params.routineId, payload)
-    toast.show('Rutina actualizada', 'success')
-    router.back()
+    const msg = isGlobal.value ? 'Rutina global actualizada' : 'Rutina actualizada'
+    toast.show(msg, 'success')
+
+    if (isGlobal.value) {
+      router.push({ name: 'overview' })
+    } else {
+      router.back()
+    }
   } catch (e) {
-    console.error(`[EditRoutine] Error actualizando rutina:`, e)
+    const logPrefix = isGlobal.value ? '[GlobalEditRoutine]' : '[EditRoutine]'
+    console.error(`${logPrefix} Error actualizando rutina:`, e)
     errorMsg.value = friendlyError(e)
   } finally {
     saving.value = false
@@ -290,7 +313,7 @@ onMounted(async () => {
   const homeId = route.params.homeId
 
   try {
-    if (devicesStore.devices.length === 0 && homeId) {
+    if (!isGlobal.value && devicesStore.devices.length === 0 && homeId) {
       await devicesStore.fetchAllForHome(homeId)
     }
 
@@ -305,10 +328,11 @@ onMounted(async () => {
     form.days = Array.isArray(routine.days) ? [...routine.days] : []
 
     if (Array.isArray(routine.actions)) {
+      const allDevices = availableDevices.value
       actions.value = routine.actions.map(action => {
         const deviceId = action.device?.id
-        const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
-        const typeName = device?.type || ''
+        const device = allDevices.find(d => String(d.id) === String(deviceId))
+        const typeName = device?.type || action.device?.type || ''
         const paramDefs = paramsFor(typeName, action.actionName)
         const params = paramDefs.map((_, i) =>
           Array.isArray(action.params) && action.params[i] !== undefined ? action.params[i] : ''

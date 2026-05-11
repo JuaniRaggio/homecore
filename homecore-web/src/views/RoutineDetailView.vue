@@ -1,4 +1,5 @@
 <template>
+  <div :class="isGlobal ? 'page-content--full' : ''">
   <div class="routine-detail view-narrow">
     <div class="detail-header">
       <button class="btn-back" @click="router.back()">
@@ -12,6 +13,7 @@
       <div class="detail-header-info">
         <div class="detail-title-row">
           <h1 class="view-title">{{ routine.name }}</h1>
+          <div v-if="isGlobal" class="badge-global">Global</div>
           <div class="detail-actions">
             <button class="icon-btn" @click="goToEdit" title="Editar rutina">
               <i class="fa-regular fa-pen-to-square"></i>
@@ -73,7 +75,7 @@
 
     <ConfirmModal
       :visible="deleteConfirm.visible.value"
-      title="Eliminar rutina"
+      :title="isGlobal ? 'Eliminar rutina global' : 'Eliminar rutina'"
       :description="deleteDescription"
       confirm-label="Eliminar"
       confirming-label="Eliminando..."
@@ -82,6 +84,7 @@
       @close="deleteConfirm.close"
       @confirm="confirmDelete"
     />
+  </div>
   </div>
 </template>
 
@@ -113,6 +116,8 @@ const routine = ref({})
 const loading = ref(true)
 const loadError = ref('')
 
+const isGlobal = computed(() => routine.value.metadata?.crossHome === true)
+
 const sortedDays = computed(() => {
   if (!routine.value.days || !Array.isArray(routine.value.days)) return []
   return DAY_ORDER.filter(d => routine.value.days.includes(d))
@@ -122,9 +127,10 @@ function dayLabel(day) {
   return DAY_LABELS[day] || day
 }
 
-const deleteDescription = computed(() =>
-  `Estas seguro de que queres eliminar "${routine.value.name}"? Esta accion no se puede deshacer.`
-)
+const deleteDescription = computed(() => {
+  const type = isGlobal.value ? 'rutina global' : 'rutina'
+  return `Estas seguro de que queres eliminar la ${type} "${routine.value.name}"? Esta accion no se puede deshacer.`
+})
 
 function findDevice(action) {
   const deviceId = action.device?.id
@@ -133,28 +139,44 @@ function findDevice(action) {
 }
 
 function getActionDeviceName(action) {
+  if (isGlobal.value) {
+    return action.device?.name || 'Dispositivo desconocido'
+  }
   const device = findDevice(action)
   if (!device) return action.device?.name || 'Dispositivo desconocido'
   return getDisplayName(device, devicesStore.devices)
 }
 
 function getActionDeviceIcon(action) {
+  if (isGlobal.value) {
+    return getDeviceIcon(action.device?.type || '')
+  }
   const device = findDevice(action)
   return getDeviceIcon(device?.type || '')
 }
 
 function getActionDeviceType(action) {
+  if (isGlobal.value) {
+    return action.device?.type || ''
+  }
   const device = findDevice(action)
   return device ? translateType(device.type) : ''
 }
 
 function getActionDeviceTypeName(action) {
+  if (isGlobal.value) {
+    return action.device?.type || ''
+  }
   const device = findDevice(action)
   return device?.type || ''
 }
 
 function goToEdit() {
-  router.push({ name: 'edit-routine', params: { homeId: route.params.homeId, routineId: routine.value.id } })
+  if (isGlobal.value) {
+    router.push({ name: 'edit-routine-global', params: { routineId: routine.value.id } })
+  } else {
+    router.push({ name: 'edit-routine', params: { homeId: route.params.homeId, routineId: routine.value.id } })
+  }
 }
 
 async function handleToggleActive() {
@@ -184,8 +206,13 @@ async function handleExecute() {
 async function confirmDelete() {
   await deleteConfirm.confirm(async () => {
     await routinesStore.remove(routine.value.id)
-    toast.show('Rutina eliminada', 'success')
-    router.back()
+    const msg = isGlobal.value ? 'Rutina global eliminada' : 'Rutina eliminada'
+    toast.show(msg, 'success')
+    if (isGlobal.value) {
+      router.push({ name: 'overview' })
+    } else {
+      router.back()
+    }
   })
 }
 
@@ -199,7 +226,7 @@ onMounted(async () => {
     }
     routine.value = r
 
-    if (devicesStore.devices.length === 0 && homeId) {
+    if (!isGlobal.value && devicesStore.devices.length === 0 && homeId) {
       await devicesStore.fetchAllForHome(homeId)
     }
   } catch (e) {
@@ -217,7 +244,7 @@ onMounted(async () => {
 
 .routine-detail { padding: 0; }
 
-.view-title { margin-bottom: 4px; }
+.view-title { margin-bottom: var(--space-2xs); }
 
 .routine-description {
   font-size: var(--font-base);
@@ -225,13 +252,24 @@ onMounted(async () => {
   margin: 0;
 }
 
+.badge-global {
+  display: inline-block;
+  padding: var(--space-2xs) var(--space-base);
+  border-radius: var(--radius-md);
+  background-color: var(--accent);
+  color: #fff;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  margin-left: var(--space-base);
+}
+
 /* Info rows inside the card */
 .info-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
+  gap: var(--space-base);
+  padding: var(--space-md) 0;
 }
 .info-row + .info-row { border-top: 1px solid var(--border); }
 
@@ -247,10 +285,10 @@ onMounted(async () => {
 }
 
 /* Day chips */
-.days-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.days-chips { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 .day-chip {
   display: inline-block;
-  padding: 4px 10px;
+  padding: var(--space-2xs) var(--space-md);
   border-radius: var(--radius-md);
   background-color: var(--accent);
   color: #fff;
@@ -263,20 +301,20 @@ onMounted(async () => {
   font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: var(--space-base);
 }
 
 .action-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-md);
 }
 
 .action-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: var(--space-base);
+  padding: var(--space-base) var(--space-xl);
   background-color: var(--bg-main);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -286,7 +324,7 @@ onMounted(async () => {
 .action-item__device {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   font-weight: 600;
   font-size: var(--font-base);
   color: var(--text-primary);
