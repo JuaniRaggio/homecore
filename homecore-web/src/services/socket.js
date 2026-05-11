@@ -15,7 +15,9 @@ function log(...args) {
 // Deduplicacion de notificaciones: evita duplicados cuando el servidor
 // emite deviceEvent + deviceUpdated por la misma accion del usuario.
 const DEDUP_WINDOW_MS = 2000
+const CLEANUP_THRESHOLD = 100
 const recentDeviceNotifs = new Map()
+let cleanupCounter = 0
 
 function shouldNotify(deviceId) {
   if (!deviceId) return true
@@ -24,6 +26,17 @@ function shouldNotify(deviceId) {
   const last = recentDeviceNotifs.get(key)
   if (last && now - last < DEDUP_WINDOW_MS) return false
   recentDeviceNotifs.set(key, now)
+
+  cleanupCounter++
+  if (cleanupCounter >= CLEANUP_THRESHOLD) {
+    cleanupCounter = 0
+    for (const [k, timestamp] of recentDeviceNotifs.entries()) {
+      if (now - timestamp > DEDUP_WINDOW_MS) {
+        recentDeviceNotifs.delete(k)
+      }
+    }
+  }
+
   return true
 }
 
