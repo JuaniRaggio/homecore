@@ -195,7 +195,7 @@ onMounted(async () => {
 <style scoped>
 .routine-detail { padding: 0; }
 
-.view-title { margin-bottom: 4px; }
+.view-title { margin-bottom: var(--space-2xs); }
 
 .routine-description {
   font-size: var(--font-base);
@@ -205,21 +205,21 @@ onMounted(async () => {
 
 .badge-global {
   display: inline-block;
-  padding: 4px 12px;
+  padding: var(--space-2xs) var(--space-base);
   border-radius: var(--radius-md);
   background-color: var(--accent);
   color: #fff;
   font-size: var(--font-sm);
   font-weight: 600;
-  margin-left: 12px;
+  margin-left: var(--space-base);
 }
 
 .info-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
+  gap: var(--space-base);
+  padding: var(--space-md) 0;
 }
 .info-row + .info-row { border-top: 1px solid var(--border); }
 
@@ -234,10 +234,10 @@ onMounted(async () => {
   font-weight: 600;
 }
 
-.days-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.days-chips { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 .day-chip {
   display: inline-block;
-  padding: 4px 10px;
+  padding: var(--space-2xs) var(--space-md);
   border-radius: var(--radius-md);
   background-color: var(--accent);
   color: #fff;
@@ -249,20 +249,20 @@ onMounted(async () => {
   font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: var(--space-base);
 }
 
 .action-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-md);
 }
 
 .action-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: var(--space-base);
+  padding: var(--space-base) var(--space-xl);
   background-color: var(--bg-main);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -272,7 +272,7 @@ onMounted(async () => {
 .action-item__device {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   font-weight: 600;
   font-size: var(--font-base);
   color: var(--text-primary);

@@ -334,18 +334,18 @@ onMounted(async () => {
   font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 12px;
+  margin-bottom: var(--space-base);
 }
 
 .action-edit-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: var(--space-base);
+  padding: var(--space-lg) var(--space-xl);
   background-color: var(--bg-main);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  margin-bottom: 10px;
+  margin-bottom: var(--space-md);
   flex-wrap: wrap;
 }
 
@@ -368,14 +368,14 @@ onMounted(async () => {
 .add-action-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-base);
   flex-wrap: wrap;
-  padding-top: 16px;
+  padding-top: var(--space-xl);
   border-top: 1px solid var(--border);
 }
 
 .btn-add-action {
-  padding: 8px 16px;
+  padding: var(--space-sm) var(--space-xl);
   border-radius: var(--radius-md);
   border: 1px solid var(--accent);
   background-color: var(--accent);

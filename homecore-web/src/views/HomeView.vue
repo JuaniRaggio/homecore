@@ -108,24 +108,6 @@
     @save="confirmEditHome"
   />
 
-  <CreateRoomModal
-    :visible="newRoomModal.visible.value"
-    :home-id="String(homeId)"
-    @close="newRoomModal.close"
-    @created="newRoomModal.close"
-  />
-
-  <ConfirmModal
-    :visible="deleteRoomConfirm.visible.value"
-    title="Eliminar habitacion"
-    description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
-    confirm-label="Eliminar"
-    confirming-label="Eliminando..."
-    :danger="true"
-    :loading="deleteRoomConfirm.loading.value"
-    @close="deleteRoomConfirm.close"
-    @confirm="confirmDeleteRoom"
-  />
 
   <ConfirmModal
     :visible="deleteHomeConfirm.visible.value"
@@ -152,7 +134,6 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
-import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
 import InviteGuestModal from '@/components/common/InviteGuestModal.vue'
@@ -187,8 +168,6 @@ const favoriteRoutines = computed(() =>
     return rHomeId && String(rHomeId) === String(homeId.value)
   })
 )
-const rooms = computed(() => roomsStore.rooms)
-
 const stats = computed(() => ({
   active: devicesStore.activeDevices.length,
   total: devicesStore.devices.length,
@@ -198,25 +177,6 @@ const stats = computed(() => ({
 
 // Loading state for edit home modal
 const saving = ref(false)
-
-// Delete room confirmation
-const deleteRoomConfirm = useConfirmAction()
-
-function requestDeleteRoom(roomId) {
-  deleteRoomConfirm.request(roomId)
-}
-
-async function confirmDeleteRoom() {
-  await deleteRoomConfirm.confirm(async (roomId) => {
-    const roomDevices = devicesStore.getDevicesByRoomId(roomId)
-    if (roomDevices.length) {
-      await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
-      roomDevices.forEach(d => devicesStore.removeDevice(d.id))
-    }
-    await roomsStore.removeRoom(roomId)
-    toast.show('Habitacion eliminada', 'success')
-  })
-}
 
 // Delete home confirmation
 const deleteHomeConfirm = useConfirmAction()
@@ -237,9 +197,6 @@ async function confirmDeleteHome() {
     router.push({ name: 'overview' })
   })
 }
-
-// Modal nueva habitacion
-const newRoomModal = useModal()
 
 // Modal editar hogar
 const editHomeModal = useModal()
