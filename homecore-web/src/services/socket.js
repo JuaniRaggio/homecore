@@ -50,9 +50,9 @@ const STATE_FIELD_TO_ACTION = {
   volume: 'setVolume',
   genre: 'setGenre',
   color: 'setColor',
-  heat: 'setHeatSource',
-  grill: 'setGrillMode',
-  convection: 'setConvectionMode',
+  heat: 'setHeat',
+  grill: 'setGrill',
+  convection: 'setConvection',
   location: 'setLocation',
 }
 
@@ -134,15 +134,8 @@ export function connect(token) {
     if (data.device) {
       useDevicesStore().updateDeviceFromEvent(data.device)
     }
-    const deviceId = data.device?.id || data.deviceId
-    if (shouldNotify(deviceId)) {
-      const name = data.device?.name || 'Un dispositivo'
-      useNotificationsStore().addNotification({
-        title: 'Dispositivo actualizado',
-        message: `"${name}" fue modificado.`,
-        type: 'info'
-      })
-    }
+    // NO mostrar notificación aqui - deviceEvent ya maneja los cambios de estado
+    // Solo deviceEvent debe notificar para evitar duplicados
   })
 
   socket.on('deviceDeleted', (data) => {
