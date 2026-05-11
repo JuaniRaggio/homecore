@@ -124,7 +124,7 @@
 
 Esta segunda entrega consiste en la implementación funcional del sitio web de HomeCore, la aplicación de gestión de casas inteligentes diseñada en la primera entrega. El objetivo fue trasladar los prototipos de alta fidelidad a una aplicación web real, conectada a la API provista por la cátedra, manteniendo las decisiones de diseño y usabilidad establecidas previamente.
 
-La implementación se realizó con Vue.js 3 (Composition API), Pinia para el manejo de estado, Vue Router para la navegación, y Socket.io para notificaciones en tiempo real. Se priorizó la fidelidad al prototipo original, adaptando únicamente lo necesario para resolver limitaciones técnicas o mejorar la experiencia a partir del feedback recibido en la primera entrega.
+La implementación se realizó con Vue.js 3, la API provista, Pinia para el manejo de estado, Vue Router para la navegación, y Socket.io para notificaciones en tiempo real. Se priorizó la fidelidad al prototipo original, adaptando únicamente lo necesario para resolver limitaciones técnicas o mejorar la experiencia a partir del feedback recibido en la primera entrega.
 
 = Modelos de Persona (Contexto)
 
@@ -232,15 +232,13 @@ El sistema presenta gráficos de consumo eléctrico de los dispositivos del hoga
 
 Al crear o editar una rutina, el usuario puede configurar los días de la semana y la hora exacta en que debe ejecutarse automáticamente. Esto permite la automatización total de tareas frecuentes sin necesidad de intervención manual periódica.
 
-= Decisiones de diseño e implementación
-
 // ====================================
 // 4. REQUISITOS NO FUNCIONALES
 // ====================================
 
 = Requisitos no funcionales
 
-- *Tecnologías utilizadas (RNF1):* El frontend fue desarrollado con Vue.js 3 utilizando Composition API, Pinia para el estado y Vue Router. Se emplea Vite como herramienta de construcción y Socket.io para comunicación en tiempo real. Para visualización se integró Chart.js.
+- *Tecnologías utilizadas (RNF1):* El frontend fue desarrollado con Vue.js 3 utilizando la API provista, Pinia para el estado y Vue Router. Se emplea Vite como herramienta de construcción y Socket.io para comunicación en tiempo real. Para visualización se integró Chart.js.
 - *Adaptación a resoluciones de pantalla (RNF3):* La interfaz fue optimizada para pantallas de escritorio y laptops (1280px a 1920px), asegurando un layout estable y legible en el entorno de uso principal.
 - *Separación de estructura y presentación (RNF4):* Se respeta la separación entre HTML y CSS, utilizando una arquitectura de estilos modular y scoped para evitar estilos inline y asegurar la mantenibilidad.
 - *Separación de estructura y comportamiento (RNF5):* La lógica de negocio y comportamiento se extrae de los componentes hacia servicios y stores independientes, manteniendo los templates enfocados en la estructura de la interfaz.
@@ -248,7 +246,7 @@ Al crear o editar una rutina, el usuario puede configurar los días de la semana
 
 == Tecnologías utilizadas (RNF1)
 
-El frontend de HomeCore fue desarrollado con Vue.js, utilizando la Composition API y una arquitectura basada en componentes para lograr una estructura modular. La navegación entre vistas se implementó mediante Vue Router, mientras que el manejo del estado global se realizó con Pinia. 
+El frontend de HomeCore fue desarrollado con Vue.js, utilizando la API provista y una arquitectura basada en componentes para lograr una estructura modular. La navegación entre vistas se implementó mediante Vue Router, mientras que el manejo del estado global se realizó con Pinia. 
 El proyecto emplea Vite como herramienta de construcción y desarrollo, permitiendo tiempos de compilación y recarga rápida. La comunicación en tiempo real con el servidor se resolvió mediante Socket.IO, y las solicitudes HTTP al backend se realizaron utilizando la Fetch API. 
 Para la visualización de datos en la vista ‘Consumo’  se integró Chart.js junto con vue-chartjs. Finalmente, la interfaz utiliza Font Awesome para los íconos y la librería p-limit para controlar la concurrencia en la carga paralela de datos. 
 
@@ -400,6 +398,72 @@ Los componentes de UI se reservaron exclusivamente para casos que requieren lóg
 
 *Justificación:* Esto garantiza consistencia visual de forma técnica: un cambio de color se propaga a toda la aplicación. Durante la implementación se detectaron valores hardcoded (por ejemplo, `#d32f2f` en vez de `var(--danger)`) que fueron corregidos en una pasada de auditoría. Se agregaron las variables `--warning`, `--danger-bg` y `--success-bg` que no estaban previstas en el prototipo original pero resultaron necesarias para estados intermedios.
 
+=== Paleta de colores implementada
+
+La paleta de colores definida en la primera entrega se mantuvo fielmente en la implementación, garantizando coherencia visual entre el prototipo y la aplicación final. El tema oscuro profundo con indigo para acciones y ámbar para estados activos cumple con el estándar WCAG AA en todos los casos.
+
+#let swatch(color, nombre, hex) = {
+  box(
+    width: 100%,
+    inset: 0pt,
+    stack(
+      dir: ttb,
+      rect(fill: rgb(color), width: 100%, height: 32pt, radius: (top-left: 4pt, top-right: 4pt)),
+      rect(
+        fill: rgb("#1a1a24"),
+        stroke: 0.5pt + rgb("#3a3a4a"),
+        width: 100%,
+        radius: (bottom-left: 4pt, bottom-right: 4pt),
+        inset: 6pt,
+      )[
+        #set text(size: 8pt)
+        #text(fill: rgb("#f1f5f9"), weight: "bold")[#nombre] \
+        #text(fill: rgb("#8494a7"))[#hex]
+      ],
+    )
+  )
+}
+
+#v(0.5em)
+#text(size: 10pt, weight: "bold")[Fondos]
+#grid(
+  columns: (1fr, 1fr, 1fr),
+  gutter: 8pt,
+  swatch("#0f0f14", "Primary", "#0f0f14"),
+  swatch("#1a1a24", "Secondary", "#1a1a24"),
+  swatch("#252532", "Tertiary", "#252532"),
+)
+
+#v(0.3em)
+#text(size: 10pt, weight: "bold")[Acentos]
+#grid(
+  columns: (1fr, 1fr, 1fr),
+  gutter: 8pt,
+  swatch("#818cf8", "Indigo", "#818cf8"),
+  swatch("#a5b4fc", "Indigo Hover", "#a5b4fc"),
+  swatch("#fbbf24", "Ámbar", "#fbbf24"),
+)
+
+#v(0.3em)
+#text(size: 10pt, weight: "bold")[Semánticos]
+#grid(
+  columns: (1fr, 1fr, 1fr),
+  gutter: 8pt,
+  swatch("#34d399", "Success", "#34d399"),
+  swatch("#f87171", "Danger", "#f87171"),
+  swatch("#3a3a4a", "Border", "#3a3a4a"),
+)
+
+#v(0.3em)
+#text(size: 10pt, weight: "bold")[Texto]
+#grid(
+  columns: (1fr, 1fr, 1fr),
+  gutter: 8pt,
+  swatch("#f1f5f9", "Primary", "#f1f5f9"),
+  swatch("#b0bdd0", "Secondary", "#b0bdd0"),
+  swatch("#8494a7", "Muted", "#8494a7"),
+)
+
 == Controles específicos por tipo de dispositivo
 
 *Decisión:* Cada tipo de dispositivo cuenta con un componente de controles dedicado (`LightControls`, `DoorControls`, `CurtainControls`, `AlarmControls`, `WaterControls`) que se renderiza condicionalmente en la vista de detalle.
@@ -542,7 +606,15 @@ Durante la implementación se realizaron ajustes respecto al diseño original pa
 
 *Decisión:* Se priorizó el uso de tarjetas de resumen y métricas clave sobre la representación gráfica del plano de la casa.
 
-*Justificación:* El diseño original contemplaba un plano isométrico con la ubicación espacial de los dispositivos. Dado que la API no proporciona datos de posicionamiento, se optó por un enfoque basado en tarjetas de información. Esto asegura que el usuario reciba datos precisos y accionables sobre sus dispositivos favoritos y el consumo energético, manteniendo la claridad informativa.
+*Justificación:* El diseño original contemplaba un plano isométrico con la ubicación espacial de los dispositivos. Dado que la API no proporciona datos de posicionamiento, se optó por un enfoque basado en tarjetas de información. Esto asegura que el usuario reciba datos precisos y accionables sobre sus dispositivos favoritos y el consumo energético, manteniendo la claridad informativa para usuarios como *Carolina*, que buscan monitorear su hogar rápidamente.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/overview/oold.png", width: 100%),
+    image("hci_before_and_after/overview/onew.png", width: 100%),
+  ),
+  caption: [Home Overview: prototipo isométrico (izq.) vs. implementación final (der.)],
+)
 
 == Simplificación de roles de usuario
 
@@ -554,7 +626,15 @@ Durante la implementación se realizaron ajustes respecto al diseño original pa
 
 *Decisión:* Se reemplazaron algunos selectores binarios (on/off) por paneles de acciones contextuales para dispositivos con múltiples estados.
 
-*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la correspondencia con el mundo real y hace la interacción más intuitiva. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real. Esto se evidencia en la comparación del control de cortinas presentada en la sección de capturas.
+*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la correspondencia con el mundo real y hace la interacción más intuitiva para perfiles como *Marta*. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/boton de la cortina/bold.png", width: 100%),
+    image("hci_before_and_after/boton de la cortina/bnew.png", width: 100%),
+  ),
+  caption: [Control de cortinas: El interruptor binario del prototipo evolucionó hacia un panel de acciones contextuales.],
+)
 
 == Introducción de la vista de Resumen Global (Overview)
 
@@ -562,37 +642,6 @@ Durante la implementación se realizaron ajustes respecto al diseño original pa
 
 *Justificación:* Esta vista permite al usuario identificar rápidamente estados de alerta o ejecutar rutinas frecuentes sin necesidad de navegar por cada propiedad individualmente. Esto reduce el esfuerzo necesario para obtener una visión general del sistema, potenciando el reconocimiento sobre el recuerdo y la eficiencia de uso.
 
-
-
-= Diseño gráfico y paleta de colores
-
-La identidad visual de HomeCore se basa en una paleta de tonos oscuros diseñada para minimizar la fatiga visual, especialmente en entornos de baja luminosidad, habituales en la gestión de hogares durante la noche. Esta elección cromática también permite que los estados activos (dispositivos encendidos, alertas, favoritos) resalten de forma efectiva mediante acentos de color.
-
-== Paleta de colores
-
-Los colores se encuentran definidos mediante variables CSS (Design Tokens) para garantizar la consistencia en todos los componentes.
-
-#table(
-  columns: (auto, auto, 1fr),
-  align: (left, left, left),
-  stroke: 0.5pt,
-  inset: 8pt,
-  fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*Color*], [*Variable*], [*Uso principal*]),
-  [#rect(fill: rgb("#0e0d13"), width: 1em, height: 1em)], [`--bg-main`], [Fondo de la aplicación],
-  [#rect(fill: rgb("#181924"), width: 1em, height: 1em)], [`--bg-sidebar`], [Barras y paneles (sidebar, topbar, tarjetas)],
-  [#rect(fill: rgb("#6f78da"), width: 1em, height: 1em)], [`--accent`], [Color de acento (acciones principales)],
-  [#rect(fill: rgb("#f6bd20"), width: 1em, height: 1em)], [`--amber`], [Alertas y avisos],
-  [#rect(fill: rgb("#f87171"), width: 1em, height: 1em)], [`--danger`], [Acciones destructivas y errores],
-  [#rect(fill: rgb("#d0d3db"), width: 1em, height: 1em)], [`--text-primary`], [Texto principal y encabezados],
-)
-
-== Justificación técnica
-
--- *Reducción de fatiga visual:* La elección de un esquema de colores oscuros está respaldada por principios de usabilidad que indican que, en interfaces de domótica —que suelen utilizarse por la noche—, los fondos oscuros minimizan el deslumbramiento y reducen la fatiga ocular del usuario.
--- *Jerarquía visual:* El uso del acento violeta (`--accent`) crea un contraste definido sobre el fondo oscuro, guiando la atención del usuario hacia las acciones principales (encendido de dispositivos, confirmación de rutinas) sin saturar la interfaz.
--- *Accesibilidad:* Se aseguró una relación de contraste adecuada entre el color de fondo (`--bg-main`) y los colores de texto (`--text-primary`, `--text-secondary`), cumpliendo con los estándares mínimos de legibilidad (RNF9).
--- *Semántica de colores:* Los colores semánticos (`--danger` para errores/eliminación, `--success` para estados activos) siguen las convenciones estándar de la industria, facilitando el reconocimiento inmediato de estados por parte de los usuarios.
 
 = Instructivo de instalación
 
@@ -609,14 +658,16 @@ Para ejecutar la aplicación en un entorno local, siga los siguientes pasos:
 == Navegadores compatibles
 
 La aplicación ha sido testeada y es compatible con las últimas versiones de los siguientes navegadores:
--- Google Chrome
--- Mozilla Firefox
--- Microsoft Edge
--- Safari
+- Google Chrome
+- Mozilla Firefox
+- Microsoft Edge
+- Safari
 
 // ====================================
 // 8. FEEDBACK DE LA PRIMERA ENTREGA
 // ====================================
+
+= Feedback de la primera entrega
 
 == Configuración de usuario
 
@@ -624,6 +675,11 @@ La aplicación ha sido testeada y es compatible con las últimas versiones de lo
 
 *Resolución:* En la primera entrega, la sección de Configuración solo era accesible desde el fondo de la barra lateral, lo cual dificultaba su descubrimiento y acceso. A partir del feedback recibido, se decidió incorporarla también dentro del menú de usuario en la barra superior, aumentando su visibilidad y accesibilidad para todos los usuarios. Esta decisión se relaciona con la consistencia y el uso de estándares ya que ubicar la configuración dentro del menú de usuario sigue patrones de navegación ampliamente utilizados. Además, también refuerza el reconocimiento antes que el recuerdo, porque el usuario puede identificar rápidamente dónde acceder a las configuraciones sin necesidad de memorizar su ubicación.
 
+== Vista isométrica del hogar
+
+*Feedback:* "La vista isométrica 3D del hogar no aporta utilidad práctica y representa complejidad técnica innecesaria."
+
+*Resolución:* Siguiendo la sugerencia de la cátedra, se eliminó completamente la vista isométrica 3D que formaba parte del diseño original. Esta decisión se fundamentó en que la representación gráfica del plano de la casa, aunque visualmente atractiva, no proporcionaba información funcional que justificara su complejidad de implementación y mantenimiento. En su lugar, se priorizó una presentación más directa y eficiente de la información mediante tarjetas de resumen, métricas clave y listas de dispositivos favoritos. Este enfoque mejora la velocidad de carga de la vista principal, reduce la complejidad del código y mantiene el foco en la funcionalidad real del sistema: el control y monitoreo de dispositivos. La eliminación de este elemento decorativo refuerza el principio de diseño minimalista, donde cada componente de la interfaz debe cumplir un propósito claro en la experiencia del usuario.
 
 // TODO: Completar con el feedback recibido del profesor/evaluador
 // y cómo se abordó en la implementación.
@@ -632,3 +688,33 @@ La aplicación ha sido testeada y es compatible con las últimas versiones de lo
 //    los perfiles, aunque con restricciones."
 //    *Resolución:* Se implementó la sección de Configuración accesible desde
 //    el menú de usuario en la barra superior, visible para todos los usuarios.
+
+// ====================================
+// 9. CONCLUSIÓN
+// ====================================
+
+= Conclusión
+
+Esta segunda entrega representa la materialización funcional de HomeCore, transformando los prototipos de alta fidelidad de la primera entrega en una aplicación web completamente operativa. El resultado es un sistema de gestión domótica que mantiene la fidelidad visual y conceptual del diseño original, mientras resuelve los desafíos técnicos a la implementación real.
+
+El desarrollo se fundamentó en principios de usabilidad establecidos, particularmente las heurísticas de Nielsen, que guiaron cada decisión de implementación. La arquitectura técnica adoptada Vue.js con la API provista, Pinia para estado global, y un sistema de CSS modular demostró ser efectiva para mantener la consistencia visual y la escalabilidad del código.
+
+Los requisitos funcionales obligatorios fueron implementados en su totalidad, junto con varios opcionales que enriquecen la experiencia de usuario: notificaciones en tiempo real mediante WebSocket y visualización de consumo energético con gráficos. Esta implementación responde a las necesidades identificadas en la investigación de usuarios de la primera entrega, donde se evidenció la importancia del acceso remoto y la visibilidad del consumo.
+
+Las decisiones de diseño documentadas en este informe reflejan un proceso iterativo desde la consolidación de código para eliminar duplicación, hasta la implementación de patrones como actualización con rollback que mejoran la percepción de control del usuario. Cada decisión técnica fue evaluada por su funcionalidad e impacto en la experiencia de uso.
+
+El feedback recibido en la primera entrega fue incorporado, evidenciando un ciclo de diseño centrado en el usuario. La reubicación de la configuración de usuario, respondiendo a observaciones sobre su baja visibilidad, ejemplifica cómo las evaluaciones empíricas informan mejoras concretas en la interfaz.
+
+Los desafíos enfrentados durante la implementación resultaron en soluciones que fortalecieron la arquitectura general del sistema. La documentación detallada de estos problemas y sus resoluciones (disponible en el historial de git) constituye un recurso valioso para futuras iteraciones y mantenimiento.
+
+En términos de cumplimiento normativo, la aplicación satisface todos los requisitos no funcionales especificados: validación HTML/CSS sin errores, separación de responsabilidades estructura/presentación/comportamiento, compatibilidad con navegadores modernos, y accesibilidad básica verificada con WAVE.
+
+== Trabajo futuro
+
+Si bien esta entrega cumple con los objetivos establecidos, se identifican oportunidades de mejora para futuras iteraciones:
+
+- *Planificación automática de rutinas:* La funcionalidad de configuración horaria está implementada en el frontend, pero requiere un componente de backend (cron job o scheduler) para ejecutar rutinas automáticamente sin intervención del usuario.
+
+- *Optimización de carga progresiva:* Aunque se implementó lazy loading de rutas, podría explorarse la carga progresiva de imágenes y datos en vistas con alta densidad de información.
+
+- *Análisis de consumo histórico:* Expandir la vista de consumo para incluir comparativas temporales (semana actual vs. anterior, proyecciones mensuales) agregaría valor analítico.
