@@ -18,6 +18,8 @@ const RoutinesView = () => import('@/views/RoutinesView.vue')
 const NewRoutineView = () => import('@/views/NewRoutineView.vue')
 const RoutineDetailView = () => import('@/views/RoutineDetailView.vue')
 const EditRoutineView = () => import('@/views/EditRoutineView.vue')
+const GlobalRoutineDetailView = () => import('@/views/GlobalRoutineDetailView.vue')
+const GlobalRoutineEditView = () => import('@/views/GlobalRoutineEditView.vue')
 const HistoryView = () => import('@/views/HistoryView.vue')
 const ConsumptionView = () => import('@/views/ConsumptionView.vue')
 const SettingsView = () => import('@/views/SettingsView.vue')
@@ -63,6 +65,16 @@ const routes = [
     path: '/rutinas/nueva',
     name: 'new-routine-global',
     component: NewRoutineView
+  },
+  {
+    path: '/rutinas/:routineId',
+    name: 'routine-detail-global',
+    component: GlobalRoutineDetailView
+  },
+  {
+    path: '/rutinas/:routineId/editar',
+    name: 'edit-routine-global',
+    component: GlobalRoutineEditView
   },
   {
     path: '/casa/:homeId',

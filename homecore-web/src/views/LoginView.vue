@@ -52,12 +52,17 @@ async function handleLogin() {
     return
   }
   loading.value = true
-  const result = await authStore.login(email.value, password.value)
-  loading.value = false
-  if (result.success) {
-    router.push('/overview')
-  } else {
-    error.value = result.error || 'Error al iniciar sesion'
+  try {
+    const result = await authStore.login(email.value, password.value)
+    if (result.success) {
+      router.push('/overview')
+    } else {
+      error.value = result.error || 'Error al iniciar sesion'
+    }
+  } catch (e) {
+    error.value = 'Error inesperado al iniciar sesion'
+  } finally {
+    loading.value = false
   }
 }
 

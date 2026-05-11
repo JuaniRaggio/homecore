@@ -11,7 +11,7 @@
       <i class="fa-solid fa-star"></i>
     </span>
 
-    <div class="routine-info">
+    <div class="routine-info" @click="$emit('open', routine.id)">
       <span class="routine-name">{{ routine.name }}</span>
       <!-- schedule: texto como "07:30 - Lun, Mar, Mie, Jue, Vie" -->
       <span class="routine-schedule">{{ routine.schedule }}</span>
@@ -40,7 +40,7 @@ defineProps({
   }
 })
 
-defineEmits(['execute', 'toggle-favorite'])
+defineEmits(['execute', 'toggle-favorite', 'open'])
 </script>
 
 <style scoped>
@@ -68,6 +68,7 @@ defineEmits(['execute', 'toggle-favorite'])
   display: flex;
   flex-direction: column;
   gap: 2px;
+  cursor: pointer;
 }
 
 .routine-name {

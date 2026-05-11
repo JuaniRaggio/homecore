@@ -18,6 +18,17 @@ export async function request(method, path, body = null) {
   const url = `${BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
   const res = await fetch(url, options)
   if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user_data')
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
+      }
+      const err = new Error('Tu sesion ha expirado. Por favor, inicia sesion nuevamente.')
+      err.status = 401
+      throw err
+    }
+
     const errorData = await res.json().catch(() => ({}))
     const err = new Error(errorData.error?.description || errorData.message || 'API request failed')
     err.status = res.status

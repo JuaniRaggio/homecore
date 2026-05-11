@@ -39,8 +39,9 @@ const routineActions = useRoutineActions()
 const homeId = computed(() => route.params.homeId)
 const routines = computed(() =>
   routinesStore.routines.filter(r => {
-    const rHomeId = r.metadata?.homeId
-    return rHomeId && String(rHomeId) === String(homeId.value)
+    const isGlobal = r.metadata?.crossHome === true
+    const belongsToThisHome = r.metadata?.homeId && String(r.metadata.homeId) === String(homeId.value)
+    return isGlobal || belongsToThisHome
   })
 )
 

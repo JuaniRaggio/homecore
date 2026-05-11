@@ -4,9 +4,8 @@
   <p v-if="devicesStore.loading" class="state-loading">Cargando...</p>
   <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
   <template v-else>
-  <!-- SECCION DE LA CASA: stats + pisos/habitaciones + isometria -->
+  <!-- Barra de estadisticas -->
   <section class="house-section">
-    <!-- Barra de estadisticas -->
     <div class="stats-row">
       <div class="stats-bar">
         <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
@@ -26,35 +25,6 @@
       <button class="btn-invite" @click="inviteModal.open">
         <i class="fa-solid fa-user-plus"></i> Agregar invitado
       </button>
-    </div>
-
-    <div class="house-inner">
-      <!-- Panel izquierdo: selector de pisos y lista de habitaciones -->
-      <div class="house-panel">
-        <!-- Tabs de pisos -->
-        <div class="floor-tabs">
-          <button class="floor-tab floor-tab--active">Piso 0</button>
-          <button class="floor-tab floor-tab--disabled" disabled title="TODO: Proximamente">
-            <i class="fa-solid fa-plus"></i> Piso
-          </button>
-        </div>
-
-        <ul class="room-list">
-          <li v-for="room in rooms" :key="room.id" class="room-item">
-            {{ room.name }}
-            <button class="room-close" @click="requestDeleteRoom(room.id)"><i class="fa-solid fa-xmark"></i></button>
-          </li>
-        </ul>
-
-        <button class="btn-dashed" @click="newRoomModal.open">
-          <i class="fa-solid fa-plus"></i> Agregar habitacion
-        </button>
-      </div>
-
-      <!-- ISOMETRIA DE LA CASA -->
-      <div class="isometry-placeholder">
-        <p class="state-empty">TODO: Vista isometrica proximamente</p>
-      </div>
     </div>
   </section>
 
@@ -99,11 +69,35 @@
           :key="routine.id"
           :routine="routine"
           @execute="routineActions.executeRoutine"
+          @open="handleOpenRoutine"
         />
         <p v-if="favoriteRoutines.length === 0" class="empty-msg">Sin rutinas favoritas</p>
       </div>
     </section>
   </div>
+
+  <!-- Historial reciente -->
+  <section class="panel history-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Historial reciente</h2>
+      <router-link :to="`/casa/${homeId}/historial`" class="panel-link">Ver todo</router-link>
+    </div>
+
+    <p v-if="historyLoading" class="state-loading">Cargando historial...</p>
+    <p v-else-if="historyEvents.length === 0" class="state-empty">Sin eventos recientes</p>
+    <div v-else class="timeline">
+      <div v-for="event in historyEvents" :key="event.id" class="timeline-item">
+        <div class="timeline-dot" :class="`timeline-dot--${event.type}`"></div>
+        <div class="timeline-content">
+          <div class="timeline-row">
+            <span class="timeline-device">{{ event.deviceName }}</span>
+            <span class="timeline-time">{{ event.time }}</span>
+          </div>
+          <span class="timeline-action">{{ event.action }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <EditNameModal
     :visible="editHomeModal.visible.value"
@@ -115,24 +109,6 @@
     @save="confirmEditHome"
   />
 
-  <CreateRoomModal
-    :visible="newRoomModal.visible.value"
-    :home-id="String(homeId)"
-    @close="newRoomModal.close"
-    @created="newRoomModal.close"
-  />
-
-  <ConfirmModal
-    :visible="deleteRoomConfirm.visible.value"
-    title="Eliminar habitacion"
-    description="Estas seguro de que queres eliminar esta habitacion? Los dispositivos vinculados tambien seran eliminados."
-    confirm-label="Eliminar"
-    confirming-label="Eliminando..."
-    :danger="true"
-    :loading="deleteRoomConfirm.loading.value"
-    @close="deleteRoomConfirm.close"
-    @confirm="confirmDeleteRoom"
-  />
 
   <ConfirmModal
     :visible="deleteHomeConfirm.visible.value"
@@ -159,7 +135,6 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import DeviceCard from '@/components/devices/DeviceCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
-import CreateRoomModal from '@/components/common/CreateRoomModal.vue'
 import ConfirmModal from '@/components/common/ConfirmModal.vue'
 import EditNameModal from '@/components/common/EditNameModal.vue'
 import InviteGuestModal from '@/components/common/InviteGuestModal.vue'
@@ -167,6 +142,7 @@ import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
 import { actionError } from '@/utils/friendly-error'
+import { describeAction, ACTIONS_MAP } from '@/config/routine-actions'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useRoutineActions } from '@/composables/useRoutineActions'
 import { useModal } from '@/composables/useModal'
@@ -193,8 +169,6 @@ const favoriteRoutines = computed(() =>
     return rHomeId && String(rHomeId) === String(homeId.value)
   })
 )
-const rooms = computed(() => roomsStore.rooms)
-
 const stats = computed(() => ({
   active: devicesStore.activeDevices.length,
   total: devicesStore.devices.length,
@@ -205,31 +179,12 @@ const stats = computed(() => ({
 // Loading state for edit home modal
 const saving = ref(false)
 
-// Delete room confirmation
-const deleteRoomConfirm = useConfirmAction()
-
-function requestDeleteRoom(roomId) {
-  deleteRoomConfirm.request(roomId)
-}
-
-async function confirmDeleteRoom() {
-  await deleteRoomConfirm.confirm(async (roomId) => {
-    const roomDevices = devicesStore.getDevicesByRoomId(roomId)
-    if (roomDevices.length) {
-      await Promise.all(roomDevices.map(d => api.deleteDevice(d.id)))
-      roomDevices.forEach(d => devicesStore.removeDevice(d.id))
-    }
-    await roomsStore.removeRoom(roomId)
-    toast.show('Habitacion eliminada', 'success')
-  })
-}
-
 // Delete home confirmation
 const deleteHomeConfirm = useConfirmAction()
 
 async function confirmDeleteHome() {
   await deleteHomeConfirm.confirm(async () => {
-    const roomsSnapshot = [...rooms.value]
+    const roomsSnapshot = [...roomsStore.rooms]
     for (const room of roomsSnapshot) {
       const roomDevices = devicesStore.getDevicesByRoomId(room.id)
       if (roomDevices.length) {
@@ -243,9 +198,6 @@ async function confirmDeleteHome() {
     router.push({ name: 'overview' })
   })
 }
-
-// Modal nueva habitacion
-const newRoomModal = useModal()
 
 // Modal editar hogar
 const editHomeModal = useModal()
@@ -271,10 +223,70 @@ function handleOpenDevice(id) {
   router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })
 }
 
-// Fetch routines additionally (useHomeData already fetches devices + rooms)
+function handleOpenRoutine(routineId) {
+  router.push({ name: 'routine-detail', params: { homeId: homeId.value, routineId } })
+}
+
+// Historial reciente
+const historyEvents = ref([])
+const historyLoading = ref(true)
+
+function getDeviceInfo(log) {
+  const deviceId = log.deviceId || log.device?.id
+  const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+  const name = device?.name || log.device?.name || 'Dispositivo eliminado'
+  const type = device?.type || log.device?.type?.name || log.device?.type || ''
+  return { name, type }
+}
+
+function describeLogAction(actionName, deviceType) {
+  if (!actionName) return 'Accion'
+  const desc = describeAction(deviceType, actionName, [])
+  if (desc !== actionName) return desc
+  for (const type of Object.keys(ACTIONS_MAP)) {
+    const match = ACTIONS_MAP[type].find(a => a.actionName === actionName)
+    if (match) return describeAction(type, actionName, [])
+  }
+  return actionName
+}
+
+function formatTime(timestamp) {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const now = new Date()
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  }
+  return date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+async function fetchRecentHistory() {
+  try {
+    const data = await api.getAllDeviceLogs(10, 0)
+    const logs = Array.isArray(data) ? data : []
+    historyEvents.value = logs.map(log => {
+      const info = getDeviceInfo(log)
+      const action = (log.actionName || '').toLowerCase()
+      return {
+        id: log.id,
+        deviceName: info.name,
+        action: describeLogAction(log.actionName || log.action || '', info.type),
+        time: formatTime(log.timestamp),
+        type: action.includes('routine') || action.includes('execute') ? 'routine' : 'device',
+      }
+    })
+  } catch (e) {
+    console.error('[Home] Error cargando historial:', e)
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+// Fetch routines + history (useHomeData already fetches devices + rooms)
 onMounted(() => {
   if (homeId.value) {
     routinesStore.fetchRoutines()
+    fetchRecentHistory()
   }
 })
 </script>
@@ -308,88 +320,65 @@ onMounted(() => {
   color: var(--border);
 }
 
-.house-inner {
+/* -- Historial -- */
+.history-panel {
+  margin-top: 20px;
+}
+
+.timeline {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.house-panel {
-  min-width: 220px;
-}
-
-.floor-tabs {
+.timeline-item {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.floor-tab {
-  background-color: var(--bg-card);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 6px 14px;
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.floor-tab--active {
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
   background-color: var(--bg-main);
-  color: var(--text-on-accent);
-  border-color: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.floor-tab--disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
 }
 
-.room-list {
-  list-style: none;
-  margin-bottom: 12px;
+.timeline-dot--device { background-color: var(--accent); }
+.timeline-dot--routine { background-color: var(--success); }
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.room-item {
+.timeline-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: var(--font-base);
+}
+
+.timeline-device {
+  font-size: var(--font-md);
+  font-weight: 600;
   color: var(--text-primary);
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.room-item:hover {
-  background-color: var(--bg-card);
-}
-
-.room-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
+.timeline-time {
   font-size: var(--font-sm);
-  opacity: 0;
-  transition: opacity 0.2s;
+  color: var(--text-muted);
 }
 
-.room-item:hover .room-close {
-  opacity: 1;
-}
-
-
-.isometry-placeholder {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  background-color: var(--bg-card);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-xl);
+.timeline-action {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
 }
 
 /* -- Grilla inferior: 2 columnas -- */
@@ -429,16 +418,8 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .house-inner {
-    flex-direction: column;
-  }
-
   .stats-bar {
     flex-wrap: wrap;
-  }
-
-  .house-panel {
-    min-width: unset;
   }
 }
 </style>
