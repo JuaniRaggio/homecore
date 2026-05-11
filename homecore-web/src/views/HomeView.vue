@@ -358,88 +358,65 @@ onMounted(() => {
   color: var(--border);
 }
 
-.house-inner {
+/* -- Historial -- */
+.history-panel {
+  margin-top: 20px;
+}
+
+.timeline {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.house-panel {
-  min-width: 220px;
-}
-
-.floor-tabs {
+.timeline-item {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.floor-tab {
-  background-color: var(--bg-card);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 6px 14px;
-  font-size: var(--font-base);
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.floor-tab--active {
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
   background-color: var(--bg-main);
-  color: var(--text-on-accent);
-  border-color: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
-.floor-tab--disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
 }
 
-.room-list {
-  list-style: none;
-  margin-bottom: 12px;
+.timeline-dot--device { background-color: var(--accent); }
+.timeline-dot--routine { background-color: var(--success); }
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.room-item {
+.timeline-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: var(--font-base);
+}
+
+.timeline-device {
+  font-size: var(--font-md);
+  font-weight: 600;
   color: var(--text-primary);
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.room-item:hover {
-  background-color: var(--bg-card);
-}
-
-.room-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
+.timeline-time {
   font-size: var(--font-sm);
-  opacity: 0;
-  transition: opacity 0.2s;
+  color: var(--text-muted);
 }
 
-.room-item:hover .room-close {
-  opacity: 1;
-}
-
-
-.isometry-placeholder {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  background-color: var(--bg-card);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-xl);
+.timeline-action {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
 }
 
 /* -- Grilla inferior: 2 columnas -- */
