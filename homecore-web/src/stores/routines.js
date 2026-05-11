@@ -21,7 +21,8 @@ export const useRoutinesStore = defineStore('routines', () => {
     return {
       ...r,
       isFavorite: r.metadata?.favorite || r.isFavorite || false,
-      isActive: r.isActive ?? true,
+      isActive: r.isActive ?? r.metadata?.active ?? true,
+      description: r.description || r.metadata?.description || '',
       time: r.time || r.metadata?.time || '',
       days,
     }
@@ -55,7 +56,7 @@ export const useRoutinesStore = defineStore('routines', () => {
     const payload = { ...currentData, ...data }
     const updated = await api.updateRoutine(id, payload)
     const idx = routines.value.findIndex(r => String(r.id) === String(id))
-    if (idx !== -1) routines.value[idx] = { ...routines.value[idx], ...updated, ...data }
+    if (idx !== -1) routines.value[idx] = normalizeRoutine({ ...routines.value[idx], ...updated, ...data })
   }
 
   async function remove(id) {

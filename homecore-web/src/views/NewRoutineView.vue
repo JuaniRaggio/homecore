@@ -252,8 +252,8 @@ async function submit() {
   saving.value = true
   try {
     const metadata = isCrossHome.value
-      ? { crossHome: true, favorite: true, time: form.time, days: form.days }
-      : { homeId: homeId.value, time: form.time, days: form.days }
+      ? { crossHome: true, favorite: true, description: form.description.trim(), time: form.time, days: form.days }
+      : { homeId: homeId.value, description: form.description.trim(), time: form.time, days: form.days }
 
     const payload = {
       name: form.name.trim(),
