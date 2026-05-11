@@ -54,6 +54,14 @@
             <span class="state-info-label">Temperatura:</span>
             <span class="state-info-value">{{ deviceState.ovenTemp }}°C</span>
           </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Fuente:</span>
+            <span class="state-info-value">{{ deviceState.heatSource }}</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Grill:</span>
+            <span class="state-info-value">{{ deviceState.grillMode }}</span>
+          </div>
         </div>
         <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
@@ -154,10 +162,16 @@
         <OvenControls
           v-else-if="device.type === 'oven'"
           :temperature="deviceState.ovenTemp"
+          :heat-source="deviceState.heatSource"
+          :grill-mode="deviceState.grillMode"
+          :convection-mode="deviceState.convectionMode"
           :disabled="cmd.busy.value"
           :limits="ovenLimits"
           @update:temperature="v => deviceState.ovenTemp = v"
           @change:temperature="setOvenTemperature"
+          @update:heat-source="setOvenHeatSource"
+          @update:grill-mode="setOvenGrillMode"
+          @update:convection-mode="setOvenConvectionMode"
         />
         <p v-else class="no-controls">Este dispositivo solo tiene encendido/apagado.</p>
       </div>
@@ -231,7 +245,7 @@ const deviceState = reactive({
   volume: 5, genre: 'pop', playlist: [], currentSong: null,
   vacuumMode: 'aspirar', vacuumLocation: null,
   fridgeTemp: 5, freezerTemp: -18, fridgeMode: 'normal',
-  ovenTemp: 180,
+  ovenTemp: 180, heatSource: 'convencional', grillMode: 'apagado', convectionMode: 'apagado',
 })
 
 // Loading state for delete
@@ -279,9 +293,9 @@ const fridgeLimits = computed(() => ({
 
 const ovenLimits = computed(() => ({
   temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
-  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeatSource'),
-  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrillMode'),
-  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvectionMode'),
+  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeat'),
+  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrill'),
+  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvection'),
 }))
 
 function goToEdit() {
@@ -575,6 +589,33 @@ async function setOvenTemperature(value) {
   })
 }
 
+async function setOvenHeatSource(value) {
+  deviceState.heatSource = value
+  await cmd.execute(device.value.id, 'setHeat', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setHeat', [value]),
+    errorMsg: actionError('cambiar la fuente de calor'),
+  })
+}
+
+async function setOvenGrillMode(value) {
+  deviceState.grillMode = value
+  await cmd.execute(device.value.id, 'setGrill', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setGrill', [value]),
+    errorMsg: actionError('cambiar el modo grill'),
+  })
+}
+
+async function setOvenConvectionMode(value) {
+  deviceState.convectionMode = value
+  await cmd.execute(device.value.id, 'setConvection', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setConvection', [value]),
+    errorMsg: actionError('cambiar el modo convección'),
+  })
+}
+
 async function loadDeviceState(id) {
   try {
     const state = await api.getDeviceState(id)
@@ -627,9 +668,6 @@ onMounted(async () => {
     if (!devicesStore.deviceTypes.length) await devicesStore.fetchDeviceTypes()
     const raw = await api.getDevice(deviceId)
     device.value = normalizeDevice(raw, undefined, undefined, devicesStore.deviceTypes)
-    console.log('[DeviceDetail] Raw device type:', raw.type?.name || raw.type)
-    console.log('[DeviceDetail] Normalized device.type:', device.value.type)
-    console.log('[DeviceDetail] TypeId:', device.value.typeId)
     await loadDeviceState(deviceId)
     if (device.value.typeId) {
       deviceLimits.fetchLimits(device.value.typeId)
