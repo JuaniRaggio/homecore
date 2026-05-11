@@ -86,7 +86,8 @@ async function fetchGuests() {
 async function addGuest() {
   const trimmed = email.value.trim()
   if (!trimmed) return
-  if (!trimmed.includes('@')) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(trimmed)) {
     errorMsg.value = 'Ingresá un email válido'
     return
   }
