@@ -92,6 +92,7 @@
               :key="routine.id"
               :routine="{ ...routine, name: routine.displayName || routine.name, schedule: 'Global', isFavorite: true }"
               @execute="routineActions.executeRoutine"
+              @open="handleOpenRoutine"
             />
           </div>
         </template>
@@ -105,6 +106,7 @@
               :key="routine.id"
               :routine="{ ...routine, name: routine.displayName || routine.name, schedule: getRoutineHomeName(routine), isFavorite: true }"
               @execute="routineActions.executeRoutine"
+              @open="handleOpenRoutine"
             />
           </div>
         </template>
@@ -148,6 +150,7 @@
 
 <script setup>
 import { onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import HomeCard from '@/components/homes/HomeCard.vue'
 import RoutineRow from '@/components/routines/RoutineRow.vue'
 import { useHomesStore } from '@/stores/homes'
@@ -157,6 +160,7 @@ import { useToastStore } from '@/stores/toast'
 import { useOverviewData } from '@/composables/useOverviewData'
 import { useRoutineActions } from '@/composables/useRoutineActions'
 
+const router = useRouter()
 const homesStore = useHomesStore()
 const authStore = useAuthStore()
 const routinesStore = useRoutinesStore()
@@ -166,24 +170,39 @@ const routineActions = useRoutineActions()
 
 const userName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Usuario')
 
-const globalRoutines = computed(() =>
-  routinesStore.favoriteRoutines.filter(r => r.metadata?.crossHome)
-)
-
-const homeRoutines = computed(() => {
-  const favs = routinesStore.favoriteRoutines.filter(r => !r.metadata?.crossHome)
+const globalRoutines = computed(() => {
+  const allFavs = routinesStore.favoriteRoutines
   const nameCount = {}
-  for (const r of favs) {
+  for (const r of allFavs) {
     nameCount[r.name] = (nameCount[r.name] || 0) + 1
   }
-  return favs.map(r => {
-    const isDuplicate = nameCount[r.name] > 1
-    if (!isDuplicate) return r
-    const hid = r.metadata?.homeId
-    const home = hid ? homesStore.getById(hid) : null
-    const homeName = home?.name || 'Sin casa'
-    return { ...r, displayName: `${homeName}::${r.name}` }
-  })
+
+  return allFavs
+    .filter(r => r.metadata?.crossHome || !r.metadata?.homeId)
+    .map(r => {
+      const isDuplicate = nameCount[r.name] > 1
+      if (!isDuplicate) return r
+      return { ...r, displayName: `Global::${r.name}` }
+    })
+})
+
+const homeRoutines = computed(() => {
+  const allFavs = routinesStore.favoriteRoutines
+  const nameCount = {}
+  for (const r of allFavs) {
+    nameCount[r.name] = (nameCount[r.name] || 0) + 1
+  }
+
+  return allFavs
+    .filter(r => !r.metadata?.crossHome && r.metadata?.homeId)
+    .map(r => {
+      const isDuplicate = nameCount[r.name] > 1
+      if (!isDuplicate) return r
+      const hid = r.metadata?.homeId
+      const home = hid ? homesStore.getById(hid) : null
+      const homeName = home?.name || 'Sin casa'
+      return { ...r, displayName: `${homeName}::${r.name}` }
+    })
 })
 
 function getRoutineHomeName(routine) {
@@ -204,6 +223,24 @@ const alarmSummary = computed(() =>
 const openDoors = computed(() =>
   overview.criticalDevices.value.filter(d => d.type === 'door')
 )
+
+function handleOpenRoutine(routineId) {
+  const routine = routinesStore.getById(routineId)
+  if (!routine) return
+
+  const targetHomeId = routine.metadata?.homeId
+  if (targetHomeId) {
+    router.push({
+      name: 'routine-detail',
+      params: { homeId: targetHomeId, routineId }
+    })
+  } else {
+    router.push({
+      name: 'routine-detail-global',
+      params: { routineId }
+    })
+  }
+}
 
 onMounted(async () => {
   try {

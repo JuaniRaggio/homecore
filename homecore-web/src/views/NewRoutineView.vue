@@ -251,13 +251,18 @@ async function submit() {
   if (!canCreate.value || saving.value) return
   saving.value = true
   try {
+    const metadata = isCrossHome.value
+      ? { crossHome: true, favorite: true }
+      : { homeId: homeId.value }
+
     const payload = {
       name: form.name.trim(),
       description: form.description.trim(),
       actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
-      metadata: isCrossHome.value ? { crossHome: true } : { homeId: homeId.value },
+      isFavorite: isCrossHome.value ? true : undefined,
+      metadata,
     }
 
     if (isEditMode.value) {

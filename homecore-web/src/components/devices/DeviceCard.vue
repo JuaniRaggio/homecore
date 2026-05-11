@@ -29,6 +29,17 @@
         {{ device.isOn ? 'Armada' : 'Desarmada' }}
       </span>
 
+      <!-- Puerta: badge clickeable para abrir/cerrar -->
+      <button
+        v-else-if="device.type === 'door'"
+        class="badge badge--door"
+        :class="device.isOn ? 'badge--danger' : 'badge--active'"
+        @click.stop="$emit('toggle', device.id)"
+      >
+        <i :class="device.isOn ? 'fa-solid fa-door-open' : 'fa-solid fa-door-closed'"></i>
+        {{ device.isOn ? 'Abierta' : 'Cerrada' }}
+      </button>
+
       <!-- Cortina: representacion visual + botones -->
       <div v-else-if="device.type === 'curtain'" class="curtain-controls" @click.stop>
         <div class="curtain-layout">
@@ -145,7 +156,6 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   flex-direction: column;
   gap: 10px;
   min-width: 0;
-  min-height: fit-content;
   transition: background-color 0.2s;
 }
 
@@ -185,6 +195,19 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 
 .device-card__footer {
   margin-top: auto;
+}
+
+.badge--door {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  transition: opacity 0.2s;
+}
+
+.badge--door:hover {
+  opacity: 0.75;
 }
 
 /* Los estilos de curtain-controls estan en src/assets/styles/controls.css */
