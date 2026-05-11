@@ -4,9 +4,8 @@
   <p v-if="devicesStore.loading" class="state-loading">Cargando...</p>
   <p v-else-if="devicesStore.error" class="state-error">{{ devicesStore.error }}</p>
   <template v-else>
-  <!-- SECCION DE LA CASA: stats + pisos/habitaciones + isometria -->
+  <!-- Barra de estadisticas -->
   <section class="house-section">
-    <!-- Barra de estadisticas -->
     <div class="stats-row">
       <div class="stats-bar">
         <span class="stat-item"><b>{{ stats.active }}</b> activos</span>
@@ -26,35 +25,6 @@
       <button class="btn-invite" @click="inviteModal.open">
         <i class="fa-solid fa-user-plus"></i> Agregar invitado
       </button>
-    </div>
-
-    <div class="house-inner">
-      <!-- Panel izquierdo: selector de pisos y lista de habitaciones -->
-      <div class="house-panel">
-        <!-- Tabs de pisos -->
-        <div class="floor-tabs">
-          <button class="floor-tab floor-tab--active">Piso 0</button>
-          <button class="floor-tab floor-tab--disabled" disabled title="TODO: Proximamente">
-            <i class="fa-solid fa-plus"></i> Piso
-          </button>
-        </div>
-
-        <ul class="room-list">
-          <li v-for="room in rooms" :key="room.id" class="room-item">
-            {{ room.name }}
-            <button class="room-close" @click="requestDeleteRoom(room.id)"><i class="fa-solid fa-xmark"></i></button>
-          </li>
-        </ul>
-
-        <button class="btn-dashed" @click="newRoomModal.open">
-          <i class="fa-solid fa-plus"></i> Agregar habitacion
-        </button>
-      </div>
-
-      <!-- ISOMETRIA DE LA CASA -->
-      <div class="isometry-placeholder">
-        <p class="state-empty">TODO: Vista isometrica proximamente</p>
-      </div>
     </div>
   </section>
 
@@ -104,6 +74,29 @@
       </div>
     </section>
   </div>
+
+  <!-- Historial reciente -->
+  <section class="panel history-panel">
+    <div class="panel-header">
+      <h2 class="panel-title">Historial reciente</h2>
+      <router-link :to="`/casa/${homeId}/historial`" class="panel-link">Ver todo</router-link>
+    </div>
+
+    <p v-if="historyLoading" class="state-loading">Cargando historial...</p>
+    <p v-else-if="historyEvents.length === 0" class="state-empty">Sin eventos recientes</p>
+    <div v-else class="timeline">
+      <div v-for="event in historyEvents" :key="event.id" class="timeline-item">
+        <div class="timeline-dot" :class="`timeline-dot--${event.type}`"></div>
+        <div class="timeline-content">
+          <div class="timeline-row">
+            <span class="timeline-device">{{ event.deviceName }}</span>
+            <span class="timeline-time">{{ event.time }}</span>
+          </div>
+          <span class="timeline-action">{{ event.action }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <EditNameModal
     :visible="editHomeModal.visible.value"
@@ -166,7 +159,8 @@ import InviteGuestModal from '@/components/common/InviteGuestModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
-import { actionError } from '@/utils/friendly-error'
+import { actionError, friendlyError } from '@/utils/friendly-error'
+import { describeAction, ACTIONS_MAP } from '@/config/routine-actions'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useRoutineActions } from '@/composables/useRoutineActions'
 import { useModal } from '@/composables/useModal'
