@@ -150,7 +150,7 @@ onMounted(async () => {
 <style scoped>
 .history-filters {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .table-container {
@@ -181,6 +181,6 @@ onMounted(async () => {
 .load-more {
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: var(--space-lg);
 }
 </style>
