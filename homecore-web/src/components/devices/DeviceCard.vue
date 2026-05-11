@@ -29,15 +29,20 @@
         {{ device.isOn ? 'Armada' : 'Desarmada' }}
       </span>
 
-      <!-- Puerta: badge clickeable para abrir/cerrar -->
+      <!-- Puerta: badge clickeable para abrir/cerrar (deshabilitado si esta bloqueada) -->
       <button
         v-else-if="device.type === 'door'"
         class="badge badge--door"
-        :class="device.isOn ? 'badge--danger' : 'badge--active'"
+        :class="[
+          device.isOn ? 'badge--active' : 'badge--danger',
+          { 'badge--locked': isDoorLocked }
+        ]"
+        :disabled="isDoorLocked"
         @click.stop="$emit('toggle', device.id)"
       >
-        <i :class="device.isOn ? 'fa-solid fa-door-open' : 'fa-solid fa-door-closed'"></i>
-        {{ device.isOn ? 'Abierta' : 'Cerrada' }}
+        <i v-if="isDoorLocked" class="fa-solid fa-lock"></i>
+        <i v-else :class="device.isOn ? 'fa-solid fa-door-open' : 'fa-solid fa-door-closed'"></i>
+        {{ isDoorLocked ? 'Bloqueada' : device.isOn ? 'Abierta' : 'Cerrada' }}
       </button>
 
       <!-- Cortina: representacion visual + botones -->
@@ -154,6 +159,8 @@ const curtainColor = computed(() => getCurtainColor(props.device.level ?? 0))
 const fridgeMode = computed(() => props.device.state?.mode ?? 'normal')
 const fridgeTemp = computed(() => props.device.state?.temperature ?? 5)
 
+const isDoorLocked = computed(() => props.device.state?.lock === 'locked')
+
 defineEmits(['toggle', 'toggle-favorite', 'open', 'curtain-up', 'curtain-down', 'speaker-power', 'speaker-previous', 'speaker-pause-resume', 'speaker-next'])
 
 const deviceIcon = computed(() => getDeviceIcon(props.device.type))
@@ -221,8 +228,19 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
   transition: opacity 0.2s;
 }
 
-.badge--door:hover {
+.badge--door:hover:not(:disabled) {
   opacity: 0.75;
+}
+
+.badge--door:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mayor especificidad sin !important */
+.badge--door.badge--locked {
+  background: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
 }
 
 /* Los estilos de curtain-controls estan en src/assets/styles/controls.css */
