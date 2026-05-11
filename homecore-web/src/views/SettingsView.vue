@@ -111,18 +111,24 @@ async function handleChangePassword() {
   }
 
   loading.value = true
-  const result = await authStore.changePassword(currentPassword.value, newPassword.value)
-  loading.value = false
+  try {
+    const result = await authStore.changePassword(currentPassword.value, newPassword.value)
 
-  if (result.success) {
-    passwordSuccess.value = 'Contraseña actualizada correctamente'
-    toast.show('Contraseña actualizada', 'success')
-    currentPassword.value = ''
-    newPassword.value = ''
-    confirmPassword.value = ''
-  } else {
-    passwordError.value = result.error || 'No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.'
-    toast.show('No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.', 'error')
+    if (result.success) {
+      passwordSuccess.value = 'Contraseña actualizada correctamente'
+      toast.show('Contraseña actualizada', 'success')
+      currentPassword.value = ''
+      newPassword.value = ''
+      confirmPassword.value = ''
+    } else {
+      passwordError.value = result.error || 'No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.'
+      toast.show('No se pudo cambiar la contrasena. Verifica que la contrasena actual sea correcta.', 'error')
+    }
+  } catch (e) {
+    passwordError.value = 'Error inesperado al cambiar la contraseña'
+    toast.show('Error inesperado al cambiar la contraseña', 'error')
+  } finally {
+    loading.value = false
   }
 }
 </script>

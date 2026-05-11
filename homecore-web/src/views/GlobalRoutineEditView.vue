@@ -1,5 +1,6 @@
 <template>
-  <main class="edit-routine view-narrow page-content--full">
+  <div class="page-content--full">
+  <main class="edit-routine view-narrow">
     <section class="edit-header">
       <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i> Volver
@@ -163,6 +164,7 @@
       </div>
     </form>
   </main>
+  </div>
 </template>
 
 <script setup>

@@ -1,5 +1,6 @@
 <template>
-  <div class="routine-detail view-narrow page-content--full">
+  <div class="page-content--full">
+  <div class="routine-detail view-narrow">
     <div class="detail-header">
       <button class="btn-back" @click="router.back()">
         <i class="fa-solid fa-arrow-left"></i> Volver
@@ -83,6 +84,7 @@
       @close="deleteConfirm.close"
       @confirm="confirmDelete"
     />
+  </div>
   </div>
 </template>
 

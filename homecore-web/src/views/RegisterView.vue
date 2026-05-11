@@ -73,15 +73,20 @@ async function handleRegister() {
   }
 
   loading.value = true
-  const result = await authStore.register(name.value, email.value, password.value)
-  loading.value = false
+  try {
+    const result = await authStore.register(name.value, email.value, password.value)
 
-  if (result.success) {
-    router.push('/verificar')
-  } else if (result.conflict) {
-    router.push('/login')
-  } else {
-    error.value = result.error || 'Error al registrarse'
+    if (result.success) {
+      router.push('/verificar')
+    } else if (result.conflict) {
+      router.push('/login')
+    } else {
+      error.value = result.error || 'Error al registrarse'
+    }
+  } catch (e) {
+    error.value = 'Error inesperado al registrarse'
+  } finally {
+    loading.value = false
   }
 }
 </script>
