@@ -85,8 +85,8 @@ export function actionsFor(typeName) {
   if (t.includes('ac') || t.includes('air') || t.includes('acondicionado')) return ACTIONS_MAP.ac
   if (t.includes('speaker') || t.includes('parlante')) return ACTIONS_MAP.speaker
   if (t.includes('vacuum') || t.includes('aspiradora')) return ACTIONS_MAP.vacuum
-  if (t.includes('fridge') || t.includes('heladera')) return ACTIONS_MAP.fridge
-  if (t.includes('oven') || t.includes('horno')) return ACTIONS_MAP.oven
+  if (t.includes('fridge') || t.includes('heladera') || t.includes('refrigerator') || t.includes('freezer')) return ACTIONS_MAP.fridge
+  if (t.includes('oven') || t.includes('horno') || t.includes('stove')) return ACTIONS_MAP.oven
   return []
 }
 

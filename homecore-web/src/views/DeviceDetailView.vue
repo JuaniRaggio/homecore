@@ -54,6 +54,14 @@
             <span class="state-info-label">Temperatura:</span>
             <span class="state-info-value">{{ deviceState.ovenTemp }}°C</span>
           </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Fuente:</span>
+            <span class="state-info-value">{{ deviceState.heatSource }}</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Grill:</span>
+            <span class="state-info-value">{{ deviceState.grillMode }}</span>
+          </div>
         </div>
         <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
@@ -154,10 +162,16 @@
         <OvenControls
           v-else-if="device.type === 'oven'"
           :temperature="deviceState.ovenTemp"
+          :heat-source="deviceState.heatSource"
+          :grill-mode="deviceState.grillMode"
+          :convection-mode="deviceState.convectionMode"
           :disabled="cmd.busy.value"
           :limits="ovenLimits"
           @update:temperature="v => deviceState.ovenTemp = v"
           @change:temperature="setOvenTemperature"
+          @update:heat-source="setOvenHeatSource"
+          @update:grill-mode="setOvenGrillMode"
+          @update:convection-mode="setOvenConvectionMode"
         />
         <p v-else class="no-controls">Este dispositivo solo tiene encendido/apagado.</p>
       </div>
@@ -231,7 +245,7 @@ const deviceState = reactive({
   volume: 5, genre: 'pop', playlist: [], currentSong: null,
   vacuumMode: 'aspirar', vacuumLocation: null,
   fridgeTemp: 5, freezerTemp: -18, fridgeMode: 'normal',
-  ovenTemp: 180,
+  ovenTemp: 180, heatSource: 'convencional', grillMode: 'apagado', convectionMode: 'apagado',
 })
 
 // Loading state for delete
@@ -572,6 +586,33 @@ async function setOvenTemperature(value) {
     params: [value],
     successMsg: describeAction(device.value.type, 'setTemperature', [value]),
     errorMsg: actionError('cambiar la temperatura'),
+  })
+}
+
+async function setOvenHeatSource(value) {
+  deviceState.heatSource = value
+  await cmd.execute(device.value.id, 'setHeatSource', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
+    errorMsg: actionError('cambiar la fuente de calor'),
+  })
+}
+
+async function setOvenGrillMode(value) {
+  deviceState.grillMode = value
+  await cmd.execute(device.value.id, 'setGrillMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
+    errorMsg: actionError('cambiar el modo grill'),
+  })
+}
+
+async function setOvenConvectionMode(value) {
+  deviceState.convectionMode = value
+  await cmd.execute(device.value.id, 'setConvectionMode', {
+    params: [value],
+    successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
+    errorMsg: actionError('cambiar el modo convección'),
   })
 }
 
