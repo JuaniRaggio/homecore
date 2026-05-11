@@ -178,6 +178,7 @@ Se implementaron los flujos completos de registro, verificación por email, recu
 -- *Control de dispositivos (RF9):* Cada tipo de dispositivo tiene controles específicos en su vista de detalle: sliders para luces (brillo, color), botones para puertas (abrir/cerrar/bloquear), sliders para cortinas (apertura), controles de temperatura para AC, etc.
 
 // TODO: Agregar capturas de dispositivos, detalle, edición
+
 // #figure(image("assets/devices-list.png", width: 100%), caption: [Vista de dispositivos])
 
 == Rutinas (RF10--RF12)
