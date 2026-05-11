@@ -103,6 +103,18 @@
         </div>
       </div>
 
+      <!-- Heladera: info de modo y temperatura -->
+      <div v-else-if="device.type === 'fridge'" class="fridge-info" @click.stop>
+        <div class="fridge-info-line">
+          <span class="fridge-label">Modo:</span>
+          <span class="fridge-value">{{ fridgeMode }}</span>
+        </div>
+        <div class="fridge-info-line">
+          <span class="fridge-label">Temp:</span>
+          <span class="fridge-value">{{ fridgeTemp }}°C</span>
+        </div>
+      </div>
+
       <!-- Otros dispositivos: toggle normal -->
       <ToggleSwitch v-else :model-value="device.isOn" @update:model-value="$emit('toggle', device.id)" @click.stop />
     </div>
@@ -138,6 +150,9 @@ const displayName = computed(() => {
 
 const curtainLevelText = computed(() => getCurtainLevelText(props.device.level ?? 0))
 const curtainColor = computed(() => getCurtainColor(props.device.level ?? 0))
+
+const fridgeMode = computed(() => props.device.state?.mode ?? 'normal')
+const fridgeTemp = computed(() => props.device.state?.temperature ?? 5)
 
 defineEmits(['toggle', 'toggle-favorite', 'open', 'curtain-up', 'curtain-down', 'speaker-power', 'speaker-previous', 'speaker-pause-resume', 'speaker-next'])
 
@@ -281,5 +296,28 @@ const deviceIcon = computed(() => getDeviceIcon(props.device.type))
 
 .btn-speaker i {
   font-size: var(--font-lg);
+}
+
+/* Informacion de heladera */
+.fridge-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.fridge-info-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+}
+
+.fridge-label {
+  color: var(--color-text-secondary);
+}
+
+.fridge-value {
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
 }
 </style>
