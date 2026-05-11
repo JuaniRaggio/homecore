@@ -165,7 +165,11 @@ Se implementaron los flujos completos de registro, verificación por email, recu
 -- *Login/Logout (RF5, RF6):* Login con email y contraseña, persistencia de sesión con token en localStorage. Logout desconecta el WebSocket y limpia el estado.
 
 // TODO: Agregar capturas de login, registro, verificación y recuperación
-// #figure(image("assets/auth-login.png", width: 80%), caption: [Pantalla de login])
+ #figure(image("hci_before_and_after/login_account/registrarse.png", width: 80%), caption: [Pantalla de registro])
+ #figure(image("hci_before_and_after/login_account/verificacion.png", width: 80%), caption: [Pantalla de verificación de email])
+ #figure(image("hci_before_and_after/login_account/recuperarcuenta.png", width: 80%), caption: [Pantalla de recuperación de constraseña])
+ #figure(image("hci_before_and_after/login_account/cambiocontra.png", width: 80%), caption: [Pantalla de cambio de contraseña])
+ #figure(image("hci_before_and_after/login_account/iniciarsesion.png", width: 80%), caption: [Pantalla de login])
 
 == Gestión de dispositivos (RF7--RF9)
 
