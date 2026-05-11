@@ -1,3 +1,17 @@
+/* Titulo de seccion de controles */
+.controls-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+/* Mensaje cuando no hay controles */
+.no-controls {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+}
+
 /* Fila de control (dispositivos: brillo, cerradura, etc.) */
 .control-row {
   display: flex;

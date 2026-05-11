@@ -26,7 +26,7 @@
 
     <div class="detail-body">
       <div class="card card--xl status-card">
-        <div class="status-row">
+        <div v-if="device.type !== 'fridge'" class="status-row">
           <span class="status-label">Estado</span>
           <span class="status-value" :class="device.isOn ? 'status--on' : 'status--off'">
             {{ statusLabel }}
@@ -48,6 +48,30 @@
             <span class="state-info-label">Modo:</span>
             <span class="state-info-value">{{ deviceState.fridgeMode }}</span>
           </div>
+        </div>
+        <div v-else-if="device.type === 'door'" class="door-state-controls">
+          <button
+            class="btn-door"
+            :class="{ 'btn-door--active': device.isOn }"
+            :disabled="locked || cmd.busy.value"
+            @click="openDoor"
+          >
+            <i class="fa-solid fa-door-open"></i>
+            Abrir
+          </button>
+          <button
+            class="btn-door"
+            :class="{ 'btn-door--active': !device.isOn }"
+            :disabled="locked || cmd.busy.value"
+            @click="closeDoor"
+          >
+            <i class="fa-solid fa-door-closed"></i>
+            Cerrar
+          </button>
+          <span v-if="locked" class="door-locked-hint">
+            <i class="fa-solid fa-lock"></i>
+            Puerta bloqueada
+          </span>
         </div>
         <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
@@ -351,6 +375,28 @@ async function toggleLock() {
     onSuccess() {
       locked.value = !locked.value
       toast.show(describeAction(device.value.type, locked.value ? 'lock' : 'unlock'), 'success')
+    },
+  })
+}
+
+async function openDoor() {
+  if (locked.value) return
+  await cmd.execute(device.value.id, 'open', {
+    successMsg: 'Puerta abierta',
+    errorMsg: actionError('abrir la puerta'),
+    onSuccess() {
+      device.value.isOn = true
+    },
+  })
+}
+
+async function closeDoor() {
+  if (locked.value) return
+  await cmd.execute(device.value.id, 'close', {
+    successMsg: 'Puerta cerrada',
+    errorMsg: actionError('cerrar la puerta'),
+    onSuccess() {
+      device.value.isOn = false
     },
   })
 }
@@ -712,42 +758,83 @@ onMounted(async () => {
 .status--on { color: var(--success); }
 .status--off { color: var(--text-muted); }
 
-/* Controls card (usa .card-title global para el titulo) */
-.controls-title {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.no-controls {
-  font-size: var(--font-base);
-  color: var(--text-muted);
-}
+/* controls-title y no-controls estan en controls.css global */
 
 /* Device state info (para fridge, oven, etc.) */
 .device-state-info {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--space-md);
 }
 
 .state-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-xs) 0;
+  padding: var(--space-xs) 0;
 }
 
 .state-info-label {
-  font-size: var(--text-md);
-  color: var(--color-text-secondary);
+  font-size: var(--font-md);
+  color: var(--text-secondary);
 }
 
 .state-info-value {
-  font-size: var(--text-md);
-  font-weight: var(--font-medium);
-  color: var(--color-text-primary);
+  font-size: var(--font-md);
   font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Door controls - especifico de esta vista */
+.door-state-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.btn-door {
+  padding: var(--space-md);
+  border: 2px solid var(--border);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-md);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  transition: all 0.2s;
+}
+
+.btn-door:hover:not(:disabled) {
+  background: var(--card-hover);
+  border-color: var(--accent);
+}
+
+.btn-door:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-door--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.btn-door--active:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.door-locked-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  padding: var(--space-xs) 0;
 }
 </style>

@@ -153,97 +153,163 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 
 === RF1 — Registrar cuenta
 El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación.
-image("hci_before_and_after/login_account/registrarse.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/login_account/registrarse.png", width: 100%)
+)
 
 === RF2 — Verificar cuenta
 Tras el registro, el sistema envía un correo de verificación al usuario, para validar su correo.
-image("hci_before_and_after\login_account\verificacion.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/login_account/verificacion.png", width: 100%)
+)
 
 === RF3 — Recuperar contraseña
 El sistema implementa el flujo de recuperación de contraseña. El usuario ingresa su correo y recibe un código de verificación para poder posteriormente ingresar la nueva contraseña.
-image("hci_before_and_after\login_account\recuperarcuenta.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/login_account/recuperarcuenta.png", width: 100%)
+)
 
 === RF4 — Cambiar contraseña
 Un usuario autenticado puede cambiar su contraseña desde la sección de configuración, ingresando la contraseña actual y la nueva que desea establecer.
-image("hci_before_and_after\login_account\cambiocontra.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/login_account/cambiocontra.png", width: 100%)
+)
 
 === RF5 — Iniciar sesión
-El sistema permite al usuario autenticarse ingresando su correo electrónico y contraseña. La sesión se mantiene activa durante la navegación, adjuntando automáticamente las credenciales a todas las solicitudes al backend.
+El sistema permite al usuario autenticarse ingresando su correo electrónico y contraseña. La sesión se mantiene activa durante la navegación, y el sistema maneja automáticamente la expiración de tokens JWT redirigiendo al usuario al login con un mensaje explicativo.
 
-Los tokens de sesión (JWT) tienen una fecha de expiración. Cuando un token expira, todas las solicitudes al backend fallan con un error 401, dejando al usuario en un estado inconsistente. Para resolver este problema se implementó el siguiente flujo: al detectar una respuesta HTTP 401, el sistema limpia automáticamente el token expirado del almacenamiento local, redirige al usuario a la pantalla de inicio de sesión y muestra el mensaje "Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.", informando claramente el motivo del cierre de sesión.
-image("hci_before_and_after\login_account\iniciarsesion.png", width: 100%)
+#figure(
+  image("hci_before_and_after/login_account/iniciarsesion.png", width: 100%)
+)
 
 === RF6 — Cerrar sesión
 El usuario puede cerrar su sesión desde el menú de perfil disponible en la barra superior. Al hacerlo, se elimina la sesión activa y se redirige al usuario a la pantalla de inicio de sesión.
-image("hci_before_and_after\login_account\logout.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/login_account/logout.png", width: 100%)
+)
 
 === RF7 — Gestionar dispositivos
 El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
-image("hci_before_and_after\dispositivos\gestiona2.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/dispositivos/gestion2.png", width: 100%)
+)
 
 === RF8 — Consultar dispositivos
 El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real.
-image("hci_before_and_after\dispositivos\gestionar.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/dispositivos/gestionar.png", width: 100%)
+)
 
 === RF9 — Controlar dispositivos
 Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API:
 
-| Tipo               | Acciones disponibles                                                            |
-| ------------------ | ------------------------------------------------------------------------------- |
-| Lampara            | Encender/apagar, brillo (0–100%), color                                         |
-| Puerta             | Abrir/cerrar, bloquear/desbloquear                                              |
-| Alarma             | Armar (modo ausente/en casa), desarmar, cambiar código                          |
-| Canilla            | Abrir/cerrar                                                                    |
-| Persiana           | Subir/bajar, posición exacta (0–100%) con indicador visual                      |
-| Aire Acondicionado | Encender/apagar, temperatura (18–38°C), modo, velocidad del ventilador          |
-| Parlante           | Play/pausa/reanudar, siguiente/anterior, volumen, género, lista de reproducción |
-| Aspiradora         | Iniciar/pausar, volver a la base, modo (aspirar/trapear), ubicación             |
-| Heladera           | Temperatura heladera (2–8°C) y freezer (−20 a −8°C), modo de operación          |
-| Horno              | Encender/apagar, temperatura (90–230°C), fuente de calor, grill, convección     |
-| Cerradura          | Bloquear/desbloquear                                                            |
+#table(
+  columns: (auto, 1fr),
+  align: (left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+  table.header([*Tipo*], [*Acciones disponibles*]),
+  [Lampara], [Encender/apagar, brillo (0–100%), color],
+  [Puerta], [Abrir/cerrar, bloquear/desbloquear],
+  [Alarma], [Armar (modo ausente/en casa), desarmar, cambiar código],
+  [Canilla], [Abrir/cerrar],
+  [Persiana], [Subir/bajar, posición exacta (0–100%) con indicador visual],
+  [Aire Acondicionado], [Encender/apagar, temperatura (18–38°C), modo, velocidad del ventilador],
+  [Parlante], [Play/pausa/reanudar, siguiente/anterior, volumen, género, lista de reproducción],
+  [Aspiradora], [Iniciar/pausar, volver a la base, modo (aspirar/trapear), ubicación],
+  [Heladera], [Temperatura heladera (2–8°C) y freezer (−20 a −8°C), modo de operación],
+  [Horno], [Encender/apagar, temperatura (90–230°C), fuente de calor, grill, convección],
+  [Cerradura], [Bloquear/desbloquear],
+)
+
+==== Estados combinados de alarmas
+
+El sistema implementa una lógica de estados agregados para las alarmas a nivel de hogar. Cuando un hogar contiene múltiples alarmas, el estado general de seguridad se calcula combinando los estados individuales de cada alarma:
+
+- *Desarmada:* Todas las alarmas del hogar están desactivadas. El hogar se visualiza con un indicador de seguridad en rojo, señalizando ausencia de protección.
+- *Armada:* Todas las alarmas del hogar están activadas (ya sea en modo ausente o en casa). El hogar muestra un indicador verde, confirmando protección completa.
+- *Parcialmente armada:* Algunas alarmas están activadas mientras otras permanecen desactivadas. El hogar se identifica con un indicador amarillo, alertando sobre una cobertura de seguridad incompleta.
+
+Esta agregación de estados permite al usuario identificar de un vistazo el nivel de protección de cada propiedad sin necesidad de revisar individualmente el estado de cada alarma. La representación visual mediante colores (rojo, verde, amarillo) sigue convenciones estándar de sistemas de seguridad, facilitando el reconocimiento inmediato del estado de protección.
 
 
 === RF10 — Gestionar rutinas
-El usuario puede crear rutinas definiendo un nombre, los días de la semana en que deben ejecutarse, la hora de activación y una secuencia de acciones sobre distintos dispositivos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
-image("hci_before_and_after\rutinas\crear-rutina1.png", width: 100%)
-image("hci_before_and_after\rutinas\crear-rutina2.png", width: 100%)
-image("hci_before_and_after\rutinas\crear-rutina3.png", width: 100%)
-image("hci_before_and_after\rutinas\crear-rutina4.png", width: 100%)
+El usuario puede crear rutinas definiendo un nombre, los días de la semana en que deben ejecutarse, la hora de activación y una secuencia de acciones sobre distintos dispositivos mediante un asistente de 4 pasos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
 
-Para editar rutinas se implemento 
-image("hci_before_and_after\rutinas\editar-rutina.png", width: 100%)
-image("hci_before_and_after\rutinas\editar-rutina2.png", width: 100%)
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/rutinas/crear-rutina1.png", width: 100%),
+    image("hci_before_and_after/rutinas/crear-rutina2.png", width: 100%),
+    image("hci_before_and_after/rutinas/crear-rutina3.png", width: 100%),
+    image("hci_before_and_after/rutinas/crear-rutina4.png", width: 100%),
+  ),
+  caption: [Asistente de creación de rutinas (4 pasos)],
+)
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/rutinas/editar-rutina.png", width: 100%),
+    image("hci_before_and_after/rutinas/editar-rutina2.png", width: 100%),
+  ),
+  caption: [Edición de rutinas existentes],
+)
 
 === RF11 — Consultar rutinas
 El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones que ejecuta.
-image("hci_before_and_after\rutinas\gestion.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/rutinas/gestion.png", width: 100%)
+)
 
 === RF12 — Ejecutar rutinas
 Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente con un solo clic en "ejecutar ahora". El sistema dispara en el backend todas las acciones definidas sobre los dispositivos correspondientes.
 
 === RF13 — Consultar acciones realizadas
-El sistema presenta un registro paginado de todas las acciones ejecutadas sobre los dispositivos del hogar en la vista “Historial”, incluyendo el nombre del dispositivo, la acción realizada y la marca temporal de cada evento.
+El sistema presenta un registro paginado de todas las acciones ejecutadas sobre los dispositivos del hogar en la vista "Historial", incluyendo el nombre del dispositivo, la acción realizada y la marca temporal de cada evento.
 
-image("hci_before_and_after\historial\historia.png", width: 100%)
+#figure(
+  image("hci_before_and_after/historial/historia.png", width: 100%)
+)
 
 === RF14 — Gestionar habitaciones
 El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita.
-image("hci_before_and_after\habitaciones\image.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/habitaciones/image.png", width: 100%)
+)
 
 === RF15 — Consultar habitaciones
 El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
 
-image("hci_before_and_after\habitaciones\habitaciones.png", width: 100%)
+#figure(
+  image("hci_before_and_after/habitaciones/habitaciones.png", width: 100%)
+)
 
 === RF16 — Vincular dispositivos a habitaciones
 El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Todos los dispositivos deben pertenecer a alguna habitación; no se permiten dispositivos sin asignar.
-image("hci_before_and_after\habitaciones\vincular.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/habitaciones/vincular.png", width: 100%)
+)
 
 === RF17 — Gestionar hogares
 El sistema permite crear hogares con un nombre identificatorio, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico, otorgándoles acceso a sus dispositivos y habitaciones.
-Puede realizarse desde el Inicio o agregarse Hogar desde Overview
-image("hci_before_and_after\hogar\gestionhogar.png", width: 100%)
-image("hci_before_and_after\hogar\gestionOver.png", width: 100%)
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/hogar/gestionhogar.png", width: 100%),
+    image("hci_before_and_after/hogar/gestionOver.png", width: 100%),
+  ),
+  caption: [Gestión de hogares: desde el Inicio (izq.) y desde Overview (der.)],
+)
 
 === RF18 — Consultar hogares
 El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario, tanto propios como compartidos, junto con un resumen del estado de sus dispositivos. Desde este panel se navega al detalle de cada hogar.
@@ -256,11 +322,17 @@ El sistema notifica al usuario en tiempo real cuando un dispositivo cambia de es
 
 === RF21 — Restringir acceso a dispositivos, rutinas, habitaciones y hogares
 El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los hogares, habitaciones, dispositivos y rutinas a los que tiene acceso autorizado, el resto de dispositivos pueden accionarse mediante una contraseña.
-image("hci_before_and_after\Editar-dispositivo\alarma-control.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/Editar-dispositivo/alarma-control.png", width: 100%)
+)
 
 === RF22 — Consultar consumo eléctrico
 El sistema presenta gráficos de consumo eléctrico de los dispositivos del hogar, permitiendo al usuario visualizar el uso energético a lo largo del tiempo.
-image("hci_before_and_after\consumo\consumoactual.png", width: 100%)
+
+#figure(
+  image("hci_before_and_after/consumo/consumoactual.png", width: 100%)
+)
 
 === RF23 — Planificar ejecución de rutinas
 Al crear o editar una rutina, el usuario puede configurar los días de la semana y la hora exacta en que debe ejecutarse automáticamente, sin necesidad de intervención manual en cada ocasión.

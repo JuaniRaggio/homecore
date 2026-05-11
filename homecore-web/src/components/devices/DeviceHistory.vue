@@ -54,17 +54,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.controls-title {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.no-controls {
-  font-size: var(--font-base);
-  color: var(--text-muted);
-}
+/* controls-title y no-controls estan en controls.css global */
 
 .history-list {
   display: flex;
