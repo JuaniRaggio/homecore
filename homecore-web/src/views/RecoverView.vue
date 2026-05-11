@@ -16,7 +16,7 @@
         </div>
 
         <p class="card-description">
-          Ingresa tu email y te enviaremos un codigo para restablecer tu contrasena.
+          Ingresa tu email y te enviaremos un código para restablecer tu contraseña.
         </p>
 
         <div class="form-group">
@@ -27,47 +27,47 @@
         <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
 
         <button class="btn-primary" @click="handleRecover" :disabled="loading">
-          {{ loading ? 'Enviando...' : 'Enviar codigo' }}
+          {{ loading ? 'Enviando...' : 'Enviar código' }}
         </button>
       </div>
 
-      <!-- Paso 2: Ingresar codigo y nueva contrasena -->
+      <!-- Paso 2: Ingresar código y nueva contraseña -->
       <div v-else-if="step === 'reset'" class="auth-card">
         <div class="card-top-row">
-          <h2 class="card-subtitle">Nueva contrasena</h2>
+          <h2 class="card-subtitle">Nueva contraseña</h2>
           <a class="back-link" @click.prevent="step = 'email'">Volver</a>
         </div>
 
         <p class="card-description">
-          Ingresa el codigo de recuperacion y tu nueva contrasena.
+          Ingresa el código de recuperación y tu nueva contraseña.
         </p>
 
         <div class="form-group">
-          <label class="form-label">Codigo de recuperacion</label>
-          <input v-model="code" type="text" placeholder="Ingrese el codigo" @keyup.enter="handleReset" />
+          <label class="form-label">Código de recuperación</label>
+          <input v-model="code" type="text" placeholder="Ingrese el código" @keyup.enter="handleReset" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Nueva contrasena</label>
-          <input v-model="newPassword" type="password" placeholder="Minimo 8 caracteres" @keyup.enter="handleReset" />
+          <label class="form-label">Nueva contraseña</label>
+          <input v-model="newPassword" type="password" placeholder="Mínimo 8 caracteres" @keyup.enter="handleReset" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Confirmar contrasena</label>
-          <input v-model="confirmPassword" type="password" placeholder="Repita la contrasena" @keyup.enter="handleReset" />
+          <label class="form-label">Confirmar contraseña</label>
+          <input v-model="confirmPassword" type="password" placeholder="Repita la contraseña" @keyup.enter="handleReset" />
         </div>
 
         <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
 
         <button class="btn-primary" @click="handleReset" :disabled="loading">
-          {{ loading ? 'Restableciendo...' : 'Restablecer contrasena' }}
+          {{ loading ? 'Restableciendo...' : 'Restablecer contraseña' }}
         </button>
       </div>
 
       <!-- Paso 3: Exito -->
       <div v-else-if="step === 'done'" class="auth-card">
-        <p class="success-msg">Contrasena restablecida correctamente.</p>
-        <button class="btn-accent" @click="router.push('/login')">Iniciar sesion</button>
+        <p class="success-msg">Contraseña restablecida correctamente.</p>
+        <button class="btn-accent" @click="router.push('/login')">Iniciar sesión</button>
       </div>
     </div>
   </div>
@@ -108,15 +108,15 @@ async function handleRecover() {
 async function handleReset() {
   errorMsg.value = ''
   if (!code.value) {
-    errorMsg.value = 'Ingrese el codigo de recuperacion'
+    errorMsg.value = 'Ingrese el código de recuperación'
     return
   }
   if (newPassword.value.length < 8) {
-    errorMsg.value = 'La contrasena debe tener al menos 8 caracteres'
+    errorMsg.value = 'La contraseña debe tener al menos 8 caracteres'
     return
   }
   if (newPassword.value !== confirmPassword.value) {
-    errorMsg.value = 'Las contrasenas no coinciden'
+    errorMsg.value = 'Las contraseñas no coinciden'
     return
   }
   loading.value = true

@@ -65,6 +65,16 @@ const routes = [
     component: NewRoutineView
   },
   {
+    path: '/rutinas/:routineId',
+    name: 'routine-detail-global',
+    component: RoutineDetailView
+  },
+  {
+    path: '/rutinas/:routineId/editar',
+    name: 'edit-routine-global',
+    component: EditRoutineView
+  },
+  {
     path: '/casa/:homeId',
     component: HomeLayout,
     children: [

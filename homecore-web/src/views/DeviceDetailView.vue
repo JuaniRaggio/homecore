@@ -226,7 +226,7 @@ const saving = ref(false)
 // Delete modal
 const deleteModal = useModal()
 const deleteDescription = computed(() =>
-  `Estas seguro de que queres eliminar "${device.value.name}"? Esta accion no se puede deshacer.`
+  `¿Estás seguro de que querés eliminar "${device.value.name}"? Esta acción no se puede deshacer.`
 )
 
 const statusLabel = computed(() => {
@@ -302,7 +302,7 @@ async function togglePower() {
       device.value.isOn = newIsOn
       const newMap = getStatusMap(device.value.type)
       toast.show(device.value.isOn ? newMap.on : newMap.off, 'success')
-      // Actualizar el store tambien para que persista entre vistas
+      // Actualizar el store también para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
         data: { status: newIsOn ? 'on' : 'off' }
@@ -350,7 +350,7 @@ function verifyAlarmCode(code) {
 
 async function handleArmAway(code) {
   if (!verifyAlarmCode(code)) {
-    toast.show('Codigo de seguridad incorrecto', 'error')
+    toast.show('Código de seguridad incorrecto', 'error')
     return
   }
   await cmd.execute(device.value.id, 'armAway', {
@@ -359,7 +359,7 @@ async function handleArmAway(code) {
     errorMsg: actionError('activar la alarma'),
     onSuccess() {
       device.value.isOn = true
-      // Actualizar el store tambien para que persista entre vistas
+      // Actualizar el store también para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
         data: { status: 'armedAway' }
@@ -370,7 +370,7 @@ async function handleArmAway(code) {
 
 async function handleArmHome(code) {
   if (!verifyAlarmCode(code)) {
-    toast.show('Codigo de seguridad incorrecto', 'error')
+    toast.show('Código de seguridad incorrecto', 'error')
     return
   }
   await cmd.execute(device.value.id, 'armStay', {
@@ -379,7 +379,7 @@ async function handleArmHome(code) {
     errorMsg: actionError('activar la alarma'),
     onSuccess() {
       device.value.isOn = true
-      // Actualizar el store tambien para que persista entre vistas
+      // Actualizar el store también para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
         data: { status: 'armedStay' }
@@ -390,7 +390,7 @@ async function handleArmHome(code) {
 
 async function handleDisarm(code) {
   if (!verifyAlarmCode(code)) {
-    toast.show('Codigo de seguridad incorrecto', 'error')
+    toast.show('Código de seguridad incorrecto', 'error')
     return
   }
   await cmd.execute(device.value.id, 'disarm', {
@@ -399,7 +399,7 @@ async function handleDisarm(code) {
     errorMsg: actionError('desactivar la alarma'),
     onSuccess() {
       device.value.isOn = false
-      // Actualizar el store tambien para que persista entre vistas
+      // Actualizar el store también para que persista entre vistas
       devicesStore.applyDeviceEvent({
         id: device.value.id,
         data: { status: 'disarmed' }
@@ -410,7 +410,7 @@ async function handleDisarm(code) {
 
 async function handleChangeCode(currentCode, newCode) {
   if (!verifyAlarmCode(currentCode)) {
-    toast.show('Codigo actual incorrecto', 'error')
+    toast.show('Código actual incorrecto', 'error')
     return
   }
   const body = {
@@ -422,9 +422,9 @@ async function handleChangeCode(currentCode, newCode) {
   try {
     await devicesStore.updateDevice(device.value.id, body)
     device.value.metadata = { ...device.value.metadata, securityCode: newCode }
-    toast.show('Codigo de seguridad actualizado', 'success')
+    toast.show('Código de seguridad actualizado', 'success')
   } catch (e) {
-    toast.show(e.message || actionError('cambiar el codigo de seguridad'), 'error')
+    toast.show(e.message || actionError('cambiar el código de seguridad'), 'error')
   }
 }
 
@@ -433,7 +433,7 @@ async function setPositionTo(value) {
   await cmd.execute(device.value.id, 'setLevel', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setLevel', [value]),
-    errorMsg: actionError('cambiar la posicion'),
+    errorMsg: actionError('cambiar la posición'),
   })
 }
 
@@ -480,14 +480,14 @@ async function setSpeakerGenre(value) {
   await cmd.execute(device.value.id, 'setGenre', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setGenre', [value]),
-    errorMsg: actionError('cambiar el genero'),
+    errorMsg: actionError('cambiar el género'),
   })
 }
 
 async function handleSpeakerAction(actionName) {
   await cmd.execute(device.value.id, actionName, {
     successMsg: describeAction(device.value.type, actionName),
-    errorMsg: actionError('ejecutar la accion'),
+    errorMsg: actionError('ejecutar la acción'),
     async onSuccess() {
       try {
         const state = await api.getDeviceState(device.value.id)
@@ -510,7 +510,7 @@ async function setVacuumMode(value) {
 async function handleVacuumAction(actionName) {
   await cmd.execute(device.value.id, actionName, {
     successMsg: describeAction(device.value.type, actionName),
-    errorMsg: actionError('ejecutar la accion'),
+    errorMsg: actionError('ejecutar la acción'),
   })
 }
 
@@ -519,7 +519,7 @@ async function setVacuumLocation(roomId) {
   await cmd.execute(device.value.id, 'setLocation', {
     params: [roomId],
     successMsg: describeAction(device.value.type, 'setLocation', [roomId]),
-    errorMsg: actionError('cambiar la ubicacion'),
+    errorMsg: actionError('cambiar la ubicación'),
   })
 }
 
@@ -584,7 +584,7 @@ async function setOvenConvectionMode(value) {
   await cmd.execute(device.value.id, 'setConvectionMode', {
     params: [value],
     successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
-    errorMsg: actionError('cambiar el modo conveccion'),
+    errorMsg: actionError('cambiar el modo convección'),
   })
 }
 

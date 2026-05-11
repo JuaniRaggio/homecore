@@ -12,10 +12,10 @@ export const ACTIONS_MAP = {
     { actionName: 'unlock',  label: 'Desbloquear',  params: [] },
   ],
   alarm: [
-    { actionName: 'armAway',  label: 'Activar (modo regular)', params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
-    { actionName: 'armStay',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
-    { actionName: 'disarm',   label: 'Desactivar',            params: [{ type: 'text', placeholder: 'Codigo 0000-9999' }] },
-    { actionName: 'changeSecurityCode', label: 'Cambiar codigo', params: [{ type: 'text', placeholder: 'Codigo nuevo' }] },
+    { actionName: 'armAway',  label: 'Activar (modo regular)', params: [{ type: 'text', placeholder: 'Código 0000-9999' }] },
+    { actionName: 'armStay',  label: 'Activar (modo casa)',    params: [{ type: 'text', placeholder: 'Código 0000-9999' }] },
+    { actionName: 'disarm',   label: 'Desactivar',            params: [{ type: 'text', placeholder: 'Código 0000-9999' }] },
+    { actionName: 'changeSecurityCode', label: 'Cambiar código', params: [{ type: 'text', placeholder: 'Código nuevo' }] },
   ],
   water: [
     { actionName: 'open',     label: 'Abrir',     params: [] },
@@ -28,7 +28,7 @@ export const ACTIONS_MAP = {
   curtain: [
     { actionName: 'up',       label: 'Subir',    params: [] },
     { actionName: 'down',     label: 'Bajar',    params: [] },
-    { actionName: 'setLevel', label: 'Posicion', params: [{ type: 'number', min: 0, max: 100, step: 1, placeholder: '0-100' }] },
+    { actionName: 'setLevel', label: 'Posición', params: [{ type: 'number', min: 0, max: 100, step: 1, placeholder: '0-100' }] },
   ],
   ac: [
     { actionName: 'turnOn',         label: 'Encender',    params: [] },
@@ -42,10 +42,10 @@ export const ACTIONS_MAP = {
     { actionName: 'stop',          label: 'Detener',          params: [] },
     { actionName: 'pause',         label: 'Pausar',           params: [] },
     { actionName: 'resume',        label: 'Reanudar',         params: [] },
-    { actionName: 'nextSong',      label: 'Siguiente cancion',params: [] },
-    { actionName: 'previousSong',  label: 'Cancion anterior', params: [] },
+    { actionName: 'nextSong',      label: 'Siguiente canción',params: [] },
+    { actionName: 'previousSong',  label: 'Canción anterior', params: [] },
     { actionName: 'setVolume',     label: 'Volumen',          params: [{ type: 'number', min: 0, max: 10, step: 1, placeholder: '0-10' }] },
-    { actionName: 'setGenre',      label: 'Genero',           params: [{ type: 'select', options: ['clasica', 'country', 'dance', 'latina', 'pop', 'rock'] }] },
+    { actionName: 'setGenre',      label: 'Género',           params: [{ type: 'select', options: ['clasica', 'country', 'dance', 'latina', 'pop', 'rock'] }] },
     { actionName: 'getPlaylist',   label: 'Obtener playlist', params: [] },
   ],
   vacuum: [
@@ -66,7 +66,7 @@ export const ACTIONS_MAP = {
     { actionName: 'setTemperature',  label: 'Temperatura',      params: [{ type: 'number', min: 90, max: 230, step: 10, placeholder: '90-230 C' }] },
     { actionName: 'setHeatSource',   label: 'Fuente de calor',  params: [{ type: 'select', options: ['convencional', 'abajo', 'arriba'] }] },
     { actionName: 'setGrillMode',    label: 'Modo grill',       params: [{ type: 'select', options: ['apagado', 'economico', 'completo'] }] },
-    { actionName: 'setConvectionMode', label: 'Modo conveccion',params: [{ type: 'select', options: ['apagado', 'economico', 'convencional'] }] },
+    { actionName: 'setConvectionMode', label: 'Modo convección',params: [{ type: 'select', options: ['apagado', 'economico', 'convencional'] }] },
   ],
 }
 
@@ -123,7 +123,16 @@ export function describeAction(typeName, actionName, params) {
   if (!params || params.length === 0) return label
 
   const suffix = UNIT_SUFFIXES[actionName] ?? ''
-  const value = params[0]
+  let value = params[0]
+
+  // Sanitizar códigos de seguridad de alarmas
+  const isAlarmSecurityAction = ['armAway', 'armStay', 'disarm', 'changeSecurityCode'].includes(actionName)
+  if (isAlarmSecurityAction && value !== undefined && value !== null) {
+    value = '****'
+  }
+
+  // Si el valor es undefined o null, retornar solo el label
+  if (value === undefined || value === null) return label
 
   if (params.length === 2) {
     return `${label}: ${value} ${params[1]}`

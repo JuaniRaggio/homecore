@@ -27,13 +27,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Contrasena</label>
-          <input v-model="password" type="password" placeholder="Ingrese su contrasena" />
+          <label class="form-label">Contraseña</label>
+          <input v-model="password" type="password" placeholder="Ingrese su contraseña" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Confirme su contrasena</label>
-          <input v-model="confirmPassword" type="password" placeholder="Confirme su contrasena" />
+          <label class="form-label">Confirme su contraseña</label>
+          <input v-model="confirmPassword" type="password" placeholder="Confirme su contraseña" />
         </div>
 
         <button class="btn-primary" @click="handleRegister" :disabled="loading">
@@ -73,15 +73,20 @@ async function handleRegister() {
   }
 
   loading.value = true
-  const result = await authStore.register(name.value, email.value, password.value)
-  loading.value = false
+  try {
+    const result = await authStore.register(name.value, email.value, password.value)
 
-  if (result.success) {
-    router.push('/verificar')
-  } else if (result.conflict) {
-    router.push('/login')
-  } else {
-    error.value = result.error || 'Error al registrarse'
+    if (result.success) {
+      router.push('/verificar')
+    } else if (result.conflict) {
+      router.push('/login')
+    } else {
+      error.value = result.error || 'Error al registrarse'
+    }
+  } catch (e) {
+    error.value = 'Error inesperado al registrarse'
+  } finally {
+    loading.value = false
   }
 }
 </script>

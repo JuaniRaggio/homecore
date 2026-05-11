@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="control-row">
-      <span class="control-label">Codigo de seguridad</span>
+      <span class="control-label">Código de seguridad</span>
       <input
         type="password"
         class="control-input"
         v-model="code"
-        placeholder="Codigo de seguridad"
+        placeholder="Código de seguridad"
         :disabled="disabled"
       />
     </div>
@@ -29,7 +29,7 @@
       class="btn-detail"
       @click="showChangeCode = true"
     >
-      <i class="fa-solid fa-key"></i> Cambiar codigo de seguridad
+      <i class="fa-solid fa-key"></i> Cambiar código de seguridad
     </button>
 
     <div v-if="hasCode && showChangeCode" class="form-group">
@@ -37,7 +37,7 @@
         type="password"
         class="control-input"
         v-model="currentCode"
-        placeholder="Codigo actual"
+        placeholder="Código actual"
         maxlength="4"
         :disabled="disabled"
       />
@@ -45,7 +45,7 @@
         type="password"
         class="control-input"
         v-model="newCode"
-        placeholder="Nuevo codigo (4 digitos)"
+        placeholder="Nuevo código (4 dígitos)"
         maxlength="4"
         :disabled="disabled"
       />
@@ -53,7 +53,7 @@
         type="password"
         class="control-input"
         v-model="newCodeConfirm"
-        placeholder="Confirmar nuevo codigo"
+        placeholder="Confirmar nuevo código"
         maxlength="4"
         :disabled="disabled"
       />
@@ -62,7 +62,7 @@
         :disabled="disabled || !canChangeCode"
         @click="emitChangeCode"
       >
-        Cambiar codigo
+        Cambiar código
       </button>
     </div>
   </div>

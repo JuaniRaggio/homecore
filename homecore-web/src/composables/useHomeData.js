@@ -10,11 +10,11 @@ export function useHomeData() {
 
   const homeId = computed(() => route.params.homeId)
 
-  function fetchHomeData() {
+  async function fetchHomeData() {
     if (!homeId.value) return
-    devicesStore.fetchAllForHome(homeId.value)
     devicesStore.fetchDeviceTypes()
-    roomsStore.fetchRooms(homeId.value)
+    await roomsStore.fetchRooms(homeId.value)
+    devicesStore.fetchAllForHome(homeId.value, roomsStore.rooms)
   }
 
   onMounted(fetchHomeData)

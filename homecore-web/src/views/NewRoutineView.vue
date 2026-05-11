@@ -24,13 +24,13 @@
 
       <!-- Step 1: Nombre -->
       <div v-if="step === 1" class="step-content">
-        <h2 class="step-title">Nombre y descripcion</h2>
+        <h2 class="step-title">Nombre y descripción</h2>
         <div class="form-group">
           <label class="form-label">Nombre de la rutina</label>
-          <input v-model="form.name" class="form-input" type="text" placeholder="Ej: Buenos dias" />
+          <input v-model="form.name" class="form-input" type="text" placeholder="Ej: Buenos días" />
         </div>
         <div class="form-group">
-          <label class="form-label">Descripcion (opcional)</label>
+          <label class="form-label">Descripción (opcional)</label>
           <input v-model="form.description" class="form-input" type="text" placeholder="Ej: Abre persianas y enciende luces suaves" />
         </div>
       </div>
@@ -58,7 +58,7 @@
       <!-- Step 3: Acciones -->
       <div v-else-if="step === 3" class="step-content">
         <h2 class="step-title">Definir acciones</h2>
-        <p class="step-hint">Configura la accion para cada dispositivo seleccionado.</p>
+        <p class="step-hint">Configura la acción para cada dispositivo seleccionado.</p>
         <p v-if="selectedDevices.length === 0" class="state-empty">No seleccionaste dispositivos.</p>
         <div v-for="device in selectedDevices" :key="device.id" class="action-row">
           <span class="action-device-name">{{ displayName(device) }}</span>
@@ -68,7 +68,7 @@
               :value="deviceActions[device.id]?.actionName ?? ''"
               @change="onActionChange(device.id, device.type, $event.target.value)"
             >
-              <option value="">Sin accion</option>
+              <option value="">Sin acción</option>
               <option v-for="a in actionsFor(device.type)" :key="a.actionName" :value="a.actionName">
                 {{ a.label }}
               </option>
@@ -107,16 +107,16 @@
 
       <!-- Step 4: Horario -->
       <div v-else-if="step === 4" class="step-content">
-        <h2 class="step-title">Planificacion</h2>
+        <h2 class="step-title">Planificación</h2>
         <p v-if="!selectedDevices.some(d => deviceActions[d.id]?.actionName)" class="step-warning">
-          La API requiere al menos una accion. Volvé al paso anterior y configurá una.
+          La API requiere al menos una acción. Volvé al paso anterior y configurá una.
         </p>
         <div class="form-group">
-          <label class="form-label">Hora de ejecucion</label>
+          <label class="form-label">Hora de ejecución</label>
           <input v-model="form.time" class="form-input form-input-time" type="time" />
         </div>
         <div class="form-group">
-          <label class="form-label">Dias de la semana</label>
+          <label class="form-label">Días de la semana</label>
           <div class="days-row">
             <button
               v-for="d in DAY_OPTIONS"
@@ -251,13 +251,18 @@ async function submit() {
   if (!canCreate.value || saving.value) return
   saving.value = true
   try {
+    const metadata = isCrossHome.value
+      ? { crossHome: true, favorite: true }
+      : { homeId: homeId.value }
+
     const payload = {
       name: form.name.trim(),
       description: form.description.trim(),
       actions: buildActionsPayload(),
       time: form.time,
       days: form.days,
-      metadata: isCrossHome.value ? { crossHome: true } : { homeId: homeId.value },
+      isFavorite: isCrossHome.value ? true : undefined,
+      metadata,
     }
 
     if (isEditMode.value) {

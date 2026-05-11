@@ -73,6 +73,10 @@
   gap: 16px;
 }
 
+.items-grid--narrow {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
 /* Wrapper de vista sin padding */
 .view-content {
   padding: 0;

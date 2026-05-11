@@ -24,7 +24,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
   }
 
   function addNotification(notification) {
-    const id = Math.max(...notifications.value.map(n => n.id), 0) + 1
+    const id = notifications.value.reduce((max, n) => Math.max(max, n.id), 0) + 1
     notifications.value.unshift({
       ...notification,
       id,

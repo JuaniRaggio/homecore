@@ -22,9 +22,9 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Habitacion</label>
+          <label class="form-label">Habitación</label>
           <select v-model="form.roomId">
-            <option value="">Sin habitacion</option>
+            <option value="">Sin habitación</option>
             <option v-for="room in rooms" :key="room.id" :value="room.id">
               {{ room.name }}
             </option>

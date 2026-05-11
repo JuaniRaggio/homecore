@@ -1,11 +1,11 @@
 <template>
   <ModalBase :visible="visible" @close="emitClose">
-    <h2 class="modal-title">Nueva habitacion</h2>
+    <h2 class="modal-title">Nueva habitación</h2>
     <input
       v-model="newRoomName"
       class="modal-input"
       type="text"
-      placeholder="Nombre de la habitacion"
+      placeholder="Nombre de la habitación"
       @keyup.enter="confirmCreate"
     />
     <div class="modal-actions">
@@ -54,12 +54,12 @@ async function confirmCreate() {
   saving.value = true
   try {
     await roomsStore.addRoom(props.homeId, { name: newRoomName.value.trim() })
-    toast.show('Habitacion creada', 'success')
+    toast.show('Habitación creada', 'success')
     emit('created')
     emit('close')
   } catch (e) {
-    console.error('[CreateRoomModal] Error creando habitacion:', e)
-    toast.show(e.message || actionError('crear la habitacion'), 'error')
+    console.error('[CreateRoomModal] Error creando habitación:', e)
+    toast.show(e.message || actionError('crear la habitación'), 'error')
   } finally {
     saving.value = false
   }
