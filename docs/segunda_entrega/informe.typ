@@ -149,64 +149,47 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 
 == Requisitos funcionales
 
-=== RF1 — Registrar cuenta
-El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación.
+=== RF1-6 — Gestión de cuenta y autenticación
+
+El sistema implementa un flujo completo de autenticación que incluye registro, verificación, inicio de sesión y gestión de contraseñas. El usuario puede:
+
+- *Registrar cuenta (RF1):* Crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación.
+- *Verificar cuenta (RF2):* El sistema envía un correo de verificación para validar la dirección de correo electrónico.
+- *Iniciar sesión (RF5):* Autenticarse ingresando correo electrónico y contraseña. La sesión se mantiene activa durante la navegación, y el sistema maneja automáticamente la expiración de tokens JWT redirigiendo al usuario al login con un mensaje explicativo.
+- *Cerrar sesión (RF6):* Finalizar la sesión desde el menú de perfil en la barra superior.
+- *Recuperar contraseña (RF3):* Ingresar el correo para recibir un código de verificación y posteriormente establecer una nueva contraseña.
+- *Cambiar contraseña (RF4):* Modificar la contraseña desde la sección de configuración, ingresando la contraseña actual y la nueva.
 
 #figure(
-  image("hci_before_and_after/login_account/registrarse.png", width: 100%)
+  grid(columns: 3, gutter: 12pt,
+    image("hci_before_and_after/login_account/registrarse.png", width: 100%),
+    image("hci_before_and_after/login_account/verificacion.png", width: 100%),
+    image("hci_before_and_after/login_account/iniciarsesion.png", width: 100%),
+    image("hci_before_and_after/login_account/logout.png", width: 100%),
+    image("hci_before_and_after/login_account/recuperarcuenta.png", width: 100%),
+    image("hci_before_and_after/login_account/cambiocontra.png", width: 100%),
+  ),
+  caption: [Flujos de autenticación: registro, verificación, inicio de sesión, cierre de sesión, recuperación de contraseña y cambio de contraseña],
 )
 
-=== RF2 — Verificar cuenta
-Tras el registro, el sistema envía un correo de verificación al usuario, para validar su correo.
+=== RF7-9 — Gestión y control de dispositivos
 
-#figure(
-  image("hci_before_and_after/login_account/verificacion.png", width: 100%)
-)
-
-=== RF3 — Recuperar contraseña
-El sistema implementa el flujo de recuperación de contraseña. El usuario ingresa su correo y recibe un código de verificación para poder posteriormente ingresar la nueva contraseña.
-
-#figure(
-  image("hci_before_and_after/login_account/recuperarcuenta.png", width: 100%)
-)
-
-=== RF4 — Cambiar contraseña
-Un usuario autenticado puede cambiar su contraseña desde la sección de configuración, ingresando la contraseña actual y la nueva que desea establecer.
-
-#figure(
-  image("hci_before_and_after/login_account/cambiocontra.png", width: 100%)
-)
-
-=== RF5 — Iniciar sesión
-El sistema permite al usuario autenticarse ingresando su correo electrónico y contraseña. La sesión se mantiene activa durante la navegación, y el sistema maneja automáticamente la expiración de tokens JWT redirigiendo al usuario al login con un mensaje explicativo.
-
-#figure(
-  image("hci_before_and_after/login_account/iniciarsesion.png", width: 100%)
-)
-
-=== RF6 — Cerrar sesión
-El usuario puede cerrar su sesión desde el menú de perfil disponible en la barra superior. Al hacerlo, se elimina la sesión activa y se redirige al usuario a la pantalla de inicio de sesión.
-
-#figure(
-  image("hci_before_and_after/login_account/logout.png", width: 100%)
-)
-
-=== RF7 — Gestionar dispositivos
+==== Gestión de dispositivos (RF7)
 El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
 
-#figure(
-  image("hci_before_and_after/dispositivos/gestion2.png", width: 100%)
-)
-
-=== RF8 — Consultar dispositivos
+==== Consulta de dispositivos (RF8)
 El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real.
 
 #figure(
-  image("hci_before_and_after/dispositivos/gestionar.png", width: 100%)
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/dispositivos/gestion2.png", width: 100%),
+    image("hci_before_and_after/dispositivos/VistaDispositivos.jpg", width: 100%),
+  ),
+  caption: [Gestión de dispositivos (izq.) y vista de listado de dispositivos (der.)],
 )
 
-=== RF9 — Controlar dispositivos
-Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API:
+==== Control de dispositivos (RF9)
+Se implementaron controles específicos para los 10 tipos de dispositivos soportados por la API:
 
 #table(
   columns: (auto, 1fr),
@@ -225,7 +208,6 @@ Se implementaron controles específicos para los 11 tipos de dispositivos soport
   [Aspiradora], [Iniciar/pausar, volver a la base, modo (aspirar/trapear), ubicación],
   [Heladera], [Temperatura heladera (2–8°C) y freezer (−20 a −8°C), modo de operación],
   [Horno], [Encender/apagar, temperatura (90–230°C), fuente de calor, grill, convección],
-  [Cerradura], [Bloquear/desbloquear],
 )
 
 ==== Estados combinados de alarmas
@@ -236,11 +218,27 @@ El sistema implementa una lógica de estados agregados para las alarmas a nivel 
 - *Armada:* Todas las alarmas del hogar están activadas (ya sea en modo ausente o en casa). El hogar muestra un indicador verde, confirmando protección completa.
 - *Parcialmente armada:* Algunas alarmas están activadas mientras otras permanecen desactivadas. El hogar se identifica con un indicador amarillo, alertando sobre una cobertura de seguridad incompleta.
 
+#figure(
+  image("hci_before_and_after/MultiplesAlarmasEstados.jpg", width: 100%),
+  caption: [Se observan los 4 posibles estados de las casas],
+)
+
 Esta agregación de estados permite al usuario identificar de un vistazo el nivel de protección de cada propiedad sin necesidad de revisar individualmente el estado de cada alarma. La representación visual mediante colores (rojo, verde, amarillo) sigue convenciones estándar de sistemas de seguridad, facilitando el reconocimiento inmediato del estado de protección.
 
+#pagebreak()
 
-=== RF10 — Gestionar rutinas
-El usuario puede crear rutinas definiendo un nombre, los días de la semana en que deben ejecutarse, la hora de activación y una secuencia de acciones sobre distintos dispositivos mediante un asistente de 4 pasos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
+=== RF10-12, 23 — Gestión completa de rutinas
+
+El sistema permite gestionar rutinas automatizadas que ejecutan múltiples acciones sobre dispositivos del hogar.
+
+==== Creación y edición de rutinas (RF10)
+El usuario puede crear rutinas mediante un asistente de 4 pasos donde define:
+1. Nombre de la rutina
+2. Selección de dispositivos a controlar
+3. Configuración de acciones específicas para cada dispositivo
+4. Resumen y confirmación
+
+Las rutinas pueden editarse y eliminarse en cualquier momento. La creación incluye la configuración de los días de la semana y hora de ejecución automática (RF23), sin necesidad de intervención manual posterior.
 
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -249,7 +247,7 @@ El usuario puede crear rutinas definiendo un nombre, los días de la semana en q
     image("hci_before_and_after/rutinas/crear-rutina3.png", width: 100%),
     image("hci_before_and_after/rutinas/crear-rutina4.png", width: 100%),
   ),
-  caption: [Asistente de creación de rutinas (4 pasos)],
+  caption: [Asistente de creación de rutinas (4 pasos) con configuración de horarios y días],
 )
 
 #figure(
@@ -260,15 +258,16 @@ El usuario puede crear rutinas definiendo un nombre, los días de la semana en q
   caption: [Edición de rutinas existentes],
 )
 
-=== RF11 — Consultar rutinas
-El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones que ejecuta.
+#pagebreak()
+
+==== Consulta y ejecución de rutinas (RF11-12)
+El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones que ejecuta. Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente con un solo clic en "ejecutar ahora", disparando todas las acciones definidas sobre los dispositivos correspondientes.
 
 #figure(
-  image("hci_before_and_after/rutinas/gestion.png", width: 100%)
+  image("hci_before_and_after/rutinas/gestion.png", width: 100%),
+  caption: [Vista de listado y gestión de rutinas],
 )
 
-=== RF12 — Ejecutar rutinas
-Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente con un solo clic en "ejecutar ahora". El sistema dispara en el backend todas las acciones definidas sobre los dispositivos correspondientes.
 
 === RF13 — Consultar acciones realizadas
 El sistema presenta un registro paginado de todas las acciones ejecutadas sobre los dispositivos del hogar en la vista "Historial", incluyendo el nombre del dispositivo, la acción realizada y la marca temporal de cada evento.
@@ -277,43 +276,48 @@ El sistema presenta un registro paginado de todas las acciones ejecutadas sobre 
   image("hci_before_and_after/historial/historia.png", width: 100%)
 )
 
-=== RF14 — Gestionar habitaciones
-El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita.
+=== RF14-16 — Gestión de habitaciones y vinculación de dispositivos
 
-#figure(
-  image("hci_before_and_after/habitaciones/image.png", width: 100%)
-)
-
-=== RF15 — Consultar habitaciones
-El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
-
-#figure(
-  image("hci_before_and_after/habitaciones/habitaciones.png", width: 100%)
-)
-
-=== RF16 — Vincular dispositivos a habitaciones
-El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Todos los dispositivos deben pertenecer a alguna habitación; no se permiten dispositivos sin asignar.
-
-#figure(
-  image("hci_before_and_after/habitaciones/vincular.png", width: 100%)
-)
-
-=== RF17 — Gestionar hogares
-El sistema permite crear hogares con un nombre identificatorio, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico, otorgándoles acceso a sus dispositivos y habitaciones.
+==== Gestión de habitaciones (RF14-15)
+El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita. El sistema lista las habitaciones del hogar seleccionado, y al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene con acceso directo al control de cada uno.
 
 #figure(
   grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/hogar/gestionhogar.png", width: 100%),
+    image("hci_before_and_after/habitaciones/image.png", width: 100%),
+    image("hci_before_and_after/habitaciones/habitaciones.png", width: 100%),
+  ),
+  caption: [Gestión de habitaciones (izq.) y vista de listado con dispositivos asociados (der.)],
+)
+
+#pagebreak()
+
+==== Vinculación de dispositivos a habitaciones (RF16)
+El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Todos los dispositivos deben pertenecer a alguna habitación; no se permiten dispositivos sin asignar. Esta funcionalidad mantiene la jerarquía organizacional hogar $->$ habitación $->$ dispositivo.
+
+#figure(
+  image("hci_before_and_after/habitaciones/vincular.png", width: 100%),
+  caption: [Vinculación de dispositivos a habitaciones],
+)
+
+=== RF17-19 — Gestión y consulta de hogares
+
+El sistema permite gestionar múltiples hogares de forma completa:
+
+==== Gestión de hogares (RF17)
+El usuario puede crear hogares con un nombre identificatorio, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico, otorgándoles acceso a sus dispositivos y habitaciones.
+
+Las habitaciones se crean y gestionan dentro del contexto de un hogar específico (RF19), manteniendo en todo momento la jerarquía hogar $->$ habitación $->$ dispositivo tanto en la navegación como en la lógica del sistema.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/AAAAAA.jpg", width: 100%),
     image("hci_before_and_after/hogar/gestionOver.png", width: 100%),
   ),
   caption: [Gestión de hogares: desde el Inicio (izq.) y desde Overview (der.)],
 )
 
-=== RF18 — Consultar hogares
+==== Consulta de hogares (RF18)
 El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario, tanto propios como compartidos, junto con un resumen del estado de sus dispositivos. Desde este panel se navega al detalle de cada hogar.
-
-=== RF19 — Vincular habitaciones a hogares
-Las habitaciones se crean y gestionan dentro del contexto de un hogar específico, manteniendo en todo momento la jerarquía hogar → habitación → dispositivo tanto en la navegación como en la lógica del sistema.
 
 === RF20 — Enviar notificaciones
 El sistema notifica al usuario en tiempo real cuando un dispositivo cambia de estado, mostrando un mensaje emergente en pantalla.
@@ -329,11 +333,9 @@ El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los h
 El sistema presenta gráficos de consumo eléctrico de los dispositivos del hogar, permitiendo al usuario visualizar el uso energético a lo largo del tiempo.
 
 #figure(
-  image("hci_before_and_after/consumo/consumoactual.png", width: 100%)
+  image("hci_before_and_after/consumo/consumoactual.png", width: 100%),
+  caption: [Visualización de consumo eléctrico por dispositivo],
 )
-
-=== RF23 — Planificar ejecución de rutinas
-Al crear o editar una rutina, el usuario puede configurar los días de la semana y la hora exacta en que debe ejecutarse automáticamente, sin necesidad de intervención manual en cada ocasión.
 
 == Requisitos no funcionales
 
@@ -394,7 +396,7 @@ El sistema de notificaciones responde al feedback de la primera entrega, donde s
 
 == Notificaciones de éxito (_toasts_)
 
-Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *Heurística de Nielsen #1: Visibilidad del estado del sistema*.
+Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *Visibilidad del estado del sistema* _(Heurística de Nielsen #1)_.
 
 #figure(
   grid(columns: 3, gutter: 12pt,
@@ -409,7 +411,7 @@ El color verde y el mensaje conciso eliminan la incertidumbre sin requerir accio
 
 == Notificaciones de error
 
-Los mensajes de error proporcionan información clara sobre qué salió mal y cómo proceder, cumpliendo con la *Heurística #9: Ayudar a los usuarios a reconocer, diagnosticar y recuperarse de errores*.
+Los mensajes de error proporcionan información clara sobre qué salió mal y cómo proceder, cumpliendo con la *ayudar a los usuarios a reconocer, diagnosticar y recuperarse de errores*.
 
 #figure(
   image("hci_before_and_after/Notificaciones/codigo-seguridad-incorrecto.png", width: 60%),
@@ -420,7 +422,7 @@ El mensaje claro evita frustración y guía al usuario hacia la recuperación de
 
 == Confirmaciones preventivas
 
-Los diálogos de confirmación implementan la *Heurística #5: Prevención de errores*, solicitando confirmación antes de acciones destructivas.
+Los diálogos de confirmación implementan la *Prevención de errores*, solicitando confirmación antes de acciones destructivas.
 
 #figure(
   image("hci_before_and_after/Notificaciones/eliminar-habitacion.png", width: 60%),
@@ -441,12 +443,12 @@ Las notificaciones persistentes (accesibles desde el menú superior) informan so
 Este sistema de notificaciones diferenciadas cubre todos los escenarios de comunicación sistema-usuario, asegurando que cada tipo de mensaje tenga el tratamiento visual y temporal adecuado según su importancia y naturaleza.
 
 // ====================================
-// 6. DECISIONES DE DISEÑO E IMPLEMENTACIÓN
+// 6. DECISIONES DE DISEÑO
 // ====================================
 
-= Decisiones de diseño e implementación
+= Decisiones de diseño
 
-En esta sección se detallan las decisiones adoptadas durante el desarrollo, fundamentadas en principios de usabilidad, requisitos técnicos y el feedback recibido en la primera entrega.
+Esta sección detalla las decisiones de experiencia de usuario y diseño de interacción adoptadas durante el desarrollo, fundamentadas en principios de usabilidad y el feedback recibido en la primera entrega.
 
 - Se eliminó la vista isométrica siguiendo la sugerencia del equipo docente, ya que se identificó que no aportaba utilidad práctica y representaba una característica meramente estética que no justificaba su complejidad técnica.
 
@@ -472,13 +474,15 @@ Los componentes de UI se reservaron exclusivamente para casos que requieren lóg
 
 *Decisión:* Todos los colores, tamaños, espacios y radios se centralizaron en variables CSS (`variables.css`), eliminando valores hardcoded en los componentes.
 
-*Justificación:* Esto garantiza consistencia visual de forma técnica: un cambio de color se propaga a toda la aplicación. Durante la implementación se detectaron valores hardcoded (por ejemplo, `#d32f2f` en vez de `var(--danger)`) que fueron corregidos en una pasada de auditoría. Se agregaron las variables `--warning`, `--danger-bg` y `--success-bg` que no estaban previstas en el prototipo original pero resultaron necesarias para estados intermedios.
+*Justificación:* Esto garantiza consistencia visual de forma técnica: un cambio de color se propaga a toda la aplicación. Durante la implementación se detectaron valores hardcoded (por ejemplo, `#d32f2f` en vez de `var(--danger)`) lo que generaba inconsistencias y distintos tonos de colores a traves de toda la aplicacion
 
 *Beneficia especialmente a:* Todos los usuarios mediante consistencia visual. Particularmente útil para usuarios con necesidades de accesibilidad al garantizar ratios de contraste estables.
 
+#pagebreak()
+
 === Paleta de colores implementada
 
-La paleta de colores definida en la primera entrega se mantuvo fielmente en la implementación, garantizando coherencia visual entre el prototipo y la aplicación final. El tema oscuro profundo con indigo para acciones y ámbar para estados activos cumple con el estándar WCAG AA en todos los casos.
+La paleta de colores definida en la primera entrega se mantuvo fielmente en la implementación, garantizando coherencia visual entre el prototipo y la aplicación final.
 
 #let swatch(color, nombre, hex) = {
   box(
@@ -549,6 +553,8 @@ La paleta de colores definida en la primera entrega se mantuvo fielmente en la i
 *Justificación:* En la etapa de prototipado, se observó que la configuración de rutinas podía resultar compleja. El asistente fragmenta la tarea en etapas simples con una progresión clara, reduciendo la carga cognitiva. El paso final de resumen permite verificar la configuración antes de confirmarla, funcionando como un mecanismo de prevención de errores.
 
 *Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria).
+
+#pagebreak()
 
 == Confirmación de acciones irreversibles
 
