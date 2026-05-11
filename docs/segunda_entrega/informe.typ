@@ -310,24 +310,6 @@ Como resultado final, las cuatro páginas públicas del sistema (/login, /regist
 
 En esta sección se presenta la comparación entre el prototipo de alta fidelidad (primera entrega) y la implementación funcional definitiva, destacando la evolución estética y técnica del sistema.
 
-== Resumen Global (Global Overview)
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/global overview/goold.png", width: 100%),
-    image("hci_before_and_after/global overview/gonew.png", width: 100%),
-  ),
-  caption: [Global Overview: prototipo (izq.) vs. implementación (der.)],
-)
-
-== Resumen del Hogar (Home Overview)
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/overview/oold.png", width: 100%),
-    image("hci_before_and_after/overview/onew.png", width: 100%),
-  ),
-  caption: [Home Overview: prototipo (izq.) vs. implementación (der.)],
-)
-
 == Habitaciones
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -734,7 +716,25 @@ La aplicación ha sido testeada y es compatible con las últimas versiones de lo
 
 *Feedback:* "La vista isométrica 3D del hogar no aporta utilidad práctica y representa complejidad técnica innecesaria."
 
-*Resolución:* Siguiendo la sugerencia de la cátedra, se eliminó completamente la vista isométrica 3D que formaba parte del diseño original. Esta decisión se fundamentó en que la representación gráfica del plano de la casa, aunque visualmente atractiva, no proporcionaba información funcional que justificara su complejidad de implementación y mantenimiento. En su lugar, se priorizó una presentación más directa y eficiente de la información mediante tarjetas de resumen, métricas clave y listas de dispositivos favoritos. Este enfoque mejora la velocidad de carga de la vista principal, reduce la complejidad del código y mantiene el foco en la funcionalidad real del sistema: el control y monitoreo de dispositivos. La eliminación de este elemento decorativo refuerza el principio de diseño minimalista, donde cada componente de la interfaz debe cumplir un propósito claro en la experiencia del usuario.
+*Resolución:* Siguiendo la sugerencia de la cátedra, se eliminó completamente la vista isométrica 3D que formaba parte del diseño original. Esta decisión se fundamentó en que la representación gráfica del plano de la casa, aunque visualmente atractiva, no proporcionaba información funcional que justificara su complejidad de implementación y mantenimiento. En su lugar, se priorizó una presentación más directa y eficiente de la información mediante tarjetas de resumen, métricas clave y listas de dispositivos favoritos.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/global overview/goold.png", width: 100%),
+    image("hci_before_and_after/global overview/gonew.png", width: 100%),
+  ),
+  caption: [Resumen Global: prototipo con vista isométrica (izq.) vs. implementación sin vista isométrica (der.). La nueva versión prioriza métricas y favoritos en lugar de la representación gráfica del plano.],
+)
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/overview/oold.png", width: 100%),
+    image("hci_before_and_after/overview/onew.png", width: 100%),
+  ),
+  caption: [Vista del Hogar: prototipo con vista isométrica (izq.) vs. implementación con tarjetas de dispositivos y estado (der.). El cambio mejora la velocidad de carga y el acceso directo a la información relevante.],
+)
+
+Este enfoque mejora la velocidad de carga de la vista principal, reduce la complejidad del código y mantiene el foco en la funcionalidad real del sistema: el control y monitoreo de dispositivos. La eliminación de este elemento decorativo refuerza el principio de diseño minimalista, donde cada componente de la interfaz debe cumplir un propósito claro en la experiencia del usuario.
 
 // TODO: Completar con el feedback recibido del profesor/evaluador
 // y cómo se abordó en la implementación.
