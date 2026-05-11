@@ -41,7 +41,7 @@
 .btn-accent {
   width: 100%;
   padding: 13px;
-  background-color: var(--accent);
+  background-color: #4a52b8;
   color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-lg);
