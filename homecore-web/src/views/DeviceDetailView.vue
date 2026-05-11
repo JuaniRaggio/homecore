@@ -575,33 +575,6 @@ async function setOvenTemperature(value) {
   })
 }
 
-async function setOvenHeatSource(value) {
-  deviceState.heatSource = value
-  await cmd.execute(device.value.id, 'setHeatSource', {
-    params: [value],
-    successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
-    errorMsg: actionError('cambiar la fuente de calor'),
-  })
-}
-
-async function setOvenGrillMode(value) {
-  deviceState.grillMode = value
-  await cmd.execute(device.value.id, 'setGrillMode', {
-    params: [value],
-    successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
-    errorMsg: actionError('cambiar el modo grill'),
-  })
-}
-
-async function setOvenConvectionMode(value) {
-  deviceState.convectionMode = value
-  await cmd.execute(device.value.id, 'setConvectionMode', {
-    params: [value],
-    successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
-    errorMsg: actionError('cambiar el modo convección'),
-  })
-}
-
 async function loadDeviceState(id) {
   try {
     const state = await api.getDeviceState(id)
