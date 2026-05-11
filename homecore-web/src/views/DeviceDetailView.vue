@@ -758,18 +758,7 @@ onMounted(async () => {
 .status--on { color: var(--success); }
 .status--off { color: var(--text-muted); }
 
-/* Controls card (usa .card-title global para el titulo) */
-.controls-title {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.no-controls {
-  font-size: var(--font-base);
-  color: var(--text-muted);
-}
+/* controls-title y no-controls estan en controls.css global */
 
 /* Device state info (para fridge, oven, etc.) */
 .device-state-info {
