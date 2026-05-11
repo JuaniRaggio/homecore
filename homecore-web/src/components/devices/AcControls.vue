@@ -66,9 +66,9 @@
 import { computed } from 'vue'
 
 const MODE_CONFIG = {
-  frio:        { icon: 'fa-regular fa-snowflake',  label: 'Frio' },
-  calor:       { icon: 'fa-solid fa-sun',          label: 'Calor' },
-  ventilacion: { icon: 'fa-solid fa-fan',          label: 'Ventilacion' },
+  frio:        { icon: 'fa-solid fa-snowflake',  label: 'Frio' },
+  calor:       { icon: 'fa-solid fa-fire',       label: 'Calor' },
+  ventilacion: { icon: 'fa-solid fa-wind',       label: 'Ventilacion' },
 }
 
 const FAN_LABELS = {
