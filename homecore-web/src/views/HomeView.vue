@@ -265,10 +265,66 @@ function handleOpenDevice(id) {
   router.push({ name: 'device-detail', params: { homeId: homeId.value, id } })
 }
 
-// Fetch routines additionally (useHomeData already fetches devices + rooms)
+// Historial reciente
+const historyEvents = ref([])
+const historyLoading = ref(true)
+
+function getDeviceInfo(log) {
+  const deviceId = log.deviceId || log.device?.id
+  const device = devicesStore.devices.find(d => String(d.id) === String(deviceId))
+  const name = device?.name || log.device?.name || 'Dispositivo eliminado'
+  const type = device?.type || log.device?.type?.name || log.device?.type || ''
+  return { name, type }
+}
+
+function describeLogAction(actionName, deviceType) {
+  if (!actionName) return 'Accion'
+  const desc = describeAction(deviceType, actionName, [])
+  if (desc !== actionName) return desc
+  for (const type of Object.keys(ACTIONS_MAP)) {
+    const match = ACTIONS_MAP[type].find(a => a.actionName === actionName)
+    if (match) return describeAction(type, actionName, [])
+  }
+  return actionName
+}
+
+function formatTime(timestamp) {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  const now = new Date()
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  }
+  return date.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+async function fetchRecentHistory() {
+  try {
+    const data = await api.getAllDeviceLogs(10, 0)
+    const logs = Array.isArray(data) ? data : []
+    historyEvents.value = logs.map(log => {
+      const info = getDeviceInfo(log)
+      const action = (log.actionName || '').toLowerCase()
+      return {
+        id: log.id,
+        deviceName: info.name,
+        action: describeLogAction(log.actionName || log.action || '', info.type),
+        time: formatTime(log.timestamp),
+        type: action.includes('routine') || action.includes('execute') ? 'routine' : 'device',
+      }
+    })
+  } catch (e) {
+    console.error('[Home] Error cargando historial:', e)
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+// Fetch routines + history (useHomeData already fetches devices + rooms)
 onMounted(() => {
   if (homeId.value) {
     routinesStore.fetchRoutines()
+    fetchRecentHistory()
   }
 })
 </script>
