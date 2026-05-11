@@ -246,6 +246,10 @@ onMounted(async () => {
 
 .routine-detail { padding: 0; }
 
+.detail-header-info {
+  margin-bottom: var(--space-2xl);
+}
+
 .view-title { margin-bottom: var(--space-2xs); }
 
 .title-with-badge {
