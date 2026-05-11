@@ -2,6 +2,18 @@
 // HomeCore -- TP Gestión de Casas Inteligentes (Segunda Entrega)
 // ============================================================
 
+#let nota(contenido) = {
+  block(
+    fill: rgb("#E3F2FD"),
+    stroke: rgb("#1976D2") + 1pt,
+    inset: 10pt,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #text(weight: "bold", fill: rgb("#1976D2"))[Nota:] #contenido
+  ]
+}
+
 #set document(
   title: "HomeCore - TP 2 Implementación Web",
   author: "Grupo 15",
@@ -146,7 +158,6 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 - *Iniciar sesión (RF5):* El sistema permite la autenticación mediante correo y contraseña. La sesión se mantiene mediante un token (JWT) que se adjunta automáticamente a las solicitudes. Se implementó un interceptor para manejar la expiración del token (error 401), redirigiendo al usuario al login con un mensaje explicativo para mantener la consistencia del estado.
 - *Cerrar sesión (RF6):* El usuario puede finalizar su sesión desde el menú de perfil. Esto elimina el token local, desconecta el WebSocket y redirige a la pantalla de inicio.
 
-// TODO: Agregar capturas de login, registro, verificación y recuperación
  #figure(image("hci_before_and_after/login_account/registrarse.png", width: 80%), caption: [Pantalla de registro])
  #figure(image("hci_before_and_after/login_account/verificacion.png", width: 80%), caption: [Pantalla de verificación de email])
  #figure(image("hci_before_and_after/login_account/recuperarcuenta.png", width: 80%), caption: [Pantalla de recuperación de constraseña])
@@ -274,7 +285,7 @@ Esto evita la mezcla de responsabilidades dentro de los componentes, facilitando
 
 La aplicación fue validada utilizando el W3C Markup Validation Service, asegurando que el HTML generado cumple con los estándares web (validator.w3.org). El análisis arrojó un resultado sin errores ni advertencias, confirmado por la respuesta del validador:
 
-{"version":"26.5.9","messages":[]}
+`{"version":"26.5.9","messages":[]}`
 
 El arreglo messages vacío indica que el documento HTML cumple plenamente con el estándar, sin ninguna observación por parte del validador.
 
@@ -364,7 +375,55 @@ En esta sección se presenta la comparación entre el prototipo de alta fidelida
 
 == Notificaciones
 
-// TODO: dropdown, toasts
+El sistema de notificaciones responde al feedback de la primera entrega, donde se identificó la necesidad de mejorar la visibilidad del estado del sistema y proporcionar retroalimentación clara al usuario. Se implementaron dos tipos de notificaciones diferenciadas:
+
+=== Notificaciones de éxito (_toasts_)
+
+Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *Heurística de Nielsen #1: Visibilidad del estado del sistema*.
+
+#figure(
+  grid(columns: 3, gutter: 12pt,
+    image("hci_before_and_after/Notificaciones/Creacion-de-casa.png", width: 100%),
+    image("hci_before_and_after/Notificaciones/rutina creada.png", width: 100%),
+    image("hci_before_and_after/Notificaciones/habitacion-eliminada.png", width: 100%),
+  ),
+  caption: [Notificaciones de éxito: Confirmación de creación de casa, rutina creada, y habitación eliminada. Estas notificaciones temporales aparecen durante 3 segundos y se desvanecen automáticamente.],
+)
+
+El color verde y el mensaje conciso eliminan la incertidumbre sin requerir acciones adicionales del usuario. Este tipo de retroalimentación inmediata es fundamental para cualquier interfaz, ya que confirma que la acción se registró correctamente y el sistema respondió como se esperaba.
+
+=== Notificaciones de error
+
+Los mensajes de error proporcionan información clara sobre qué salió mal y cómo proceder, cumpliendo con la *Heurística #9: Ayudar a los usuarios a reconocer, diagnosticar y recuperarse de errores*.
+
+#figure(
+  image("hci_before_and_after/Notificaciones/codigo-seguridad-incorrecto.png", width: 60%),
+  caption: [Notificación de error: Código de seguridad incorrecto. El mensaje en rojo indica claramente el problema y permite al usuario intentar nuevamente.],
+)
+
+El mensaje claro evita frustración y guía al usuario hacia la recuperación del error, proporcionando información específica sobre qué falló sin exponer detalles sensibles del sistema.
+
+=== Confirmaciones preventivas
+
+Los diálogos de confirmación implementan la *Heurística #5: Prevención de errores*, solicitando confirmación antes de acciones destructivas.
+
+#figure(
+  image("hci_before_and_after/Notificaciones/eliminar-habitacion.png", width: 60%),
+  caption: [Modal de confirmación: Eliminar habitación. El diálogo explica las consecuencias de la acción (eliminación de dispositivos asociados) y requiere confirmación explícita antes de proceder.],
+)
+
+El diálogo explica claramente las consecuencias de la acción ("y todos sus dispositivos serán eliminados") y ofrece la opción de cancelar, previniendo errores irreversibles y dando tiempo al usuario para reconsiderar acciones destructivas.
+
+=== Notificaciones de eventos externos
+
+Las notificaciones persistentes (accesibles desde el menú superior) informan sobre eventos del sistema que ocurren independientemente de las acciones del usuario.
+
+#figure(
+  image("hci_before_and_after/Notificaciones/puerta-abierta.png", width: 60%),
+  caption: [Notificación de evento: Puerta del frente abierta. Este tipo de notificación informa sobre cambios de estado de dispositivos monitoreados, especialmente útil para eventos de seguridad.],
+)
+
+Este sistema de notificaciones diferenciadas cubre todos los escenarios de comunicación sistema-usuario, asegurando que cada tipo de mensaje tenga el tratamiento visual y temporal adecuado según su importancia y naturaleza.
 
 // ====================================
 // 6. DECISIONES DE DISEÑO E IMPLEMENTACIÓN
@@ -508,50 +567,46 @@ La paleta de colores definida en la primera entrega se mantuvo fielmente en la i
 
 == CSS manual vs. frameworks de componentes (Vuetify)
 
-*Decisión:* Se implementaron todos los estilos de la aplicación con CSS puro organizado en módulos (variables, botones, formularios, tarjetas, tablas, controles, layout) y estilos scoped por componente, sin utilizar frameworks de UI como Vuetify, Quasar o PrimeVue.
+*Decisión:* Se implementaron todos los estilos de la aplicación con CSS puro organizado en módulos (variables, botones, formularios, tarjetas, tablas, controles, layout) y estilos scoped por componente, sin utilizar Vuetify
 
-*Justificación:* Esta decisión se fundamenta en criterios técnicos y pedagógicos:
+*Justificación:* Esta decisión se fundamenta en los siguientes criterios:
 
--- *Comprensión del modelo de caja y del flujo CSS:* Escribir las reglas de layout, flexbox, grid y media queries a mano obliga a entender cómo funciona el posicionamiento, el sizing y la respuesta a cambios de viewport. Un framework como Vuetify abstrae estos mecanismos detrás de props (`cols`, `sm`, `md`) y clases utilitarias, lo cual resuelve el problema pero no enseña el fundamento. Al implementar el responsive manualmente, cada decisión (cuándo apilar columnas, cuándo ocultar un elemento, cómo manejar overflow) es explícita y trazable en el código.
+- *Comprensión del modelo CSS:* Escribir las reglas de layout, flexbox, grid y media queries a mano obliga a entender cómo funciona el posicionamiento, el sizing y la respuesta a cambios de viewport. Un framework como Vuetify abstrae estos mecanismos detrás de props (`cols`, `sm`, `md`) y clases utilitarias, lo cual resuelve el problema pero no enseña el fundamento. Al implementar el responsive manualmente, cada decisión (cuándo apilar columnas, cuándo ocultar un elemento, cómo manejar overflow) es explícita y trazable en el código.
 
--- *Control sobre el sistema de diseño:* HomeCore utiliza un sistema de design tokens propio (variables CSS para colores, tipografía, espaciado, radios) que define la identidad visual de la aplicación. Vuetify impone su propio sistema de diseño (Material Design) con tokens, componentes y convenciones que habría que sobrescribir extensivamente para lograr la estética definida en el prototipo. Esto introduce una capa de complejidad: se estaría trabajando _contra_ el framework en lugar de _con_ él.
+- *Control sobre el sistema de diseño:* HomeCore utiliza un sistema de design tokens propio (variables CSS para colores, tipografía, espaciado, radios) que define la identidad visual de la aplicación. Vuetify impone su propio sistema de diseño Material Design con componentes y convenciones que habría que sobrescribir extensivamente para lograr la estética definida en el prototipo.
 
--- *Tamaño del bundle:* Vuetify agrega entre 200KB y 500KB al bundle comprimido, dependiendo de la configuración de tree-shaking. La aplicación actual, con CSS modular propio, tiene un CSS total de ~25KB gzip. Esta diferencia es significativa para la performance de carga inicial, especialmente relevante en el contexto de una aplicación de domotica donde los usuarios pueden acceder desde dispositivos con conectividad limitada.
+- *Tamaño del bundle:* Vuetify agrega entre 200KB y 500KB al bundle comprimido, dependiendo de la configuración de tree-shaking. La aplicación actual, con CSS modular propio, tiene un CSS total de ~25KB gzip. Esta diferencia es significativa para la performance de carga inicial, especialmente relevante en el contexto de una aplicación de domotica donde los usuarios pueden acceder desde dispositivos con conectividad limitada.
 
--- *Separación de responsabilidades (RNF4):* Al no depender de clases utilitarias mezcladas en el template (`<v-col cols="12" sm="6" md="4">`), la separación entre estructura HTML y presentación CSS se mantiene clara. Las reglas de layout viven en archivos CSS, no dispersas en atributos del template.
+- *Separación de responsabilidades (RNF4):* Al no depender de clases utilitarias mezcladas en el template (`<v-col cols="12" sm="6" md="4">`), la separación entre estructura HTML y presentación CSS se mantiene clara. Las reglas de layout viven en archivos CSS, no dispersas en atributos del template.
 
--- *Responsabilidad del sizing en el componente correcto:* Al escribir CSS manual, se forzó una decisión arquitectónica importante: las grillas de layout (`items-grid`, `homes-grid`, `bottom-grid`) son las responsables de definir el tamaño de las celdas mediante `minmax()`, mientras que las tarjetas hijo (`DeviceCard`, `HomeCard`, `RoutineCard`) se adaptan al espacio disponible sin imponer anchos mínimos propios. En una versión intermedia, `DeviceCard` tenía `min-width: 240px` que hacía que las tarjetas desbordaran su contenedor cuando la grilla asignaba columnas más angostas. La corrección (cambiar a `min-width: 0`) ilustra el principio: el padre define el espacio, el hijo lo ocupa.
+- *Responsabilidad del sizing en el componente correcto:* Al escribir CSS manual, se forzó una decisión arquitectónica importante: las grillas de layout (`items-grid`, `homes-grid`, `bottom-grid`) son las responsables de definir el tamaño de las celdas mediante `minmax()`, mientras que las tarjetas hijo (`DeviceCard`, `HomeCard`, `RoutineCard`) se adaptan al espacio disponible sin imponer anchos mínimos propios. En una versión intermedia, `DeviceCard` tenía `min-width: 240px` que hacía que las tarjetas desbordaran su contenedor cuando la grilla asignaba columnas más angostas. La corrección (cambiar a `min-width: 0`) ilustra el principio "el padre define el espacio, el hijo lo ocupa"
 
 == Diseño responsivo (RNF8)
 
-*Decisión:* Se implementó diseño responsivo con un breakpoint principal en 768px. Por debajo de ese ancho, la sidebar se oculta y el contenido ocupa el ancho completo. Se incorporó un botón de menú hamburguesa en la barra superior para acceder a la sidebar como overlay con backdrop semitransparente.
+_Este requisito no funcional fue implementado parcialmente ya que no fue
+testeado de forma exhaustiva, pero en su mayoria responde correctamente a 
+tamaños de pantalla mobile_
+
+*Decisión:* Se implementó diseño responsivo con un breakpoint principal en 768px. Por debajo de ese ancho, la sidebar se oculta y el contenido ocupa el ancho completo. Se incorporó un botón de menú en la barra superior para acceder a la sidebar como overlay con backdrop semitransparente.
 
 *Justificación:* Si bien el RNF3 obligatorio solo exige soporte para resoluciones de 1280px a 1920px, se optó por implementar el RNF8 opcional (diseño responsivo) por las siguientes razones:
 
--- *Perfil de usuario:* En la primera entrega se definieron modelos de persona que incluyen usuarios que gestionan su hogar desde dispositivos móviles (por ejemplo, verificar el estado de los dispositivos fuera de casa). Una aplicación de domotica que solo funciona en escritorio limita su utilidad al contexto del hogar, lo cual contradice uno de sus principales beneficios: el control remoto.
+- *Perfil de usuario:* En la primera entrega se definieron modelos de persona que incluyen usuarios que gestionan su hogar desde dispositivos móviles (por ejemplo, verificar el estado de los dispositivos fuera de casa). Una aplicación de domotica que solo funciona en escritorio limita su utilidad al contexto del hogar, lo cual contradice uno de sus principales beneficios: el control remoto.
 
--- *Principio de flexibilidad y eficiencia:* La adaptación a distintos tamaños de pantalla permite que tanto usuarios novatos como expertos tengan una experiencia funcional sin degradación.
+- *Principio de flexibilidad y eficiencia:* La adaptación a distintos tamaños de pantalla permite que tanto usuarios novatos como expertos tengan una experiencia funcional sin degradación.
 
 Las adaptaciones específicas por componente fueron:
 
-#table(
-  columns: (auto, 1fr),
-  align: (left, left),
-  stroke: 0.5pt,
-  inset: 8pt,
-  fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*Componente*], [*Adaptación en mobile (<=768px)*]),
-  [Sidebar], [Se oculta con `translateX(-100%)`. Aparece como overlay al tocar la hamburguesa. Un backdrop semitransparente permite cerrarla tocando fuera. Se cierra automáticamente al navegar.],
-  [TopBar], [Se muestra el botón hamburguesa. Se oculta el nombre de usuario (queda solo el avatar) para liberar espacio horizontal.],
-  [Layout general], [El `page-content` elimina el margen izquierdo de la sidebar y usa márgenes simétricos de 16px.],
-  [HomeView], [La grilla inferior (favoritos + rutinas) pasa de 2 columnas a 1. La sección de casa apila el panel de habitaciones y la isometría verticalmente.],
-  [OverviewView], [La grilla de propiedades pasa de auto-fill a 1 columna. Se reduce el tamaño del título de bienvenida.],
-  [DevicesView], [Los filtros de tipo y habitación se apilan verticalmente.],
-  [Wizard (rutinas)], [Los labels del stepper se ocultan y quedan solo los números. Las filas de acciones apilan sus elementos verticalmente. El stepper tiene `overflow: hidden` para que nunca desborde su contenedor independientemente del ancho.],
-  [Vistas existentes], [RoomsView, ConsumptionView, HistoryView, SettingsView, RoomDetailView ya eran responsivas por usar grillas con `auto-fill` o layouts naturalmente verticales.],
-)
-
 *Implementación técnica:* El estado de la sidebar mobile se maneja con un composable singleton (`useSidebar.js`) que expone un `ref` reactivo compartido entre la TopBar (que lo toglea) y la SideBar (que reacciona). Este patrón es consistente con otros composables de la aplicación (`useModal`, `useConfirmAction`) y evita acoplar los componentes mediante props o eventos.
+
+#nota[
+  Se tiene un detalle en el overview que en el breakpoint principal, se
+  muestra el boton de menu de la sidebar, pero siendo que nuestra 
+  implementacion se centra en el desarrollo web y la aplicacion va a 
+  requerir una implementacion mobile aparte, decidimos que sea una correcion
+  para el futuro. Es posible que haya otros posibles puntos en los que la 
+  aplicacion no se adapte perfectamente al tamaño mobile.
+]
 
 == Manejo de expiración de token JWT
 
@@ -577,8 +632,8 @@ Las adaptaciones específicas por componente fueron:
 
 *Justificación:* JavaScript no limpia automáticamente referencias a callbacks registrados con `setInterval` ni entradas en estructuras como Map. En una versión intermedia, el store de dispositivos iniciaba un intervalo para acumular consumo cada minuto pero nunca lo detenía, causando que múltiples intervalos se acumularan si el usuario navegaba entre hogares. Similar problema ocurría con el Map de deduplicación de notificaciones (`recentDeviceNotifs`) que crecía indefinidamente. La corrección incluyó:
 
--- `stopDailySampling()` que ejecuta `clearInterval()` al cambiar de hogar o cerrar sesión.
--- Limpieza cada 100 notificaciones del Map, eliminando entradas más antiguas que 2 segundos (ventana de deduplicación).
+- `stopDailySampling()` que ejecuta `clearInterval()` al cambiar de hogar o cerrar sesión.
+- Limpieza cada 100 notificaciones del Map, eliminando entradas más antiguas que 2 segundos (ventana de deduplicación).
 
 Esta decisión aplica principios de gestión de recursos: el código que crea un recurso debe ser responsable de liberarlo. Memory leaks degradan el rendimiento progresivamente y pueden causar fallos en sesiones largas, violando la expectativa de estabilidad y la estética minimalista del sistema al acumular datos innecesarios.
 
@@ -669,11 +724,11 @@ La aplicación ha sido testeada y es compatible con las últimas versiones de lo
 
 = Feedback de la primera entrega
 
-== Configuración de usuario
+== Contraste de colores y legibilidad
 
-*Feedback:* "La sección de configuración debería ser más visible. Su ubicación es poco estratégica."
+*Feedback:* "El contraste entre ciertos elementos de texto y sus fondos debería mejorarse para garantizar mejor legibilidad."
 
-*Resolución:* En la primera entrega, la sección de Configuración solo era accesible desde el fondo de la barra lateral, lo cual dificultaba su descubrimiento y acceso. A partir del feedback recibido, se decidió incorporarla también dentro del menú de usuario en la barra superior, aumentando su visibilidad y accesibilidad para todos los usuarios. Esta decisión se relaciona con la consistencia y el uso de estándares ya que ubicar la configuración dentro del menú de usuario sigue patrones de navegación ampliamente utilizados. Además, también refuerza el reconocimiento antes que el recuerdo, porque el usuario puede identificar rápidamente dónde acceder a las configuraciones sin necesidad de memorizar su ubicación.
+*Resolución:* Se mantuvo y mejoró el contraste de colores en toda la aplicación para asegurar una legibilidad óptima. La paleta de colores definida en la primera entrega ya cumplía con los estándares WCAG AA, pero durante la implementación se validó sistemáticamente que todos los pares texto-fondo mantuvieran ratios de contraste adecuados. Se prestó especial atención a elementos críticos como botones de acción, etiquetas de estado de dispositivos y mensajes de error, asegurando que la información importante sea claramente legible en todas las condiciones de uso. Esta decisión refuerza el principio de accesibilidad y garantiza que usuarios con diferentes capacidades visuales puedan interactuar efectivamente con el sistema, cumpliendo con el compromiso de diseño inclusivo establecido desde la primera entrega.
 
 == Vista isométrica del hogar
 
@@ -718,3 +773,6 @@ Si bien esta entrega cumple con los objetivos establecidos, se identifican oport
 - *Optimización de carga progresiva:* Aunque se implementó lazy loading de rutas, podría explorarse la carga progresiva de imágenes y datos en vistas con alta densidad de información.
 
 - *Análisis de consumo histórico:* Expandir la vista de consumo para incluir comparativas temporales (semana actual vs. anterior, proyecciones mensuales) agregaría valor analítico.
+
+- *Responsiveness para mobile:* Como se menciono, si bien la aplicacion deberia responder a tamaños de pantalla inferiores a los solicitados, 
+  deberian realizarse testeos y correcciones para poder afirmarlo con seguridad
