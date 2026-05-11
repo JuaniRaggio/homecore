@@ -49,20 +49,6 @@
             <span class="state-info-value">{{ deviceState.fridgeMode }}</span>
           </div>
         </div>
-        <div v-else-if="device.type === 'oven'" class="device-state-info">
-          <div class="state-info-row">
-            <span class="state-info-label">Temperatura:</span>
-            <span class="state-info-value">{{ deviceState.ovenTemp }}°C</span>
-          </div>
-          <div class="state-info-row">
-            <span class="state-info-label">Fuente:</span>
-            <span class="state-info-value">{{ deviceState.heatSource }}</span>
-          </div>
-          <div class="state-info-row">
-            <span class="state-info-label">Grill:</span>
-            <span class="state-info-value">{{ deviceState.grillMode }}</span>
-          </div>
-        </div>
         <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
@@ -743,23 +729,25 @@ onMounted(async () => {
 .device-state-info {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--spacing-md);
 }
 
 .state-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: var(--spacing-xs) 0;
 }
 
 .state-info-label {
-  font-size: var(--font-base);
-  color: var(--text-muted);
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
 }
 
 .state-info-value {
-  font-size: var(--font-base);
-  color: var(--text-primary);
+  font-size: var(--text-md);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 </style>
