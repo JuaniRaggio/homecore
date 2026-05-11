@@ -92,10 +92,6 @@ const createModal = useModal()
   margin-bottom: var(--space-4xl);
 }
 
-.items-grid--narrow {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
-
 @media (max-width: 768px) {
   .devices-filters {
     flex-direction: column;

@@ -67,7 +67,7 @@
         <router-link :to="`/casa/${homeId}/dispositivos`" class="panel-link">Ver todos</router-link>
       </div>
 
-      <div class="devices-flex">
+      <div class="items-grid items-grid--narrow">
         <DeviceCard
           v-for="device in favoriteDevices"
           :key="device.id"
@@ -401,44 +401,8 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.panel {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  min-width: 0;
-  overflow: hidden;
-}
 
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
 
-.panel-title {
-  font-size: var(--font-xl);
-  font-weight: 600;
-}
-
-.panel-link {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: var(--font-base);
-  font-weight: 500;
-}
-
-.devices-flex {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.routines-list {
-  display: flex;
-  flex-direction: column;
-}
 
 .btn-invite {
   margin-left: auto;

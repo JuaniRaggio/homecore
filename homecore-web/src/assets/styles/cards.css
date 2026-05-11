@@ -104,3 +104,38 @@
   font-size: var(--font-sm);
   color: var(--text-muted);
 }
+
+/* Panel contenedor (secciones con fondo, usada en grillas) */
+.panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.panel-title {
+  font-size: var(--font-xl);
+  font-weight: 600;
+}
+
+.panel-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: var(--font-base);
+  font-weight: 500;
+}
+
+/* Lista vertical de rutinas (dentro de paneles) */
+.routines-list {
+  display: flex;
+  flex-direction: column;
+}
