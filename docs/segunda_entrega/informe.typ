@@ -130,9 +130,9 @@ La implementación se realizó con Vue.js 3 (Composition API), Pinia para el man
 
 Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos de usuario:
 
--- *Valentina "La Power User" (27 años):* Nivel tecnológico avanzado. Busca automatizaciones complejas, control granular de dispositivos y análisis de datos.
--- *Carolina "La Gestora del Hogar" (42 años):* Nivel tecnológico intermedio. Su prioridad es la seguridad familiar y la eficiencia en la gestión del hogar.
--- *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
+- *Valentina "La Power User" (27 años):* Nivel tecnológico avanzado. Busca automatizaciones complejas, control granular de dispositivos y análisis de datos.
+- *Carolina "La Gestora del Hogar" (42 años):* Nivel tecnológico intermedio. Su prioridad es la seguridad familiar y la eficiencia en la gestión del hogar.
+- *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
 
 
 // ====================================
@@ -266,11 +266,11 @@ Al crear o editar una rutina, el usuario puede configurar los días de la semana
 
 = Requisitos no funcionales
 
--- *Tecnologías utilizadas (RNF1):* El frontend fue desarrollado con Vue.js 3 utilizando Composition API, Pinia para el estado y Vue Router. Se emplea Vite como herramienta de construcción y Socket.io para comunicación en tiempo real. Para visualización se integró Chart.js.
--- *Adaptación a resoluciones de pantalla (RNF3):* La interfaz fue optimizada para pantallas de escritorio y laptops (1280px a 1920px), asegurando un layout estable y legible en el entorno de uso principal.
--- *Separación de estructura y presentación (RNF4):* Se respeta la separación entre HTML y CSS, utilizando una arquitectura de estilos modular y scoped para evitar estilos inline y asegurar la mantenibilidad.
--- *Separación de estructura y comportamiento (RNF5):* La lógica de negocio y comportamiento se extrae de los componentes hacia servicios y stores independientes, manteniendo los templates enfocados en la estructura de la interfaz.
--- *Diseño responsivo (RNF8):* Aunque el foco principal fue el escritorio, se implementaron adaptaciones para resoluciones móviles, permitiendo una navegación fluida en distintos tamaños de pantalla.
+- *Tecnologías utilizadas (RNF1):* El frontend fue desarrollado con Vue.js 3 utilizando Composition API, Pinia para el estado y Vue Router. Se emplea Vite como herramienta de construcción y Socket.io para comunicación en tiempo real. Para visualización se integró Chart.js.
+- *Adaptación a resoluciones de pantalla (RNF3):* La interfaz fue optimizada para pantallas de escritorio y laptops (1280px a 1920px), asegurando un layout estable y legible en el entorno de uso principal.
+- *Separación de estructura y presentación (RNF4):* Se respeta la separación entre HTML y CSS, utilizando una arquitectura de estilos modular y scoped para evitar estilos inline y asegurar la mantenibilidad.
+- *Separación de estructura y comportamiento (RNF5):* La lógica de negocio y comportamiento se extrae de los componentes hacia servicios y stores independientes, manteniendo los templates enfocados en la estructura de la interfaz.
+- *Diseño responsivo (RNF8):* Aunque el foco principal fue el escritorio, se implementaron adaptaciones para resoluciones móviles, permitiendo una navegación fluida en distintos tamaños de pantalla.
 
 == Tecnologías utilizadas (RNF1)
 
@@ -412,11 +412,11 @@ En esta sección se detallan las decisiones adoptadas durante el desarrollo, fun
 
 *Justificación:* Esta arquitectura se seleccionó para resolver los desafíos de escalabilidad y mantenibilidad, basándose en los siguientes pilares técnicos:
 
--- *Sistema de Design Tokens:* El uso de variables CSS centralizadas actúa como una "única fuente de verdad" para la identidad visual. Esto asegura que cualquier cambio en la paleta de colores, tipografía o espaciado se propague instantáneamente a toda la aplicación, garantizando una consistencia visual absoluta.
--- *Aislamiento de efectos colaterales:* El uso de `<style scoped>` garantiza que las reglas CSS de un componente no "filtren" hacia el resto de la interfaz. Esto elimina los conflictos en el espacio de nombres global, permitiendo realizar ajustes locales de layout con la seguridad de no romper otras secciones de la aplicación.
--- *Separación de Responsabilidades:* Se distingue claramente entre la *identidad visual compartida* (estilos globales) y el *posicionamiento específico* (estilos locales). Mientras que los archivos globales definen qué es un botón o una tarjeta, el componente decide cómo se integra ese elemento en su propia estructura.
--- *Optimización y Performance:* Al evitar frameworks de UI pesados, el tamaño del bundle se mantiene mínimo. Vue se encarga de inyectar y retirar los estilos _scoped_ dinámicamente según el ciclo de vida de los componentes, optimizando el consumo de recursos en el navegador.
--- *Flexibilidad sin abstracciones innecesarias:* En lugar de crear componentes "wrapper" sin lógica propia (ej. un `<BaseButton>` que solo aplica una clase), se optó por composición de clases CSS. Esto reduce la profundidad del árbol de componentes y simplifica el desarrollo sin sacrificar la estandarización.
+- *Sistema de Design Tokens:* El uso de variables CSS centralizadas actúa como una "única fuente de verdad" para la identidad visual. Esto asegura que cualquier cambio en la paleta de colores, tipografía o espaciado se propague instantáneamente a toda la aplicación, garantizando una consistencia visual absoluta.
+- *Aislamiento de efectos colaterales:* El uso de `<style scoped>` garantiza que las reglas CSS de un componente no "filtren" hacia el resto de la interfaz. Esto elimina los conflictos en el espacio de nombres global, permitiendo realizar ajustes locales de layout con la seguridad de no romper otras secciones de la aplicación.
+- *Separación de Responsabilidades:* Se distingue claramente entre la *identidad visual compartida* (estilos globales) y el *posicionamiento específico* (estilos locales). Mientras que los archivos globales definen qué es un botón o una tarjeta, el componente decide cómo se integra ese elemento en su propia estructura.
+- *Optimización y Performance:* Al evitar frameworks de UI pesados, el tamaño del bundle se mantiene mínimo. Vue se encarga de inyectar y retirar los estilos _scoped_ dinámicamente según el ciclo de vida de los componentes, optimizando el consumo de recursos en el navegador.
+- *Flexibilidad sin abstracciones innecesarias:* En lugar de crear componentes "wrapper" sin lógica propia (ej. un `<BaseButton>` que solo aplica una clase), se optó por composición de clases CSS. Esto reduce la profundidad del árbol de componentes y simplifica el desarrollo sin sacrificar la estandarización.
 
 Los componentes de UI se reservaron exclusivamente para casos que requieren lógica de estado o comportamiento interactivo, como `ToggleSwitch` o `DeviceCard`.
 
