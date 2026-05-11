@@ -389,7 +389,7 @@ Cuando se usan tipos de dispositivos con estados especificos (no genericos como 
 
 # Problemas de vista para solucionar
 
-## Responsiveness - DONE (igual seguir probando)
+## Responsiveness
 
 Cuando achico la vista, los breadcrumbs colisionan con la parte de 
 notificaciones y el perfil del usuario, directamente se superponen, 
@@ -401,7 +401,7 @@ y tiene que funcionar en multiples tamaños de pantalla**
 # Problemas de requisitos funcionales
 
 _Work in progress by Maru_
-- [X] Registrar cuenta no funciona realmente ya que no verificamos como 
+- [~] Registrar cuenta no funciona realmente ya que no verificamos como 
       corresponde asique se puede considerar que esta mal
 
 > [!NOTE]
@@ -411,9 +411,10 @@ _Work in progress by Maru_
 > - Recuperar Contraseña
 > - Cambiar contraseña
 
+
 - [X] Iniciar sesion
 
-- [X] Cerrar sesion
+- [ ] Cerrar sesion
 
 - [X] Gestionar Dispositivos
 
@@ -426,11 +427,11 @@ _Work in progress by Maru_
 > que surgieron al agregar controles para poder modificar tmp, intensidad,
 > etc. a los distintos tipos de dispositivos
 
-- [X] Gestionar rutinas
+- [ ] Gestionar rutinas - _Pendiente a testear_
 
-- [X] Consultar rutinas
+- [ ] Consultar rutinas - _Pendiente a testear_
 
-- [X] Ejecutar rutinas
+- [ ] Ejecutar rutinas - _Pendiente a testear_
 
 - [X] Consultar acciones realizadas - Historial
 
