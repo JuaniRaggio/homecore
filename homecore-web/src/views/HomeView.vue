@@ -140,7 +140,7 @@ import InviteGuestModal from '@/components/common/InviteGuestModal.vue'
 import { useRoutinesStore } from '@/stores/routines'
 import { useHomesStore } from '@/stores/homes'
 import { useToastStore } from '@/stores/toast'
-import { actionError, friendlyError } from '@/utils/friendly-error'
+import { actionError } from '@/utils/friendly-error'
 import { describeAction, ACTIONS_MAP } from '@/config/routine-actions'
 import { useDeviceActions } from '@/composables/useDeviceActions'
 import { useRoutineActions } from '@/composables/useRoutineActions'
@@ -183,7 +183,7 @@ const deleteHomeConfirm = useConfirmAction()
 
 async function confirmDeleteHome() {
   await deleteHomeConfirm.confirm(async () => {
-    const roomsSnapshot = [...rooms.value]
+    const roomsSnapshot = [...roomsStore.rooms]
     for (const room of roomsSnapshot) {
       const roomDevices = devicesStore.getDevicesByRoomId(room.id)
       if (roomDevices.length) {
@@ -413,16 +413,8 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .house-inner {
-    flex-direction: column;
-  }
-
   .stats-bar {
     flex-wrap: wrap;
-  }
-
-  .house-panel {
-    min-width: unset;
   }
 }
 </style>
