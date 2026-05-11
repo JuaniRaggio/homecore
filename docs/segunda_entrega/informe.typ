@@ -2,11 +2,6 @@
 // HomeCore -- TP Gestión de Casas Inteligentes (Segunda Entrega)
 // ============================================================
 
-// ====================================
-// FUNCIONES UTILES
-// ====================================
-
-// Funcion para crear una caja de nota/observacion
 #let nota(contenido) = {
   block(
     fill: rgb("#E3F2FD"),
@@ -380,7 +375,55 @@ En esta sección se presenta la comparación entre el prototipo de alta fidelida
 
 == Notificaciones
 
-// TODO: dropdown, toasts
+El sistema de notificaciones responde al feedback de la primera entrega, donde se identificó la necesidad de mejorar la visibilidad del estado del sistema y proporcionar retroalimentación clara al usuario. Se implementaron dos tipos de notificaciones diferenciadas:
+
+=== Notificaciones de éxito (_toasts_)
+
+Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *Heurística de Nielsen #1: Visibilidad del estado del sistema*.
+
+#figure(
+  grid(columns: 3, gutter: 12pt,
+    image("hci_before_and_after/Notificaciones/Creacion-de-casa.png", width: 100%),
+    image("hci_before_and_after/Notificaciones/rutina creada.png", width: 100%),
+    image("hci_before_and_after/Notificaciones/habitacion-eliminada.png", width: 100%),
+  ),
+  caption: [Notificaciones de éxito: Confirmación de creación de casa, rutina creada, y habitación eliminada. Estas notificaciones temporales aparecen durante 3 segundos y se desvanecen automáticamente.],
+)
+
+El color verde y el mensaje conciso eliminan la incertidumbre sin requerir acciones adicionales del usuario. Este tipo de retroalimentación inmediata es fundamental para cualquier interfaz, ya que confirma que la acción se registró correctamente y el sistema respondió como se esperaba.
+
+=== Notificaciones de error
+
+Los mensajes de error proporcionan información clara sobre qué salió mal y cómo proceder, cumpliendo con la *Heurística #9: Ayudar a los usuarios a reconocer, diagnosticar y recuperarse de errores*.
+
+#figure(
+  image("hci_before_and_after/Notificaciones/codigo-seguridad-incorrecto.png", width: 60%),
+  caption: [Notificación de error: Código de seguridad incorrecto. El mensaje en rojo indica claramente el problema y permite al usuario intentar nuevamente.],
+)
+
+El mensaje claro evita frustración y guía al usuario hacia la recuperación del error, proporcionando información específica sobre qué falló sin exponer detalles sensibles del sistema.
+
+=== Confirmaciones preventivas
+
+Los diálogos de confirmación implementan la *Heurística #5: Prevención de errores*, solicitando confirmación antes de acciones destructivas.
+
+#figure(
+  image("hci_before_and_after/Notificaciones/eliminar-habitacion.png", width: 60%),
+  caption: [Modal de confirmación: Eliminar habitación. El diálogo explica las consecuencias de la acción (eliminación de dispositivos asociados) y requiere confirmación explícita antes de proceder.],
+)
+
+El diálogo explica claramente las consecuencias de la acción ("y todos sus dispositivos serán eliminados") y ofrece la opción de cancelar, previniendo errores irreversibles y dando tiempo al usuario para reconsiderar acciones destructivas.
+
+=== Notificaciones de eventos externos
+
+Las notificaciones persistentes (accesibles desde el menú superior) informan sobre eventos del sistema que ocurren independientemente de las acciones del usuario.
+
+#figure(
+  image("hci_before_and_after/Notificaciones/puerta-abierta.png", width: 60%),
+  caption: [Notificación de evento: Puerta del frente abierta. Este tipo de notificación informa sobre cambios de estado de dispositivos monitoreados, especialmente útil para eventos de seguridad.],
+)
+
+Este sistema de notificaciones diferenciadas cubre todos los escenarios de comunicación sistema-usuario, asegurando que cada tipo de mensaje tenga el tratamiento visual y temporal adecuado según su importancia y naturaleza.
 
 // ====================================
 // 6. DECISIONES DE DISEÑO E IMPLEMENTACIÓN
