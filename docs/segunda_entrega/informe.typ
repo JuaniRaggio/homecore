@@ -147,159 +147,171 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 - *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
 
 
-= Requisitos funcionales implementados
+=* 1. Requisitos funcionales y no funcionales implementados.*
 
-== Autenticación (RF1--RF6)
+== Requisitos funcionales
 
-- *Registrar cuenta (RF1):* El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación. Se implementaron validaciones en el lado del cliente para asegurar la integridad de los datos.
-- *Verificar cuenta (RF2):* Tras el registro, el sistema envía un correo de verificación al usuario para validar su dirección. El usuario debe ingresar un código de 4 dígitos en una vista dedicada para activar su cuenta.
-- *Recuperar contraseña (RF3):* El sistema implementa un flujo de recuperación de contraseña en tres pasos: ingreso de correo para recibir un código, validación del código y establecimiento de la nueva contraseña.
-- *Cambiar contraseña (RF4):* Un usuario autenticado puede actualizar su contraseña desde la sección de configuración, requiriendo la contraseña actual para validar la identidad y la nueva para el cambio.
-- *Iniciar sesión (RF5):* El sistema permite la autenticación mediante correo y contraseña. La sesión se mantiene mediante un token (JWT) que se adjunta automáticamente a las solicitudes. Se implementó un interceptor para manejar la expiración del token (error 401), redirigiendo al usuario al login con un mensaje explicativo para mantener la consistencia del estado.
-- *Cerrar sesión (RF6):* El usuario puede finalizar su sesión desde el menú de perfil. Esto elimina el token local, desconecta el WebSocket y redirige a la pantalla de inicio.
+=== RF1 — Registrar cuenta
+El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación.
+image("hci_before_and_after/login_account/registrarse.png", width: 100%)
 
- #figure(image("hci_before_and_after/login_account/registrarse.png", width: 80%), caption: [Pantalla de registro])
- #figure(image("hci_before_and_after/login_account/verificacion.png", width: 80%), caption: [Pantalla de verificación de email])
- #figure(image("hci_before_and_after/login_account/recuperarcuenta.png", width: 80%), caption: [Pantalla de recuperación de constraseña])
- #figure(image("hci_before_and_after/login_account/cambiocontra.png", width: 80%), caption: [Pantalla de cambio de contraseña])
- #figure(image("hci_before_and_after/login_account/iniciarsesion.png", width: 80%), caption: [Pantalla de login])
+=== RF2 — Verificar cuenta
+Tras el registro, el sistema envía un correo de verificación al usuario, para validar su correo.
+image("hci_before_and_after\login_account\verificacion.png", width: 100%)
 
-== Gestión de dispositivos (RF7--RF9)
+=== RF3 — Recuperar contraseña
+El sistema implementa el flujo de recuperación de contraseña. El usuario ingresa su correo y recibe un código de verificación para poder posteriormente ingresar la nueva contraseña.
+image("hci_before_and_after\login_account\recuperarcuenta.png", width: 100%)
 
-- *Gestionar dispositivos (RF7):* El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
-- *Consultar dispositivos (RF8):* El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real mediante WebSocket.
-- *Controlar dispositivos (RF9):* Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API, incluyendo lámparas (brillo, color), puertas (abrir/cerrar/bloquear), alarmas (modos ausente/en casa), aire acondicionado (temperatura, modos, ventilador), parlantes (volumen, género, reproducción), aspiradoras (modos, ubicación), heladeras y hornos.
+=== RF4 — Cambiar contraseña
+Un usuario autenticado puede cambiar su contraseña desde la sección de configuración, ingresando la contraseña actual y la nueva que desea establecer.
+image("hci_before_and_after\login_account\cambiocontra.png", width: 100%)
 
-// TODO: Agregar capturas de dispositivos, detalle, edición
+=== RF5 — Iniciar sesión
+El sistema permite al usuario autenticarse ingresando su correo electrónico y contraseña. La sesión se mantiene activa durante la navegación, adjuntando automáticamente las credenciales a todas las solicitudes al backend.
 
-// #figure(image("assets/devices-list.png", width: 100%), caption: [Vista de dispositivos])
+Los tokens de sesión (JWT) tienen una fecha de expiración. Cuando un token expira, todas las solicitudes al backend fallan con un error 401, dejando al usuario en un estado inconsistente. Para resolver este problema se implementó el siguiente flujo: al detectar una respuesta HTTP 401, el sistema limpia automáticamente el token expirado del almacenamiento local, redirige al usuario a la pantalla de inicio de sesión y muestra el mensaje "Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.", informando claramente el motivo del cierre de sesión.
+image("hci_before_and_after\login_account\iniciarsesion.png", width: 100%)
 
-== Rutinas (RF10--RF12)
+=== RF6 — Cerrar sesión
+El usuario puede cerrar su sesión desde el menú de perfil disponible en la barra superior. Al hacerlo, se elimina la sesión activa y se redirige al usuario a la pantalla de inicio de sesión.
+image("hci_before_and_after\login_account\logout.png", width: 100%)
 
-- *Gestionar rutinas (RF10):* El usuario puede crear rutinas definiendo un nombre, los días de la semana, la hora de activación y una secuencia de acciones sobre distintos dispositivos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
-- *Consultar rutinas (RF11):* El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones vinculadas.
-- *Ejecutar rutinas (RF12):* Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente. El sistema dispara en el backend todas las acciones definidas de forma coordinada.
+=== RF7 — Gestionar dispositivos
+El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
+image("hci_before_and_after\dispositivos\gestiona2.png", width: 100%)
 
-// TODO: Agregar capturas de rutinas, wizard
-// #figure(image("assets/routines.png", width: 100%), caption: [Vista de rutinas])
+=== RF8 — Consultar dispositivos
+El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real.
+image("hci_before_and_after\dispositivos\gestionar.png", width: 100%)
 
-== Historial (RF13)
+=== RF9 — Controlar dispositivos
+Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API:
 
-El sistema presenta un registro paginado de todas las acciones ejecutadas sobre los dispositivos del hogar en la vista “Historial”, incluyendo el nombre del dispositivo, la acción realizada y la marca temporal de cada evento. Los registros se obtienen de la API y se presentan ordenados cronológicamente para facilitar la auditoría.
+| Tipo               | Acciones disponibles                                                            |
+| ------------------ | ------------------------------------------------------------------------------- |
+| Lampara            | Encender/apagar, brillo (0–100%), color                                         |
+| Puerta             | Abrir/cerrar, bloquear/desbloquear                                              |
+| Alarma             | Armar (modo ausente/en casa), desarmar, cambiar código                          |
+| Canilla            | Abrir/cerrar                                                                    |
+| Persiana           | Subir/bajar, posición exacta (0–100%) con indicador visual                      |
+| Aire Acondicionado | Encender/apagar, temperatura (18–38°C), modo, velocidad del ventilador          |
+| Parlante           | Play/pausa/reanudar, siguiente/anterior, volumen, género, lista de reproducción |
+| Aspiradora         | Iniciar/pausar, volver a la base, modo (aspirar/trapear), ubicación             |
+| Heladera           | Temperatura heladera (2–8°C) y freezer (−20 a −8°C), modo de operación          |
+| Horno              | Encender/apagar, temperatura (90–230°C), fuente de calor, grill, convección     |
+| Cerradura          | Bloquear/desbloquear                                                            |
 
-// TODO: Agregar captura de historial
-// #figure(image("assets/history.png", width: 100%), caption: [Vista de historial])
 
-== Habitaciones (RF14--RF16)
+=== RF10 — Gestionar rutinas
+El usuario puede crear rutinas definiendo un nombre, los días de la semana en que deben ejecutarse, la hora de activación y una secuencia de acciones sobre distintos dispositivos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
+image("hci_before_and_after\rutinas\crear-rutina1.png", width: 100%)
+image("hci_before_and_after\rutinas\crear-rutina2.png", width: 100%)
+image("hci_before_and_after\rutinas\crear-rutina3.png", width: 100%)
+image("hci_before_and_after\rutinas\crear-rutina4.png", width: 100%)
 
-- *Gestionar habitaciones (RF14):* El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita para asegurar la consistencia del sistema.
-- *Consultar habitaciones (RF15):* El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
-- *Vincular dispositivos a habitaciones (RF16):* El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Se garantiza que cada dispositivo esté correctamente ubicado dentro de la jerarquía espacial del hogar.
+Para editar rutinas se implemento 
+image("hci_before_and_after\rutinas\editar-rutina.png", width: 100%)
+image("hci_before_and_after\rutinas\editar-rutina2.png", width: 100%)
 
-// TODO: Agregar capturas de habitaciones
-// #figure(image("assets/rooms.png", width: 100%), caption: [Vista de habitaciones])
+=== RF11 — Consultar rutinas
+El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones que ejecuta.
+image("hci_before_and_after\rutinas\gestion.png", width: 100%)
 
-== Hogares (RF17--RF19)
+=== RF12 — Ejecutar rutinas
+Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente con un solo clic en "ejecutar ahora". El sistema dispara en el backend todas las acciones definidas sobre los dispositivos correspondientes.
 
-- *Gestionar hogares (RF17):* El sistema permite crear hogares con un nombre identificatorio y dirección, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico.
-- *Consultar hogares (RF18):* El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario (propios y compartidos), junto con un resumen de métricas clave y dispositivos favoritos.
-- *Vincular habitaciones a hogares (RF19):* Las habitaciones se crean y gestionan dentro del contexto de un hogar específico, manteniendo la jerarquía estructural y de navegación en todo momento.
+=== RF13 — Consultar acciones realizadas
+El sistema presenta un registro paginado de todas las acciones ejecutadas sobre los dispositivos del hogar en la vista “Historial”, incluyendo el nombre del dispositivo, la acción realizada y la marca temporal de cada evento.
 
-// TODO: Agregar capturas de overview y nueva propiedad
-// #figure(image("assets/overview.png", width: 100%), caption: [Vista Overview])
+image("hci_before_and_after\historial\historia.png", width: 100%)
 
-== Notificaciones -- opcional (RF20)
+=== RF14 — Gestionar habitaciones
+El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita.
+image("hci_before_and_after\habitaciones\image.png", width: 100%)
 
-Se implementó un sistema de notificaciones en tiempo real utilizando Socket.io. El frontend recibe eventos del servidor sobre cambios en los dispositivos o en la configuración del hogar, los almacena y los presenta en un menú desplegable accesible desde la barra superior. El sistema notifica al usuario cuando un dispositivo cambia de estado, permitiendo un monitoreo continuo.
+=== RF15 — Consultar habitaciones
+El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
 
-Los eventos procesados son:
+image("hci_before_and_after\habitaciones\habitaciones.png", width: 100%)
 
-#table(
-  columns: (auto, 1fr),
-  align: (left, left),
-  stroke: 0.5pt,
-  inset: 8pt,
-  fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*Evento*], [*Descripción*]),
-  [`deviceCreated`], [Un dispositivo fue agregado al hogar.],
-  [`deviceUpdated`], [Un dispositivo fue modificado (nombre, tipo, habitación).],
-  [`deviceDeleted`], [Un dispositivo fue eliminado.],
-  [`deviceEvent`], [Un dispositivo cambió de estado (encendido/apagado, brillo, etc.). El cambio se refleja inmediatamente en la interfaz.],
-  [`homeShared`], [Se compartió un hogar con el usuario.],
-  [`homeUnshared`], [Se revocó el acceso a un hogar.],
-)
+=== RF16 — Vincular dispositivos a habitaciones
+El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Todos los dispositivos deben pertenecer a alguna habitación; no se permiten dispositivos sin asignar.
+image("hci_before_and_after\habitaciones\vincular.png", width: 100%)
 
-Cada notificación incluye un título, mensaje descriptivo y marca temporal. Los usuarios pueden gestionarlas marcándolas como leídas de forma individual o masiva.
+=== RF17 — Gestionar hogares
+El sistema permite crear hogares con un nombre identificatorio, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico, otorgándoles acceso a sus dispositivos y habitaciones.
+Puede realizarse desde el Inicio o agregarse Hogar desde Overview
+image("hci_before_and_after\hogar\gestionhogar.png", width: 100%)
+image("hci_before_and_after\hogar\gestionOver.png", width: 100%)
 
-== Restricción de acceso -- opcional (RF21)
+=== RF18 — Consultar hogares
+El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario, tanto propios como compartidos, junto con un resumen del estado de sus dispositivos. Desde este panel se navega al detalle de cada hogar.
 
-El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los hogares, habitaciones, dispositivos y rutinas a los que tiene acceso autorizado. Para dispositivos que requieren mayor seguridad, como alarmas o cerraduras, se implementó el uso de códigos de seguridad para autorizar acciones críticas.
+=== RF19 — Vincular habitaciones a hogares
+Las habitaciones se crean y gestionan dentro del contexto de un hogar específico, manteniendo en todo momento la jerarquía hogar → habitación → dispositivo tanto en la navegación como en la lógica del sistema.
 
-== Consumo energético -- opcional (RF22)
+=== RF20 — Enviar notificaciones
+El sistema notifica al usuario en tiempo real cuando un dispositivo cambia de estado, mostrando un mensaje emergente en pantalla.
 
-El sistema presenta gráficos de consumo eléctrico de los dispositivos del hogar, permitiendo al usuario visualizar el uso energético de forma agregada y detallada por dispositivo. Se incluyen visualizaciones dinámicas (gráficos de torta y barras) para facilitar la interpretación de los datos de consumo en tiempo real.
+=== RF21 — Restringir acceso a dispositivos, rutinas, habitaciones y hogares
+El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los hogares, habitaciones, dispositivos y rutinas a los que tiene acceso autorizado, el resto de dispositivos pueden accionarse mediante una contraseña.
+image("hci_before_and_after\Editar-dispositivo\alarma-control.png", width: 100%)
 
-== Planificar ejecución de rutinas -- opcional (RF23)
+=== RF22 — Consultar consumo eléctrico
+El sistema presenta gráficos de consumo eléctrico de los dispositivos del hogar, permitiendo al usuario visualizar el uso energético a lo largo del tiempo.
+image("hci_before_and_after\consumo\consumoactual.png", width: 100%)
 
-Al crear o editar una rutina, el usuario puede configurar los días de la semana y la hora exacta en que debe ejecutarse automáticamente. Esto permite la automatización total de tareas frecuentes sin necesidad de intervención manual periódica.
+=== RF23 — Planificar ejecución de rutinas
+Al crear o editar una rutina, el usuario puede configurar los días de la semana y la hora exacta en que debe ejecutarse automáticamente, sin necesidad de intervención manual en cada ocasión.
 
-// ====================================
-// 4. REQUISITOS NO FUNCIONALES
-// ====================================
+== Requisitos no funcionales
 
-= Requisitos no funcionales
+=== RNF1 — Tecnologías utilizadas
+El frontend de HomeCore fue desarrollado con Vue.js, utilizando la Composition API y una arquitectura basada en componentes para lograr una estructura modular. La navegación entre vistas se implementó mediante Vue Router, mientras que el manejo del estado global se realizó con Pinia.
 
-- *Tecnologías utilizadas (RNF1):* El frontend fue desarrollado con Vue.js 3 utilizando la API provista, Pinia para el estado y Vue Router. Se emplea Vite como herramienta de construcción y Socket.io para comunicación en tiempo real. Para visualización se integró Chart.js.
-- *Adaptación a resoluciones de pantalla (RNF3):* La interfaz fue optimizada para pantallas de escritorio y laptops (1280px a 1920px), asegurando un layout estable y legible en el entorno de uso principal.
-- *Separación de estructura y presentación (RNF4):* Se respeta la separación entre HTML y CSS, utilizando una arquitectura de estilos modular y scoped para evitar estilos inline y asegurar la mantenibilidad.
-- *Separación de estructura y comportamiento (RNF5):* La lógica de negocio y comportamiento se extrae de los componentes hacia servicios y stores independientes, manteniendo los templates enfocados en la estructura de la interfaz.
-- *Diseño responsivo (RNF8):* Aunque el foco principal fue el escritorio, se implementaron adaptaciones para resoluciones móviles, permitiendo una navegación fluida en distintos tamaños de pantalla.
+El proyecto emplea Vite como herramienta de construcción y desarrollo, permitiendo tiempos de compilación y recarga rápida. La comunicación en tiempo real con el servidor se resolvió mediante Socket.IO, y las solicitudes HTTP al backend se realizaron utilizando la Fetch API.
 
-== Tecnologías utilizadas (RNF1)
+Para la visualización de datos en la vista “Consumo” se integró Chart.js junto con vue-chartjs. Finalmente, la interfaz utiliza Font Awesome para los íconos y la librería p-limit para controlar la concurrencia en la carga paralela de datos.
 
-El frontend de HomeCore fue desarrollado con Vue.js, utilizando la API provista y una arquitectura basada en componentes para lograr una estructura modular. La navegación entre vistas se implementó mediante Vue Router, mientras que el manejo del estado global se realizó con Pinia. 
-El proyecto emplea Vite como herramienta de construcción y desarrollo, permitiendo tiempos de compilación y recarga rápida. La comunicación en tiempo real con el servidor se resolvió mediante Socket.IO, y las solicitudes HTTP al backend se realizaron utilizando la Fetch API. 
-Para la visualización de datos en la vista ‘Consumo’  se integró Chart.js junto con vue-chartjs. Finalmente, la interfaz utiliza Font Awesome para los íconos y la librería p-limit para controlar la concurrencia en la carga paralela de datos. 
+=== RNF2 — Compatibilidad con Navegadores
+La aplicación es compatible con los navegadores: Google Chrome, Mozilla Firefox, Microsoft Edge y Safari.
 
-== Compatibilidad con navegadores (RNF2)
-
-HomeCore es compatible con las últimas versiones de los navegadores Chromium (Google Chrome, Microsoft Edge), Firefox y Safari.
-
-== Adaptación a resoluciones de pantalla (RNF3)
-
+=== RNF3 — Adaptación a resoluciones de pantalla
 La interfaz fue diseñada y optimizada principalmente para su uso en pantallas de escritorio y laptops, priorizando una experiencia clara y estable en resoluciones de monitor estándar. El layout general, compuesto por una barra lateral de navegación y un área principal de contenido, mantiene un comportamiento adecuado para el entorno de uso previsto.
+
 Si bien la aplicación puede presentar algunas limitaciones de adaptación en resoluciones más reducidas, como tablets o dispositivos móviles, estos casos no formaron parte del foco principal de desarrollo en la presente entrega.
 
-== Separación de estructura y presentación (RNF4)
+=== RNF4 — Separación de estructura y presentación
+La aplicación respeta la separación entre la estructura del contenido y su presentación visual. Cada componente de Vue define su marcado HTML de forma independiente a los estilos que lo afectan, los cuales se declaran en bloques de CSS dedicados dentro del mismo componente o en hojas de estilo globales separadas.
 
-La aplicación respeta la separación entre la estructura del contenido y su presentación visual. Cada componente de Vue define su marcado HTML de forma independiente a los estilos que lo afectan, los cuales se declaran en bloques de CSS dedicados dentro del mismo componente o en hojas de estilo globales separadas. 
+=== RNF5 — Separación de estructura y comportamiento
+La aplicación mantiene una clara separación entre el marcado HTML y la lógica de comportamiento. En el modelo de componentes de Vue 3, cada unidad de la interfaz divide explícitamente su template (estructura), sus estilos (presentación) y su script (comportamiento) en bloques diferenciados.
 
-*Nota sobre RNF4:* Se utilizó un sistema de CSS en capas: variables globales (design tokens), archivos de estilos compartidos por categoría (botones, formularios, tarjetas, tablas, controles) y estilos scoped en cada componente Vue para reglas específicas de la vista. Esta decisión se detalla en la sección de decisiones de diseño.
+La lógica de negocio compleja —como la comunicación con el backend, el manejo del estado global y las operaciones sobre dispositivos o rutinas— se extrae de los componentes hacia capas independientes: servicios, stores y composables.
 
-== Separación de estructura y comportamiento (RNF5)
+=== RNF6 — Validación de HTML
+El HTML generado por la aplicación fue sometido al validador oficial del W3C (validator.w3.org). El análisis arrojó un resultado sin errores ni advertencias, confirmado por la respuesta del validador:
 
-La aplicación mantiene una clara separación entre el marcado HTML y la lógica de comportamiento. En el modelo de componentes de Vue 3, cada unidad de la interfaz divide explícitamente su template (estructura), sus estilos (presentación) y su script (comportamiento) en bloques diferenciados. La lógica de negocio compleja —como la comunicación con el backend, el manejo del estado global y las operaciones sobre dispositivos o rutinas— se extrae de los componentes hacia capas independientes: servicios, stores y composables. 
-Esto evita la mezcla de responsabilidades dentro de los componentes, facilitando su mantenimiento y escalabilidad. Por ejemplo, el componente `DeviceCard` se encarga únicamente de renderizar la información del dispositivo y manejar eventos de interacción, mientras que la lógica de actualización del estado global y las llamadas a la API se delegan a Pinia y a servicios específicos.
+```json
+{"version":"26.5.9","messages":[]}
+```
 
-== Validación de HTML (RNF6)
+El arreglo `messages` vacío indica que el documento HTML cumple plenamente con el estándar, sin ninguna observación por parte del validador.
 
-La aplicación fue validada utilizando el W3C Markup Validation Service, asegurando que el HTML generado cumple con los estándares web (validator.w3.org). El análisis arrojó un resultado sin errores ni advertencias, confirmado por la respuesta del validador:
+=== RNF7 — Validación de CSS
+La validación de estilos correspondiente al requerimiento RNF7 se realizó utilizando el servicio W3C CSS Validation Service, configurado con el perfil CSS Level 3. Cada hoja de estilos del proyecto fue analizada de manera individual mediante carga multipart. La aplicación organiza sus estilos en doce archivos especializados, entre ellos `variables.css`, `reset.css`, `utilities.css`, `layout.css` y `forms.css`.
 
-`{"version":"26.5.9","messages":[]}`
-
-El arreglo messages vacío indica que el documento HTML cumple plenamente con el estándar, sin ninguna observación por parte del validador.
-
-== Validación de CSS (RNF7)
-
-La validación de estilos correspondiente al requerimiento RNF7 se realizó utilizando el servicio W3C CSS Validation Service, configurado con el perfil CSS Level 3. Cada hoja de estilos del proyecto fue analizada de manera individual mediante carga multipart. La aplicación organiza sus estilos en doce archivos especializados, entre ellos variables.css, reset.css, utilities.css, layout.css y forms.css.
 Como resultado general, los doce archivos CSS del proyecto superaron la validación sin presentar errores.
-Las advertencias restantes detectadas por el validador se relacionan con limitaciones conocidas de la herramienta frente a características modernas de CSS. Por un lado, se generaron advertencias sobre expresiones var(--nombre) debido a que las CSS Custom Properties son dinámicas y su valor solo puede resolverse en tiempo de ejecución en el navegador. Por otro lado, la importación de Google Fonts mediante `@import` produjo advertencias porque el validador no analiza recursos externos cargados desde URLs.
 
-== Wave (RNF)
+Las advertencias restantes detectadas por el validador se relacionan con limitaciones conocidas de la herramienta frente a características modernas de CSS. Por un lado, se generaron advertencias sobre expresiones `var(--nombre)` debido a que las CSS Custom Properties son dinámicas y su valor solo puede resolverse en tiempo de ejecución en el navegador. Por otro lado, la importación de Google Fonts mediante `@import` produjo advertencias porque el validador no analiza recursos externos cargados desde URLs.
 
+=== RNF9 — Wave
 La validación de accesibilidad correspondiente al requerimiento RNF se realizó utilizando herramientas basadas en axe-core y criterios WCAG 2.x nivel AA. Inicialmente se detectaron problemas relacionados con la ausencia del elemento semántico `<main>`, contenido fuera de regiones accesibles y contrastes insuficientes en algunos componentes de interfaz.
+
 Las correcciones aplicadas incluyeron la incorporación de landmarks semánticos en todas las vistas de autenticación y el ajuste de colores para garantizar relaciones de contraste adecuadas según las pautas de accesibilidad.
-Como resultado final, las cuatro páginas públicas del sistema (/login, /registro, /verificar y /recuperar) superaron exitosamente la validación de accesibilidad, obteniendo un estado de “0 violations found”, sin errores ni advertencias reportadas por las herramientas de análisis.
+
+Como resultado final, las cuatro páginas públicas del sistema (`/login`, `/registro`, `/verificar` y `/recuperar`) superaron exitosamente la validación de accesibilidad, obteniendo un estado de “0 violations found”, sin errores ni advertencias reportadas por las herramientas de análisis.
 
 
 // ====================================
