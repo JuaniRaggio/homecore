@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-bg">
+  <main class="auth-bg">
     <div class="auth-container">
       <div class="auth-header">
         <div class="icon-app">
@@ -29,7 +29,7 @@
 
       <button class="btn-accent" @click="handleRegister">Crear Cuenta</button>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>

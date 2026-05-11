@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-bg">
+  <main class="auth-bg">
     <div class="auth-container">
       <div class="auth-header">
         <div class="icon-app">
@@ -41,7 +41,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup>
