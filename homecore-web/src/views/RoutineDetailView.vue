@@ -12,8 +12,10 @@
     <template v-else>
       <div class="detail-header-info">
         <div class="detail-title-row">
-          <h1 class="view-title">{{ routine.name }}</h1>
-          <div v-if="isGlobal" class="badge-global">Global</div>
+          <div class="title-with-badge">
+            <h1 class="view-title">{{ routine.name }}</h1>
+            <div v-if="isGlobal" class="badge-global">Global</div>
+          </div>
           <div class="detail-actions">
             <button class="icon-btn" @click="goToEdit" title="Editar rutina">
               <i class="fa-regular fa-pen-to-square"></i>
@@ -246,6 +248,16 @@ onMounted(async () => {
 
 .view-title { margin-bottom: var(--space-2xs); }
 
+.title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-base);
+}
+
+.title-with-badge .view-title {
+  margin-bottom: 0;
+}
+
 .routine-description {
   font-size: var(--font-base);
   color: var(--text-muted);
@@ -260,7 +272,6 @@ onMounted(async () => {
   color: #fff;
   font-size: var(--font-sm);
   font-weight: 600;
-  margin-left: var(--space-base);
 }
 
 /* Info rows inside the card */
