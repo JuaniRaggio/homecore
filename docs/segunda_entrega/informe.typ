@@ -478,13 +478,6 @@ Durante la implementación se realizaron ajustes respecto al prototipo de la pri
 
 *Justificación:* En la primera entrega se definió que "el usuario puede ver estados de alerta o rutinas favoritas sin navegar casa por casa, reduciendo drásticamente la carga de trabajo". Sin embargo, el prototipo no incluía una vista específica para esto. Por ende, para cumplir con esta premisa, se decidió implementar una vista Overview que sirva como dashboard principal previo a ingresar a un hogar. Esta vista proporciona acceso rápido a la información más relevante (como dispositivos críticos y rutinas favoritas) y un resumen de cada propiedad a lo que respecta sus dispositivos. Esto logra informar al usuario para que luego tome una decisión más directa en vez de navegar por cada hogar para obtener la misma información. De esta forma, se aplica el principio de reconocimiento sobre recuerdo (Nielsen \#6) al mostrar la información clave de forma inmediata, sin requerir navegación adicional.
 
-== Desarrollo de la vista de configuración de usuario
-
-*Decisión:* En la primera entrega, la configuración de usuario solo contenía 
-
-
-En la primera entrega, la sección de configuración solo era accesible para el perfil administrador. En la implementación se decidió hacerla accesible para todos los usuarios, aunque con restricciones en las opciones disponibles según el rol.
-
 
 
 // ====================================
