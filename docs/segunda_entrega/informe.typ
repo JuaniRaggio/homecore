@@ -126,6 +126,15 @@ Esta segunda entrega consiste en la implementación funcional del sitio web de H
 
 La implementación se realizó con Vue.js 3 (Composition API), Pinia para el manejo de estado, Vue Router para la navegación, y Socket.io para notificaciones en tiempo real. Se priorizó la fidelidad al prototipo original, adaptando únicamente lo necesario para resolver limitaciones técnicas o mejorar la experiencia a partir del feedback recibido en la primera entrega.
 
+= Modelos de Persona (Contexto)
+
+Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos de usuario:
+
+-- *Valentina "La Power User" (27 años):* Nivel tecnológico avanzado. Busca automatizaciones complejas, control granular de dispositivos y análisis de datos.
+-- *Carolina "La Gestora del Hogar" (42 años):* Nivel tecnológico intermedio. Su prioridad es la seguridad familiar y la eficiencia en la gestión del hogar.
+-- *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
+
+
 // ====================================
 // 2. STACK TECNOLÓGICO
 // ====================================
@@ -531,11 +540,35 @@ Durante la implementación se realizaron ajustes respecto al diseño original pa
 
 
 
-// ====================================
-// 8. FEEDBACK DE LA PRIMERA ENTREGA
-// = ====================================
-// 6. INSTRUCTIVO DE INSTALACIÓN
-// ====================================
+= Diseño gráfico y paleta de colores
+
+La identidad visual de HomeCore se basa en una paleta de tonos oscuros diseñada para minimizar la fatiga visual, especialmente en entornos de baja luminosidad, habituales en la gestión de hogares durante la noche. Esta elección cromática también permite que los estados activos (dispositivos encendidos, alertas, favoritos) resalten de forma efectiva mediante acentos de color.
+
+== Paleta de colores
+
+Los colores se encuentran definidos mediante variables CSS (Design Tokens) para garantizar la consistencia en todos los componentes.
+
+#table(
+  columns: (auto, auto, 1fr),
+  align: (left, left, left),
+  stroke: 0.5pt,
+  inset: 8pt,
+  fill: (x, y) => if y == 0 { gray.lighten(80%) },
+  table.header([*Color*], [*Variable*], [*Uso principal*]),
+  [#rect(fill: rgb("#0e0d13"), width: 1em, height: 1em)], [`--bg-main`], [Fondo de la aplicación],
+  [#rect(fill: rgb("#181924"), width: 1em, height: 1em)], [`--bg-sidebar`], [Barras y paneles (sidebar, topbar, tarjetas)],
+  [#rect(fill: rgb("#6f78da"), width: 1em, height: 1em)], [`--accent`], [Color de acento (acciones principales)],
+  [#rect(fill: rgb("#f6bd20"), width: 1em, height: 1em)], [`--amber`], [Alertas y avisos],
+  [#rect(fill: rgb("#f87171"), width: 1em, height: 1em)], [`--danger`], [Acciones destructivas y errores],
+  [#rect(fill: rgb("#d0d3db"), width: 1em, height: 1em)], [`--text-primary`], [Texto principal y encabezados],
+)
+
+== Justificación técnica
+
+-- *Reducción de fatiga visual:* La elección de un esquema de colores oscuros está respaldada por principios de usabilidad que indican que, en interfaces de domótica —que suelen utilizarse por la noche—, los fondos oscuros minimizan el deslumbramiento y reducen la fatiga ocular del usuario.
+-- *Jerarquía visual:* El uso del acento violeta (`--accent`) crea un contraste definido sobre el fondo oscuro, guiando la atención del usuario hacia las acciones principales (encendido de dispositivos, confirmación de rutinas) sin saturar la interfaz.
+-- *Accesibilidad:* Se aseguró una relación de contraste adecuada entre el color de fondo (`--bg-main`) y los colores de texto (`--text-primary`, `--text-secondary`), cumpliendo con los estándares mínimos de legibilidad (RNF9).
+-- *Semántica de colores:* Los colores semánticos (`--danger` para errores/eliminación, `--success` para estados activos) siguen las convenciones estándar de la industria, facilitando el reconocimiento inmediato de estados por parte de los usuarios.
 
 = Instructivo de instalación
 

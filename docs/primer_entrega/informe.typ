@@ -382,24 +382,30 @@ Se seleccionaron los siguientes atributos por ser factores que influyen directam
     dir: ttb,
     image("assets/personas/santiago.jpg", width: 4cm),
     v(0.5em),
-    align(center)[#text(style: "italic", size: 9pt)["Si puedo automatizarlo, lo haré. Si no, lo programo."]]
+    align(center)[#text(style: "italic", size: 9pt)["Automatizar para optimizar."]]
   ),
   table(
     columns: (auto, 1fr),
     align: (left, left),
     stroke: 0.5pt,
     inset: 8pt,
-    [*Nombre*], [Valentina],
+    [*Atributo*], [*Descripción*],
     [*Edad*], [27 años],
-    [*Ocupación*], [Desarrolladora de software (Backend)],
-    [*Ubicación*], [Departamento en Palermo, CABA],
-    [*Tecnologia*], [Nivel 3 (Power User)],
-    [*Dispositivos*], [12+ (Luces, Cerradura, AC, Sensores, Hub)],
+    [*Comodidad*], [Nivel 3 - Power User: automatizaciones, API, scripts],
+    [*Ubicación*], [Depto en Palermo, CABA],
+    [*Dispositivos*], [12+ (Luces, Cerradura, AC, Hub)],
   )
 )
 
-=== Bio
-Valentina vive sola y trabaja de forma remota. Su casa es su laboratorio. Disfruta optimizando cada aspecto de su vida: desde el café que se prepara solo al despertar hasta las luces que cambian de color según su calendario de reuniones. No tolera la latencia ni las apps que requieren muchos clics para tareas simples.
+=== Comportamientos esperados
+- Prioriza atajos y comandos rápidos para acciones frecuentes.
+- Explora las opciones de configuración avanzada sin dudar.
+- Utiliza datos (gráficos, logs) para tomar decisiones de uso.
+
+=== Características deseadas
+- API robusta para integraciones externas.
+- Control granular de dispositivos (valores precisos, no solo on/off).
+- Interfaz de baja latencia con respuesta visual inmediata.
 
 #grid(
   columns: (1fr, 1fr),
