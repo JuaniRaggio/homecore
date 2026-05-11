@@ -53,7 +53,15 @@ export const useDevicesStore = defineStore('devices', () => {
     }, SAMPLE_INTERVAL_MS)
   }
 
+  function stopDailySampling() {
+    if (_samplingTimer !== null) {
+      clearInterval(_samplingTimer)
+      _samplingTimer = null
+    }
+  }
+
   function clear() {
+    stopDailySampling()
     devices.value = []
   }
 
@@ -92,6 +100,7 @@ export const useDevicesStore = defineStore('devices', () => {
    * @param {string} homeId
    */
   async function fetchAllForHome(homeId) {
+    stopDailySampling()
     loading.value = true
     error.value = null
     devices.value = []
@@ -266,7 +275,7 @@ export const useDevicesStore = defineStore('devices', () => {
     favoriteDevices, activeDevices, totalConsumption, dailyConsumptionWh,
     clear, fetchAllForHome, fetchDeviceTypes, getPowerUsage, toggleDevice, toggleFavorite,
     applyDeviceEvent, addDeviceFromEvent, updateDeviceFromEvent,
-    clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice,
+    clearDeviceRoom, removeDevice, getDevicesByRoomId, updateDevice, stopDailySampling,
   }
 
 })
