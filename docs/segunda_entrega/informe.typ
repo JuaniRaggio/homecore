@@ -825,14 +825,6 @@ Esta modificación mejora la densidad de información en la pantalla y reduce la
 
 Al remover los gráficos del overview, la interfaz se vuelve más limpia y enfocada en su función principal: permitir al usuario seleccionar rápidamente el hogar con el que desea interactuar y visualizar métricas clave de un vistazo (cantidad de dispositivos, alertas, favoritos). Esta simplificación reduce el tiempo de carga inicial y mejora la jerarquía visual, guiando al usuario hacia las acciones más frecuentes sin sobrecargarlo con análisis detallados que puede consultar cuando los necesite en la sección dedicada de Consumo.
 
-// TODO: Completar con el feedback recibido del profesor/evaluador
-// y cómo se abordó en la implementación.
-// Ejemplo:
-// -- *Feedback:* "La sección de configuración debería estar visible para todos
-//    los perfiles, aunque con restricciones."
-//    *Resolución:* Se implementó la sección de Configuración accesible desde
-//    el menú de usuario en la barra superior, visible para todos los usuarios.
-
 // ====================================
 // 9. CONCLUSIÓN
 // ====================================
@@ -849,7 +841,7 @@ Las decisiones de diseño documentadas en este informe reflejan un proceso itera
 
 El feedback recibido en la primera entrega fue incorporado, evidenciando un ciclo de diseño centrado en el usuario. La reubicación de la configuración de usuario, respondiendo a observaciones sobre su baja visibilidad, ejemplifica cómo las evaluaciones empíricas informan mejoras concretas en la interfaz.
 
-Los desafíos enfrentados durante la implementación resultaron en soluciones que fortalecieron la arquitectura general del sistema. La documentación detallada de estos problemas y sus resoluciones (disponible en el historial de git) constituye un recurso valioso para futuras iteraciones y mantenimiento.
+Los desafíos enfrentados durante la implementación resultaron en soluciones que fortalecieron la arquitectura general del sistema. La documentación detallada de estos problemas y sus resoluciones (disponible en el historial de git y en el archivo de troubleshooting) constituye un recurso valioso para futuras iteraciones y mantenimiento.
 
 En términos de cumplimiento normativo, la aplicación satisface todos los requisitos no funcionales especificados: validación HTML/CSS sin errores, separación de responsabilidades estructura/presentación/comportamiento, compatibilidad con navegadores modernos, y accesibilidad básica verificada con WAVE.
 
