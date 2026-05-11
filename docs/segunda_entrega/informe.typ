@@ -135,42 +135,16 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 - *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
 
 
-// ====================================
-// 2. STACK TECNOLÓGICO
-// ====================================
-
-= Stack tecnológico
-
-#table(
-  columns: (auto, 1fr),
-  align: (left, left),
-  stroke: 0.5pt,
-  inset: 8pt,
-  fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*Tecnología*], [*Justificación*]),
-  [Vue.js 3 + Composition API], [Requerido por la cátedra (RNF1). Se eligió Composition API sobre Options API por su mayor composabilidad y reutilización de lógica entre componentes.],
-  [Pinia], [Store manager oficial de Vue 3. Reemplaza a Vuex con una API más simple y tipado nativo.],
-  [Vue Router], [Manejo de rutas con lazy loading. Permite navegación SPA sin recargas.],
-  [Vite], [Bundler con HMR instantáneo, mejorando la velocidad de desarrollo.],
-  [Socket.io Client], [Conexión en tiempo real para recibir eventos del backend y generar notificaciones.],
-  [Chart.js + vue-chartjs], [Gráficos de consumo energético (donut y barras) con renderizado reactivo.],
-  [Font Awesome], [Iconografía consistente en toda la aplicación.],
-)
-
-// ====================================
-// 3. REQUISITOS FUNCIONALES
-// ====================================
-
 = Requisitos funcionales implementados
 
 == Autenticación (RF1--RF6)
 
--- *Registrar cuenta (RF1):* El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación. Se implementaron validaciones en el lado del cliente para asegurar la integridad de los datos.
--- *Verificar cuenta (RF2):* Tras el registro, el sistema envía un correo de verificación al usuario para validar su dirección. El usuario debe ingresar un código de 4 dígitos en una vista dedicada para activar su cuenta.
--- *Recuperar contraseña (RF3):* El sistema implementa un flujo de recuperación de contraseña en tres pasos: ingreso de correo para recibir un código, validación del código y establecimiento de la nueva contraseña.
--- *Cambiar contraseña (RF4):* Un usuario autenticado puede actualizar su contraseña desde la sección de configuración, requiriendo la contraseña actual para validar la identidad y la nueva para el cambio.
--- *Iniciar sesión (RF5):* El sistema permite la autenticación mediante correo y contraseña. La sesión se mantiene mediante un token (JWT) que se adjunta automáticamente a las solicitudes. Se implementó un interceptor para manejar la expiración del token (error 401), redirigiendo al usuario al login con un mensaje explicativo para mantener la consistencia del estado.
--- *Cerrar sesión (RF6):* El usuario puede finalizar su sesión desde el menú de perfil. Esto elimina el token local, desconecta el WebSocket y redirige a la pantalla de inicio.
+- *Registrar cuenta (RF1):* El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación. Se implementaron validaciones en el lado del cliente para asegurar la integridad de los datos.
+- *Verificar cuenta (RF2):* Tras el registro, el sistema envía un correo de verificación al usuario para validar su dirección. El usuario debe ingresar un código de 4 dígitos en una vista dedicada para activar su cuenta.
+- *Recuperar contraseña (RF3):* El sistema implementa un flujo de recuperación de contraseña en tres pasos: ingreso de correo para recibir un código, validación del código y establecimiento de la nueva contraseña.
+- *Cambiar contraseña (RF4):* Un usuario autenticado puede actualizar su contraseña desde la sección de configuración, requiriendo la contraseña actual para validar la identidad y la nueva para el cambio.
+- *Iniciar sesión (RF5):* El sistema permite la autenticación mediante correo y contraseña. La sesión se mantiene mediante un token (JWT) que se adjunta automáticamente a las solicitudes. Se implementó un interceptor para manejar la expiración del token (error 401), redirigiendo al usuario al login con un mensaje explicativo para mantener la consistencia del estado.
+- *Cerrar sesión (RF6):* El usuario puede finalizar su sesión desde el menú de perfil. Esto elimina el token local, desconecta el WebSocket y redirige a la pantalla de inicio.
 
 // TODO: Agregar capturas de login, registro, verificación y recuperación
  #figure(image("hci_before_and_after/login_account/registrarse.png", width: 80%), caption: [Pantalla de registro])
@@ -181,9 +155,9 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 
 == Gestión de dispositivos (RF7--RF9)
 
--- *Gestionar dispositivos (RF7):* El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
--- *Consultar dispositivos (RF8):* El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real mediante WebSocket.
--- *Controlar dispositivos (RF9):* Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API, incluyendo lámparas (brillo, color), puertas (abrir/cerrar/bloquear), alarmas (modos ausente/en casa), aire acondicionado (temperatura, modos, ventilador), parlantes (volumen, género, reproducción), aspiradoras (modos, ubicación), heladeras y hornos.
+- *Gestionar dispositivos (RF7):* El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
+- *Consultar dispositivos (RF8):* El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real mediante WebSocket.
+- *Controlar dispositivos (RF9):* Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API, incluyendo lámparas (brillo, color), puertas (abrir/cerrar/bloquear), alarmas (modos ausente/en casa), aire acondicionado (temperatura, modos, ventilador), parlantes (volumen, género, reproducción), aspiradoras (modos, ubicación), heladeras y hornos.
 
 // TODO: Agregar capturas de dispositivos, detalle, edición
 
@@ -191,9 +165,9 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 
 == Rutinas (RF10--RF12)
 
--- *Gestionar rutinas (RF10):* El usuario puede crear rutinas definiendo un nombre, los días de la semana, la hora de activación y una secuencia de acciones sobre distintos dispositivos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
--- *Consultar rutinas (RF11):* El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones vinculadas.
--- *Ejecutar rutinas (RF12):* Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente. El sistema dispara en el backend todas las acciones definidas de forma coordinada.
+- *Gestionar rutinas (RF10):* El usuario puede crear rutinas definiendo un nombre, los días de la semana, la hora de activación y una secuencia de acciones sobre distintos dispositivos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
+- *Consultar rutinas (RF11):* El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones vinculadas.
+- *Ejecutar rutinas (RF12):* Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente. El sistema dispara en el backend todas las acciones definidas de forma coordinada.
 
 // TODO: Agregar capturas de rutinas, wizard
 // #figure(image("assets/routines.png", width: 100%), caption: [Vista de rutinas])
@@ -207,18 +181,18 @@ El sistema presenta un registro paginado de todas las acciones ejecutadas sobre 
 
 == Habitaciones (RF14--RF16)
 
--- *Gestionar habitaciones (RF14):* El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita para asegurar la consistencia del sistema.
--- *Consultar habitaciones (RF15):* El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
--- *Vincular dispositivos a habitaciones (RF16):* El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Se garantiza que cada dispositivo esté correctamente ubicado dentro de la jerarquía espacial del hogar.
+- *Gestionar habitaciones (RF14):* El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita para asegurar la consistencia del sistema.
+- *Consultar habitaciones (RF15):* El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
+- *Vincular dispositivos a habitaciones (RF16):* El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Se garantiza que cada dispositivo esté correctamente ubicado dentro de la jerarquía espacial del hogar.
 
 // TODO: Agregar capturas de habitaciones
 // #figure(image("assets/rooms.png", width: 100%), caption: [Vista de habitaciones])
 
 == Hogares (RF17--RF19)
 
--- *Gestionar hogares (RF17):* El sistema permite crear hogares con un nombre identificatorio y dirección, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico.
--- *Consultar hogares (RF18):* El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario (propios y compartidos), junto con un resumen de métricas clave y dispositivos favoritos.
--- *Vincular habitaciones a hogares (RF19):* Las habitaciones se crean y gestionan dentro del contexto de un hogar específico, manteniendo la jerarquía estructural y de navegación en todo momento.
+- *Gestionar hogares (RF17):* El sistema permite crear hogares con un nombre identificatorio y dirección, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico.
+- *Consultar hogares (RF18):* El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario (propios y compartidos), junto con un resumen de métricas clave y dispositivos favoritos.
+- *Vincular habitaciones a hogares (RF19):* Las habitaciones se crean y gestionan dentro del contexto de un hogar específico, manteniendo la jerarquía estructural y de navegación en todo momento.
 
 // TODO: Agregar capturas de overview y nueva propiedad
 // #figure(image("assets/overview.png", width: 100%), caption: [Vista Overview])
