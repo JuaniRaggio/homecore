@@ -26,7 +26,7 @@
 
     <div class="detail-body">
       <div class="card card--xl status-card">
-        <div class="status-row">
+        <div v-if="device.type !== 'fridge'" class="status-row">
           <span class="status-label">Estado</span>
           <span class="status-value" :class="device.isOn ? 'status--on' : 'status--off'">
             {{ statusLabel }}
