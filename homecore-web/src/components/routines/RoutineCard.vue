@@ -162,6 +162,8 @@ defineEmits(['execute', 'toggle-favorite', 'toggle-active', 'open'])
   align-items: center;
   gap: 10px;
   margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
 }
 
 </style>

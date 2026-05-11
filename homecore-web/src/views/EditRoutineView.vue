@@ -286,8 +286,8 @@ async function handleSave() {
       time: form.time,
       days: form.days,
       metadata: isGlobal.value
-        ? { crossHome: true, time: form.time, days: form.days }
-        : { homeId: route.params.homeId, time: form.time, days: form.days },
+        ? { crossHome: true, description: form.description.trim(), time: form.time, days: form.days }
+        : { homeId: route.params.homeId, description: form.description.trim(), time: form.time, days: form.days },
     }
 
     await routinesStore.update(route.params.routineId, payload)

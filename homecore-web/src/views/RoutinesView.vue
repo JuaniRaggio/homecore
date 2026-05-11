@@ -60,8 +60,11 @@ async function handleToggleFavorite(id) {
 
 async function handleToggleActive(id) {
   try {
+    const routine = routinesStore.getById(id)
+    const newActive = !routine?.isActive
     await routinesStore.update(id, {
-      isActive: !routinesStore.getById(id)?.isActive
+      isActive: newActive,
+      metadata: { ...(routine?.metadata || {}), active: newActive },
     })
   } catch (e) {
     console.error(`[Routines] Error cambiando estado de rutina ${id}:`, e)

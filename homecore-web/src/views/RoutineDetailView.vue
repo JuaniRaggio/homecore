@@ -183,8 +183,12 @@ function goToEdit() {
 
 async function handleToggleActive() {
   try {
-    await routinesStore.update(routine.value.id, { isActive: !routine.value.isActive })
-    routine.value.isActive = !routine.value.isActive
+    const newActive = !routine.value.isActive
+    await routinesStore.update(routine.value.id, {
+      isActive: newActive,
+      metadata: { ...(routine.value.metadata || {}), active: newActive },
+    })
+    routine.value.isActive = newActive
   } catch (e) {
     console.error(`[RoutineDetail] Error cambiando estado:`, e)
     toast.show(e.message || actionError('cambiar el estado de la rutina'), 'error')
