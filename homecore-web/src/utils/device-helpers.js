@@ -57,8 +57,8 @@ const TYPE_PATTERNS = [
   { key: 'ac',      patterns: ['ac', 'air', 'acondicionado'] },
   { key: 'speaker', patterns: ['speaker', 'parlante'] },
   { key: 'vacuum',  patterns: ['vacuum', 'aspiradora'] },
-  { key: 'fridge',  patterns: ['fridge', 'heladera', 'refrigerador'] },
-  { key: 'oven',    patterns: ['oven', 'horno'] },
+  { key: 'fridge',  patterns: ['fridge', 'heladera', 'refrigerador', 'refrigerator', 'freezer'] },
+  { key: 'oven',    patterns: ['oven', 'horno', 'stove'] },
 ]
 
 /**

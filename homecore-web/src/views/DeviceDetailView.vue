@@ -35,6 +35,26 @@
         <span v-if="device.type === 'alarm'" class="badge" :class="device.isOn ? 'badge--active' : 'badge--danger'">
           {{ statusLabel }}
         </span>
+        <div v-else-if="device.type === 'fridge'" class="device-state-info">
+          <div class="state-info-row">
+            <span class="state-info-label">Temperatura:</span>
+            <span class="state-info-value">{{ deviceState.fridgeTemp }}°C</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Freezer:</span>
+            <span class="state-info-value">{{ deviceState.freezerTemp }}°C</span>
+          </div>
+          <div class="state-info-row">
+            <span class="state-info-label">Modo:</span>
+            <span class="state-info-value">{{ deviceState.fridgeMode }}</span>
+          </div>
+        </div>
+        <div v-else-if="device.type === 'oven'" class="device-state-info">
+          <div class="state-info-row">
+            <span class="state-info-label">Temperatura:</span>
+            <span class="state-info-value">{{ deviceState.ovenTemp }}°C</span>
+          </div>
+        </div>
         <ToggleSwitch v-else :model-value="device.isOn" :disabled="cmd.busy.value" @update:model-value="togglePower" />
       </div>
 
@@ -134,16 +154,10 @@
         <OvenControls
           v-else-if="device.type === 'oven'"
           :temperature="deviceState.ovenTemp"
-          :heat-source="deviceState.heatSource"
-          :grill-mode="deviceState.grillMode"
-          :convection-mode="deviceState.convectionMode"
           :disabled="cmd.busy.value"
           :limits="ovenLimits"
           @update:temperature="v => deviceState.ovenTemp = v"
           @change:temperature="setOvenTemperature"
-          @update:heat-source="setOvenHeatSource"
-          @update:grill-mode="setOvenGrillMode"
-          @update:convection-mode="setOvenConvectionMode"
         />
         <p v-else class="no-controls">Este dispositivo solo tiene encendido/apagado.</p>
       </div>
@@ -217,7 +231,7 @@ const deviceState = reactive({
   volume: 5, genre: 'pop', playlist: [], currentSong: null,
   vacuumMode: 'aspirar', vacuumLocation: null,
   fridgeTemp: 5, freezerTemp: -18, fridgeMode: 'normal',
-  ovenTemp: 180, heatSource: 'convencional', grillMode: 'apagado', convectionMode: 'apagado',
+  ovenTemp: 180,
 })
 
 // Loading state for delete
@@ -640,6 +654,9 @@ onMounted(async () => {
     if (!devicesStore.deviceTypes.length) await devicesStore.fetchDeviceTypes()
     const raw = await api.getDevice(deviceId)
     device.value = normalizeDevice(raw, undefined, undefined, devicesStore.deviceTypes)
+    console.log('[DeviceDetail] Raw device type:', raw.type?.name || raw.type)
+    console.log('[DeviceDetail] Normalized device.type:', device.value.type)
+    console.log('[DeviceDetail] TypeId:', device.value.typeId)
     await loadDeviceState(deviceId)
     if (device.value.typeId) {
       deviceLimits.fetchLimits(device.value.typeId)
@@ -709,5 +726,29 @@ onMounted(async () => {
 .no-controls {
   font-size: var(--font-base);
   color: var(--text-muted);
+}
+
+/* Device state info (para fridge, oven, etc.) */
+.device-state-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.state-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.state-info-label {
+  font-size: var(--font-base);
+  color: var(--text-muted);
+}
+
+.state-info-value {
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  font-weight: 600;
 }
 </style>
