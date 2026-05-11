@@ -328,15 +328,6 @@ En esta sección se presenta la comparación entre el prototipo de alta fidelida
   caption: [Historial: prototipo (izq.) vs. implementación (der.)],
 )
 
-== Consumo energético
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/consumo/cold.png", width: 100%),
-    image("hci_before_and_after/consumo/cnew.png", width: 100%),
-  ),
-  caption: [Métricas de consumo: prototipo (izq.) vs. implementación (der.)],
-)
-
 == Configuración de usuario
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -735,6 +726,22 @@ La aplicación ha sido testeada y es compatible con las últimas versiones de lo
 )
 
 Este enfoque mejora la velocidad de carga de la vista principal, reduce la complejidad del código y mantiene el foco en la funcionalidad real del sistema: el control y monitoreo de dispositivos. La eliminación de este elemento decorativo refuerza el principio de diseño minimalista, donde cada componente de la interfaz debe cumplir un propósito claro en la experiencia del usuario.
+
+== Tamaño de gráficos de consumo energético
+
+*Feedback:* "Los gráficos de consumo energético ocupan demasiado espacio visual y deberían reducirse para mejorar la densidad de información."
+
+*Resolución:* Siguiendo la recomendación de la cátedra, se ajustó el tamaño de los gráficos de consumo energético para optimizar el uso del espacio disponible. Los gráficos de torta y barras se redimensionaron manteniendo su legibilidad pero permitiendo que más información sea visible sin necesidad de desplazamiento vertical excesivo.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/consumo/cold.png", width: 100%),
+    image("hci_before_and_after/consumo/cnew.png", width: 100%),
+  ),
+  caption: [Visualización de consumo energético: prototipo con gráficos de gran tamaño (izq.) vs. implementación con gráficos optimizados (der.). La reducción de escala permite visualizar múltiples métricas simultáneamente sin comprometer la legibilidad.],
+)
+
+Esta modificación mejora la densidad de información en la pantalla y reduce la necesidad de scroll, facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo. El ajuste mantiene todos los elementos críticos del gráfico (etiquetas, valores, leyendas) completamente legibles mientras aprovecha mejor el espacio disponible.
 
 // TODO: Completar con el feedback recibido del profesor/evaluador
 // y cómo se abordó en la implementación.
