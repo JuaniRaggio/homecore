@@ -293,9 +293,9 @@ const fridgeLimits = computed(() => ({
 
 const ovenLimits = computed(() => ({
   temperature: deviceLimits.getNumericLimits(device.value.type, 'setTemperature'),
-  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeatSource'),
-  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrillMode'),
-  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvectionMode'),
+  heatSourceOptions: deviceLimits.getSelectOptions(device.value.type, 'setHeat'),
+  grillOptions: deviceLimits.getSelectOptions(device.value.type, 'setGrill'),
+  convectionOptions: deviceLimits.getSelectOptions(device.value.type, 'setConvection'),
 }))
 
 function goToEdit() {
@@ -591,27 +591,27 @@ async function setOvenTemperature(value) {
 
 async function setOvenHeatSource(value) {
   deviceState.heatSource = value
-  await cmd.execute(device.value.id, 'setHeatSource', {
+  await cmd.execute(device.value.id, 'setHeat', {
     params: [value],
-    successMsg: describeAction(device.value.type, 'setHeatSource', [value]),
+    successMsg: describeAction(device.value.type, 'setHeat', [value]),
     errorMsg: actionError('cambiar la fuente de calor'),
   })
 }
 
 async function setOvenGrillMode(value) {
   deviceState.grillMode = value
-  await cmd.execute(device.value.id, 'setGrillMode', {
+  await cmd.execute(device.value.id, 'setGrill', {
     params: [value],
-    successMsg: describeAction(device.value.type, 'setGrillMode', [value]),
+    successMsg: describeAction(device.value.type, 'setGrill', [value]),
     errorMsg: actionError('cambiar el modo grill'),
   })
 }
 
 async function setOvenConvectionMode(value) {
   deviceState.convectionMode = value
-  await cmd.execute(device.value.id, 'setConvectionMode', {
+  await cmd.execute(device.value.id, 'setConvection', {
     params: [value],
-    successMsg: describeAction(device.value.type, 'setConvectionMode', [value]),
+    successMsg: describeAction(device.value.type, 'setConvection', [value]),
     errorMsg: actionError('cambiar el modo convección'),
   })
 }
@@ -668,9 +668,6 @@ onMounted(async () => {
     if (!devicesStore.deviceTypes.length) await devicesStore.fetchDeviceTypes()
     const raw = await api.getDevice(deviceId)
     device.value = normalizeDevice(raw, undefined, undefined, devicesStore.deviceTypes)
-    console.log('[DeviceDetail] Raw device type:', raw.type?.name || raw.type)
-    console.log('[DeviceDetail] Normalized device.type:', device.value.type)
-    console.log('[DeviceDetail] TypeId:', device.value.typeId)
     await loadDeviceState(deviceId)
     if (device.value.typeId) {
       deviceLimits.fetchLimits(device.value.typeId)

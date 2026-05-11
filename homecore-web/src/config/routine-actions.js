@@ -64,9 +64,9 @@ export const ACTIONS_MAP = {
     { actionName: 'turnOn',          label: 'Encender',         params: [] },
     { actionName: 'turnOff',         label: 'Apagar',           params: [] },
     { actionName: 'setTemperature',  label: 'Temperatura',      params: [{ type: 'number', min: 90, max: 230, step: 10, placeholder: '90-230 C' }] },
-    { actionName: 'setHeatSource',   label: 'Fuente de calor',  params: [{ type: 'select', options: ['convencional', 'abajo', 'arriba'] }] },
-    { actionName: 'setGrillMode',    label: 'Modo grill',       params: [{ type: 'select', options: ['apagado', 'economico', 'completo'] }] },
-    { actionName: 'setConvectionMode', label: 'Modo convección',params: [{ type: 'select', options: ['apagado', 'economico', 'convencional'] }] },
+    { actionName: 'setHeat',         label: 'Fuente de calor',  params: [{ type: 'select', options: ['convencional', 'abajo', 'arriba'] }] },
+    { actionName: 'setGrill',        label: 'Modo grill',       params: [{ type: 'select', options: ['apagado', 'economico', 'completo'] }] },
+    { actionName: 'setConvection',   label: 'Modo convección',  params: [{ type: 'select', options: ['apagado', 'economico', 'convencional'] }] },
   ],
 }
 
