@@ -266,54 +266,70 @@ Al crear o editar una rutina, el usuario puede configurar los días de la semana
 
 = Capturas de pantalla
 
-// En esta sección se comparan las pantallas del prototipo de alta fidelidad
-// (primera entrega) con la implementación final.
+En esta sección se presenta la comparación entre el prototipo de alta fidelidad (primera entrega) y la implementación funcional definitiva, destacando la evolución estética y técnica del sistema.
 
-// TODO: Para cada vista, agregar:
-// 1. Captura del prototipo (de la primera entrega)
-// 2. Captura de la implementación
-// Ejemplo:
-//
-// == Login
-// #figure(
-//   grid(columns: 2, gutter: 12pt,
-//     image("assets/proto-login.png", width: 100%),
-//     image("assets/impl-login.png", width: 100%),
-//   ),
-//   caption: [Login: prototipo (izq.) vs. implementación (der.)],
-// )
+== Resumen Global (Global Overview)
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/global overview/goold.png", width: 100%),
+    image("hci_before_and_after/global overview/gonew.png", width: 100%),
+  ),
+  caption: [Global Overview: prototipo (izq.) vs. implementación (der.)],
+)
 
-== Autenticación
-
-// TODO: login, registro, verificación, recuperación
-
-== Overview
-
-// TODO: vista principal con resumen del hogar
-
-== Dispositivos
-
-// TODO: lista, detalle, edición
+== Resumen del Hogar (Home Overview)
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/overview/oold.png", width: 100%),
+    image("hci_before_and_after/overview/onew.png", width: 100%),
+  ),
+  caption: [Home Overview: prototipo (izq.) vs. implementación (der.)],
+)
 
 == Habitaciones
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/habitaciones/haold.png", width: 100%),
+    image("hci_before_and_after/habitaciones/hanew.png", width: 100%),
+  ),
+  caption: [Gestión de habitaciones: prototipo (izq.) vs. implementación (der.)],
+)
 
-// TODO: vista de habitaciones con dispositivos vinculados
+== Historial de acciones
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/historial/hold.png", width: 100%),
+    image("hci_before_and_after/historial/hnew.png", width: 100%),
+  ),
+  caption: [Historial: prototipo (izq.) vs. implementación (der.)],
+)
 
-== Rutinas
+== Consumo energético
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/consumo/cold.png", width: 100%),
+    image("hci_before_and_after/consumo/cnew.png", width: 100%),
+  ),
+  caption: [Métricas de consumo: prototipo (izq.) vs. implementación (der.)],
+)
 
-// TODO: lista, wizard de creación
+== Configuración de usuario
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/config/coold.png", width: 100%),
+    image("hci_before_and_after/config/conew.png", width: 100%),
+  ),
+  caption: [Ajustes de perfil: prototipo (izq.) vs. implementación (der.)],
+)
 
-== Historial
-
-// TODO: tabla con filtros
-
-== Consumo
-
-// TODO: gráficos y tabla
-
-== Configuración
-
-// TODO: perfil y cambio de contraseña
+== Evolución de controles de dispositivos (Cortinas)
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/boton de la cortina/bold.png", width: 100%),
+    image("hci_before_and_after/boton de la cortina/bnew.png", width: 100%),
+  ),
+  caption: [Control de cortinas: El interruptor binario del prototipo evolucionó hacia un panel de acciones contextuales más intuitivo para estados intermedios.],
+)
 
 == Notificaciones
 
@@ -505,7 +521,7 @@ Durante la implementación se realizaron ajustes respecto al diseño original pa
 
 *Decisión:* Se reemplazaron algunos selectores binarios (on/off) por paneles de acciones contextuales para dispositivos con múltiples estados.
 
-*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la correspondencia con el mundo real (Heurística \#2) y hace la interacción más intuitiva. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real.
+*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la correspondencia con el mundo real y hace la interacción más intuitiva. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real. Esto se evidencia en la comparación del control de cortinas presentada en la sección de capturas.
 
 == Introducción de la vista de Resumen Global (Overview)
 
