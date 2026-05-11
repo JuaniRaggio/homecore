@@ -454,11 +454,11 @@ Las adaptaciones específicas por componente fueron:
 
 Durante la implementación se realizaron ajustes respecto al prototipo de la primera entrega. Los cambios más significativos son:
 
-== Cambios en el Overview
+== Cambios en el Overview del hogar
 
-*Decisión:* Se reemplazó el mapa visual de la casa por tarjetas de resumen con métricas clave.
+*Decisión:* Se reemplazó el mapa visual de la casa por tarjetas de resumen con métricas clave y una vista más simple del hogar.
 
-*Justificación:* El prototipo original incluía un plano isométrico de la casa con habitaciones y dispositivos ubicados espacialmente. Sin embargo, la API provista no ofrece datos de ubicación ni dimensiones de los dispositivos, lo que imposibilitaba generar un mapa visual preciso. En su lugar, se optó por mostrar tarjetas de resumen que destacan los dispositivos favoritos, los dispositivos activos y rutinas recientes, manteniendo la función principal del Overview como punto de entrada rápido a la información más relevante.
+*Justificación:* El prototipo original incluía un plano isométrico más avanzado de la casa con habitaciones y dispositivos ubicados espacialmente. Sin embargo, la API provista no ofrece datos de ubicación ni dimensiones de los dispositivos, lo que imposibilitaba generar un mapa visual preciso. En su lugar, se priorizó mostrar tarjetas de resumen que destacan los dispositivos favoritos, los dispositivos activos y rutinas recientes, manteniendo la función principal del Overview del hogar como punto de entrada rápido a la información más relevante.
 
 == Eliminación de perfiles de usuario
 
@@ -470,7 +470,21 @@ Durante la implementación se realizaron ajustes respecto al prototipo de la pri
 
 *Decisión:* Se cambiaron los controles de dispositivos como el parlante y la cortina. Anteriormente se tenía un toggle button para encender/apagar. En la implementación se optó por un panel de acciones contextuales compuesto por múltiples botones independientes.
 
-*Justificación:* En el prototipo, dispositivos como el parlante o la cortina tenían un toggle button que alternaba entre encendido y apagado. Sin embargo, durante la implementación se identificó que estos dispositivos tienen acciones discretas (por ejemplo, una cortina puede estar abierta, cerrada o en posición intermedia) que no se adaptan bien a un toggle binario. Por lo tanto, se diseñó un panel de acciones contextuales con botones independientes para cada acción relevante (subir, bajar para la cortina; reproducir, pausar, siguiente para el parlante), lo que mejora la correspondencia con las funcionalidades reales de los dispositivos y reduce la confusión del usuario. El diseño de cada control refleja el modelo de interacción familiar para dispositivos multimedia y automatización del hogar.
+*Justificación:* En el prototipo, dispositivos como el parlante o la cortina tenían un toggle button que alternaba entre encendido y apagado. Sin embargo, durante la implementación se identificó que estos dispositivos tienen acciones discretas (por ejemplo, una cortina puede estar abierta, cerrada o en posición intermedia) que no se adaptan bien a un toggle binario. Haciendo que el manejo del dispositivo sea muy poco intuitivo. Por lo tanto, se diseñó un panel de acciones contextuales con botones independientes para cada acción relevante (subir, bajar para la cortina; reproducir, pausar, siguiente para el parlante), lo que mejora la correspondencia con las funcionalidades reales de los dispositivos y reduce la confusión del usuario. El diseño actual de cada control refleja el modelo de interacción familiar para dispositivos multimedia y automatización del hogar, reenforzando la coherencia entre el sistema y el mundo real (Nielsen \#2).
+
+== Incorporación de una vista Overview como pantalla principal al ingresar a la página web
+
+*Decisión:* Se agregó una vista Overview que se muestra al ingresar a la página web. Ésta muestra un resumen global del sistema , mostrando todas las propiedades registradas, métricas principales de cada una, dispositivos críticos y rutinas globales favoritas.
+
+*Justificación:* En la primera entrega se definió que "el usuario puede ver estados de alerta o rutinas favoritas sin navegar casa por casa, reduciendo drásticamente la carga de trabajo". Sin embargo, el prototipo no incluía una vista específica para esto. Por ende, para cumplir con esta premisa, se decidió implementar una vista Overview que sirva como dashboard principal previo a ingresar a un hogar. Esta vista proporciona acceso rápido a la información más relevante (como dispositivos críticos y rutinas favoritas) y un resumen de cada propiedad a lo que respecta sus dispositivos. Esto logra informar al usuario para que luego tome una decisión más directa en vez de navegar por cada hogar para obtener la misma información. De esta forma, se aplica el principio de reconocimiento sobre recuerdo (Nielsen \#6) al mostrar la información clave de forma inmediata, sin requerir navegación adicional.
+
+== Desarrollo de la vista de configuración de usuario
+
+*Decisión:* En la primera entrega, la configuración de usuario solo contenía 
+
+
+En la primera entrega, la sección de configuración solo era accesible para el perfil administrador. En la implementación se decidió hacerla accesible para todos los usuarios, aunque con restricciones en las opciones disponibles según el rol.
+
 
 
 // ====================================
@@ -478,6 +492,13 @@ Durante la implementación se realizaron ajustes respecto al prototipo de la pri
 // ====================================
 
 = Feedback de la primera entrega
+
+== Configuración de usuario
+
+*Feedback:* "La sección de configuración debería ser más visible. Su ubicación es poco estratégica."
+
+*Resolución:* En la primera entrega, la sección de Configuración solo era accesible desde el fondo de la barra lateral, lo cual dificultaba su descubrimiento y acceso. A partir del feedback recibido, se decidió incorporarla también dentro del menú de usuario en la barra superior, aumentando su visibilidad y accesibilidad para todos los usuarios. Esta decisión se relaciona con la heurística de "Consistencia y estándares" (Nielsen \#4) ya que ubicar la configuración dentro del menú de usuario sigue patrones de navegación ampliamente utilizados en aplicaciones modernas, haciendo que la interfaz resulte más familiar e intuitiva. Además, también refuerza la heurística "Reconocimiento antes que recuerdo"(Nielsen \#6), porque el usuario puede identificar rápidamente dónde acceder a las configuraciones sin necesidad de recordar su ubicación específica dentro de la barra lateral.
+
 
 // TODO: Completar con el feedback recibido del profesor/evaluador
 // y cómo se abordó en la implementación.
