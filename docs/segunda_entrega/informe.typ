@@ -156,65 +156,64 @@ La implementación se realizó con Vue.js 3 (Composition API), Pinia para el man
 
 == Autenticación (RF1--RF6)
 
-Se implementaron los flujos completos de registro, verificación por email, recuperación de contraseña, cambio de contraseña, login y logout.
-
--- *Registro (RF1):* Formulario con nombre, email y contraseña con validación client-side. Al registrarse, se redirige a la pantalla de verificación.
--- *Verificación de email (RF2):* Vista dedicada donde el usuario ingresa el código de 4 dígitos recibido por email. Se implementó reenvío de código.
--- *Recuperación de contraseña (RF3):* Flujo de 3 pasos: ingreso de email, código de verificación y nueva contraseña.
--- *Cambio de contraseña (RF4):* Disponible en la vista de Configuración. Requiere contraseña actual y confirmación de la nueva.
--- *Login/Logout (RF5, RF6):* Login con email y contraseña, persistencia de sesión con token en localStorage. Logout desconecta el WebSocket y limpia el estado.
+-- *Registrar cuenta (RF1):* El sistema permite crear una cuenta nueva ingresando nombre, correo electrónico y contraseña. Al registrarse exitosamente, el usuario es redirigido al flujo de verificación. Se implementaron validaciones en el lado del cliente para asegurar la integridad de los datos.
+-- *Verificar cuenta (RF2):* Tras el registro, el sistema envía un correo de verificación al usuario para validar su dirección. El usuario debe ingresar un código de 4 dígitos en una vista dedicada para activar su cuenta.
+-- *Recuperar contraseña (RF3):* El sistema implementa un flujo de recuperación de contraseña en tres pasos: ingreso de correo para recibir un código, validación del código y establecimiento de la nueva contraseña.
+-- *Cambiar contraseña (RF4):* Un usuario autenticado puede actualizar su contraseña desde la sección de configuración, requiriendo la contraseña actual para validar la identidad y la nueva para el cambio.
+-- *Iniciar sesión (RF5):* El sistema permite la autenticación mediante correo y contraseña. La sesión se mantiene mediante un token (JWT) que se adjunta automáticamente a las solicitudes. Se implementó un interceptor para manejar la expiración del token (error 401), redirigiendo al usuario al login con un mensaje explicativo para mantener la consistencia del estado.
+-- *Cerrar sesión (RF6):* El usuario puede finalizar su sesión desde el menú de perfil. Esto elimina el token local, desconecta el WebSocket y redirige a la pantalla de inicio.
 
 // TODO: Agregar capturas de login, registro, verificación y recuperación
 // #figure(image("assets/auth-login.png", width: 80%), caption: [Pantalla de login])
 
 == Gestión de dispositivos (RF7--RF9)
 
--- *CRUD de dispositivos (RF7):* Se pueden agregar dispositivos desde la vista de Dispositivos, seleccionando tipo y nombre. La edición se realiza en una vista dedicada (`EditDeviceView`) donde se puede modificar nombre, tipo y habitación asignada. La eliminación requiere confirmación mediante modal.
--- *Consulta de dispositivos (RF8):* La vista de Dispositivos muestra todos los dispositivos del hogar en formato de tarjetas (`DeviceCard`) con estado on/off, tipo e indicador de favorito. Se puede filtrar por tipo o habitación.
--- *Control de dispositivos (RF9):* Cada tipo de dispositivo tiene controles específicos en su vista de detalle: sliders para luces (brillo, color), botones para puertas (abrir/cerrar/bloquear), sliders para cortinas (apertura), controles de temperatura para AC, etc.
+-- *Gestionar dispositivos (RF7):* El usuario puede crear dispositivos asignándoles un nombre y tipo, renombrarlos, editarlos y eliminarlos. Toda eliminación requiere confirmación explícita para evitar acciones accidentales.
+-- *Consultar dispositivos (RF8):* El sistema presenta un listado de todos los dispositivos del hogar mostrando nombre, tipo, estado actual y habitación asignada. Además, existe una vista de detalle por dispositivo que expone su estado completo y sus controles específicos, actualizada en tiempo real mediante WebSocket.
+-- *Controlar dispositivos (RF9):* Se implementaron controles específicos para los 11 tipos de dispositivos soportados por la API, incluyendo lámparas (brillo, color), puertas (abrir/cerrar/bloquear), alarmas (modos ausente/en casa), aire acondicionado (temperatura, modos, ventilador), parlantes (volumen, género, reproducción), aspiradoras (modos, ubicación), heladeras y hornos.
 
 // TODO: Agregar capturas de dispositivos, detalle, edición
 // #figure(image("assets/devices-list.png", width: 100%), caption: [Vista de dispositivos])
 
 == Rutinas (RF10--RF12)
 
--- *Gestión de rutinas (RF10):* Creación mediante un wizard de 4 pasos: nombre, selección de dispositivos, configuración de acciones por dispositivo y resumen. La edición y eliminación se realizan desde la vista de rutinas.
--- *Consulta de rutinas (RF11):* Vista con tarjetas que muestran nombre, cantidad de acciones y estado (activa/inactiva).
--- *Ejecución de rutinas (RF12):* Botón de ejecución directa en cada tarjeta de rutina. Al ejecutar, se aplican todas las acciones configuradas sobre los dispositivos.
+-- *Gestionar rutinas (RF10):* El usuario puede crear rutinas definiendo un nombre, los días de la semana, la hora de activación y una secuencia de acciones sobre distintos dispositivos. Las rutinas pueden ser editadas y eliminadas en cualquier momento.
+-- *Consultar rutinas (RF11):* El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones vinculadas.
+-- *Ejecutar rutinas (RF12):* Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente. El sistema dispara en el backend todas las acciones definidas de forma coordinada.
 
 // TODO: Agregar capturas de rutinas, wizard
 // #figure(image("assets/routines.png", width: 100%), caption: [Vista de rutinas])
 
 == Historial (RF13)
 
-Vista de historial con tabla que muestra todas las acciones ejecutadas sobre los dispositivos. Se puede filtrar por tipo de acción y por dispositivo. Los registros se obtienen de la API y se muestran ordenados cronológicamente con paginación.
+El sistema presenta un registro paginado de todas las acciones ejecutadas sobre los dispositivos del hogar en la vista “Historial”, incluyendo el nombre del dispositivo, la acción realizada y la marca temporal de cada evento. Los registros se obtienen de la API y se presentan ordenados cronológicamente para facilitar la auditoría.
 
 // TODO: Agregar captura de historial
 // #figure(image("assets/history.png", width: 100%), caption: [Vista de historial])
 
 == Habitaciones (RF14--RF16)
 
--- *Gestión de habitaciones (RF14):* Creación y edición mediante modales. Eliminación con confirmación que advierte que los dispositivos vinculados también serán eliminados.
--- *Consulta de habitaciones (RF15):* Vista en grilla de tarjetas, cada una mostrando el nombre de la habitación y los dispositivos vinculados con sus controles de toggle.
--- *Vinculación de dispositivos (RF16):* Cada tarjeta de habitación incluye un selector para vincular dispositivos disponibles (sin habitación asignada). La desvinculación se realiza con un botón por dispositivo, con confirmación.
+-- *Gestionar habitaciones (RF14):* El usuario puede crear habitaciones dentro de un hogar, renombrarlas y eliminarlas. Toda eliminación requiere confirmación explícita para asegurar la consistencia del sistema.
+-- *Consultar habitaciones (RF15):* El sistema lista las habitaciones del hogar seleccionado. Al ingresar al detalle de una habitación, se visualizan los dispositivos que contiene y se puede acceder directamente al control de cada uno.
+-- *Vincular dispositivos a habitaciones (RF16):* El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Se garantiza que cada dispositivo esté correctamente ubicado dentro de la jerarquía espacial del hogar.
 
 // TODO: Agregar capturas de habitaciones
 // #figure(image("assets/rooms.png", width: 100%), caption: [Vista de habitaciones])
 
 == Hogares (RF17--RF19)
 
--- *Gestión de hogares (RF17):* Creación de propiedades con nombre y dirección desde una vista dedicada.
--- *Consulta de hogares (RF18):* Vista Overview que muestra un resumen del hogar seleccionado con dispositivos favoritos, consumo total y dispositivos activos.
--- *Vinculación de habitaciones (RF19):* Las habitaciones se crean dentro del contexto de un hogar específico. El selector de hogar en el sidebar permite navegar entre propiedades.
+-- *Gestionar hogares (RF17):* El sistema permite crear hogares con un nombre identificatorio y dirección, editarlos y eliminarlos. Adicionalmente, se implementó la posibilidad de compartir un hogar con otros usuarios mediante su correo electrónico.
+-- *Consultar hogares (RF18):* El sistema presenta un panel general con todos los hogares a los que tiene acceso el usuario (propios y compartidos), junto con un resumen de métricas clave y dispositivos favoritos.
+-- *Vincular habitaciones a hogares (RF19):* Las habitaciones se crean y gestionan dentro del contexto de un hogar específico, manteniendo la jerarquía estructural y de navegación en todo momento.
 
 // TODO: Agregar capturas de overview y nueva propiedad
 // #figure(image("assets/overview.png", width: 100%), caption: [Vista Overview])
 
 == Notificaciones -- opcional (RF20)
 
-Se implementó un sistema de notificaciones en tiempo real mediante Socket.io. El backend emite eventos cuando se producen cambios en dispositivos o en la configuración del hogar. El frontend recibe estos eventos, los almacena en un store dedicado y los muestra en un dropdown accesible desde la campana de notificaciones en la barra superior.
+Se implementó un sistema de notificaciones en tiempo real utilizando Socket.io. El frontend recibe eventos del servidor sobre cambios en los dispositivos o en la configuración del hogar, los almacena y los presenta en un menú desplegable accesible desde la barra superior. El sistema notifica al usuario cuando un dispositivo cambia de estado, permitiendo un monitoreo continuo.
 
-Los eventos manejados son:
+Los eventos procesados son:
 
 #table(
   columns: (auto, 1fr),
@@ -226,26 +225,26 @@ Los eventos manejados son:
   [`deviceCreated`], [Un dispositivo fue agregado al hogar.],
   [`deviceUpdated`], [Un dispositivo fue modificado (nombre, tipo, habitación).],
   [`deviceDeleted`], [Un dispositivo fue eliminado.],
-  [`deviceEvent`], [Un dispositivo cambió de estado (encendido/apagado, brillo, etc.). Se aplica el cambio en el store local sin refetch.],
-  [`homeShared`], [Se compartió un hogar con el usuario actual.],
+  [`deviceEvent`], [Un dispositivo cambió de estado (encendido/apagado, brillo, etc.). El cambio se refleja inmediatamente en la interfaz.],
+  [`homeShared`], [Se compartió un hogar con el usuario.],
   [`homeUnshared`], [Se revocó el acceso a un hogar.],
 )
 
-Cada notificación muestra título, mensaje descriptivo y fecha. Se pueden marcar como leídas de forma individual o masiva. El badge en la campana muestra la cantidad de no leídas.
+Cada notificación incluye un título, mensaje descriptivo y marca temporal. Los usuarios pueden gestionarlas marcándolas como leídas de forma individual o masiva.
 
-*Decisión de diseño:* Se separó el sistema de notificaciones persistentes (dropdown) del sistema de toasts efímeros (feedback de acciones). Los toasts confirman acciones del usuario ("Dispositivo guardado"), mientras que las notificaciones informan sobre eventos externos. Esta separación evita que el usuario confunda feedback propio con información del sistema (Nielsen \#1: visibilidad del estado).
+== Restricción de acceso -- opcional (RF21)
 
-// TODO: Agregar captura de notificaciones
-// #figure(image("assets/notifications.png", width: 60%), caption: [Dropdown de notificaciones])
+El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los hogares, habitaciones, dispositivos y rutinas a los que tiene acceso autorizado. Para dispositivos que requieren mayor seguridad, como alarmas o cerraduras, se implementó el uso de códigos de seguridad para autorizar acciones críticas.
 
 == Consumo energético -- opcional (RF22)
 
-Vista dedicada que muestra el consumo actual del hogar con tres métricas resumidas (consumo en tiempo real, proyección diaria, dispositivos activos), dos gráficos (donut por tipo de dispositivo y barras por dispositivo individual) y una tabla de detalle ordenada por consumo.
+El sistema presenta gráficos de consumo eléctrico de los dispositivos del hogar, permitiendo al usuario visualizar el uso energético de forma agregada y detallada por dispositivo. Se incluyen visualizaciones dinámicas (gráficos de torta y barras) para facilitar la interpretación de los datos de consumo en tiempo real.
 
-Los colores de los gráficos se asignan por tipo de dispositivo de forma consistente, con una paleta de fallback para tipos no previstos.
+== Planificar ejecución de rutinas -- opcional (RF23)
 
-// TODO: Agregar captura de consumo
-// #figure(image("assets/consumption.png", width: 100%), caption: [Vista de consumo energético])
+Al crear o editar una rutina, el usuario puede configurar los días de la semana y la hora exacta en que debe ejecutarse automáticamente. Esto permite la automatización total de tareas frecuentes sin necesidad de intervención manual periódica.
+
+= Decisiones de diseño e implementación
 
 // ====================================
 // 4. REQUISITOS NO FUNCIONALES
@@ -253,22 +252,13 @@ Los colores de los gráficos se asignan por tipo de dispositivo de forma consist
 
 = Requisitos no funcionales
 
-#table(
-  columns: (auto, 1fr, auto),
-  align: (center, left, center),
-  stroke: 0.5pt,
-  inset: 8pt,
-  fill: (x, y) => if y == 0 { gray.lighten(80%) },
-  table.header([*RNF*], [*Descripción*], [*Estado*]),
-  [1], [Uso de Vue.js y su ecosistema (Pinia, Vue Router, Vite).], [Cumplido],
-  [2], [Compatible con Chromium 140+ y Firefox 140+.], [Cumplido],
-  [3], [Resolución de 1280px a 1920px de ancho.], [Cumplido],
-  [4], [Separación de estructura y presentación (HTML/CSS). Sin estilos inline en el HTML.], [Cumplido],
-  [5], [Separación de estructura y comportamiento (HTML/JS). Sin handlers inline.], [Cumplido],
-  [8], [Diseño responsivo. Adaptación a distintos tamaños de pantalla.], [Cumplido],
-)
-
-*Nota sobre RNF4:* Se utilizó un sistema de CSS en capas: variables globales (design tokens), archivos de estilos compartidos por categoría (botones, formularios, tarjetas, tablas, controles) y estilos scoped en cada componente Vue para reglas específicas de la vista. Esta decisión se detalla en la sección de decisiones de diseño.
+-- *Tecnologías utilizadas (RNF1):* El frontend fue desarrollado con Vue.js 3 utilizando Composition API, Pinia para el estado y Vue Router. Se emplea Vite como herramienta de construcción y Socket.io para comunicación en tiempo real. Para visualización se integró Chart.js.
+-- *Compatibilidad con Navegadores (RNF2):* La aplicación es compatible con Google Chrome, Mozilla Firefox, Microsoft Edge y Safari en sus versiones más recientes.
+-- *Adaptación a resoluciones de pantalla (RNF3):* La interfaz fue optimizada para pantallas de escritorio y laptops (1280px a 1920px), asegurando un layout estable y legible en el entorno de uso principal.
+-- *Separación de estructura y presentación (RNF4):* Se respeta la separación entre HTML y CSS, utilizando una arquitectura de estilos modular y scoped para evitar estilos inline y asegurar la mantenibilidad.
+-- *Separación de estructura y comportamiento (RNF5):* La lógica de negocio y comportamiento se extrae de los componentes hacia servicios y stores independientes, manteniendo los templates enfocados en la estructura de la interfaz.
+-- *Validación de HTML (RNF6):* El marcado generado cumple con los estándares del W3C, habiendo sido validado sin errores ni advertencias.
+-- *Diseño responsivo (RNF8):* Aunque el foco principal fue el escritorio, se implementaron adaptaciones para resoluciones móviles, permitiendo una navegación fluida en distintos tamaños de pantalla.
 
 // ====================================
 // 5. CAPTURAS DE PANTALLA
@@ -335,69 +325,73 @@ Los colores de los gráficos se asignan por tipo de dispositivo de forma consist
 
 = Decisiones de diseño e implementación
 
-Esta sección documenta las decisiones tomadas durante la implementación que complementan o adaptan lo planteado en la primera entrega. Cada decisión se justifica con los principios de HCI establecidos previamente.
+En esta sección se detallan las decisiones adoptadas durante el desarrollo, fundamentadas en principios de usabilidad, requisitos técnicos y el feedback recibido en la primera entrega.
 
-== Arquitectura CSS: módulos globales vs. estilos scoped
+- Se eliminó la vista isométrica siguiendo la sugerencia del equipo docente, ya que se identificó que no aportaba utilidad práctica y representaba una característica meramente estética que no justificaba su complejidad técnica.
 
-*Decisión:* Se organizó el CSS en una capa de archivos globales por categoría (`variables.css`, `buttons.css`, `forms.css`, `cards.css`, `tables.css`, `controls.css`, `modals.css`) complementados con estilos scoped en cada componente Vue para reglas específicas de la vista.
+- Se separó el sistema de notificaciones persistentes (menú desplegable) del sistema de avisos temporales o _toasts_ (feedback de acciones). Los _toasts_ confirman acciones inmediatas del usuario ("Dispositivo guardado"), mientras que las notificaciones informan sobre eventos externos. Esta distinción mejora la visibilidad del estado del sistema al diferenciar el origen de la información.
 
-*Justificación:* La alternativa idiomática de Vue sería encapsular cada patrón visual en un componente base (por ejemplo, `<BaseCard>`, `<DataTable>`). Se optó por CSS global modular por las siguientes razones:
+== Arquitectura CSS: módulos globales y estilos encapsulados (_scoped_)
 
--- Los patrones compartidos (tarjetas, botones, formularios) son puramente visuales y no encapsulan comportamiento ni estado. Crear componentes wrapper sin lógica agrega una capa de abstracción que no aporta valor funcional.
--- Las clases CSS permiten composición libre (`class="card card--xl chart-card"`) sin necesidad de props para cada variante, lo cual resulta en menos código y mayor flexibilidad.
--- La separación estructura/presentación (RNF4) se mantiene de forma más clara: el HTML define la semántica, el CSS global define la apariencia compartida, y el scoped define excepciones.
+*Decisión:* Se implementó un esquema híbrido que combina una base de CSS global organizado por categorías (`variables.css`, `buttons.css`, `forms.css`, etc.) con estilos específicos encapsulados mediante el atributo `scoped` en cada componente Vue.
 
-Los componentes base se reservaron para casos donde sí encapsulan comportamiento: `ToggleSwitch` (estado reactivo), `ToastContainer` (auto-dismiss), `DeviceCard` (interacción con el store).
+*Justificación:* Esta arquitectura se seleccionó para resolver los desafíos de escalabilidad y mantenibilidad, basándose en los siguientes pilares técnicos:
+
+-- *Sistema de Design Tokens:* El uso de variables CSS centralizadas actúa como una "única fuente de verdad" para la identidad visual. Esto asegura que cualquier cambio en la paleta de colores, tipografía o espaciado se propague instantáneamente a toda la aplicación, garantizando una consistencia visual absoluta.
+-- *Aislamiento de efectos colaterales:* El uso de `<style scoped>` garantiza que las reglas CSS de un componente no "filtren" hacia el resto de la interfaz. Esto elimina los conflictos en el espacio de nombres global, permitiendo realizar ajustes locales de layout con la seguridad de no romper otras secciones de la aplicación.
+-- *Separación de Responsabilidades:* Se distingue claramente entre la *identidad visual compartida* (estilos globales) y el *posicionamiento específico* (estilos locales). Mientras que los archivos globales definen qué es un botón o una tarjeta, el componente decide cómo se integra ese elemento en su propia estructura.
+-- *Optimización y Performance:* Al evitar frameworks de UI pesados, el tamaño del bundle se mantiene mínimo. Vue se encarga de inyectar y retirar los estilos _scoped_ dinámicamente según el ciclo de vida de los componentes, optimizando el consumo de recursos en el navegador.
+-- *Flexibilidad sin abstracciones innecesarias:* En lugar de crear componentes "wrapper" sin lógica propia (ej. un `<BaseButton>` que solo aplica una clase), se optó por composición de clases CSS. Esto reduce la profundidad del árbol de componentes y simplifica el desarrollo sin sacrificar la estandarización.
+
+Los componentes de UI se reservaron exclusivamente para casos que requieren lógica de estado o comportamiento interactivo, como `ToggleSwitch` o `DeviceCard`.
 
 == Sistema de design tokens
 
 *Decisión:* Todos los colores, tamaños, espacios y radios se centralizaron en variables CSS (`variables.css`), eliminando valores hardcoded en los componentes.
 
-*Justificación:* Esto garantiza consistencia visual (Nielsen \#4) de forma técnica: un cambio de color se propaga a toda la aplicación. Durante la implementación se detectaron valores hardcoded (por ejemplo, `#d32f2f` en vez de `var(--danger)`) que fueron corregidos en una pasada de auditoría. Se agregaron las variables `--warning`, `--danger-bg` y `--success-bg` que no estaban previstas en el prototipo original pero resultaron necesarias para estados intermedios.
+*Justificación:* Esto garantiza consistencia visual de forma técnica: un cambio de color se propaga a toda la aplicación. Durante la implementación se detectaron valores hardcoded (por ejemplo, `#d32f2f` en vez de `var(--danger)`) que fueron corregidos en una pasada de auditoría. Se agregaron las variables `--warning`, `--danger-bg` y `--success-bg` que no estaban previstas en el prototipo original pero resultaron necesarias para estados intermedios.
 
 == Controles específicos por tipo de dispositivo
 
-*Decisión:* Cada tipo de dispositivo tiene un componente de controles dedicado (`LightControls`, `DoorControls`, `CurtainControls`, `AlarmControls`, `WaterControls`) que se renderiza condicionalmente en la vista de detalle.
+*Decisión:* Cada tipo de dispositivo cuenta con un componente de controles dedicado (`LightControls`, `DoorControls`, `CurtainControls`, `AlarmControls`, `WaterControls`) que se renderiza condicionalmente en la vista de detalle.
 
-*Justificación:* Los dispositivos del mundo real tienen interacciones fundamentalmente distintas: una lámpara se controla con un slider de brillo y un color picker, mientras que una puerta tiene acciones discretas (abrir/cerrar/bloquear). Unificar estos controles en un componente genérico sacrificaría la correspondencia con el mundo real (Nielsen \#2) y aumentaría la carga cognitiva al presentar controles irrelevantes para cada tipo.
+*Justificación:* Los dispositivos domésticos requieren interacciones diversas: una luminaria se gestiona mediante niveles de brillo y selección de color, mientras que una puerta requiere acciones directas (abrir, cerrar o bloquear). Unificar estos controles en un componente genérico podría afectar la claridad del modelo mental del usuario al presentar opciones irrelevantes para el dispositivo en uso, rompiendo la correspondencia entre el sistema y el mundo real.
 
-Los estilos de estos controles (`.control-row`, `.slider`, `.btn-control`, `.color-picker`) sí se centralizaron en `controls.css` para mantener consistencia visual entre los distintos tipos.
+== Notificaciones: persistentes vs. temporales
 
-== Notificaciones: persistentes vs. efímeras
+*Decisión:* Se diferenciaron las notificaciones persistentes (eventos del sistema) de los avisos temporales o _toasts_ (confirmación de acciones).
 
-*Decisión:* Se implementaron dos sistemas de notificaciones independientes: un dropdown de notificaciones persistentes (eventos del sistema vía WebSocket) y toasts efímeros (feedback de acciones del usuario).
+*Justificación:* Mezclar ambos tipos podría generar confusión sobre la naturaleza de la información. Los _toasts_ confirman una acción inmediata ("Dispositivo guardado") y desaparecen automáticamente, minimizando la interrupción. Las notificaciones del menú informan sobre eventos externos y persisten hasta ser gestionadas por el usuario. Esta separación prioriza la visibilidad del estado del sistema sin sobrecargar la interfaz con información irrelevante, manteniendo un diseño estético y minimalista.
 
-*Justificación:* Mezclar ambos tipos generaría confusión sobre el origen de la información. Los toasts confirman la acción inmediata ("Dispositivo guardado") y desaparecen en 3 segundos, reduciendo la interrupción. Las notificaciones del dropdown informan sobre eventos externos ("Se compartió un hogar contigo") y persisten hasta ser leídas, permitiendo al usuario revisarlas cuando lo considere oportuno. Esta separación aplica el principio de visibilidad del estado (Nielsen \#1) sin sobrecargar al usuario (estética minimalista, Nielsen \#8).
+== Asistente de rutinas en pasos
 
-== Wizard de rutinas en 4 pasos
+*Decisión:* La creación de rutinas se organizó en un asistente de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen.
 
-*Decisión:* La creación de rutinas sigue un wizard de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen final.
+*Justificación:* En la etapa de prototipado, se observó que la configuración de rutinas podía resultar compleja. El asistente fragmenta la tarea en etapas simples con una progresión clara, reduciendo la carga cognitiva. El paso final de resumen permite verificar la configuración antes de confirmarla, funcionando como un mecanismo de prevención de errores.
 
-*Justificación:* En las observaciones participativas de la primera entrega, los usuarios novatos encontraron la creación de rutinas "demasiado compleja" y sugirieron plantillas o asistencia visual. El wizard fragmenta la tarea en pasos simples con una barra de progreso visible, aplicando la reducción de carga cognitiva. El paso de resumen permite revisar antes de confirmar (prevención de errores, Nielsen \#5). La barra de progreso indica claramente en qué paso se encuentra el usuario (visibilidad del estado, Nielsen \#1).
+== Confirmación de acciones irreversibles
 
-== Confirmación de acciones destructivas
+*Decisión:* Las acciones de eliminación requieren una confirmación explícita mediante un cuadro de diálogo.
 
-*Decisión:* Todas las acciones de eliminación (dispositivos, habitaciones, desvinculación) requieren confirmación mediante modal.
+*Justificación:* Esta medida busca prevenir errores accidentales. En el caso de las habitaciones, se informa adicionalmente sobre el impacto en los dispositivos vinculados para que el usuario tome una decisión informada.
 
-*Justificación:* Consistente con la decisión de la primera entrega de prevenir errores (Nielsen \#5). El modal de eliminación de habitaciones además advierte que los dispositivos vinculados serán eliminados, informando al usuario sobre las consecuencias antes de actuar.
+== Vista Overview como punto de acceso rápido
 
-== Vista Overview como punto de entrada
+*Decisión:* Se diseñó la vista Overview para ofrecer un resumen del hogar con dispositivos favoritos, consumo y estado de actividad.
 
-*Decisión:* La vista Overview muestra un resumen con dispositivos favoritos, consumo total y dispositivos activos del hogar seleccionado.
+*Justificación:* Esta vista centraliza la información más consultada, permitiendo al usuario realizar acciones frecuentes sin necesidad de navegar por las distintas secciones. Esto favorece el reconocimiento sobre el recuerdo al presentar el estado general de forma inmediata.
 
-*Justificación:* En la primera entrega se definió que "el usuario puede ver estados de alerta o rutinas favoritas sin navegar casa por casa, reduciendo drásticamente la carga de trabajo". La implementación prioriza la información más consultada (dispositivos favoritos con toggle rápido, métricas de consumo) en la primera pantalla visible al entrar al hogar, aplicando reconocimiento sobre recuerdo (Nielsen \#6).
+== Respuesta inmediata en el control de dispositivos
 
-== Feedback inmediato en controles de dispositivos
+*Decisión:* Los controles aplican el cambio visual instantáneamente mientras procesan la petición en segundo plano. En caso de error, el estado se revierte y se informa al usuario.
 
-*Decisión:* Los toggles y controles de dispositivos aplican el cambio visual de forma inmediata y envían la petición a la API en paralelo. Si la API falla, se revierte el estado y se muestra un toast de error.
+*Justificación:* La falta de respuesta inmediata puede generar incertidumbre sobre si la acción fue registrada. Esta técnica de "actualización optimista" mejora la percepción de control y visibilidad del estado, mientras que el manejo de errores asegura la consistencia entre la interfaz y el estado real del sistema.
 
-*Justificación:* En las observaciones de la primera entrega, "la falta de feedback tras activar una acción generó mucha incertidumbre". El patrón de actualización optimista elimina el delay perceptible entre la acción y el resultado visual, mientras que la reversión en caso de error mantiene la consistencia del estado.
+== Navegación y ubicación
 
-== Navegación con sidebar fija y breadcrumbs
+*Decisión:* Se mantuvo la estructura de barra lateral consistente con el diseño original. La barra superior incluye _breadcrumbs_ para indicar la ubicación actual.
 
-*Decisión:* Se mantuvo la estructura de sidebar con 6 secciones principales, consistente con el prototipo. La barra superior muestra la ubicación actual (hogar / sección) como breadcrumb. Se eliminó la funcionalidad de colapsar la sidebar (reducirla de 220px a 60px) que estaba presente en una versión intermedia.
-
-*Justificación:* La sidebar colapsable presentaba un problema técnico: al reducir su ancho, el área de contenido (`page-content`) no ajustaba su `margin-left` correspondiente, dejando un espacio vacío entre la sidebar y el contenido. Más allá del bug, el collapse agregaba complejidad sin beneficio claro: en el rango obligatorio de 1280px a 1920px, la sidebar de 220px no compite con el espacio del contenido. Para pantallas angostas (menores a 768px), se adoptó un patrón de overlay mobile en lugar de collapse, como se detalla en la sección de diseño responsivo. La barra superior muestra `Casa Martinez / Dispositivos` para que el usuario sepa en todo momento dónde se encuentra, sirviendo como "salida de emergencia" (Nielsen \#3).
+*Justificación:* Informar claramente al usuario sobre su ubicación dentro de la jerarquía de la aplicación facilita la navegación y proporciona libertad de movimiento con salidas de emergencia claras.
 
 == CSS manual vs. frameworks de componentes (Vuetify)
 
@@ -423,7 +417,7 @@ Los estilos de estos controles (`.control-row`, `.slider`, `.btn-control`, `.col
 
 -- *Perfil de usuario:* En la primera entrega se definieron modelos de persona que incluyen usuarios que gestionan su hogar desde dispositivos móviles (por ejemplo, verificar el estado de los dispositivos fuera de casa). Una aplicación de domotica que solo funciona en escritorio limita su utilidad al contexto del hogar, lo cual contradice uno de sus principales beneficios: el control remoto.
 
--- *Principio de flexibilidad y eficiencia (Nielsen \#7):* La adaptación a distintos tamaños de pantalla permite que tanto usuarios novatos (que acceden desde el celular) como expertos (que usan un monitor de escritorio) tengan una experiencia funcional sin degradación.
+-- *Principio de flexibilidad y eficiencia:* La adaptación a distintos tamaños de pantalla permite que tanto usuarios novatos como expertos tengan una experiencia funcional sin degradación.
 
 Las adaptaciones específicas por componente fueron:
 
@@ -446,51 +440,116 @@ Las adaptaciones específicas por componente fueron:
 
 *Implementación técnica:* El estado de la sidebar mobile se maneja con un composable singleton (`useSidebar.js`) que expone un `ref` reactivo compartido entre la TopBar (que lo toglea) y la SideBar (que reacciona). Este patrón es consistente con otros composables de la aplicación (`useModal`, `useConfirmAction`) y evita acoplar los componentes mediante props o eventos.
 
+== Manejo de expiración de token JWT
+
+*Decisión:* Se implementó un interceptor global en `client.js` que detecta respuestas HTTP 401, limpia el token expirado del `localStorage` y redirige automáticamente al login con mensaje explicativo.
+
+*Justificación:* Los tokens JWT tienen fecha de expiración. Sin manejo explícito, cuando el token expira todas las requests fallan silenciosamente, dejando al usuario en un estado inconsistente donde la aplicación parece funcionar pero ninguna acción se ejecuta. El interceptor global previene errores al detectar el problema de forma centralizada y guiar al usuario hacia la solución (volver a iniciar sesión). El mensaje "Tu sesión ha expirado. Por favor, inicia sesión nuevamente" informa claramente qué ocurrió y qué debe hacer, reforzando la visibilidad del estado del sistema.
+
+== Actualización optimista con rollback
+
+*Decisión:* Los controles de dispositivos (toggle on/off, favoritos) aplican el cambio visual inmediatamente y envían la petición a la API en paralelo. Si la API falla, el estado se revierte y se muestra un toast de error.
+
+*Justificación:* En las observaciones de la primera entrega se identificó que "la falta de feedback tras activar una acción generó mucha incertidumbre". El patrón de actualización optimista elimina el delay perceptible entre la acción del usuario y la respuesta visual, mejorando la sensación de control directo y la visibilidad del estado. Sin embargo, aplicar el cambio sin validación podría generar inconsistencias si la API falla. Por eso se implementó rollback: si la petición falla, el estado visual se revierte al original y se notifica al usuario del error, manteniendo la coherencia entre el modelo y la vista. Este patrón se implementó en `toggleDevice()` y `toggleFavorite()` del store de dispositivos.
+
+== Consolidación de vistas de rutinas globales y específicas
+
+*Decisión:* Se unificaron las vistas de detalle y edición de rutinas en componentes únicos que manejan tanto rutinas específicas de un hogar como rutinas globales (compartidas entre hogares), detectando el tipo mediante metadata.
+
+*Justificación:* En una versión intermedia existían cuatro vistas separadas: `RoutineDetailView`, `GlobalRoutineDetailView`, `EditRoutineView` y `GlobalRoutineEditView`. Las vistas globales y específicas compartían ~90% del código, difiriendo solo en el origen de los datos (store local vs. composable de overview) y la navegación post-guardado. Mantener cuatro archivos generaba duplicación de lógica, incrementando el riesgo de bugs por inconsistencia y dificultando el mantenimiento. La consolidación aplica el principio DRY (Don't Repeat Yourself): un computed `isGlobal` detecta el tipo de rutina y condiciona el comportamiento específico (carga de dispositivos, nombres con resolución de colisión, rutas de navegación). Esto redujo ~700 líneas de código duplicado sin comprometer la funcionalidad.
+
+== Prevención de memory leaks en stores y WebSocket
+
+*Decisión:* Se implementaron mecanismos de limpieza explícitos para recursos que persisten más allá del ciclo de vida del componente: `clearInterval()` para el muestreo de consumo diario y limpieza periódica del Map de deduplicación de notificaciones.
+
+*Justificación:* JavaScript no limpia automáticamente referencias a callbacks registrados con `setInterval` ni entradas en estructuras como Map. En una versión intermedia, el store de dispositivos iniciaba un intervalo para acumular consumo cada minuto pero nunca lo detenía, causando que múltiples intervalos se acumularan si el usuario navegaba entre hogares. Similar problema ocurría con el Map de deduplicación de notificaciones (`recentDeviceNotifs`) que crecía indefinidamente. La corrección incluyó:
+
+-- `stopDailySampling()` que ejecuta `clearInterval()` al cambiar de hogar o cerrar sesión.
+-- Limpieza cada 100 notificaciones del Map, eliminando entradas más antiguas que 2 segundos (ventana de deduplicación).
+
+Esta decisión aplica principios de gestión de recursos: el código que crea un recurso debe ser responsable de liberarlo. Memory leaks degradan el rendimiento progresivamente y pueden causar fallos en sesiones largas, violando la expectativa de estabilidad y la estética minimalista del sistema al acumular datos innecesarios.
+
+== Manejo de errores con try/catch/finally en formularios
+
+*Decisión:* Todos los formularios (login, registro, cambio de contraseña) envuelven las peticiones asíncronas en bloques `try/catch/finally` que garantizan restablecer el estado de carga (`loading = false`) incluso si la petición falla.
+
+*Justificación:* En una versión intermedia sin `finally`, si la petición de login fallaba por timeout de red, el botón quedaba en estado "Iniciando sesión..." permanentemente, bloqueando al usuario sin posibilidad de reintentar. El patrón `try { acción } catch { error } finally { loading = false }` garantiza que el estado de carga siempre se restablece, permitiendo reintentos y evitando bloqueos de UI. Esto previene errores y ayuda a los usuarios a reconocer, diagnosticar y recuperarse de fallos.
+
+== Deduplicación de notificaciones WebSocket
+
+*Decisión:* Se implementó un sistema de ventana deslizante de 2 segundos para evitar notificaciones duplicadas cuando el backend emite múltiples eventos para la misma acción del usuario (por ejemplo, `deviceEvent` + `deviceUpdated` por el mismo cambio de estado).
+
+*Justificación:* En la implementación inicial del WebSocket, cada acción del usuario generaba múltiples notificaciones redundantes: al encender una lámpara, el backend emitía `deviceEvent` (cambio de estado) y `deviceUpdated` (actualización del dispositivo) casi simultáneamente, generando dos toasts diciendo "Lámpara sala fue modificada". Esto sobrecargaba al usuario con información repetida, afectando la estética minimalista del sistema. La deduplicación basada en un Map con timestamp por dispositivo (`shouldNotify()`) filtra eventos redundantes dentro de la ventana de 2 segundos, mostrando solo la primera notificación. Este patrón es transparente para el usuario y no afecta la reactividad del sistema.
+
 // ====================================
 // 7. DIFERENCIAS CON EL PROTOTIPO
 // ====================================
 
 = Diferencias respecto al prototipo
 
-Durante la implementación se realizaron ajustes respecto al prototipo de la primera entrega. Los cambios más significativos son:
+Durante la implementación se realizaron ajustes respecto al diseño original para adaptarlo a las capacidades técnicas de la API y mejorar la usabilidad.
 
-== Cambios en el Overview del hogar
+== Ajustes en la vista de Hogar
 
-*Decisión:* Se reemplazó el mapa visual de la casa por tarjetas de resumen con métricas clave y una vista más simple del hogar.
+*Decisión:* Se priorizó el uso de tarjetas de resumen y métricas clave sobre la representación gráfica del plano de la casa.
 
-*Justificación:* El prototipo original incluía un plano isométrico más avanzado de la casa con habitaciones y dispositivos ubicados espacialmente. Sin embargo, la API provista no ofrece datos de ubicación ni dimensiones de los dispositivos, lo que imposibilitaba generar un mapa visual preciso. En su lugar, se priorizó mostrar tarjetas de resumen que destacan los dispositivos favoritos, los dispositivos activos y rutinas recientes, manteniendo la función principal del Overview del hogar como punto de entrada rápido a la información más relevante.
+*Justificación:* El diseño original contemplaba un plano isométrico con la ubicación espacial de los dispositivos. Dado que la API no proporciona datos de posicionamiento, se optó por un enfoque basado en tarjetas de información. Esto asegura que el usuario reciba datos precisos y accionables sobre sus dispositivos favoritos y el consumo energético, manteniendo la claridad informativa.
 
-== Eliminación de perfiles de usuario
+== Simplificación de roles de usuario
 
-*Decisión:* No se implementaron perfiles de usuario (administrador, adolescente).
+*Decisión:* Se implementó un modelo de usuario con acceso completo, posponiendo la gestión de perfiles con permisos restringidos.
 
-*Justificación:* El prototipo incluía la posibilidad de crear perfiles con permisos diferenciados (por ejemplo, un perfil adolescente sin acceso a la configuración). Sin embargo, el requisito RF21 que contemplaba esta funcionalidad era opcional y, dado el alcance de la implementación, se priorizaron otras funcionalidades consideradas más críticas para la experiencia general. La implementación actual asume un modelo de usuario único con acceso completo, lo cual simplifica la gestión de permisos y roles sin comprometer las funcionalidades principales de la aplicación.
+*Justificación:* Se priorizó la robustez de las funcionalidades principales de gestión de dispositivos y rutinas. El modelo actual simplifica la interacción para el usuario principal sin comprometer la capacidad de control del sistema.
 
-== Cambios en los botones de acción de dispositivos específicos 
+== Evolución de los controles de dispositivos
 
-*Decisión:* Se cambiaron los controles de dispositivos como el parlante y la cortina. Anteriormente se tenía un toggle button para encender/apagar. En la implementación se optó por un panel de acciones contextuales compuesto por múltiples botones independientes.
+*Decisión:* Se reemplazaron algunos selectores binarios (on/off) por paneles de acciones contextuales para dispositivos con múltiples estados.
 
-*Justificación:* En el prototipo, dispositivos como el parlante o la cortina tenían un toggle button que alternaba entre encendido y apagado. Sin embargo, durante la implementación se identificó que estos dispositivos tienen acciones discretas (por ejemplo, una cortina puede estar abierta, cerrada o en posición intermedia) que no se adaptan bien a un toggle binario. Haciendo que el manejo del dispositivo sea muy poco intuitivo. Por lo tanto, se diseñó un panel de acciones contextuales con botones independientes para cada acción relevante (subir, bajar para la cortina; reproducir, pausar, siguiente para el parlante), lo que mejora la correspondencia con las funcionalidades reales de los dispositivos y reduce la confusión del usuario. El diseño actual de cada control refleja el modelo de interacción familiar para dispositivos multimedia y automatización del hogar, reenforzando la coherencia entre el sistema y el mundo real (Nielsen \#2).
+*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la correspondencia con el mundo real (Heurística \#2) y hace la interacción más intuitiva. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real.
 
-== Incorporación de una vista Overview como pantalla principal al ingresar a la página web
+== Introducción de la vista de Resumen Global (Overview)
 
-*Decisión:* Se agregó una vista Overview que se muestra al ingresar a la página web. Ésta muestra un resumen global del sistema , mostrando todas las propiedades registradas, métricas principales de cada una, dispositivos críticos y rutinas globales favoritas.
+*Decisión:* Se incorporó una pantalla de bienvenida que ofrece una visión general de todas las propiedades y dispositivos críticos antes de profundizar en un hogar específico.
 
-*Justificación:* En la primera entrega se definió que "el usuario puede ver estados de alerta o rutinas favoritas sin navegar casa por casa, reduciendo drásticamente la carga de trabajo". Sin embargo, el prototipo no incluía una vista específica para esto. Por ende, para cumplir con esta premisa, se decidió implementar una vista Overview que sirva como dashboard principal previo a ingresar a un hogar. Esta vista proporciona acceso rápido a la información más relevante (como dispositivos críticos y rutinas favoritas) y un resumen de cada propiedad a lo que respecta sus dispositivos. Esto logra informar al usuario para que luego tome una decisión más directa en vez de navegar por cada hogar para obtener la misma información. De esta forma, se aplica el principio de reconocimiento sobre recuerdo (Nielsen \#6) al mostrar la información clave de forma inmediata, sin requerir navegación adicional.
+*Justificación:* Esta vista permite al usuario identificar rápidamente estados de alerta o ejecutar rutinas frecuentes sin necesidad de navegar por cada propiedad individualmente. Esto reduce el esfuerzo necesario para obtener una visión general del sistema, potenciando el reconocimiento sobre el recuerdo y la eficiencia de uso.
 
 
 
 // ====================================
 // 8. FEEDBACK DE LA PRIMERA ENTREGA
+// = ====================================
+// 6. INSTRUCTIVO DE INSTALACIÓN
 // ====================================
 
-= Feedback de la primera entrega
+= Instructivo de instalación
+
+Para ejecutar la aplicación en un entorno local, siga los siguientes pasos:
+
+1.  *Prerrequisitos:* Asegúrese de tener instalado Node.js (versión 18 o superior) y npm en su sistema.
+2.  *Descarga:* Extraiga el contenido del archivo comprimido o clone el repositorio de GitHub.
+3.  *Instalación de dependencias:* Abra una terminal, navegue hasta el directorio `homecore-web` y ejecute:
+    `npm install`
+4.  *Ejecución:* Inicie el servidor de desarrollo con el comando:
+    `npm run dev`
+5.  *Acceso:* Una vez iniciado el servidor, acceda a la aplicación mediante la URL indicada en la terminal (generalmente `http://localhost:5173`).
+
+== Navegadores compatibles
+
+La aplicación ha sido testeada y es compatible con las últimas versiones de los siguientes navegadores:
+-- Google Chrome
+-- Mozilla Firefox
+-- Microsoft Edge
+-- Safari
+
+// ====================================
+// 8. FEEDBACK DE LA PRIMERA ENTREGA
+// ====================================
 
 == Configuración de usuario
 
 *Feedback:* "La sección de configuración debería ser más visible. Su ubicación es poco estratégica."
 
-*Resolución:* En la primera entrega, la sección de Configuración solo era accesible desde el fondo de la barra lateral, lo cual dificultaba su descubrimiento y acceso. A partir del feedback recibido, se decidió incorporarla también dentro del menú de usuario en la barra superior, aumentando su visibilidad y accesibilidad para todos los usuarios. Esta decisión se relaciona con la heurística de "Consistencia y estándares" (Nielsen \#4) ya que ubicar la configuración dentro del menú de usuario sigue patrones de navegación ampliamente utilizados en aplicaciones modernas, haciendo que la interfaz resulte más familiar e intuitiva. Además, también refuerza la heurística "Reconocimiento antes que recuerdo"(Nielsen \#6), porque el usuario puede identificar rápidamente dónde acceder a las configuraciones sin necesidad de recordar su ubicación específica dentro de la barra lateral.
+*Resolución:* En la primera entrega, la sección de Configuración solo era accesible desde el fondo de la barra lateral, lo cual dificultaba su descubrimiento y acceso. A partir del feedback recibido, se decidió incorporarla también dentro del menú de usuario en la barra superior, aumentando su visibilidad y accesibilidad para todos los usuarios. Esta decisión se relaciona con la consistencia y el uso de estándares ya que ubicar la configuración dentro del menú de usuario sigue patrones de navegación ampliamente utilizados. Además, también refuerza el reconocimiento antes que el recuerdo, porque el usuario puede identificar rápidamente dónde acceder a las configuraciones sin necesidad de memorizar su ubicación.
 
 
 // TODO: Completar con el feedback recibido del profesor/evaluador
