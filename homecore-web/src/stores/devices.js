@@ -98,8 +98,9 @@ export const useDevicesStore = defineStore('devices', () => {
   /**
    * Carga todos los dispositivos de un hogar recorriendo sus habitaciones en paralelo (max 3 concurrentes).
    * @param {string} homeId
+   * @param {Array} [roomList] - Lista de habitaciones opcional. Si se pasa, evita llamada a getRooms.
    */
-  async function fetchAllForHome(homeId) {
+  async function fetchAllForHome(homeId, roomList = null) {
     stopDailySampling()
     loading.value = true
     error.value = null
@@ -107,7 +108,9 @@ export const useDevicesStore = defineStore('devices', () => {
 
     const limit = pLimit(MAX_CONCURRENT_REQUESTS)
     try {
-      const roomList = await api.getRooms(homeId)
+      if (!roomList) {
+        roomList = await api.getRooms(homeId)
+      }
 
       const batches = await Promise.all(
         roomList.map(room => limit(async () => {
@@ -145,25 +148,47 @@ export const useDevicesStore = defineStore('devices', () => {
   async function toggleDevice(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
+
+    const previousIsOn = device.isOn
+    const previousStatusText = device.statusText
+
     const map = getStatusMap(device.type)
     const action = device.isOn ? map.actionOff : map.actionOn
-    await api.executeAction(id, action, [])
+
     device.isOn = !device.isOn
     device.statusText = getStatusText(device.type, device.isOn)
+
+    try {
+      await api.executeAction(id, action, [])
+    } catch (e) {
+      device.isOn = previousIsOn
+      device.statusText = previousStatusText
+      throw e
+    }
   }
 
   async function toggleFavorite(id) {
     const device = devices.value.find(d => String(d.id) === String(id))
     if (!device) return
+
+    const previousFavorite = device.isFavorite
     const newFavorite = !device.isFavorite
+
+    device.isFavorite = newFavorite
+
     const body = {
       name: device.name,
       type: { id: device.typeId },
       metadata: { ...(device.metadata || {}), favorite: newFavorite },
     }
     if (device.roomId) body.room = { id: device.roomId }
-    await api.updateDevice(id, body)
-    device.isFavorite = newFavorite
+
+    try {
+      await api.updateDevice(id, body)
+    } catch (e) {
+      device.isFavorite = previousFavorite
+      throw e
+    }
   }
 
   /**
