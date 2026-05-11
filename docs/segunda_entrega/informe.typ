@@ -120,34 +120,19 @@
 // 1. INTRODUCCIÓN
 // ====================================
 
-= Modelos de Persona
+= Introducción
 
-Se definieron los siguientes modelos de usuario para guiar las decisiones de diseño, asegurando que las funcionalidades implementadas resuelvan necesidades específicas.
+Esta segunda entrega consiste en la implementación funcional del sitio web de HomeCore, la aplicación de gestión de casas inteligentes diseñada en la primera entrega. El objetivo fue trasladar los prototipos de alta fidelidad a una aplicación web real, conectada a la API provista por la cátedra, manteniendo las decisiones de diseño y usabilidad establecidas previamente.
 
-== Valentina "La Power User"
-- *Edad:* 27 años. *Comodidad:* Nivel 3 (Power User).
-- *Comportamientos esperados:* Utiliza atajos para acciones frecuentes y explora configuraciones avanzadas.
-- *Características deseadas:* Control granular de dispositivos y acceso a datos de consumo detallados.
+La implementación se realizó con Vue.js 3 (Composition API), Pinia para el manejo de estado, Vue Router para la navegación, y Socket.io para notificaciones en tiempo real. Se priorizó la fidelidad al prototipo original, adaptando únicamente lo necesario para resolver limitaciones técnicas o mejorar la experiencia a partir del feedback recibido en la primera entrega.
 
-== Carolina "La Gestora del Hogar"
-- *Edad:* 42 años. *Comodidad:* Nivel 2 (Average).
-- *Comportamientos esperados:* Busca seguridad y tranquilidad; monitorea notificaciones de eventos críticos.
-- *Características deseadas:* Claridad en el estado del hogar (seguridad) y facilidad para gestionar permisos de otros usuarios.
+= Modelos de Persona (Contexto)
 
-== Marta "La Usuaria Tradicional"
-- *Edad:* 63 años. *Comodidad:* Nivel 1 (Novice).
-- *Comportamientos esperados:* Prefiere flujos lineales y botones grandes con etiquetas claras.
-- *Características deseadas:* Interfaz simple, alto contraste y evitación de estados confusos o redundantes.
+Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos de usuario:
 
-= Vinculación con los Modelos de Persona
-
-Las decisiones de diseño implementadas se fundamentan en las necesidades de estas personas:
-
--- *Overview del hogar (RF18):* Diseñado para *Carolina*, permitiéndole verificar el estado de seguridad y dispositivos activos sin navegar entre secciones.
--- *Asistente de Rutinas (RF10):* Su estructura de pasos simples responde a la necesidad de *Marta* de evitar confusiones.
--- *Controles Granulares (RF9):* Implementados principalmente para *Valentina*, quien requiere precisión en sus automatizaciones.
--- *Notificaciones (RF20):* Fundamental para *Carolina*, quien monitorea la seguridad del hogar durante su jornada laboral.
--- *Navegación consistente (Breadcrumbs):* Esencial para *Marta*, quien necesita indicadores constantes de su ubicación.
+-- *Valentina "La Power User" (27 años):* Nivel tecnológico avanzado. Busca automatizaciones complejas, control granular de dispositivos y análisis de datos.
+-- *Carolina "La Gestora del Hogar" (42 años):* Nivel tecnológico intermedio. Su prioridad es la seguridad familiar y la eficiencia en la gestión del hogar.
+-- *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
 
 
 // ====================================
