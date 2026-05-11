@@ -15,22 +15,30 @@
     <p v-else-if="error" class="state-error">{{ error }}</p>
     <p v-else-if="filteredEvents.length === 0" class="state-empty">Sin eventos registrados</p>
     <template v-else>
-      <div class="timeline">
-        <div v-for="event in filteredEvents" :key="event.id" class="timeline-item">
-          <div class="timeline-dot" :class="`timeline-dot--${event.type}`"></div>
-          <div class="timeline-content">
-            <div class="timeline-row">
-              <span class="timeline-device">{{ event.deviceName }}</span>
-              <span class="timeline-time">{{ formatDate(event.timestamp) }}</span>
-            </div>
-            <span class="timeline-action">{{ event.action }}</span>
-          </div>
-        </div>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nombre Dispositivo</th>
+              <th>Acción</th>
+              <th>Tipo</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="event in filteredEvents" :key="event.id">
+              <td class="col-device">{{ event.deviceName }}</td>
+              <td class="col-action">{{ event.action }}</td>
+              <td class="col-type">{{ event.deviceType }}</td>
+              <td class="col-date">{{ formatDate(event.timestamp) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div v-if="hasMore" class="load-more">
         <button class="btn-add" @click="loadMore" :disabled="loadingMore">
-          {{ loadingMore ? 'Cargando...' : 'Cargar mas' }}
+          {{ loadingMore ? 'Cargando...' : 'Cargar más' }}
         </button>
       </div>
     </template>
@@ -42,6 +50,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useDevicesStore } from '@/stores/devices'
 import { friendlyError } from '@/utils/friendly-error'
 import { describeAction, ACTIONS_MAP } from '@/config/routine-actions'
+import { translateType } from '@/utils/device-helpers'
 import * as api from '@/services/api'
 
 const devicesStore = useDevicesStore()
@@ -101,10 +110,12 @@ function formatDate(timestamp) {
 function mapLogs(rawLogs) {
   return rawLogs.map(log => {
     const info = getDeviceInfo(log)
+    const params = Array.isArray(log.params) ? log.params : []
     return {
       id: log.id,
       deviceName: info.name,
-      action: describeLogAction(log.actionName || log.action || '', info.type, log.params),
+      deviceType: info.type ? translateType(info.type) : 'Desconocido',
+      action: describeLogAction(log.actionName || log.action || '', info.type, params),
       timestamp: log.timestamp,
       type: classifyEvent(log),
     }
@@ -142,72 +153,29 @@ onMounted(async () => {
   gap: 8px;
 }
 
-/* Timeline */
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.table-container {
+  overflow-x: auto;
 }
 
-.timeline-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 16px;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  transition: border-color 0.2s;
-}
-
-.timeline-item:hover {
-  border-color: var(--accent);
-}
-
-.timeline-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-top: 5px;
-  flex-shrink: 0;
-}
-
-.timeline-dot--device {
-  background-color: var(--accent);
-}
-
-.timeline-dot--routine {
-  background-color: var(--success);
-}
-
-.timeline-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.timeline-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.timeline-device {
-  font-size: var(--font-md);
+.col-device {
+  min-width: 180px;
   font-weight: 600;
-  color: var(--text-primary);
 }
 
-.timeline-time {
-  font-size: var(--font-sm);
+.col-action {
+  min-width: 200px;
+}
+
+.col-type {
+  width: 140px;
   color: var(--text-muted);
-  font-weight: 500;
 }
 
-.timeline-action {
-  font-size: var(--font-base);
-  color: var(--text-secondary);
+.col-date {
+  width: 140px;
+  text-align: right;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .load-more {

@@ -123,7 +123,16 @@ export function describeAction(typeName, actionName, params) {
   if (!params || params.length === 0) return label
 
   const suffix = UNIT_SUFFIXES[actionName] ?? ''
-  const value = params[0]
+  let value = params[0]
+
+  // Sanitizar códigos de seguridad de alarmas
+  const isAlarmSecurityAction = ['armAway', 'armStay', 'disarm', 'changeSecurityCode'].includes(actionName)
+  if (isAlarmSecurityAction && value !== undefined && value !== null) {
+    value = '****'
+  }
+
+  // Si el valor es undefined o null, retornar solo el label
+  if (value === undefined || value === null) return label
 
   if (params.length === 2) {
     return `${label}: ${value} ${params[1]}`
