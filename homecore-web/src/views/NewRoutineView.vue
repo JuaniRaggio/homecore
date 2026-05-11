@@ -27,7 +27,7 @@
         <h2 class="step-title">Nombre y descripción</h2>
         <div class="form-group">
           <label class="form-label">Nombre de la rutina</label>
-          <input v-model="form.name" class="form-input" type="text" placeholder="Ej: Buenos dias" />
+          <input v-model="form.name" class="form-input" type="text" placeholder="Ej: Buenos días" />
         </div>
         <div class="form-group">
           <label class="form-label">Descripción (opcional)</label>
