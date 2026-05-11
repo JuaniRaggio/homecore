@@ -319,15 +319,6 @@ En esta sección se presenta la comparación entre el prototipo de alta fidelida
   caption: [Gestión de habitaciones: prototipo (izq.) vs. implementación (der.)],
 )
 
-== Historial de acciones
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/historial/hold.png", width: 100%),
-    image("hci_before_and_after/historial/hnew.png", width: 100%),
-  ),
-  caption: [Historial: prototipo (izq.) vs. implementación (der.)],
-)
-
 == Configuración de usuario
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -335,15 +326,6 @@ En esta sección se presenta la comparación entre el prototipo de alta fidelida
     image("hci_before_and_after/config/conew.png", width: 100%),
   ),
   caption: [Ajustes de perfil: prototipo (izq.) vs. implementación (der.)],
-)
-
-== Evolución de controles de dispositivos (Cortinas)
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/boton de la cortina/bold.png", width: 100%),
-    image("hci_before_and_after/boton de la cortina/bnew.png", width: 100%),
-  ),
-  caption: [Control de cortinas: El interruptor binario del prototipo evolucionó hacia un panel de acciones contextuales más intuitivo para estados intermedios.],
 )
 
 == Notificaciones
@@ -742,6 +724,22 @@ Este enfoque mejora la velocidad de carga de la vista principal, reduce la compl
 )
 
 Esta modificación mejora la densidad de información en la pantalla y reduce la necesidad de scroll, facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo. El ajuste mantiene todos los elementos críticos del gráfico (etiquetas, valores, leyendas) completamente legibles mientras aprovecha mejor el espacio disponible.
+
+== Gráficos de consumo en el overview global
+
+*Feedback:* "Los gráficos de consumo en la vista de resumen global no aportan valor en ese contexto y aumentan la carga visual innecesariamente."
+
+*Resolución:* Se eliminaron los gráficos de consumo energético de la vista de overview global. Esta decisión reconoce que el propósito principal del overview es proporcionar acceso rápido a todos los hogares del usuario y presentar métricas de alto nivel, no análisis detallado de consumo. Los gráficos son información secundaria que corresponde a una sección específica dedicada al análisis de consumo.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/global overview/goold.png", width: 100%),
+    image("hci_before_and_after/global overview/gonew.png", width: 100%),
+  ),
+  caption: [Resumen Global: prototipo con gráficos de consumo (izq.) vs. implementación sin gráficos (der.). La nueva versión se enfoca en shortcuts y acceso rápido a las casas, eliminando información que distraía del propósito principal de la vista.],
+)
+
+Al remover los gráficos del overview, la interfaz se vuelve más limpia y enfocada en su función principal: permitir al usuario seleccionar rápidamente el hogar con el que desea interactuar y visualizar métricas clave de un vistazo (cantidad de dispositivos, alertas, favoritos). Esta simplificación reduce el tiempo de carga inicial y mejora la jerarquía visual, guiando al usuario hacia las acciones más frecuentes sin sobrecargarlo con análisis detallados que puede consultar cuando los necesite en la sección dedicada de Consumo.
 
 // TODO: Completar con el feedback recibido del profesor/evaluador
 // y cómo se abordó en la implementación.
