@@ -237,7 +237,6 @@ Las rutinas pueden editarse y eliminarse en cualquier momento. La creación incl
   caption: [Edición de rutinas existentes],
 )
 
-#pagebreak()
 - *Consulta y ejecución de rutinas (RF11-12):* El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones que ejecuta. Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente con un solo clic en "ejecutar ahora", disparando todas las acciones definidas sobre los dispositivos correspondientes.
 
 #figure(
@@ -264,8 +263,6 @@ El sistema presenta un registro paginado de todas las acciones ejecutadas sobre 
   ),
   caption: [Gestión de habitaciones (izq.) y vista de listado con dispositivos asociados (der.)],
 )
-
-#pagebreak()
 
 - *Vinculación de dispositivos a habitaciones (RF16):* El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Todos los dispositivos deben pertenecer a alguna habitación; no se permiten dispositivos sin asignar. Esta funcionalidad mantiene la jerarquía organizacional hogar $->$ habitación $->$ dispositivo.
 
@@ -439,6 +436,15 @@ Esta sección detalla las decisiones adoptadas durante el desarrollo, fundamenta
 *Justificación:* El asistente al igual que en el asistente de rutinas en pasos, ayuda a fragmentar la tarea de forma guiada en etapas simples con una progresión clara, reduciendo la carga cognitiva.
 
 *Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria). Ademas mejora significativamente la facilidad de integrar la aplicación a un entorno existente.
+
+#figure(
+  grid(columns: 2, gutter: 12pt, 
+    image("hci_before_and_after/hogar/paso1.png", width: 100%),
+    image("hci_before_and_after/hogar/paso2.png", width: 100%),
+    image("hci_before_and_after/hogar/paso3.png", width: 100%),
+  ),
+  caption: [Home Overview: prototipo isométrico (izq.) vs. implementación final (der.)],
+)
 
 === Confirmación de acciones irreversibles
 
@@ -700,8 +706,6 @@ Los componentes de UI se reservaron exclusivamente para casos que requieren lóg
 *Manejo de errores:* Todos los formularios utilizan bloques `try/catch/finally` para garantizar que el estado de carga se restablece incluso si las peticiones fallan.
 
 *Deduplicación de notificaciones:* Sistema de ventana deslizante de 2 segundos para filtrar eventos redundantes del WebSocket.
-
-#pagebreak()
 
 
 // ====================================
