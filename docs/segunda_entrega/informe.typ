@@ -296,7 +296,7 @@ El sistema permite gestionar múltiples hogares de forma completa:
 El sistema notifica al usuario en tiempo real cuando un dispositivo cambia de estado, mostrando un mensaje emergente en pantalla.
 
 == Restringir acceso a dispositivos, rutinas, habitaciones y hogares (RF21)
-El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los hogares, habitaciones, dispositivos y rutinas a los que tiene acceso autorizado, el resto de dispositivos pueden accionarse mediante una contraseña.
+Por cuestiones de seguridad se decidio que la alarma requiera un codigo *obligatorio* para poder modificar su estado
 
 #figure(
   image("hci_before_and_after/Editar-dispositivo/alarma-control.png", width: 100%)
@@ -427,7 +427,7 @@ Esta sección detalla las decisiones adoptadas durante el desarrollo, fundamenta
 
 === Asistente de rutinas en pasos
 
-*Decisión:* La creación de rutinas se organizó en un asistente de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen.
+*Decisión:* La creación de rutinas se organizó en un asistente de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen (ver Figura 3).
 
 *Justificación:* En la etapa de prototipado, se observó que la configuración de rutinas podía resultar compleja. El asistente fragmenta la tarea en etapas simples con una progresión clara, reduciendo la carga cognitiva. El paso final de resumen permite verificar la configuración antes de confirmarla, funcionando como un mecanismo de prevención de errores.
 
@@ -519,7 +519,7 @@ tamaños de pantalla mobile_
 
 *Decisión:* Se reemplazaron algunos selectores binarios (on/off) por paneles de acciones contextuales para dispositivos con múltiples estados.
 
-*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la correspondencia con el mundo real y hace la interacción más intuitiva para perfiles como *Marta*. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real.
+*Justificación:* Dispositivos como cortinas o sistemas de audio poseen estados intermedios que no se representan adecuadamente con un interruptor simple. El uso de botones para acciones específicas (subir/bajar, reproducir/pausar) mejora la *correspondencia con el mundo real* _(Heurística de Nielsen #2)_ y hace la interacción más intuitiva para perfiles como *Marta*. El diseño actual refleja el modelo de interacción familiar para sistemas multimedia y de automatización, reforzando la coherencia entre el sistema y el mundo real.
 
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -529,46 +529,54 @@ tamaños de pantalla mobile_
   caption: [Control de cortinas: El interruptor binario del prototipo evolucionó hacia un panel de acciones contextuales.],
 )
 
-=== Introducción de la vista de Resumen Global (Overview)
+=== Modificación de la vista de Resumen Global (Overview)
 
-*Decisión:* Se incorporó una pantalla de bienvenida que ofrece una visión general de todas las propiedades y dispositivos críticos antes de profundizar en un hogar específico.
+*Decisión:* Se incorporó una pantalla de bienvenida que ofrece una visión general de todas las propiedades y dispositivos críticos antes de profundizar en un hogar específico. Esta decisión abarcó dos cambios grandes: la eliminación de los gráficos de consumo energético en esta vista y la implementación de una lógica de estados combinados para las alarmas a nivel de hogar, por lo que se desarrollarán en los dos próximos ítems.
 
-*Justificación:* Esta vista permite al usuario identificar rápidamente estados de alerta o ejecutar rutinas frecuentes sin necesidad de navegar por cada propiedad individualmente. Esto reduce el esfuerzo necesario para obtener una visión general del sistema, potenciando el reconocimiento sobre el recuerdo y la eficiencia de uso.
+==== Eliminación de gráficos de consumo en el overview global
 
-// ====================================
-// 8. FEEDBACK DE LA PRIMERA ENTREGA
-// ====================================
+*Decisión:* Se eliminaron los gráficos de consumo energético de la vista de overview global. En su lugar, se priorizó la presentación de métricas clave (cantidad de dispositivos, alertas, favoritos y críticos).
 
-
-=== Contraste de colores y legibilidad
-
-*Feedback:* "El contraste entre ciertos elementos de texto y sus fondos debería mejorarse para garantizar mejor legibilidad."
-
-*Resolución:* Se mantuvo y mejoró el contraste de colores en toda la aplicación para asegurar una legibilidad óptima. La paleta de colores definida en la primera entrega ya cumplía con los estándares WCAG AA, pero durante la implementación se validó sistemáticamente que todos los pares texto-fondo mantuvieran ratios de contraste adecuados. Se prestó especial atención a elementos críticos como botones de acción, etiquetas de estado de dispositivos y mensajes de error, asegurando que la información importante sea claramente legible en todas las condiciones de uso. Esta decisión refuerza el principio de accesibilidad y garantiza que usuarios con diferentes capacidades visuales puedan interactuar efectivamente con el sistema, cumpliendo con el compromiso de diseño inclusivo establecido desde la primera entrega.
-
-== Vista isométrica del hogar
-
-*Feedback:* "La vista isométrica 3D del hogar no aporta utilidad práctica y representa complejidad técnica innecesaria."
-
-*Resolución:* Siguiendo la sugerencia de la cátedra, se eliminó completamente la vista isométrica 3D que formaba parte del diseño original. Esta decisión se fundamentó en que la representación gráfica del plano de la casa, aunque visualmente atractiva, no proporcionaba información funcional que justificara su complejidad de implementación y mantenimiento. En su lugar, se priorizó una presentación más directa y eficiente de la información mediante tarjetas de resumen, métricas clave y listas de dispositivos favoritos.
+*Justificación:* Luego de la primera entrega, se recibió el feedback de que los gráficos de consumo en la vista de resumen global no aportaban valor en ese contexto y solo aumentaban la carga visual innecesariamente. Es por esto que, siguiendo en línea con el propósito principal del overview (el cual es proporcionar acceso rápido a todos los hogares del usuario y presentar métricas de alto nivel, no análisis detallado de consumo), se reemplazaron los gráficos por un simple y más general resumen energético. Esto mejora la claridad y reduce la sobrecarga de información, permitiendo al usuario enfocarse en los aspectos más críticos del estado de sus hogares sin distracciones visuales. Los gráficos de consumo se mantienen disponibles en la sección dedicada a Consumo, donde su análisis detallado es más relevante y esperado por el usuario. Esta decisión refuerza el principio de *jerarquía visual* _(Heurística de Nielsen #8)_ al presentar solo la información más relevante en cada contexto, mejorando la experiencia general del usuario.
 
 #figure(
   grid(columns: 2, gutter: 12pt,
     image("hci_before_and_after/global overview/goold.png", width: 100%),
     image("hci_before_and_after/global overview/gonew.png", width: 100%),
   ),
-  caption: [Resumen Global: prototipo con vista isométrica (izq.) vs. implementación sin vista isométrica (der.). La nueva versión prioriza métricas y favoritos en lugar de la representación gráfica del plano.],
+  caption: [Resumen Global: prototipo original (izq.) vs. implementación (der.). La nueva versión prioriza métricas y favoritos en lugar del consumo energético.],
 )
 
+==== Agregación de estados combinados de alarmas
+
+*Decisión:* El sistema implementa una lógica de estados agregados para las alarmas a nivel de hogar. Cuando un hogar contiene múltiples alarmas, el estado general de seguridad se calcula combinando los estados individuales de cada alarma:
+
+- *Desarmada:* Todas las alarmas del hogar están desactivadas. El hogar se visualiza con un indicador de seguridad en rojo, señalizando ausencia de protección.
+- *Armada:* Todas las alarmas del hogar están activadas (ya sea en modo ausente o en casa). El hogar muestra un indicador verde, confirmando protección completa.
+- *Parcialmente armada:* Algunas alarmas están activadas mientras otras permanecen desactivadas. El hogar se identifica con un indicador amarillo, alertando sobre una cobertura de seguridad incompleta.
+
+*Justificación:* Esta lógica de estados combinados proporciona una visión clara y concisa del nivel de protección de cada hogar sin necesidad de revisar individualmente el estado de cada alarma. La representación visual mediante colores sigue convenciones estándar de sistemas de seguridad, facilitando el reconocimiento inmediato del estado general del hogar. Esta decisión mejora la *visibilidad del estado del sistema* _(Heurística de Nielsen #1)_ al ofrecer una indicación clara y rápida del nivel de seguridad, lo cual es especialmente relevante para usuarios como *Carolina* que priorizan la seguridad en su hogar.
+
+#figure(
+  image("hci_before_and_after/MultiplesAlarmasEstados.jpg", width: 100%),
+  caption: [Se observan los 4 posibles estados de las casas],
+)
+// ====================================
+// 8. FEEDBACK DE LA PRIMERA ENTREGA
+// ====================================
+
+=== Contraste de colores y legibilidad
+
+*Decisión:* Se mantuvo y mejoró el contraste de colores en toda la aplicación para asegurar una legibilidad óptima, cumpliendo con los estándares WCAG AA.
+
+*Justificación:* El feedback recibido indicó que el contraste entre ciertos elementos de texto y sus fondos debería mejorarse para garantizar mejor legibilidad. Si bien la paleta de colores definida en la primera entrega ya cumplía con los estándares WCAG AA (Web Content Accessibility Guidelines), durante la implementación se validó sistemáticamente que todos los pares texto-fondo mantuvieran ratios de contraste adecuados, prestando especial atención a elementos críticos como botones de acción, etiquetas de estado de dispositivos y mensajes de error. Esta decisión refuerza el *principio de accesibilidad* y garantiza que usuarios con diferentes capacidades visuales puedan interactuar efectivamente con el sistema, cumpliendo con el compromiso de diseño inclusivo establecido desde la primera entrega.
 
 
-Este enfoque mejora la velocidad de carga de la vista principal, reduce la complejidad del código y mantiene el foco en la funcionalidad real del sistema: el control y monitoreo de dispositivos. La eliminación de este elemento decorativo refuerza el principio de diseño minimalista, donde cada componente de la interfaz debe cumplir un propósito claro en la experiencia del usuario.
+=== Tamaño de gráficos de consumo energético
 
-== Tamaño de gráficos de consumo energético
+*Decisión:* Se ajustó el tamaño de los gráficos de consumo energético para optimizar el uso del espacio visual en la vista de Consumo.
 
-*Feedback:* "Los gráficos de consumo energético ocupan demasiado espacio visual y deberían reducirse para mejorar la densidad de información."
-
-*Resolución:* Siguiendo la recomendación de la cátedra, se ajustó el tamaño de los gráficos de consumo energético para optimizar el uso del espacio disponible. Los gráficos de torta y barras se redimensionaron manteniendo su legibilidad pero permitiendo que más información sea visible sin necesidad de desplazamiento vertical excesivo.
+*Justificación:* El feedback recibido señaló que los gráficos de consumo energético ocupaban demasiado espacio visual, lo que dificultaba la visualización simultánea de otras métricas importantes. En respuesta a esta observación, se redimensionaron los gráficos de torta y barras para mantener su legibilidad mientras se optimizaba el espacio disponible en la pantalla. Esta modificación permite que más información relevante sea visible sin necesidad de desplazamiento vertical excesivo, mejorando la *densidad de información* y facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo _(Heurística de Nielsen #8)_. El ajuste se realizó cuidadosamente para asegurar que todos los elementos críticos del gráfico (etiquetas, valores, leyendas) permanecieran completamente legibles, garantizando que la reducción de escala no comprometiera la comprensión de los datos presentados.
 
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -577,27 +585,6 @@ Este enfoque mejora la velocidad de carga de la vista principal, reduce la compl
   ),
   caption: [Visualización de consumo energético: prototipo con gráficos de gran tamaño (izq.) vs. implementación con gráficos optimizados (der.). La reducción de escala permite visualizar múltiples métricas simultáneamente sin comprometer la legibilidad.],
 )
-
-Esta modificación mejora la densidad de información en la pantalla y reduce la necesidad de scroll, facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo. El ajuste mantiene todos los elementos críticos del gráfico (etiquetas, valores, leyendas) completamente legibles mientras aprovecha mejor el espacio disponible.
-
-== Gráficos de consumo en el overview global
-
-*Feedback:* "Los gráficos de consumo en la vista de resumen global no aportan valor en ese contexto y aumentan la carga visual innecesariamente."
-
-*Resolución:* Se eliminaron los gráficos de consumo energético de la vista de overview global. Esta decisión reconoce que el propósito principal del overview es proporcionar acceso rápido a todos los hogares del usuario y presentar métricas de alto nivel, no análisis detallado de consumo. Los gráficos son información secundaria que corresponde a una sección específica dedicada al análisis de consumo.
-
-#figure(
-  grid(columns: 2, gutter: 12pt,
-    image("hci_before_and_after/global overview/goold.png", width: 100%),
-    image("hci_before_and_after/global overview/gonew.png", width: 100%),
-  ),
-  caption: [Resumen Global: prototipo con gráficos de consumo (izq.) vs. implementación sin gráficos (der.). La nueva versión se enfoca en shortcuts y acceso rápido a las casas, eliminando información que distraía del propósito principal de la vista.],
-)
-
-Al remover los gráficos del overview, la interfaz se vuelve más limpia y enfocada en su función principal: permitir al usuario seleccionar rápidamente el hogar con el que desea interactuar y visualizar métricas clave de un vistazo (cantidad de dispositivos, alertas, favoritos). Esta simplificación reduce el tiempo de carga inicial y mejora la jerarquía visual, guiando al usuario hacia las acciones más frecuentes sin sobrecargarlo con análisis detallados que puede consultar cuando los necesite en la sección dedicada de Consumo.
-
-
-#pagebreak()
 
 == Decisiones de implementación
 
@@ -729,16 +716,3 @@ El feedback recibido en la primera entrega fue incorporado, evidenciando un cicl
 Los desafíos enfrentados durante la implementación resultaron en soluciones que fortalecieron la arquitectura general del sistema. La documentación detallada de estos problemas y sus resoluciones (disponible en el historial de git y en el archivo de troubleshooting) constituye un recurso valioso para futuras iteraciones y mantenimiento.
 
 En términos de cumplimiento normativo, la aplicación satisface todos los requisitos no funcionales especificados: validación HTML/CSS sin errores, separación de responsabilidades estructura/presentación/comportamiento, compatibilidad con navegadores modernos, y accesibilidad básica verificada con WAVE.
-
-== Trabajo futuro
-
-Si bien esta entrega cumple con los objetivos establecidos, se identifican oportunidades de mejora para futuras iteraciones:
-
-- *Planificación automática de rutinas:* La funcionalidad de configuración horaria está implementada en el frontend, pero requiere un componente de backend (cron job o scheduler) para ejecutar rutinas automáticamente sin intervención del usuario.
-
-- *Optimización de carga progresiva:* Aunque se implementó lazy loading de rutas, podría explorarse la carga progresiva de imágenes y datos en vistas con alta densidad de información.
-
-- *Análisis de consumo histórico:* Expandir la vista de consumo para incluir comparativas temporales (semana actual vs. anterior, proyecciones mensuales) agregaría valor analítico.
-
-- *Responsiveness para mobile:* Como se menciono, si bien la aplicacion deberia responder a tamaños de pantalla inferiores a los solicitados, 
-  deberian realizarse testeos y correcciones para poder afirmarlo con seguridad
