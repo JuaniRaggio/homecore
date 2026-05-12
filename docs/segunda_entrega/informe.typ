@@ -237,7 +237,6 @@ Las rutinas pueden editarse y eliminarse en cualquier momento. La creación incl
   caption: [Edición de rutinas existentes],
 )
 
-#pagebreak()
 - *Consulta y ejecución de rutinas (RF11-12):* El sistema presenta un listado de todas las rutinas del hogar en formato de tarjetas, mostrando nombre, días configurados y un resumen de las acciones que ejecuta. Desde la lista o el detalle de una rutina, el usuario puede ejecutarla manualmente con un solo clic en "ejecutar ahora", disparando todas las acciones definidas sobre los dispositivos correspondientes.
 
 #figure(
