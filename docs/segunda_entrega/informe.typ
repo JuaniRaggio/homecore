@@ -409,7 +409,7 @@ El diálogo explica claramente las consecuencias de la acción ("y todos sus dis
 Las notificaciones persistentes (accesibles desde el menú superior) informan en tiempo real sobre eventos del sistema —por ejemplo, cambios de estado de dispositivos— aunque no hayan sido provocados por acciones directas del usuario. Esta retroalimentación mantiene la *visibilidad del estado del sistema* _(Heurística de Nielsen #1)_, ya que comunica de forma inmediata qué está ocurriendo, reduciendo la incertidumbre y mejorando la confianza en la interfaz.
 
 #figure(
-  image("hci_before_and_after/Notificaciones/puerta-abierta.png", width: 60%),
+  image("hci_before_and_after/Notificaciones/feedbackPuerta.jpg", width: 60%),
   caption: [Notificación de evento: Puerta del frente abierta. Este tipo de notificación informa sobre cambios de estado de dispositivos monitoreados, especialmente útil para eventos de seguridad.],
 )
 
@@ -504,7 +504,7 @@ tamaños de pantalla mobile_
 #figure(
   grid(columns: 2, gutter: 12pt,
     image("hci_before_and_after/overview/oold.png", width: 100%),
-    image("hci_before_and_after/overview/onew.png", width: 100%),
+    image("hci_before_and_after/nuevoInicio.jpg", width: 100%),
   ),
   caption: [Home Overview: prototipo isométrico (izq.) vs. implementación final (der.)],
 )
