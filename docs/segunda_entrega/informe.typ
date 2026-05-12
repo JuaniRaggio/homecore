@@ -101,7 +101,7 @@
       inset: 10pt,
       fill: (x, y) => if y == 0 { gray.lighten(80%) },
       table.header([*Nombre*], [*Legajo*]),
-      [Matias Bernasconi], [64188],
+      [Matias Bernasconi], [64188], // TODO: rajarlo
       [Juan Ignacio Garcia Vautrin Raggio], [63319],
       [Victoria Helena Park], [64498],
       [Maria Del Pilar Resek], [65528],
@@ -187,6 +187,8 @@ El sistema implementa un flujo completo de autenticación que incluye registro, 
 )
 
 - *Control de dispositivos (RF9):* Se implementaron controles específicos para los 10 tipos de dispositivos soportados por la API:
+
+#pagebreak()
 
 #table(
   columns: (auto, 1fr),
@@ -355,6 +357,7 @@ Las correcciones aplicadas incluyeron la incorporación de landmarks semánticos
 
 Como resultado final, las cuatro páginas públicas del sistema (`/login`, `/registro`, `/verificar` y `/recuperar`) superaron exitosamente la validación de accesibilidad, obteniendo un estado de “0 violations found”, sin errores ni advertencias reportadas por las herramientas de análisis.
 
+#pagebreak()
 
 // ====================================
 // 5. SISTEMA DE NOTIFICACIONES
@@ -652,6 +655,8 @@ La paleta de colores definida en la primera entrega se mantuvo fielmente en la i
   swatch("#a5b4fc", "Indigo Hover", "#a5b4fc"),
   swatch("#fbbf24", "Ámbar", "#fbbf24"),
 )
+
+#pagebreak()
 
 #v(0.3em)
 #text(size: 10pt, weight: "bold")[Semánticos]
