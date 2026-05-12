@@ -586,8 +586,6 @@ tamaños de pantalla mobile_
   caption: [Visualización de consumo energético: prototipo con gráficos de gran tamaño (izq.) vs. implementación con gráficos optimizados (der.). La reducción de escala permite visualizar múltiples métricas simultáneamente sin comprometer la legibilidad.],
 )
 
-#pagebreak()
-
 == Decisiones de implementación
 
 Esta subsección documenta las decisiones técnicas de arquitectura y patrones de programación relevantes, sin profundizar en detalles exhaustivos de código.
