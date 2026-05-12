@@ -576,7 +576,7 @@ tamaños de pantalla mobile_
 
 *Decisión:* Se ajustó el tamaño de los gráficos de consumo energético para optimizar el uso del espacio visual en la vista de Consumo.
 
-*Justificación:* El feedback recibido señaló que los gráficos de consumo energético ocupaban demasiado espacio visual, lo que dificultaba la visualización simultánea de otras métricas importantes. En respuesta a esta observación, se redimensionaron los gráficos de torta y barras para mantener su legibilidad mientras se optimizaba el espacio disponible en la pantalla. Esta modificación permite que más información relevante sea visible sin necesidad de desplazamiento vertical excesivo, mejorando la densidad de información y facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo. El ajuste se realizó cuidadosamente para asegurar que todos los elementos críticos del gráfico (etiquetas, valores, leyendas) permanecieran completamente legibles, garantizando que la reducción de escala no comprometiera la comprensión de los datos presentados.
+*Justificación:* El feedback recibido señaló que los gráficos de consumo energético ocupaban demasiado espacio visual, lo que dificultaba la visualización simultánea de otras métricas importantes. En respuesta a esta observación, se redimensionaron los gráficos de torta y barras para mantener su legibilidad mientras se optimizaba el espacio disponible en la pantalla. Esta modificación permite que más información relevante sea visible sin necesidad de desplazamiento vertical excesivo, mejorando la *densidad de información* y facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo _(Heurística de Nielsen #8)_. El ajuste se realizó cuidadosamente para asegurar que todos los elementos críticos del gráfico (etiquetas, valores, leyendas) permanecieran completamente legibles, garantizando que la reducción de escala no comprometiera la comprensión de los datos presentados.
 
 #figure(
   grid(columns: 2, gutter: 12pt,
@@ -585,10 +585,6 @@ tamaños de pantalla mobile_
   ),
   caption: [Visualización de consumo energético: prototipo con gráficos de gran tamaño (izq.) vs. implementación con gráficos optimizados (der.). La reducción de escala permite visualizar múltiples métricas simultáneamente sin comprometer la legibilidad.],
 )
-
-Esta modificación mejora la densidad de información en la pantalla y reduce la necesidad de scroll, facilitando la comparación visual entre diferentes dispositivos y períodos de tiempo. El ajuste mantiene todos los elementos críticos del gráfico (etiquetas, valores, leyendas) completamente legibles mientras aprovecha mejor el espacio disponible.
-
-
 
 #pagebreak()
 
