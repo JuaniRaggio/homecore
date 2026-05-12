@@ -264,8 +264,6 @@ El sistema presenta un registro paginado de todas las acciones ejecutadas sobre 
   caption: [Gestión de habitaciones (izq.) y vista de listado con dispositivos asociados (der.)],
 )
 
-#pagebreak()
-
 - *Vinculación de dispositivos a habitaciones (RF16):* El usuario puede asignar o mover un dispositivo a una habitación distinta dentro del mismo hogar. Todos los dispositivos deben pertenecer a alguna habitación; no se permiten dispositivos sin asignar. Esta funcionalidad mantiene la jerarquía organizacional hogar $->$ habitación $->$ dispositivo.
 
 #figure(
@@ -371,10 +369,10 @@ El sistema de notificaciones responde al feedback de la primera entrega, donde s
 Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *visibilidad del estado del sistema* _(Heurística de Nielsen #1)_.
 
 #figure(
-  grid(columns: 3, gutter: 12pt,
+  grid(columns: 2, gutter: 12pt,
     image("hci_before_and_after/Notificaciones/Creacion-de-casa.png", width: 100%),
     image("hci_before_and_after/Notificaciones/rutina creada.png", width: 100%),
-    image("hci_before_and_after/Notificaciones/habitacion-eliminada.png", width: 100%),
+    grid.cell(colspan: 2, align(center, image("hci_before_and_after/Notificaciones/habitacion-eliminada.png", width: 50%))),
   ),
   caption: [Notificaciones de éxito: Confirmación de creación de casa, rutina creada, y habitación eliminada. Estas notificaciones temporales aparecen durante 3 segundos y se desvanecen automáticamente.],
 )
@@ -431,6 +429,22 @@ Esta sección detalla las decisiones adoptadas durante el desarrollo, fundamenta
 *Justificación:* En la etapa de prototipado, se observó que la configuración de rutinas podía resultar compleja. El asistente fragmenta la tarea en etapas simples con una progresión clara, reduciendo la carga cognitiva. El paso final de resumen permite verificar la configuración antes de confirmarla, funcionando como un mecanismo de prevención de errores.
 
 *Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria).
+
+=== Asistente de creación de Casas en pasos
+*Decisión:* Se agrego un opcion para la creación de casas + habitaciones + dispositivos en la que se puede utilizar un asistente para la creacion en una sola ejecucion de una casa con habitaciones y dispositivos vinculados
+
+*Justificación:* El asistente al igual que en el asistente de rutinas en pasos, ayuda a fragmentar la tarea de forma guiada en etapas simples con una progresión clara, reduciendo la carga cognitiva.
+
+*Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria). Ademas mejora significativamente la facilidad de integrar la aplicación a un entorno existente.
+
+#figure(
+  grid(columns: 2, gutter: 12pt,
+    image("hci_before_and_after/hogar/paso1.png", width: 100%),
+    image("hci_before_and_after/hogar/paso2.png", width: 100%),
+    grid.cell(colspan: 2, align(center, image("hci_before_and_after/hogar/paso3.png", width: 50%))),
+  ),
+  caption: [Home Overview: prototipo isométrico (izq.) vs. implementación final (der.)],
+)
 
 === Confirmación de acciones irreversibles
 
@@ -692,8 +706,6 @@ Los componentes de UI se reservaron exclusivamente para casos que requieren lóg
 *Manejo de errores:* Todos los formularios utilizan bloques `try/catch/finally` para garantizar que el estado de carga se restablece incluso si las peticiones fallan.
 
 *Deduplicación de notificaciones:* Sistema de ventana deslizante de 2 segundos para filtrar eventos redundantes del WebSocket.
-
-#pagebreak()
 
 
 // ====================================
