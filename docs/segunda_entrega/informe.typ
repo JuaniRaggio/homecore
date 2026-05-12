@@ -296,7 +296,7 @@ El sistema permite gestionar múltiples hogares de forma completa:
 El sistema notifica al usuario en tiempo real cuando un dispositivo cambia de estado, mostrando un mensaje emergente en pantalla.
 
 == Restringir acceso a dispositivos, rutinas, habitaciones y hogares (RF21)
-El sistema garantiza que cada usuario solo pueda visualizar y operar sobre los hogares, habitaciones, dispositivos y rutinas a los que tiene acceso autorizado, el resto de dispositivos pueden accionarse mediante una contraseña.
+Por cuestiones de seguridad se decidio que la alarma requiera un codigo *obligatorio* para poder modificar su estado
 
 #figure(
   image("hci_before_and_after/Editar-dispositivo/alarma-control.png", width: 100%)
@@ -427,7 +427,7 @@ Esta sección detalla las decisiones adoptadas durante el desarrollo, fundamenta
 
 === Asistente de rutinas en pasos
 
-*Decisión:* La creación de rutinas se organizó en un asistente de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen.
+*Decisión:* La creación de rutinas se organizó en un asistente de 4 pasos: nombre, selección de dispositivos, configuración de acciones y resumen (ver Figura 3).
 
 *Justificación:* En la etapa de prototipado, se observó que la configuración de rutinas podía resultar compleja. El asistente fragmenta la tarea en etapas simples con una progresión clara, reduciendo la carga cognitiva. El paso final de resumen permite verificar la configuración antes de confirmarla, funcionando como un mecanismo de prevención de errores.
 
@@ -718,16 +718,3 @@ El feedback recibido en la primera entrega fue incorporado, evidenciando un cicl
 Los desafíos enfrentados durante la implementación resultaron en soluciones que fortalecieron la arquitectura general del sistema. La documentación detallada de estos problemas y sus resoluciones (disponible en el historial de git y en el archivo de troubleshooting) constituye un recurso valioso para futuras iteraciones y mantenimiento.
 
 En términos de cumplimiento normativo, la aplicación satisface todos los requisitos no funcionales especificados: validación HTML/CSS sin errores, separación de responsabilidades estructura/presentación/comportamiento, compatibilidad con navegadores modernos, y accesibilidad básica verificada con WAVE.
-
-== Trabajo futuro
-
-Si bien esta entrega cumple con los objetivos establecidos, se identifican oportunidades de mejora para futuras iteraciones:
-
-- *Planificación automática de rutinas:* La funcionalidad de configuración horaria está implementada en el frontend, pero requiere un componente de backend (cron job o scheduler) para ejecutar rutinas automáticamente sin intervención del usuario.
-
-- *Optimización de carga progresiva:* Aunque se implementó lazy loading de rutas, podría explorarse la carga progresiva de imágenes y datos en vistas con alta densidad de información.
-
-- *Análisis de consumo histórico:* Expandir la vista de consumo para incluir comparativas temporales (semana actual vs. anterior, proyecciones mensuales) agregaría valor analítico.
-
-- *Responsiveness para mobile:* Como se menciono, si bien la aplicacion deberia responder a tamaños de pantalla inferiores a los solicitados, 
-  deberian realizarse testeos y correcciones para poder afirmarlo con seguridad
