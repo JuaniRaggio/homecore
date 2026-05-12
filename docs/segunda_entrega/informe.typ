@@ -369,10 +369,10 @@ El sistema de notificaciones responde al feedback de la primera entrega, donde s
 Las notificaciones temporales confirman acciones del usuario inmediatamente, proporcionando retroalimentación visual no intrusiva que refuerza la *visibilidad del estado del sistema* _(Heurística de Nielsen #1)_.
 
 #figure(
-  grid(columns: 3, gutter: 12pt,
+  grid(columns: 2, gutter: 12pt,
     image("hci_before_and_after/Notificaciones/Creacion-de-casa.png", width: 100%),
     image("hci_before_and_after/Notificaciones/rutina creada.png", width: 100%),
-    image("hci_before_and_after/Notificaciones/habitacion-eliminada.png", width: 100%),
+    grid.cell(colspan: 2, align(center, image("hci_before_and_after/Notificaciones/habitacion-eliminada.png", width: 50%))),
   ),
   caption: [Notificaciones de éxito: Confirmación de creación de casa, rutina creada, y habitación eliminada. Estas notificaciones temporales aparecen durante 3 segundos y se desvanecen automáticamente.],
 )
@@ -438,10 +438,10 @@ Esta sección detalla las decisiones adoptadas durante el desarrollo, fundamenta
 *Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria). Ademas mejora significativamente la facilidad de integrar la aplicación a un entorno existente.
 
 #figure(
-  grid(columns: 2, gutter: 12pt, 
+  grid(columns: 2, gutter: 12pt,
     image("hci_before_and_after/hogar/paso1.png", width: 100%),
     image("hci_before_and_after/hogar/paso2.png", width: 100%),
-    image("hci_before_and_after/hogar/paso3.png", width: 100%),
+    grid.cell(colspan: 2, align(center, image("hci_before_and_after/hogar/paso3.png", width: 50%))),
   ),
   caption: [Home Overview: prototipo isométrico (izq.) vs. implementación final (der.)],
 )
