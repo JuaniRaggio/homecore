@@ -433,6 +433,13 @@ Esta sección detalla las decisiones adoptadas durante el desarrollo, fundamenta
 
 *Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria).
 
+=== Asistente de creación de Casas en pasos
+*Decisión:* Se agrego un opcion para la creación de casas + habitaciones + dispositivos en la que se puede utilizar un asistente para la creacion en una sola ejecucion de una casa con habitaciones y dispositivos vinculados
+
+*Justificación:* El asistente al igual que en el asistente de rutinas en pasos, ayuda a fragmentar la tarea de forma guiada en etapas simples con una progresión clara, reduciendo la carga cognitiva.
+
+*Beneficia especialmente a:* Marta (interfaces simples, flujos lineales) y Carolina (eficiencia en la gestión sin complejidad innecesaria). Ademas mejora significativamente la facilidad de integrar la aplicación a un entorno existente.
+
 === Confirmación de acciones irreversibles
 
 *Decisión:* Las acciones de eliminación requieren una confirmación explícita mediante un cuadro de diálogo.
