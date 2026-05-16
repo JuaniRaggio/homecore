@@ -1,44 +1,37 @@
-.DS_Store
-.env
-
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Logs
-*.log
-npm-debug.log*
-
-/docs/usuarios_representativos.pdf
-/docs/informe.pdf
-
-# Android / IntelliJ IDEA
-homecore-mobile/*.iml
-homecore-mobile/.gradle/
-homecore-mobile/.idea/
-homecore-mobile/local.properties
-homecore-mobile/build/
-homecore-mobile/app/build/
-homecore-mobile/captures/
-homecore-mobile/.externalNativeBuild/
-homecore-mobile/.cxx/
-homecore-mobile/*.apk
-homecore-mobile/*.ap_
-homecore-mobile/*.aab
-homecore-mobile/*.aar
-homecore-mobile/lint-baseline.xml
-
-# Android Studio Navigation editor temp files
-homecore-mobile/.navigation/
-
-# Keystore files (nunca commitear!)
-homecore-mobile/*.jks
-homecore-mobile/*.keystore
-
-# Google Services (puede contener claves)
-homecore-mobile/google-services.json
+# ============================================
+# GLOBAL IGNORES (todo el repositorio)
+# ============================================
 
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# Logs (globales)
+*.log
+
+# Documentos temporales
+/docs/usuarios_representativos.pdf
+/docs/informe.pdf
+
+# IDEs (configuraciones locales - cada sub-proyecto tiene su propio .gitignore para cosas específicas)
+.vscode/
+.idea/
+
+# Claude Code context (SÍ commitear)
+# .claude/CLAUDE.md se debe versionar
+# Ignorar solo archivos temporales si los hay
+.claude/*.tmp
+
+# Environment files (pueden contener secrets)
+.env
+.env.local
+.env.*.local
