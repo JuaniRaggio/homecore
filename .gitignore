@@ -13,3 +13,17 @@ npm-debug.log*
 
 /docs/usuarios_representativos.pdf
 /docs/informe.pdf
+
+# Android
+homecore-mobile/*.iml
+homecore-mobile/.gradle
+homecore-mobile/local.properties
+homecore-mobile/.idea/
+homecore-mobile/build/
+homecore-mobile/app/build/
+homecore-mobile/captures/
+homecore-mobile/.externalNativeBuild
+homecore-mobile/.cxx
+homecore-mobile/*.apk
+homecore-mobile/*.aar
+homecore-mobile/lint-baseline.xml
