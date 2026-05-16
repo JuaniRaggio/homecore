@@ -179,7 +179,6 @@ homecore-web/
 
 ## Documentación Adicional
 
-- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)**: Registro histórico de problemas resueltos y soluciones técnicas
 - **[docs/segunda_entrega/informe.typ](./docs/segunda_entrega/informe.typ)**: Informe completo de la implementación
 
 ## Equipo de Desarrollo
