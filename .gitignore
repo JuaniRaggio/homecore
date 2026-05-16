@@ -14,16 +14,31 @@ npm-debug.log*
 /docs/usuarios_representativos.pdf
 /docs/informe.pdf
 
-# Android
+# Android / IntelliJ IDEA
 homecore-mobile/*.iml
-homecore-mobile/.gradle
-homecore-mobile/local.properties
+homecore-mobile/.gradle/
 homecore-mobile/.idea/
+homecore-mobile/local.properties
 homecore-mobile/build/
 homecore-mobile/app/build/
 homecore-mobile/captures/
-homecore-mobile/.externalNativeBuild
-homecore-mobile/.cxx
+homecore-mobile/.externalNativeBuild/
+homecore-mobile/.cxx/
 homecore-mobile/*.apk
+homecore-mobile/*.ap_
+homecore-mobile/*.aab
 homecore-mobile/*.aar
 homecore-mobile/lint-baseline.xml
+
+# Android Studio Navigation editor temp files
+homecore-mobile/.navigation/
+
+# Keystore files (nunca commitear!)
+homecore-mobile/*.jks
+homecore-mobile/*.keystore
+
+# Google Services (puede contener claves)
+homecore-mobile/google-services.json
+
+# macOS
+.DS_Store
