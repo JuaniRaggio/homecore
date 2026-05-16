@@ -219,14 +219,52 @@ Authorization: Bearer <token>
 
 ---
 
-## Commits
+## ⚠️ IMPORTANTE: Git y GitHub
 
-- No commitear sin que lo pida el usuario
-- Mensajes en español o inglés (consistente)
-- Formato: `tipo: descripción`
-  - `feat: agregar pantalla de dispositivos`
-  - `fix: corregir error en login`
-  - `chore: actualizar dependencias`
+### Reglas absolutas
+
+**NO HACER BAJO NINGUNA CIRCUNSTANCIA:**
+- ❌ NO hacer `git commit`
+- ❌ NO hacer `git push`
+- ❌ NO hacer `git pull`
+- ❌ NO hacer `git add`
+- ❌ NO hacer operaciones con GitHub
+- ❌ NO hacer `gh` commands
+
+**Solo el usuario puede:**
+- Hacer commits
+- Push al repositorio
+- Pull requests
+- Merge de branches
+- Cualquier operación de Git
+
+**Puedes hacer:**
+- ✅ Crear/editar/eliminar archivos
+- ✅ Leer archivos
+- ✅ Ver estado con `git status` (solo lectura)
+- ✅ Ver diff con `git diff` (solo lectura)
+- ✅ Ver log con `git log` (solo lectura)
+
+### Formato de commits (solo referencia para el usuario)
+
+Si el usuario te pide formato de mensaje de commit:
+
+```
+tipo: descripción breve
+
+Cuerpo opcional con más detalles
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+**Tipos:**
+- `feat`: Nueva funcionalidad
+- `fix`: Corrección de bug
+- `chore`: Cambios de mantenimiento (deps, config)
+- `docs`: Solo documentación
+- `refactor`: Refactorización de código
+- `test`: Agregar o modificar tests
+- `style`: Cambios de formato (no afectan lógica)
 
 ---
 
@@ -258,55 +296,150 @@ Usar la guía de referencia rápida:
 
 ## Equipo
 
-Grupo 15 - 3 personas:
+**Grupo 15 - 3 personas:**
 - Juan Ignacio Garcia Vautrin Raggio (63319)
 - Victoria Helena Park (64498)
 - Maria Del Pilar Resek (65528)
+
+**Implicaciones de ser grupo de 3:**
+- RF17-RF19 (Hogares) son **OPCIONALES** (para grupos de 3)
+- Pueden implementarlos para obtener puntos extra
+- Si no los implementan, deben cumplir todos los demás RF obligatorios
 
 ---
 
 ## Requisitos del Proyecto (Tercera Entrega)
 
-### Requisitos Funcionales Obligatorios
+### Requisitos Funcionales Obligatorios (RF)
 
 **Autenticación:**
-- RF1: Registro de cuenta
-- RF2: Verificación de cuenta (código enviado por email)
-- RF3: Inicio de sesión (JWT)
-- RF4: Cierre de sesión
+- **RF1**: Registrar cuenta
+- **RF2**: Verificar cuenta (código enviado por email)
+- **RF3**: Recuperar contraseña
+- **RF4**: Cambiar contraseña
+- **RF5**: Iniciar sesión (JWT)
+- **RF6**: Cerrar sesión
 
 **Dispositivos:**
-- RF5: Consultar lista de dispositivos
-- RF6: Consultar detalle de dispositivo
-- RF7: Controlar dispositivo (ejecutar acciones)
+- **RF7**: Gestionar dispositivos (crear/editar/eliminar)
+- **RF8**: Consultar dispositivos (lista)
+- **RF9**: Controlar dispositivos (ejecutar acciones)
 
 **Rutinas:**
-- RF8: Consultar lista de rutinas
-- RF9: Consultar detalle de rutina
-- RF10: Ejecutar rutina manualmente
+- **RF11**: Consultar rutinas
+- **RF12**: Ejecutar rutinas
 
 **Habitaciones:**
-- RF11: Consultar lista de habitaciones
-- RF12: Gestionar habitaciones (CRUD completo)
-- RF13: Vincular/desvincular dispositivos a habitaciones
+- **RF14**: Gestionar habitaciones (crear/editar/eliminar)
+- **RF15**: Consultar habitaciones
+- **RF16**: Vincular dispositivos a habitaciones
 
-**Hogares (Opcional):**
-- RF14: Consultar lista de hogares
-- RF15: Gestionar hogares
-- RF16: Vincular habitaciones a hogares
+**Hogares (Opcional - para grupos de 3 integrantes):**
+- **RF17**: Gestionar hogares (crear/editar/eliminar)
+- **RF18**: Consultar hogares
+- **RF19**: Vincular habitaciones a hogares
 
 **Notificaciones:**
-- RF17: Notificaciones push
-- RF18: Notificaciones en tiempo real (WebSocket)
+- **RF20**: Enviar notificaciones
 
-### Requisitos No Funcionales
+### Requisitos Funcionales Opcionales (RF)
 
-- RNF1: **Internacionalización** - Español e inglés
-- RNF2: **App Bar contextual** - Título dinámico según pantalla
-- RNF3: **Personalización** - Tema oscuro por defecto
-- RNF4: **Adaptabilidad a dispositivo** - Teléfonos y tablets
-- RNF5: **Adaptabilidad a orientación** - Vertical y horizontal
-- RNF6: **Compatibilidad** - Android 10+ (API 29)
+- **RF13**: Consultar acciones realizadas (historial)
+- **RF21**: Restringir acceso a dispositivos, rutinas, habitaciones y hogares
+- **RF22**: Consultar consumo eléctrico
+- **RF23**: Planificar ejecución de rutinas (scheduling)
+
+### Requisitos No Funcionales Obligatorios (RNF)
+
+- **RNF1**: Internacionalización - Español e inglés
+- **RNF2**: Barra de aplicación contextual (App Bar) - Título dinámico según pantalla
+- **RNF3**: Personalización - Tema oscuro por defecto
+- **RNF4**: Adaptabilidad a tipo de dispositivo - Teléfonos Y tablets
+- **RNF5**: Adaptabilidad a orientación - Vertical Y horizontal
+- **RNF6**: Compatibilidad - Android 10+ (API 29)
+
+### Requisitos No Funcionales Opcionales (RNF)
+
+- **RNF7**: Interactuar con dispositivos mediante comandos de voz
+- **RNF8**: Capturar códigos QR de dispositivos
+
+---
+
+## Entregables de la Tercera Entrega
+
+### 1. Informe (Máximo 30 páginas)
+
+Debe incluir:
+
+**RF y RNF implementados:**
+- Lista de requisitos funcionales implementados con descripción breve y precisa
+- Lista de requisitos no funcionales implementados con descripción breve y precisa
+
+**Capturas de pantalla:**
+- TODAS las vistas implementadas
+- Comparación con versión final de prototipos (si hay diferencias)
+- **Factor de forma**: Capturas en teléfonos Y tabletas
+- **Orientación**: Capturas en vertical Y horizontal
+- Resolución adecuada para apreciar detalles
+- Ubicar capturas próximas para facilitar apreciación de cambios
+- Incluir descripciones para ilustrar el flujo
+
+**Decisiones de usabilidad:**
+
+⚠️ **IMPORTANTE - Justificaciones requeridas:**
+
+1. **Diferencias con prototipos:**
+   - Justificar toda diferencia entre vistas implementadas y prototipos
+   - NO se admiten cambios radicales salvo que estén fundamentados
+   - NO justificaciones subjetivas o estéticas ("se ve mejor", "me gusta más")
+   - Evidenciar trazabilidad entre problema de usabilidad y solución propuesta
+
+2. **Adaptaciones a dispositivos:**
+   - Justificar cambios estructurales para adaptar a teléfonos/tabletas
+   - Justificar cambios para adaptar a orientación vertical/horizontal
+   - NO adaptaciones basadas solo en redistribución o redimensionamiento
+   - Evidenciar cambios sustanciales en:
+     - Organización de información
+     - Jerarquía visual
+     - Comportamiento de la interfaz
+
+3. **Diseño gráfico:**
+   - Hacer referencia a colores utilizados
+   - Hacer referencia a tipografías
+   - Hacer referencia a imágenes/iconografía
+   - Justificar decisiones con base en:
+     - Criterios de usabilidad
+     - Criterios de accesibilidad
+     - Coherencia con identidad visual del producto
+
+4. **Fundamentación teórica:**
+   - Hacer referencia a contenidos de la materia
+   - Aplicación práctica de conceptos (NO mera reproducción teórica)
+   - Hacer referencia a Modelos de Persona definidos
+   - Relacionar decisiones con necesidades y objetivos de los usuarios
+   - Contemplar sugerencias del equipo docente
+
+### 2. Aplicación Móvil (APK)
+
+**Formato de entrega:**
+- Archivo ZIP o RAR con:
+  - Todos los archivos necesarios para compilar
+  - APK generado y funcional
+- ⚠️ **NO incluir**:
+  - Carpeta `build/`
+  - Frameworks no utilizados
+
+**Repositorio GitHub:**
+- Repositorio PRIVADO
+- Compartir con docentes (agregar como colaboradores)
+- Debe contener código fuente completo
+
+**Instructivo de instalación:**
+- Tipo de dispositivo recomendado (físico o emulador)
+- Versiones de API Level compatibles
+- Secuencia de pasos para instalar en dispositivo físico
+- ⚠️ NO contemplar ejecución desde Android Studio
+- NOTA: El instructivo puede incorporarse al informe
 
 ---
 
@@ -709,6 +842,82 @@ localStorage.clear()           // Limpiar storage
 
 ---
 
+## Capturas de Pantalla para el Informe
+
+### Requisitos de las capturas
+
+**Cobertura:**
+- TODAS las vistas implementadas
+- TODAS las variantes de diseño
+
+**Factores de forma:**
+- Capturas en **teléfono** (ej: Pixel 8, 6.2")
+- Capturas en **tablet** (ej: Pixel Tablet, 10.95")
+
+**Orientaciones:**
+- Capturas en **vertical** (portrait)
+- Capturas en **horizontal** (landscape)
+
+**Calidad:**
+- Resolución adecuada para apreciar detalles
+- Sin bordes negros del emulador (crop si es necesario)
+- Ubicar capturas relacionadas próximas para comparar
+
+**Organización sugerida en el informe:**
+
+```
+Pantalla X - Teléfono
+├── Vertical - Español
+├── Vertical - Inglés
+├── Horizontal - Español
+└── Horizontal - Inglés
+
+Pantalla X - Tablet
+├── Vertical - Español
+├── Vertical - Inglés
+├── Horizontal - Español
+└── Horizontal - Inglés
+```
+
+**Mínimo requerido por pantalla:**
+- 1 captura en teléfono vertical
+- 1 captura en teléfono horizontal
+- 1 captura en tablet vertical
+- 1 captura en tablet horizontal
+
+**Total estimado**: ~80-100 capturas (considerando 10-12 pantallas principales)
+
+### Cómo tomar capturas
+
+**En emulador Android Studio:**
+1. Abrir emulador
+2. Navegar a la pantalla deseada
+3. Click en ícono de cámara en la barra lateral del emulador
+4. O usar `Ctrl + S` (Windows/Linux) o `Cmd + S` (Mac)
+5. Se guardan en `~/Pictures/Screenshots/` por defecto
+
+**Alternativa con ADB:**
+```bash
+adb exec-out screencap -p > screenshot.png
+```
+
+**Rotar emulador:**
+- `Ctrl + F11` / `Ctrl + F12` para rotar
+- O botón de rotación en la barra del emulador
+
+### Descriptores para capturas
+
+Cada captura debe tener una descripción breve que explique:
+- Qué pantalla es
+- Qué acción se está mostrando (si aplica)
+- Diferencias respecto al prototipo (si las hay)
+- Particularidades de la adaptación (teléfono/tablet, orientación)
+
+**Ejemplo:**
+> "Pantalla de lista de dispositivos en tablet horizontal. Se muestra un layout de dos columnas con la lista a la izquierda y el detalle del dispositivo seleccionado a la derecha (master-detail pattern). Esta adaptación difiere del prototipo original que mostraba solo la lista, mejorando la eficiencia al eliminar navegaciones innecesarias en pantallas grandes."
+
+---
+
 ## Checklist Pre-Commit
 
 Antes de hacer commit, verificar:
@@ -721,6 +930,218 @@ Antes de hacer commit, verificar:
 - [ ] Código formateado (Ctrl+Alt+L)
 - [ ] No hay archivos de configuración personal (.idea, local.properties)
 - [ ] No hay secrets en código (API keys, tokens)
+
+---
+
+## Generación del APK y Entrega
+
+### Generar APK de Debug
+
+```bash
+# En la raíz del proyecto mobile
+cd homecore-mobile
+
+# Limpiar builds anteriores
+./gradlew clean
+
+# Generar APK de debug
+./gradlew assembleDebug
+
+# El APK se genera en:
+# homecore-mobile/app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Generar APK de Release (Opcional)
+
+Si quieren generar un APK optimizado para entrega:
+
+1. **Crear keystore** (solo primera vez):
+```bash
+keytool -genkey -v -keystore homecore-release.keystore -alias homecore -keyalg RSA -keysize 2048 -validity 10000
+```
+
+2. **Configurar signing** en `app/build.gradle.kts`:
+```kotlin
+android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("../homecore-release.keystore")
+            storePassword = "password"  // Cambiar por password real
+            keyAlias = "homecore"
+            keyPassword = "password"    // Cambiar por password real
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+}
+```
+
+3. **Generar APK**:
+```bash
+./gradlew assembleRelease
+```
+
+⚠️ **IMPORTANTE**:
+- NO commitear el keystore al repositorio
+- NO compartir las contraseñas en el código
+- Para este proyecto académico, APK debug es suficiente
+
+### Instructivo de Instalación (Template)
+
+Crear archivo `INSTALL.md` en `homecore-mobile/`:
+
+```markdown
+# Instructivo de Instalación - HomeCore Mobile
+
+## Requisitos del Sistema
+
+**Dispositivo Físico:**
+- Android 10.0 o superior (API Level 29+)
+- Mínimo 100 MB de espacio disponible
+- Conexión a internet (WiFi o datos móviles)
+
+**O Emulador:**
+- Android Studio instalado
+- Emulador configurado con:
+  - API Level 29 o superior
+  - Google APIs (para notificaciones)
+  - x86_64 o ARM64 según arquitectura de la PC
+
+## Instalación en Dispositivo Físico
+
+### Paso 1: Habilitar Orígenes Desconocidos
+
+1. Abrir **Configuración** del dispositivo
+2. Ir a **Seguridad** o **Aplicaciones**
+3. Buscar **Instalar aplicaciones desconocidas**
+4. Seleccionar el navegador o gestor de archivos
+5. Habilitar **Permitir desde esta fuente**
+
+### Paso 2: Transferir el APK
+
+**Opción A - Por cable USB:**
+1. Conectar el dispositivo a la PC
+2. Copiar `app-debug.apk` a la carpeta Downloads del dispositivo
+
+**Opción B - Por enlace web:**
+1. Subir el APK a Google Drive o similar
+2. Abrir el enlace desde el navegador del dispositivo
+3. Descargar el APK
+
+### Paso 3: Instalar
+
+1. Abrir el gestor de archivos del dispositivo
+2. Navegar a **Downloads**
+3. Tocar `app-debug.apk`
+4. Confirmar instalación
+5. Esperar a que se complete
+
+### Paso 4: Configurar Backend
+
+⚠️ **IMPORTANTE**: La app necesita conectarse al backend.
+
+**Si el backend está en tu PC:**
+1. Asegurarse de que el dispositivo y la PC estén en la misma red WiFi
+2. Obtener IP de la PC:
+   - Windows: `ipconfig` (buscar IPv4)
+   - Mac/Linux: `ifconfig` o `ip addr` (buscar inet)
+3. La app debe configurarse para usar `http://[IP_PC]:8080/api/`
+
+**Nota**: Si la app tiene la URL hardcodeada a localhost, no funcionará en dispositivo físico.
+
+### Paso 5: Primera Ejecución
+
+1. Abrir la app **HomeCore**
+2. Aceptar permisos de notificaciones (si aparece el diálogo)
+3. Deberías ver la pantalla de login/registro
+4. Si aparece error de red, verificar:
+   - Backend está corriendo
+   - Dispositivo y PC en la misma red
+   - Firewall no bloquea el puerto 8080
+
+## Instalación en Emulador
+
+### Opción 1: Desde Android Studio
+
+1. Abrir el proyecto en Android Studio
+2. Crear o seleccionar un emulador (AVD)
+   - Recomendado: Pixel 8 con API 36 y Google APIs
+3. Click en **Run** (triángulo verde)
+4. Esperar a que compile e instale automáticamente
+
+### Opción 2: Instalar APK manualmente
+
+1. Iniciar el emulador
+2. Arrastrar y soltar `app-debug.apk` sobre la ventana del emulador
+3. O usar ADB:
+   ```bash
+   adb install app-debug.apk
+   ```
+
+**Nota**: En emulador, la URL del backend debe ser `http://10.0.2.2:8080/api/` (no localhost).
+
+## Verificación de Instalación
+
+1. Abrir la app
+2. Intentar registrar una cuenta
+3. Si el registro funciona → instalación exitosa
+4. Si hay errores de red → verificar configuración del backend
+
+## Troubleshooting
+
+**"Error al instalar"**
+- Verificar que Android >= 10
+- Verificar espacio disponible
+- Desinstalar versión anterior si existe
+
+**"No se puede conectar al servidor"**
+- Verificar que backend está corriendo
+- Verificar URL correcta (10.0.2.2 para emulador)
+- Verificar firewall no bloquea puerto 8080
+
+**"La app se cierra al abrir"**
+- Verificar logs con `adb logcat`
+- Revisar permisos otorgados
+
+## Contacto
+
+Para problemas con la instalación, contactar al equipo:
+- Juan Ignacio Garcia Vautrin Raggio
+- Victoria Helena Park
+- Maria Del Pilar Resek
+```
+
+### Preparar ZIP de Entrega
+
+```bash
+# En la raíz del repo
+cd homecore-mobile
+
+# Crear carpeta de entrega
+mkdir -p entrega-tp3
+
+# Copiar APK
+cp app/build/outputs/apk/debug/app-debug.apk entrega-tp3/
+
+# Copiar instructivo
+cp INSTALL.md entrega-tp3/
+
+# Comprimir
+zip -r homecore-mobile-tp3.zip entrega-tp3/
+
+# O excluir build y comprimir todo el proyecto
+zip -r homecore-mobile-source.zip . -x "*/build/*" "*.gradle/*" "*.idea/*" "local.properties"
+```
+
+**Contenido del ZIP final:**
+- `app-debug.apk` (o `app-release.apk`)
+- `INSTALL.md` (instructivo)
+- Código fuente completo (sin carpetas build)
 
 ---
 
