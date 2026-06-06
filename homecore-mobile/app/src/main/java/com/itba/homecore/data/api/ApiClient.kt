@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:8080/api/"
+    private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
+    private const val API_KEY  = "sk_2ece0079ab8c2fb4fb03b5537aebf5b6"
 
     private var token: String? = null
     fun setToken(t: String?) { token = t }
@@ -18,9 +19,10 @@ object ApiClient {
                 level = HttpLoggingInterceptor.Level.BODY
             })
             .addInterceptor { chain ->
-                val req = chain.request().newBuilder().apply {
-                    token?.let { addHeader("Authorization", "Bearer $it") }
-                }.build()
+                val req = chain.request().newBuilder()
+                    .addHeader("X-API-Key", API_KEY)
+                    .apply { token?.let { addHeader("Authorization", "Bearer $it") } }
+                    .build()
                 chain.proceed(req)
             }
             .connectTimeout(30, TimeUnit.SECONDS)
