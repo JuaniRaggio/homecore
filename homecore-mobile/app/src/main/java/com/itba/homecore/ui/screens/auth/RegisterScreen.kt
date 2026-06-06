@@ -50,19 +50,13 @@ fun RegisterScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier.align(Alignment.TopStart).padding(8.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.btn_back), tint = TextPrimary)
-        }
-
+        // Primero el contenido scrolleable
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp, vertical = 48.dp)
+                .padding(horizontal = 32.dp, vertical = 64.dp)
         ) {
             Box(
                 modifier = Modifier.size(84.dp).background(Accent, CircleShape),
@@ -101,6 +95,21 @@ fun RegisterScreen(
                     )
                 }
             }
+        }
+
+        //Boton de volver
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(top = 12.dp, start = 8.dp) // Aumentado el padding top para bajarlo un poco más
+                .align(Alignment.TopStart)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.btn_back),
+                tint = TextPrimary
+            )
         }
     }
 }
