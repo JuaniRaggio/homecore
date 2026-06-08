@@ -147,7 +147,7 @@ Para fundamentar las decisiones de diseño, se utilizaron los siguientes modelos
 - *Marta "La Usuaria Tradicional" (63 años):* Nivel tecnológico básico. Prefiere interfaces simples, flujos lineales y botones grandes con etiquetas claras.
 
 
-=* 1. Requisitos funcionales y no funcionales implementados.*
+= Requisitos funcionales y no funcionales implementados.
 
 == Requisitos funcionales
 
