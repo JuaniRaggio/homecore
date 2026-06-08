@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Design tokens - dark theme -->
+    <color name="background">#0F0F14</color>
+    <color name="surface">#1A1B2E</color>
+    <color name="surface_variant">#2A2B3E</color>
+    <color name="input_background">#3A3B52</color>
+    <color name="accent">#818CF8</color>
+    <color name="accent_dark">#4B6EF5</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B3C6</color>
+    <color name="on_accent">#FFFFFF</color>
+    <color name="error">#E05252</color>
+    <color name="success">#4CAF50</color>
+
+    <!-- Device type colors -->
+    <color name="device_light">#F5A623</color>
+    <color name="device_door">#6C8EBF</color>
+    <color name="device_alarm">#E05252</color>
+    <color name="device_water">#4FC3F7</color>
+    <color name="device_curtain">#81C784</color>
+    <color name="device_ac">#BA68C8</color>
+    <color name="device_speaker">#FF8A65</color>
+    <color name="device_vacuum">#90A4AE</color>
+    <color name="device_fridge">#4DD0E1</color>
+    <color name="device_oven">#FF7043</color>
+    <color name="device_lock">#2196F3</color>
 </resources>
