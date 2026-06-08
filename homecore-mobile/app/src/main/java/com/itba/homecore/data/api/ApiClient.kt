@@ -11,7 +11,10 @@ object ApiClient {
     private const val API_KEY  = "sk_2ece0079ab8c2fb4fb03b5537aebf5b6"
 
     private var token: String? = null
-    fun setToken(t: String?) { token = t }
+
+    fun setToken(t: String?) {
+        this.token = t
+    }
 
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -19,11 +22,15 @@ object ApiClient {
                 level = HttpLoggingInterceptor.Level.BODY
             })
             .addInterceptor { chain ->
-                val req = chain.request().newBuilder()
+                val requestBuilder = chain.request().newBuilder()
                     .addHeader("X-API-Key", API_KEY)
-                    .apply { token?.let { addHeader("Authorization", "Bearer $it") } }
-                    .build()
-                chain.proceed(req)
+                
+                // Usamos la referencia al objeto para evitar confusiones de scope
+                this@ApiClient.token?.let {
+                    requestBuilder.addHeader("Authorization", "Bearer $it")
+                }
+                
+                chain.proceed(requestBuilder.build())
             }
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -38,5 +45,24 @@ object ApiClient {
             .build()
     }
 
-    val authApi: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
+    // Usamos tipos explícitos en los bloques lazy para resolver errores de inferencia
+    val authApi: AuthApi by lazy<AuthApi> { 
+        retrofit.create(AuthApi::class.java) 
+    }
+    
+    val devicesApi: DevicesApi by lazy<DevicesApi> { 
+        retrofit.create(DevicesApi::class.java) 
+    }
+    
+    val roomsApi: RoomsApi by lazy<RoomsApi> { 
+        retrofit.create(RoomsApi::class.java) 
+    }
+    
+    val homesApi: HomesApi by lazy<HomesApi> { 
+        retrofit.create(HomesApi::class.java) 
+    }
+    
+    val routinesApi: RoutinesApi by lazy<RoutinesApi> { 
+        retrofit.create(RoutinesApi::class.java) 
+    }
 }

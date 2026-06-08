@@ -1,16 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
+    // OJO: NO agregar `kotlin-android` — AGP 9.x lo aplica automáticamente y declararlo
+    // dispara: "Cannot add extension with name 'kotlin', as there is an extension already registered"
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.itba.homecore"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.itba.homecore"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

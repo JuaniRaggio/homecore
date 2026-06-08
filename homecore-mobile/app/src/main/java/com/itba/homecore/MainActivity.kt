@@ -7,16 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.ui.screens.auth.LoginScreen
 import com.itba.homecore.ui.screens.auth.RegisterScreen
+import com.itba.homecore.ui.screens.main.MainScreen
+import com.itba.homecore.ui.theme.Accent
+import com.itba.homecore.ui.theme.Background
 import com.itba.homecore.ui.theme.HomeCoreTheme
 import com.itba.homecore.viewmodel.AuthViewModel
 
@@ -29,21 +30,31 @@ class MainActivity : ComponentActivity() {
         setContent {
             HomeCoreTheme {
                 val authViewModel: AuthViewModel = viewModel()
+                val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
+
+                // currentScreen sólo aplica cuando NO hay sesión (login/register)
                 var currentScreen by remember { mutableStateOf(AppScreen.LOGIN) }
 
-                when (currentScreen) {
-                    AppScreen.LOGIN -> LoginScreen(
-                        viewModel            = authViewModel,
-                        onLoginSuccess       = { currentScreen = AppScreen.HOME },
-                        onNavigateToRegister = { currentScreen = AppScreen.REGISTER },
-                        onNavigateToRecover  = { }
-                    )
-                    AppScreen.REGISTER -> RegisterScreen(
-                        viewModel         = authViewModel,
-                        onRegisterSuccess = { currentScreen = AppScreen.LOGIN },
-                        onBack            = { currentScreen = AppScreen.LOGIN }
-                    )
-                    AppScreen.HOME -> HomeScreen()
+                when (isLoggedIn) {
+                    null  -> SplashScreen()
+                    true  -> MainScreen(onLogout = {
+                        authViewModel.logout()
+                        currentScreen = AppScreen.LOGIN
+                    })
+                    false -> when (currentScreen) {
+                        AppScreen.LOGIN -> LoginScreen(
+                            viewModel            = authViewModel,
+                            onLoginSuccess       = { /* isLoggedIn pasa a true y se renderiza MainScreen */ },
+                            onNavigateToRegister = { currentScreen = AppScreen.REGISTER },
+                            onNavigateToRecover  = { }
+                        )
+                        AppScreen.REGISTER -> RegisterScreen(
+                            viewModel         = authViewModel,
+                            onRegisterSuccess = { currentScreen = AppScreen.LOGIN },
+                            onBack            = { currentScreen = AppScreen.LOGIN }
+                        )
+                        AppScreen.HOME -> { /* unreachable cuando isLoggedIn = false */ }
+                    }
                 }
             }
         }
@@ -51,18 +62,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen() {
+private fun SplashScreen() {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0D1B2A)), // Azul oscuro
+        modifier = Modifier.fillMaxSize().background(Background),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Bienvenido",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
-        )
+        CircularProgressIndicator(color = Accent)
     }
 }
