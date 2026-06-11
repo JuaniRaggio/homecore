@@ -12,37 +12,44 @@ Plan detallado para la implementación de la aplicación móvil Android de HomeC
 
 ## Requisitos a Cumplir
 
-### Requisitos Funcionales Obligatorios (RF1-RF20)
+### Requisitos Funcionales Obligatorios
 
 #### Autenticación
-- [x] RF1: Registro de cuenta
-- [x] RF2: Verificación de cuenta
-- [x] RF3: Inicio de sesión
-- [x] RF4: Cierre de sesión
+- [ ] **RF1**: Registrar cuenta
+- [ ] **RF2**: Verificar cuenta (código por email)
+- [ ] **RF3**: Recuperar contraseña
+- [ ] **RF4**: Cambiar contraseña
+- [ ] **RF5**: Iniciar sesión
+- [ ] **RF6**: Cerrar sesión
 
 #### Dispositivos
-- [x] RF5: Consultar dispositivos
-- [x] RF6: Consultar detalle de dispositivo
-- [x] RF7: Controlar dispositivo
+- [ ] **RF7**: Gestionar dispositivos (crear/editar/eliminar)
+- [ ] **RF8**: Consultar dispositivos
+- [ ] **RF9**: Controlar dispositivos
 
 #### Rutinas
-- [x] RF8: Consultar rutinas
-- [x] RF9: Consultar detalle de rutina
-- [x] RF10: Ejecutar rutina
+- [ ] **RF11**: Consultar rutinas
+- [ ] **RF12**: Ejecutar rutinas
 
 #### Habitaciones
-- [x] RF11: Consultar habitaciones
-- [x] RF12: Gestionar habitaciones (crear/editar/eliminar)
-- [x] RF13: Vincular/desvincular dispositivos a habitaciones
+- [ ] **RF14**: Gestionar habitaciones (crear/editar/eliminar)
+- [ ] **RF15**: Consultar habitaciones
+- [ ] **RF16**: Vincular dispositivos a habitaciones
 
-#### Hogares (Opcional)
-- [ ] RF14: Consultar hogares
-- [ ] RF15: Gestionar hogares (crear/editar/eliminar)
-- [ ] RF16: Vincular/desvincular habitaciones a hogares
+#### Hogares (Opcional - grupo de 3 integrantes)
+- [ ] **RF17**: Gestionar hogares (crear/editar/eliminar)
+- [ ] **RF18**: Consultar hogares
+- [ ] **RF19**: Vincular habitaciones a hogares
 
 #### Notificaciones
-- [x] RF17: Notificaciones push
-- [x] RF18: Notificaciones en tiempo real (WebSocket)
+- [ ] **RF20**: Enviar notificaciones
+
+### Requisitos Funcionales Opcionales
+
+- [ ] **RF13**: Consultar acciones realizadas (historial)
+- [ ] **RF21**: Restringir acceso a dispositivos, rutinas, habitaciones y hogares
+- [ ] **RF22**: Consultar consumo eléctrico
+- [ ] **RF23**: Planificar ejecución de rutinas (scheduling)
 
 ### Requisitos No Funcionales (RNF1-RNF6)
 
@@ -329,31 +336,35 @@ class PreferencesManager(private val context: Context) {
 
 ---
 
-### FASE 2: Autenticación (2-3 días)
+### FASE 2: Autenticación (3-4 días)
 
-**Objetivo**: Implementar flujo completo de autenticación (RF1-RF4).
+**Objetivo**: Implementar flujo completo de autenticación (RF1-RF6).
 
 #### 2.1. ViewModels
 - [ ] `AuthViewModel.kt`
   - States: Idle, Loading, Success, Error
-  - Functions: login(), register(), verify(), logout()
+  - Functions: login(), register(), verify(), logout(), recoverPassword(), changePassword()
   - LiveData para estado de autenticación
 
 #### 2.2. Pantallas de autenticación
 Crear en `ui/auth/`:
 
-- [ ] `LoginFragment.kt` (RF3)
+- [ ] `LoginFragment.kt` (RF5)
   - Email y contraseña
   - Botón "Iniciar sesión"
   - Link a registro
   - Link a recuperar contraseña
   - Validación de campos
-  - Mostrar errores del servidor
+  - Mostrar errores específicos del servidor
+  - Indicar campos requeridos con asterisco (*)
 
 - [ ] `RegisterFragment.kt` (RF1)
   - Nombre, apellido, email, contraseña
   - Confirmar contraseña
   - Validación de campos
+  - Campos requeridos con asterisco (*)
+  - Highlight visual en campos con error
+  - Mensajes específicos por campo
   - Al registrarse exitosamente → pantalla de verificación
 
 - [ ] `VerifyFragment.kt` (RF2)
@@ -361,8 +372,21 @@ Crear en `ui/auth/`:
   - Botón "Verificar"
   - Reenviar código
   - Al verificar → login automático
+  - Opción de verificar desde login si cuenta no verificada
 
-- [ ] `RecoverPasswordFragment.kt` (opcional)
+- [ ] `RecoverPasswordFragment.kt` (RF3)
+  - Campo para email
+  - Botón "Enviar código"
+  - Navega a pantalla de ingreso de código + nueva contraseña
+  - Validación de email
+
+- [ ] `ChangePasswordFragment.kt` (RF4)
+  - Campo contraseña actual
+  - Campo nueva contraseña
+  - Campo confirmar nueva contraseña
+  - Validaciones de fortaleza
+  - Mostrar/ocultar contraseña
+  - Accesible desde Settings una vez logueado
 
 #### 2.3. Layouts
 Crear XMLs en `res/layout/`:
@@ -783,30 +807,63 @@ Crear `docs/tercera_entrega/informe.md`:
 
 ## Distribución de Tareas (Sugerencia para 4 personas)
 
-### Persona 1: Backend & Data Layer
-- FASE 1: Capa de datos completa
+**Equipo:**
+- Matias Bernasconi (64188)
+- Juan Ignacio Garcia Vautrin Raggio (63319)
+- Victoria Helena Park (64498)
+- Maria Del Pilar Resek (65528)
+
+### Opción 1: Por Dominio
+
+**Persona 1 - Backend & Data Layer:**
+- FASE 1: Capa de datos completa (APIs, repositorios, modelos)
 - FASE 6: WebSocket y notificaciones
-- Configuración inicial (Retrofit, repos, etc.)
+- Configuración inicial (Retrofit, interceptores)
 
-### Persona 2: Autenticación & Navegación
-- FASE 2: Autenticación completa
-- FASE 8: Navegación global y UI
-- Layouts base y temas
+**Persona 2 - Autenticación & Navegación:**
+- FASE 2: Autenticación completa (login, registro, recuperar contraseña)
+- FASE 8: Navegación global, Bottom Nav, App Bar
+- Layouts base y temas (design tokens)
 
-### Persona 3: Dispositivos & Habitaciones
-- FASE 3: Dispositivos
-- FASE 4: Habitaciones
-- Componentes de control custom
+**Persona 3 - Dispositivos & Habitaciones:**
+- FASE 3: Dispositivos (lista, detalle, controles)
+- FASE 4: Habitaciones (CRUD, vinculación)
+- Componentes de control custom por tipo de dispositivo
 
-### Persona 4: Rutinas & Requisitos No Funcionales
-- FASE 5: Rutinas
-- FASE 9: RNFs (i18n, adaptabilidad)
-- FASE 10: Testing y pulido
+**Persona 4 - Rutinas & Calidad:**
+- FASE 5: Rutinas (consulta, ejecución)
+- FASE 9: RNFs (i18n, adaptabilidad, tema oscuro)
+- FASE 10: Testing, pulido, validaciones
 
-**Coordinación**:
-- FASE 0 hacerla juntos (1-2 horas)
+### Opción 2: Por Capas
+
+**Persona 1 - Data Layer Completo:**
+- Modelos, APIs, Repositorios para TODOS los módulos
+- WebSocket manager
+- DataStore / PreferencesManager
+
+**Persona 2 - ViewModels & Logic:**
+- Todos los ViewModels
+- Manejo de estados (UiState sealed classes)
+- Lógica de negocio
+
+**Persona 3 - UI Screens:**
+- Todos los Fragments
+- Navegación
+- Layouts
+
+**Persona 4 - Components & Quality:**
+- Componentes reutilizables (controles de dispositivos, cards)
+- Adapters de RecyclerView
+- i18n, temas, testing
+
+**Coordinación (importante con 4 personas):**
+- FASE 0 hacerla juntos (2 horas, videoconferencia)
 - Reuniones diarias de 15 min para sincronizar
-- Usar branches y PRs para evitar conflictos
+- Usar branches separados por feature
+- PRs con revisión de al menos 1 persona
+- Documento compartido para decisiones de diseño
+- Slack/Discord para comunicación constante
 
 ---
 
@@ -825,15 +882,57 @@ Asumiendo 15-20 horas/semana por persona:
 
 ## Checklist de Entrega
 
-- [ ] APK funcional generado
-- [ ] Repositorio GitHub actualizado
-- [ ] Informe completo (max 30 páginas)
-- [ ] Screenshots de todas las vistas
-- [ ] Video demostración (opcional pero recomendado)
+### APK y Código
+- [ ] APK funcional generado (`app-debug.apk`)
+- [ ] Repositorio GitHub actualizado y compartido con docentes
+- [ ] NO incluir carpeta `build/` en el ZIP
+- [ ] NO incluir frameworks no utilizados
 - [ ] README con instrucciones de compilación
-- [ ] Código documentado
-- [ ] Todos los requisitos funcionales obligatorios cumplidos
-- [ ] Todos los requisitos no funcionales cumplidos
+- [ ] Código sin funciones duplicadas (refactorizado desde el inicio)
+- [ ] Código sin comentarios obvios o en inglés
+- [ ] NO hay strings hardcodeados (usar R.string)
+- [ ] NO hay colores hardcodeados (usar R.color)
+- [ ] NO hay llamadas redundantes a API
+
+### Informe (Max 30 páginas)
+- [ ] Ortografía revisada con corrector (decidió, código, creación, ejecución, aplicación, a través, energético)
+- [ ] Instructivo de instalación INCLUIDO en el informe
+- [ ] RF y RNF con descripciones breves y precisas
+- [ ] Screenshots de TODAS las vistas con datos representativos (NO palabras inventadas)
+- [ ] Capturas: teléfono + tablet, vertical + horizontal, español + inglés
+- [ ] Especificar API Levels testeados (API 29, API 36, etc.)
+- [ ] Diseño gráfico completo: paleta + tipografía + iconografía + formato elementos
+- [ ] Justificaciones con trazabilidad (problema → solución), NO subjetivas
+- [ ] Modelos de persona con características ESPECÍFICAS
+- [ ] Contemplar TODAS las correcciones de segunda entrega
+- [ ] Conclusiones NO enumerativas
+
+### Usabilidad
+- [ ] Validaciones de formularios con errores específicos por campo
+- [ ] Campos requeridos indicados con asterisco (*)
+- [ ] Highlight visual en campos con error (rojo, borde)
+- [ ] Iconografía correcta (trash para borrar, NO cruz X)
+- [ ] Rojo solo para errores/peligro, NO para estados normales
+- [ ] Confirmaciones para acciones destructivas (eliminar, cerrar sesión)
+- [ ] Mensajes de error específicos, NO genéricos
+- [ ] Empty states con CTAs claros
+- [ ] Consistencia visual en todas las pantallas
+- [ ] Tamaño mínimo táctil 48dp × 48dp
+- [ ] Contraste de textos mínimo 4.5:1
+
+### Requisitos
+- [ ] Todos los RF obligatorios cumplidos (RF1-RF20, excepto RF17-RF19 si no implementan hogares)
+- [ ] Todos los RNF obligatorios cumplidos (RNF1-RNF6)
+- [ ] RF opcionales implementados claramente marcados
+
+### Testing
+- [ ] Probado en API 29 (Android 10)
+- [ ] Probado en API 36 (Android 16)
+- [ ] Probado en teléfono Y tablet
+- [ ] Probado en vertical Y horizontal
+- [ ] Probado en español E inglés
+- [ ] Todos los flujos funcionando
+- [ ] Sin crashes
 
 ---
 

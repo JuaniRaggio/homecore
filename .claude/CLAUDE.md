@@ -296,15 +296,189 @@ Usar la guía de referencia rápida:
 
 ## Equipo
 
-**Grupo 15 - 3 personas:**
+**Grupo 15 - 4 personas:**
+- Matias Bernasconi (64188)
 - Juan Ignacio Garcia Vautrin Raggio (63319)
 - Victoria Helena Park (64498)
 - Maria Del Pilar Resek (65528)
 
-**Implicaciones de ser grupo de 3:**
-- RF17-RF19 (Hogares) son **OPCIONALES** (para grupos de 3)
-- Pueden implementarlos para obtener puntos extra
-- Si no los implementan, deben cumplir todos los demás RF obligatorios
+**Implicaciones de ser grupo de 4:**
+- RF17-RF19 (Hogares) son **OPCIONALES** según enunciado (dice "opcional grupo de 3 integrantes")
+- Como son 4, pueden implementarlos para completitud del sistema
+- El enunciado no los hace obligatorios para grupos de 4, es decisión del equipo
+
+---
+
+## Aprendizajes de la Segunda Entrega (Web)
+
+Correcciones y feedback del profesor que **deben aplicarse en la tercera entrega (mobile)**:
+
+### ❌ Errores que NO deben repetirse:
+
+#### Informe:
+1. **Ortografía y redacción**
+   - Errores detectados: decidió (sin tilde), código (sin tilde), creación, ejecución, aplicación, a través, energético
+   - Frases mejorables: "cumpliendo con la ayudar a los usuarios"
+   - ✅ **Solución**: Revisar TODO con corrector ortográfico antes de entregar
+
+2. **Instructivo de instalación**
+   - ❌ En 2da entrega fue archivo separado
+   - ✅ En 3ra entrega: incluirlo como sección del informe
+
+3. **Diseño gráfico incompleto**
+   - ❌ Solo mencionaron paleta de colores
+   - ✅ Debe incluir:
+     - Paleta de colores completa (design-tokens.md)
+     - Tipografía (tipos, jerarquías, tamaños en sp)
+     - Iconografía (Material Icons, mapeo por tipo de dispositivo)
+     - Formato de elementos (botones FAB/contained/outlined, TextInputLayout, Cards, border-radius)
+
+4. **Capturas de pantalla**
+   - ❌ Datos no representativos (palabras inexistentes en "Figura 20")
+   - ✅ Usar datos reales o realistas en todas las capturas
+
+5. **Versiones no especificadas**
+   - ❌ Solo dijeron "Chrome, Firefox, Safari" sin versiones
+   - ✅ Mobile: especificar API Levels testeados (API 29, API 33, API 36, etc.)
+
+#### Justificaciones:
+1. **Evitar justificaciones subjetivas**
+   - ❌ "Se ve mejor", "es más bonito", "me gusta más"
+   - ✅ Trazabilidad: Problema de usabilidad identificado → Solución implementada
+
+2. **Justificaciones con modelos de persona**
+   - ❌ Usar características genéricas ("interacción intuitiva para Marta" aplica a todos)
+   - ✅ Usar características ESPECÍFICAS del modelo que justifican la decisión
+
+3. **No forzar justificaciones**
+   - ❌ Forzar referencias a diseño gráfico/temas/modelos cuando no aplica realmente
+   - ✅ Solo justificar cuando existe relación directa y válida
+
+4. **Correcciones de entregas anteriores**
+   - ❌ No contemplaron TODAS las correcciones de 1ra entrega
+   - ✅ En 3ra entrega: contemplar y explicitar TODAS las correcciones de 2da entrega
+
+#### Código:
+1. **Funciones duplicadas**
+   - ❌ Web tenía: `getDeviceInfo`, `describeLogAction`, `formatTime`, `curtainUp` duplicadas
+   - ❌ Constantes duplicadas: `DAY_OPTIONS`, `DAY_LEVELS`
+   - ✅ Mobile: Refactorizar desde el inicio, usar helpers/utils centralizados
+
+2. **Comentarios inadecuados**
+   - ❌ Comentarios obvios: `// Loading state for edit home modal`
+   - ❌ Comentarios en inglés mezclados con español
+   - ❌ Comentarios desactualizados: `<!-- Vista principal "Inicio" - contiene todo lo que estaba en page-content del HTML original -->`
+   - ✅ Mobile: Comentarios en español, solo cuando agregan valor (lógica compleja, decisiones no obvias)
+
+3. **Llamadas redundantes a API**
+   - ❌ Web llamaba `/send-verification` cuando `/register` ya lo hace automáticamente
+   - ❌ Llamaba `/mailconfig` innecesariamente al registrar
+   - ❌ Llamaba `/state` cuando `/devices/{id}` ya incluye el estado
+   - ✅ Mobile: Estudiar bien la API antes de implementar, evitar llamadas duplicadas
+
+#### Usabilidad:
+1. **Validaciones de formularios**
+   - ❌ No mostraban errores en conjunto
+   - ❌ No destacaban visualmente los campos con error
+   - ❌ No indicaban campos requeridos con asterisco (*)
+   - ❌ Mensajes genéricos: "Por favor complete los campos" sin especificar cuál
+   - ✅ Mobile:
+     - Indicar campos requeridos con asterisco
+     - Highlight visual en campos con error (color rojo, borde)
+     - Mostrar mensaje específico por cada campo
+     - Resumen de errores si son múltiples
+
+2. **Iconografía incorrecta**
+   - ❌ Cruz (X) para borrar (debería ser trash/delete)
+   - ❌ Estrella para favoritos (debería ser corazón - aunque en Android estrella es aceptable para "destacado")
+   - ❌ Íconos de alarma y puerta poco representativos
+   - ✅ Mobile: Usar Material Icons correctos y reconocibles
+
+3. **Uso incorrecto de colores**
+   - ❌ Rojo para estados normales de dispositivos (rojo = peligro/error)
+   - ✅ Mobile: Seguir design-tokens.md estrictamente, rojo solo para errores/destructivo
+
+4. **Confirmaciones faltantes**
+   - ❌ No pedían confirmación antes de cerrar sesión
+   - ❌ Confirmación de eliminación sin mostrar nombre de la entidad
+   - ✅ Mobile:
+     - Confirmar todas las acciones destructivas (eliminar, cerrar sesión)
+     - Mostrar contexto en confirmaciones (ej: "¿Eliminar habitación 'Sala'?")
+     - Usar AlertDialog con mensaje claro
+
+5. **Mensajes de error genéricos**
+   - ❌ "Ocurrió un error inesperado"
+   - ❌ "Error de inicio de sesión" (sin especificar qué falló)
+   - ❌ Al cambiar color de lámpara: "Color: #37629a" (no comprensible)
+   - ✅ Mobile: Mensajes específicos según el error:
+     - "Email o contraseña incorrectos"
+     - "La cuenta no está verificada. Revisa tu email."
+     - "Este email ya está registrado"
+     - "No se pudo conectar. Verifica tu conexión a internet."
+
+6. **Experiencia de usuario**
+   - ❌ No permitir verificar cuenta fuera del flujo (si el usuario intenta login con cuenta no verificada, no hay opción para verificar desde ahí)
+   - ❌ Dos códigos de verificación diferentes (el segundo invalida el primero, confuso)
+   - ❌ Opciones de editar/eliminar en contexto incorrecto (habitaciones: botones en tarjeta cuando deberían estar en detalle)
+   - ❌ Orden de dispositivos cambia al volver de detalle (confuso)
+   - ❌ Botón "Crear cuenta" en pantalla de desembarco (debería ser link)
+   - ❌ Representación hexadecimal de color no comprensible para usuarios (#37629a)
+   - ✅ Mobile:
+     - Flujos claros y consistentes
+     - Permitir acciones relevantes desde cualquier punto
+     - Mantener estado y orden consistente
+     - Usar representaciones comprensibles para usuarios (ej: selector de color visual, no hex)
+
+7. **Accesibilidad**
+   - ❌ AIM Score 5.9/10
+   - ❌ Errores de contraste
+   - ❌ Texto alternativo redundante
+   - ✅ Mobile:
+     - Contrastar textos correctamente (mínimo 4.5:1 para texto normal, 3:1 para texto grande)
+     - Content descriptions apropiados en ImageView/ImageButton
+     - Tamaño mínimo táctil 48dp × 48dp
+
+8. **JavaScript deshabilitado**
+   - ❌ No verificaban si JS está activado
+   - ✅ Mobile: No aplica (nativo)
+
+9. **Onboarding**
+   - ❌ No guiaban al usuario sobre cómo comenzar
+   - ❌ Dashboard vacío si no hay rutinas/favoritos configurados
+   - ✅ Mobile:
+     - Mostrar hints/tips en primera ejecución
+     - Empty states con CTAs claros ("Agrega tu primer dispositivo")
+     - Considerar tutorial opcional
+
+10. **Consistencia visual**
+    - ❌ Tamaño y color de botones inconsistente
+    - ❌ Capitalización inconsistente ("Nueva Habitación" vs "Nuevo dispositivo")
+    - ❌ Página de verificación no mantenía consistencia visual con otras páginas
+    - ✅ Mobile:
+      - Usar Material Design 3 components consistentemente
+      - Capitalización según Material Design guidelines (sentence case para la mayoría)
+      - Mantener misma estructura visual en todas las pantallas
+
+### ✅ Aspectos positivos a mantener:
+
+1. **Informe bien estructurado**
+   - Introducción contextualiza correctamente
+   - Desarrollo completo
+   - Conclusión no enumerativa, retoma puntos clave
+
+2. **Implementación completa**
+   - Todos los RF obligatorios cumplidos
+   - Todos los RNF cumplidos
+   - RF opcionales implementados (RF13, RF22, RF23)
+
+3. **Arquitectura y código**
+   - Separación de estilos correcta (aunque mejorable en consistencia de variables)
+   - WebSocket funcionando
+   - Validación HTML/CSS con pocos errores no atribuibles al código implementado
+
+4. **Balance técnico**
+   - Buen balance entre aspectos de diseño y técnicos en justificaciones
+   - Aunque se pueden dar más detalles (ej: memory leaks)
 
 ---
 
