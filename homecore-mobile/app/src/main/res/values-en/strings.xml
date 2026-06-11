@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">HomeCore</string>
+
+    <!-- Auth -->
     <string name="label_email">Email</string>
     <string name="label_password">Password</string>
     <string name="label_name">First Name</string>
@@ -11,4 +13,25 @@
     <string name="link_forgot_password">Forgot your password?</string>
     <string name="title_register">Create Account</string>
     <string name="cd_back">Back</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_inicio">Home</string>
+    <string name="nav_dispositivos">Devices</string>
+    <string name="nav_rutinas">Routines</string>
+    <string name="nav_usuario">User</string>
+
+    <!-- Devices screen -->
+    <string name="house_default">Summer House</string>
+    <string name="search_device">Search device</string>
+    <string name="filters">Filters</string>
+    <string name="new_device">+ New Device</string>
+    <string name="new_room">+ New Room</string>
+    <string name="room_living">Living Room</string>
+    <string name="room_bedroom">Bedroom</string>
+    <string name="device_on_pct">On %d%%</string>
+    <string name="device_off_label">Off</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_menu">Menu</string>
+    <string name="cd_dropdown">Switch home</string>
 </resources>

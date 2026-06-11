@@ -2,28 +2,16 @@ package com.itba.homecore.data.model
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Wrapper genérico que devuelve la API HCI cuando hay error.
+ * Para respuestas de éxito devuelve el objeto directo (sin wrapper).
+ */
 data class ApiResponse<T>(
     @SerializedName("result") val result: T?,
-    @SerializedName("error") val error: ApiError?
+    @SerializedName("error")  val error: ApiError?
 )
 
 data class ApiError(
     @SerializedName("code")        val code: Int?,
     @SerializedName("description") val description: String?
-)
-
-data class LoginRequest(
-    @SerializedName("email")    val email: String,
-    @SerializedName("password") val password: String
-)
-
-data class RegisterRequest(
-    @SerializedName("name")     val name: String,
-    @SerializedName("email")    val email: String,
-    @SerializedName("password") val password: String
-)
-
-data class AuthResponse(
-    @SerializedName("token") val token: String?,
-    @SerializedName("user")  val user: User?
 )

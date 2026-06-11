@@ -3,11 +3,13 @@ package com.itba.homecore.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.itba.homecore.data.api.SessionEvents
 import com.itba.homecore.data.model.User
 import com.itba.homecore.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 sealed class AuthUiState {
@@ -23,6 +25,25 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    /** null = chequeando sesión al arrancar, true/false = decisión tomada. */
+    private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
+    val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            val hasSession = repository.restoreSession()
+            _isLoggedIn.value = hasSession
+        }
+        // Si cualquier llamada a la API recibe 401, la red emite acá y limpiamos sesión.
+        viewModelScope.launch {
+            SessionEvents.unauthorized.collect {
+                repository.logout()
+                _isLoggedIn.value = false
+                _uiState.value = AuthUiState.Error("Tu sesión expiró. Iniciá sesión nuevamente.")
+            }
+        }
+    }
+
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
             _uiState.value = AuthUiState.Error("Completá todos los campos")
@@ -31,8 +52,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
             repository.login(email, password).fold(
-                onSuccess = { user -> _uiState.value = AuthUiState.Success(user) },
-                onFailure = { e  -> _uiState.value = AuthUiState.Error(e.message ?: "Error al iniciar sesión") }
+                onSuccess = { user ->
+                    _isLoggedIn.value = true
+                    _uiState.value = AuthUiState.Success(user)
+                },
+                onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "Error al iniciar sesión") }
             )
         }
     }
@@ -52,6 +76,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 onSuccess = { _uiState.value = AuthUiState.Success() },
                 onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "Error al registrar") }
             )
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            repository.logout()
+            _isLoggedIn.value = false
+            _uiState.value = AuthUiState.Idle
         }
     }
 

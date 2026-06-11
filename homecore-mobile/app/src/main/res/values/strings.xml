@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">HomeCore</string>
+
+    <!-- Auth -->
     <string name="label_email">Email</string>
     <string name="label_password">Contraseña</string>
     <string name="label_name">Nombre</string>
@@ -11,4 +13,48 @@
     <string name="link_forgot_password">¿Olvidaste tu contraseña?</string>
     <string name="title_register">Crear Cuenta</string>
     <string name="cd_back">Volver</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_dispositivos">Dispositivos</string>
+    <string name="nav_rutinas">Rutinas</string>
+    <string name="nav_usuario">Usuario</string>
+
+    <!-- Devices screen -->
+    <string name="house_default">Casa de Verano</string>
+    <string name="search_device">Buscar dispositivo</string>
+    <string name="filters">Filtros</string>
+    <string name="new_device">+ Nuevo Dispositivo</string>
+    <string name="new_room">+ Nueva Habitacion</string>
+    <string name="room_living">Living Room</string>
+    <string name="room_bedroom">Bedroom</string>
+    <string name="device_on_pct">Encendida %d%%</string>
+    <string name="device_off_label">Apagada</string>
+    <string name="cd_favorite">Favorito</string>
+    <string name="cd_search">Buscar</string>
+    <string name="cd_menu">Menú</string>
+    <string name="cd_dropdown">Cambiar de hogar</string>
+
+    <!-- Inicio -->
+    <string name="favorite_routines">Rutinas Favoritas</string>
+    <string name="favorite_devices">Dispositivos Favoritos</string>
+    <string name="see_all">Ver todas</string>
+    <string name="execute_now">Ejecutar ahora</string>
+    <string name="cd_notifications">Notificaciones</string>
+    <string name="empty_fav_routines">Sin rutinas favoritas</string>
+    <string name="empty_fav_devices">Sin dispositivos favoritos</string>
+
+    <!-- Rutinas -->
+    <string name="search_routine">Buscar rutina</string>
+    <string name="new_routine">+ Nueva Rutina</string>
+
+    <!-- Usuario -->
+    <string name="profile">Perfil</string>
+    <string name="manage_account">Gestion de la cuenta</string>
+    <string name="manage_password">Gestionar contraseña dispositivos</string>
+    <string name="consumption">Consumo</string>
+    <string name="current_consumption">Consumo actual</string>
+    <string name="devices_running">Dispositivos\nfuncionando</string>
+    <string name="history">Historial</string>
+    <string name="logout">Cerrar sesión</string>
 </resources>

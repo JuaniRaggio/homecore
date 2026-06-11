@@ -16,7 +16,13 @@ class AuthRepository(context: Context) {
         try {
             val auth  = api.login(LoginRequest(email, password))
             val token = auth.token ?: throw Exception("No se recibió token")
+
+            // 1. Notificar al ApiClient para que las próximas peticiones incluyan el header Authorization
+            ApiClient.setToken(token)
+
+            // 2. Persistir el token en el almacenamiento local
             session.saveToken(token)
+
             val user = auth.user ?: User(email = email)
             session.saveUserInfo(user.id, user.fullName, user.email)
             user
@@ -31,6 +37,24 @@ class AuthRepository(context: Context) {
             api.register(RegisterRequest(fullName, email, password))
         } catch (e: HttpException) {
             throw Exception(parseError(e) ?: "Error al registrar (${e.code()})")
+        }
+    }
+
+    suspend fun logout() {
+        ApiClient.setToken(null)
+        session.clearSession()
+    }
+
+    /**
+     * Recupera el token de la persistencia y lo carga en el ApiClient.
+     */
+    suspend fun restoreSession(): Boolean {
+        val token = session.getToken()
+        return if (token != null) {
+            ApiClient.setToken(token)
+            true
+        } else {
+            false
         }
     }
 

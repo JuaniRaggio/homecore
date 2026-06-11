@@ -1,1 +1,29 @@
 package com.itba.homecore.data.repository
+
+import com.itba.homecore.data.api.ApiClient
+import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.Room
+import retrofit2.HttpException
+
+class DevicesRepository {
+    private val devicesApi = ApiClient.devicesApi
+    private val roomsApi   = ApiClient.roomsApi
+
+    suspend fun getDevices(): Result<List<Device>> = runCatching {
+        try { devicesApi.getAllDevices() }
+        catch (e: HttpException) { throw Exception(httpMsg(e, "Error al obtener dispositivos")) }
+    }
+
+    suspend fun getRooms(): Result<List<Room>> = runCatching {
+        try { roomsApi.getAllRooms() }
+        catch (e: HttpException) { throw Exception(httpMsg(e, "Error al obtener habitaciones")) }
+    }
+
+    suspend fun executeAction(deviceId: String, action: String, params: List<Any> = emptyList()): Result<Unit> = runCatching {
+        try { devicesApi.executeAction(deviceId, action, params) }
+        catch (e: HttpException) { throw Exception(httpMsg(e, "No se pudo ejecutar la acción")) }
+    }
+
+    private fun httpMsg(e: HttpException, fallback: String) =
+        try { e.response()?.errorBody()?.string() ?: fallback } catch (_: Exception) { fallback }
+}
