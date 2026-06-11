@@ -10,6 +10,7 @@ object ApiClient {
     private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
     private const val API_KEY  = "sk_2ece0079ab8c2fb4fb03b5537aebf5b6"
 
+    @Volatile
     private var token: String? = null
 
     fun setToken(t: String?) {
@@ -24,13 +25,19 @@ object ApiClient {
             .addInterceptor { chain ->
                 val requestBuilder = chain.request().newBuilder()
                     .addHeader("X-API-Key", API_KEY)
-                
-                // Usamos la referencia al objeto para evitar confusiones de scope
+
                 this@ApiClient.token?.let {
                     requestBuilder.addHeader("Authorization", "Bearer $it")
                 }
-                
-                chain.proceed(requestBuilder.build())
+
+                val response = chain.proceed(requestBuilder.build())
+
+                // 401 ⇒ token vencido/inválido: avisar para limpiar sesión y volver a Login.
+                if (response.code == 401) {
+                    this@ApiClient.token = null
+                    SessionEvents.emitUnauthorized()
+                }
+                response
             }
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)

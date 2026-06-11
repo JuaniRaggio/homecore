@@ -9,14 +9,13 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.itba.homecore.R
 import com.itba.homecore.ui.screens.devices.DevicesScreen
+import com.itba.homecore.ui.screens.routines.RoutinesScreen
 import com.itba.homecore.ui.theme.*
 
 private enum class Tab(val icon: ImageVector, val labelRes: Int) {
@@ -28,7 +27,7 @@ private enum class Tab(val icon: ImageVector, val labelRes: Int) {
 
 @Composable
 fun MainScreen(onLogout: () -> Unit = {}) {
-    var selected by remember { mutableStateOf(Tab.DISPOSITIVOS) }
+    var selected by remember { mutableStateOf(Tab.INICIO) }
 
     Scaffold(
         containerColor = Background,
@@ -59,26 +58,12 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                 .background(Background)
         ) {
             when (selected) {
-                Tab.INICIO       -> PlaceholderTab(stringResource(R.string.nav_inicio))
+                Tab.INICIO       -> InicioScreen()
                 Tab.DISPOSITIVOS -> DevicesScreen()
-                Tab.RUTINAS      -> PlaceholderTab(stringResource(R.string.nav_rutinas))
-                Tab.USUARIO      -> PlaceholderTab(stringResource(R.string.nav_usuario), onLogout)
+                Tab.RUTINAS      -> RoutinesScreen()
+                Tab.USUARIO      -> UsuarioScreen(onLogout = onLogout)
             }
         }
     }
 }
 
-@Composable
-private fun PlaceholderTab(title: String, onAction: (() -> Unit)? = null) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(title, color = TextPrimary, fontWeight = FontWeight.Bold)
-            if (onAction != null) {
-                Spacer(Modifier.height(16.dp))
-                TextButton(onClick = onAction) {
-                    Text("Cerrar sesión", color = AccentDark)
-                }
-            }
-        }
-    }
-}

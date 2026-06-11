@@ -34,4 +34,27 @@
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
     <string name="cd_dropdown">Cambiar de hogar</string>
+
+    <!-- Inicio -->
+    <string name="favorite_routines">Rutinas Favoritas</string>
+    <string name="favorite_devices">Dispositivos Favoritos</string>
+    <string name="see_all">Ver todas</string>
+    <string name="execute_now">Ejecutar ahora</string>
+    <string name="cd_notifications">Notificaciones</string>
+    <string name="empty_fav_routines">Sin rutinas favoritas</string>
+    <string name="empty_fav_devices">Sin dispositivos favoritos</string>
+
+    <!-- Rutinas -->
+    <string name="search_routine">Buscar rutina</string>
+    <string name="new_routine">+ Nueva Rutina</string>
+
+    <!-- Usuario -->
+    <string name="profile">Perfil</string>
+    <string name="manage_account">Gestion de la cuenta</string>
+    <string name="manage_password">Gestionar contraseña dispositivos</string>
+    <string name="consumption">Consumo</string>
+    <string name="current_consumption">Consumo actual</string>
+    <string name="devices_running">Dispositivos\nfuncionando</string>
+    <string name="history">Historial</string>
+    <string name="logout">Cerrar sesión</string>
 </resources>
