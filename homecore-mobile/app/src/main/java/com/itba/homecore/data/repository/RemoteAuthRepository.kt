@@ -5,7 +5,9 @@ import com.itba.homecore.data.api.ApiClient
 import com.itba.homecore.data.local.SessionManager
 import com.itba.homecore.data.model.LoginRequest
 import com.itba.homecore.data.model.RegisterRequest
+import com.itba.homecore.data.model.SendVerificationRequest
 import com.itba.homecore.data.model.User
+import com.itba.homecore.data.model.VerifyAccountRequest
 import retrofit2.HttpException
 
 /**
@@ -31,13 +33,40 @@ class RemoteAuthRepository(context: Context) : AuthRepository {
         }
     }
 
+    /**
+     * Registro en dos pasos: primero crea la cuenta y luego dispara el envío del código
+     * de verificación por email (/send-verification), igual que el flujo de web.
+     */
     override suspend fun register(name: String, lastName: String, email: String, password: String): Result<Unit> = runCatching {
+        val fullName = if (lastName.isBlank()) name else "$name $lastName"
         try {
-            val fullName = if (lastName.isBlank()) name else "$name $lastName"
             api.register(RegisterRequest(fullName, email, password))
+        } catch (e: HttpException) {
+            // 409 ⇒ el email ya tiene cuenta: lo señalamos para mandar al usuario a iniciar sesión.
+            if (e.code() == 409) {
+                throw EmailAlreadyRegisteredException("Este email ya está registrado. Iniciá sesión.")
+            }
+            throw Exception(parseError(e) ?: "Error al registrar (${e.code()})")
+        }
+        // Cuenta creada: enviamos el código de verificación al email.
+        sendVerification(email).getOrThrow()
+    }
+
+    override suspend fun sendVerification(email: String): Result<Unit> = runCatching {
+        try {
+            api.sendVerification(SendVerificationRequest(email))
             Unit
         } catch (e: HttpException) {
-            throw Exception(parseError(e) ?: "Error al registrar (${e.code()})")
+            throw Exception(parseError(e) ?: "No se pudo enviar el código (${e.code()}). Intentá de nuevo.")
+        }
+    }
+
+    override suspend fun verifyAccount(code: String): Result<Unit> = runCatching {
+        try {
+            api.verifyAccount(VerifyAccountRequest(code))
+            Unit
+        } catch (e: HttpException) {
+            throw Exception(parseError(e) ?: "Código de verificación inválido")
         }
     }
 

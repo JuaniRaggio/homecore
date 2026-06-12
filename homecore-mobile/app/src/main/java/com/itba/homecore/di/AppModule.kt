@@ -21,8 +21,8 @@ import com.itba.homecore.data.repository.RoutinesRepository
  */
 object AppModule {
 
-    /** ⬅️ Cambiar a `false` para usar el backend real. */
-    const val USE_MOCK = true
+    /** ⬅️ Cambiar a `true` para volver a datos mock (sin red). */
+    const val USE_MOCK = false
 
     val devicesRepository: DevicesRepository by lazy {
         if (USE_MOCK) MockDevicesRepository() else RemoteDevicesRepository()

@@ -30,6 +30,7 @@ import com.itba.homecore.viewmodel.AuthViewModel
 fun RegisterScreen(
     viewModel: AuthViewModel,
     onRegisterSuccess: () -> Unit,
+    onAlreadyRegistered: () -> Unit,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -43,8 +44,10 @@ fun RegisterScreen(
 
     LaunchedEffect(uiState) {
         when (uiState) {
-            is AuthUiState.Success -> { viewModel.clearState(); onRegisterSuccess() }
-            is AuthUiState.Error   -> errorMsg = (uiState as AuthUiState.Error).message
+            is AuthUiState.RegistrationPending -> { viewModel.clearState(); onRegisterSuccess() }
+            // El email ya existe: dejamos el estado vivo para que Login muestre el mensaje al llegar.
+            is AuthUiState.AlreadyRegistered   -> onAlreadyRegistered()
+            is AuthUiState.Error               -> errorMsg = (uiState as AuthUiState.Error).message
             else -> {}
         }
     }

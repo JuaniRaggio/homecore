@@ -14,6 +14,16 @@
     <string name="title_register">Crear Cuenta</string>
     <string name="cd_back">Volver</string>
 
+    <!-- Verificación de cuenta -->
+    <string name="title_verify">Verificar cuenta</string>
+    <string name="verify_subtitle">Ingresá el código que te enviamos por email.</string>
+    <string name="verify_subtitle_email">Te enviamos un código de verificación a %1$s</string>
+    <string name="label_verification_code">Código de verificación</string>
+    <string name="btn_verify">Verificar</string>
+    <string name="verify_resend">¿No te llegó? Reenviar código</string>
+    <string name="verify_resending">Enviando…</string>
+    <string name="verify_resend_sent">Código reenviado a tu email</string>
+
     <!-- Bottom nav -->
     <string name="nav_inicio">Inicio</string>
     <string name="nav_dispositivos">Dispositivos</string>
