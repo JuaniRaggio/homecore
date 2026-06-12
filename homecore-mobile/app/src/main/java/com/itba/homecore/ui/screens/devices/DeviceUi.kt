@@ -19,7 +19,7 @@ import com.itba.homecore.R
 import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.ui.theme.*
 
-/** Ícono Material por categoría de dispositivo. Único lugar (evita duplicación). */
+/** Material icon per device category. Single place (avoids duplication). */
 fun deviceIconFor(cat: DeviceCategory): ImageVector = when (cat) {
     DeviceCategory.LAMP         -> Icons.Default.Lightbulb
     DeviceCategory.DOOR         -> Icons.Default.DoorFront
@@ -35,7 +35,7 @@ fun deviceIconFor(cat: DeviceCategory): ImageVector = when (cat) {
     else                        -> Icons.Default.DevicesOther
 }
 
-/** Color de acento por categoría (tomado de los design tokens). */
+/** Accent color per category (taken from the design tokens). */
 fun deviceColorFor(cat: DeviceCategory): Color = when (cat) {
     DeviceCategory.LAMP         -> DeviceLight
     DeviceCategory.DOOR         -> DeviceDoor
@@ -51,14 +51,14 @@ fun deviceColorFor(cat: DeviceCategory): Color = when (cat) {
     else                        -> DeviceUnknown
 }
 
-/** Opción seleccionable en el alta de dispositivo. */
+/** Selectable option in the device creation flow. */
 data class DeviceTypeOption(
     val category: DeviceCategory,
     val typeName: String,
     val labelRes: Int
 )
 
-/** Los 11 tipos soportados por la API HCI (mismas claves que homecore-web). */
+/** The 11 types supported by the HCI API (same keys as homecore-web). */
 val selectableDeviceTypes: List<DeviceTypeOption> = listOf(
     DeviceTypeOption(DeviceCategory.LAMP,         "lamp",         R.string.dtype_lamp),
     DeviceTypeOption(DeviceCategory.DOOR,         "door",         R.string.dtype_door),

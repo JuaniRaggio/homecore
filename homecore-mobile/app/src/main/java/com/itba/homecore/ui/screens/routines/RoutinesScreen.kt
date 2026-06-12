@@ -61,7 +61,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = AccentDark,
-                modifier = Modifier.clickable { /* TODO: nueva rutina */ }
+                modifier = Modifier.clickable { /* TODO: new routine */ }
             ) {
                 Text(
                     text = stringResource(R.string.new_routine),

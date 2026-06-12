@@ -66,11 +66,11 @@ fun InicioScreen(
     ) {
         HouseHeader(showNotifications = true)
 
-        // ── Rutinas Favoritas ─────────────────────────────
+        // ── Favorite routines ─────────────────────────────
         PanelCard(
             title = stringResource(R.string.favorite_routines),
             actionLabel = stringResource(R.string.see_all),
-            onAction = { /* TODO: navegar a rutinas */ }
+            onAction = { /* TODO: navigate to routines */ }
         ) {
             when (val s = routinesState) {
                 is RoutinesUiState.Loading ->
@@ -97,11 +97,11 @@ fun InicioScreen(
             }
         }
 
-        // ── Dispositivos Favoritos ────────────────────────
+        // ── Favorite devices ──────────────────────────────
         PanelCard(
             title = stringResource(R.string.favorite_devices),
             actionLabel = stringResource(R.string.see_all),
-            onAction = { /* TODO: navegar a dispositivos */ }
+            onAction = { /* TODO: navigate to devices */ }
         ) {
             when (val s = devicesState) {
                 is DevicesUiState.Loading ->
@@ -209,7 +209,7 @@ private fun FavoriteDeviceCard(
     val isOn = device.isOn()
     val isLamp = cat == DeviceCategory.LAMP
     val isDoor = cat == DeviceCategory.DOOR || cat == DeviceCategory.LOCK
-    // Cada dispositivo va en su propia box (igual que en DevicesScreen).
+    // Each device goes in its own box (same as in DevicesScreen).
     val borderColor = if (isDoor) AccentDark else Accent.copy(alpha = 0.4f)
     val iconTint = if (isLamp) DeviceLight else TextPrimary
     val iconBg = if (isLamp) Color(0xFF3A2A1A) else Color.Transparent

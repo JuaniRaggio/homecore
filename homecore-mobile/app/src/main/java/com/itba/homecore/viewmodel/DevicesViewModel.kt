@@ -22,10 +22,10 @@ sealed class DevicesUiState {
 }
 
 /**
- * Depende de la abstracción [DevicesRepository], no de una implementación concreta.
- * El constructor secundario sin argumentos resuelve el repo desde [AppModule] para
- * que `viewModel()` lo instancie por reflexión; el primario permite inyectar un
- * fake en tests.
+ * Depends on the [DevicesRepository] abstraction, not on a concrete implementation.
+ * The no-arg secondary constructor resolves the repo from [AppModule] so that
+ * `viewModel()` can instantiate it via reflection; the primary one allows injecting
+ * a fake in tests.
  */
 class DevicesViewModel(
     private val repository: DevicesRepository
@@ -98,7 +98,7 @@ class DevicesViewModel(
         }
     }
 
-    /** Crea un dispositivo y recarga la lista. [onDone] se invoca al terminar con éxito. */
+    /** Creates a device and reloads the list. [onDone] is invoked on successful completion. */
     fun createDevice(name: String, typeName: String, roomId: String?, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.createDevice(name, typeName, roomId).onSuccess {
@@ -108,7 +108,7 @@ class DevicesViewModel(
         }
     }
 
-    /** Crea una habitación y recarga la lista. [onDone] se invoca al terminar con éxito. */
+    /** Creates a room and reloads the list. [onDone] is invoked on successful completion. */
     fun createRoom(name: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.createRoom(name).onSuccess {

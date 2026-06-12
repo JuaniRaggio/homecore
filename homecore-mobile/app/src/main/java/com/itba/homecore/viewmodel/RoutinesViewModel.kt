@@ -16,7 +16,7 @@ sealed class RoutinesUiState {
     data class Error(val message: String) : RoutinesUiState()
 }
 
-/** Ver [DevicesViewModel] para el patrón de inyección por interfaz. */
+/** See [DevicesViewModel] for the interface-based injection pattern. */
 class RoutinesViewModel(
     private val repository: RoutinesRepository
 ) : ViewModel() {

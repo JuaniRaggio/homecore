@@ -152,7 +152,7 @@ private fun ProfileCard(userName: String) {
                 fontWeight = FontWeight.Bold
             )
 
-            // Avatar (Box con superposición)
+            // Avatar (Box with overlay)
             Box(contentAlignment = Alignment.BottomEnd) {
                 Box(
                     modifier = Modifier

@@ -339,8 +339,8 @@ private fun DeviceCard(
     val isLamp    = cat == DeviceCategory.LAMP
     val highlight = isDoor && device.state?.status?.lowercase() in listOf("locked", "closed")
 
-    // Cada dispositivo va en su propia box: las puertas trabadas se resaltan con el
-    // acento; el resto usa un borde neutro para que igual queden enmarcados.
+    // Each device goes in its own box: locked doors are highlighted with the
+    // accent; the rest use a neutral border so they still look framed.
     val borderColor = if (highlight) AccentDark else Accent.copy(alpha = 0.4f)
     val iconBg      = if (isLamp) Color(0xFF3A2A1A) else Color.Transparent
     val iconTint    = when (cat) {

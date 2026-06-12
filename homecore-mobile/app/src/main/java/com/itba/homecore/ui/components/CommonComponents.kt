@@ -101,9 +101,9 @@ fun HcButton(
 }
 
 /**
- * Shared header con el nombre del hogar (dropdown) y opcionalmente la campana de notificaciones.
- * Aplica el patrón "API de slots" de Compose: el caller puede pasar [trailing] para
- * sustituir el ícono de la derecha (ej.: notificaciones en Inicio, nada en Usuario).
+ * Shared header with the home name (dropdown) and optionally the notifications bell.
+ * Applies Compose's "slot API" pattern: the caller can pass [trailing] to replace
+ * the right-hand icon (e.g.: notifications on Inicio, nothing on Usuario).
  */
 @Composable
 fun HouseHeader(
