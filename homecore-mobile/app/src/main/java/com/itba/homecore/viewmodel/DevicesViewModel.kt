@@ -70,13 +70,31 @@ class DevicesViewModel(
                 "vacuum"                          -> if (turnOn) "start"  else "pause"
                 else                              -> if (turnOn) "turnOn" else "turnOff"
             }
-            repository.executeAction(device.id, action).onSuccess { load() }
+            repository.executeAction(device.id, action).onSuccess { toggle()}
         }
     }
+    fun toggle() {
+        viewModelScope.launch {
+            val roomsRes   = repository.getRooms()
+            val devicesRes = repository.getDevices()
 
+            val rooms   = roomsRes.getOrNull()
+            val devices = devicesRes.getOrNull()
+
+            if (rooms == null) {
+                _state.value = DevicesUiState.Error(roomsRes.exceptionOrNull()?.message ?: "Error al cargar")
+                return@launch
+            }
+            if (devices == null) {
+                _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
+                return@launch
+            }
+            _state.value = DevicesUiState.Success(rooms, devices)
+        }
+    }
     fun toggleFavorite(device: Device) {
         viewModelScope.launch {
-            repository.setDeviceFavorite(device.id, !device.isFavorite()).onSuccess { load() }
+            repository.setDeviceFavorite(device.id, !device.isFavorite()).onSuccess { toggle() }
         }
     }
 
