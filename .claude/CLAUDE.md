@@ -152,6 +152,7 @@ com.itba.homecore/
 - ✅ Los ViewModels dependen de las INTERFACES de repositorio. Patrón: constructor primario con la dependencia + constructor secundario sin argumentos que resuelve desde `AppModule` (así `viewModel()` funciona y los tests pueden inyectar fakes)
 - ❌ **NO** hardcodear strings, colores, o dimens
 - ✅ Usar recursos: `stringResource(R.string.x)`, `MaterialTheme.colorScheme` / `ui/theme/Color.kt`
+- ✅ **Comentarios de código: TODOS en inglés.** Mensajes visibles al usuario: SIEMPRE en español (vía recursos o, en la capa de datos, literales en español). Nunca mezclar idiomas en comentarios
 - ✅ Estado de UI que debe sobrevivir la rotación: `rememberSaveable` o subirlo al ViewModel (nunca `remember` pelado para datos que importan)
 - ✅ Lógica compartida entre pantallas (íconos por categoría, formato de horarios, etc.) va en un solo lugar, no duplicada por pantalla (feedback E2)
 - Ver justificaciones completas en `homecore-mobile/docs/DECISIONES_ARQUITECTURA.md`
@@ -392,9 +393,9 @@ Correcciones y feedback del profesor que **deben aplicarse en la tercera entrega
 
 2. **Comentarios inadecuados**
    - ❌ Comentarios obvios: `// Loading state for edit home modal`
-   - ❌ Comentarios en inglés mezclados con español
+   - ❌ Comentarios en inglés mezclados con español (el problema fue la MEZCLA de idiomas)
    - ❌ Comentarios desactualizados: `<!-- Vista principal "Inicio" - contiene todo lo que estaba en page-content del HTML original -->`
-   - ✅ Mobile: Comentarios en español, solo cuando agregan valor (lógica compleja, decisiones no obvias)
+   - ✅ Mobile (convención del equipo, 2026-06-12): comentarios TODOS en inglés, consistentes, y solo cuando agregan valor (lógica compleja, decisiones no obvias). Los mensajes visibles al usuario SIEMPRE en español
 
 3. **Llamadas redundantes a API**
    - ❌ Web llamaba `/send-verification` cuando `/register` ya lo hace automáticamente
