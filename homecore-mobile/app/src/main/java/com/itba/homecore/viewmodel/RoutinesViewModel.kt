@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Routine
 import com.itba.homecore.data.repository.RoutinesRepository
+import com.itba.homecore.di.AppModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,8 +16,12 @@ sealed class RoutinesUiState {
     data class Error(val message: String) : RoutinesUiState()
 }
 
-class RoutinesViewModel : ViewModel() {
-    private val repository = RoutinesRepository()
+/** Ver [DevicesViewModel] para el patrón de inyección por interfaz. */
+class RoutinesViewModel(
+    private val repository: RoutinesRepository
+) : ViewModel() {
+
+    constructor() : this(AppModule.routinesRepository)
 
     private val _state = MutableStateFlow<RoutinesUiState>(RoutinesUiState.Loading)
     val state: StateFlow<RoutinesUiState> = _state.asStateFlow()

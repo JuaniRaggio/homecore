@@ -1,29 +1,17 @@
 package com.itba.homecore.data.repository
 
-import com.itba.homecore.data.api.ApiClient
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.Room
-import retrofit2.HttpException
 
-class DevicesRepository {
-    private val devicesApi = ApiClient.devicesApi
-    private val roomsApi   = ApiClient.roomsApi
-
-    suspend fun getDevices(): Result<List<Device>> = runCatching {
-        try { devicesApi.getAllDevices() }
-        catch (e: HttpException) { throw Exception(httpMsg(e, "Error al obtener dispositivos")) }
-    }
-
-    suspend fun getRooms(): Result<List<Room>> = runCatching {
-        try { roomsApi.getAllRooms() }
-        catch (e: HttpException) { throw Exception(httpMsg(e, "Error al obtener habitaciones")) }
-    }
-
-    suspend fun executeAction(deviceId: String, action: String, params: List<Any> = emptyList()): Result<Unit> = runCatching {
-        try { devicesApi.executeAction(deviceId, action, params) }
-        catch (e: HttpException) { throw Exception(httpMsg(e, "No se pudo ejecutar la acción")) }
-    }
-
-    private fun httpMsg(e: HttpException, fallback: String) =
-        try { e.response()?.errorBody()?.string() ?: fallback } catch (_: Exception) { fallback }
+/**
+ * Contrato de la capa de datos de dispositivos. La UI/ViewModel dependen de esta
+ * abstracción, no de una implementación concreta. Hoy se resuelve con datos mock
+ * ([MockDevicesRepository]); para conectar el backend basta con cambiar el flag en
+ * [com.itba.homecore.di.AppModule] — la UI no se modifica.
+ */
+interface DevicesRepository {
+    suspend fun getDevices(): Result<List<Device>>
+    suspend fun getRooms(): Result<List<Room>>
+    suspend fun executeAction(deviceId: String, action: String, params: List<Any> = emptyList()): Result<Unit>
+    suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit>
 }

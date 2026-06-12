@@ -36,7 +36,6 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var search by remember { mutableStateOf("") }
-    var favorites by remember { mutableStateOf(setOf<String>()) }
 
     Column(
         modifier = Modifier
@@ -64,11 +63,8 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
                         RoomCard(
                             roomName = roomName,
                             devices  = devices,
-                            favorites = favorites,
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
-                            onToggleFavorite = { id ->
-                                favorites = if (id in favorites) favorites - id else favorites + id
-                            }
+                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) }
                         )
                     }
                 }
@@ -260,9 +256,8 @@ private fun ActionPillButton(text: String, onClick: () -> Unit) {
 private fun RoomCard(
     roomName: String,
     devices: List<Device>,
-    favorites: Set<String>,
     onToggle: (Device, Boolean) -> Unit,
-    onToggleFavorite: (String) -> Unit
+    onToggleFavorite: (Device) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -286,9 +281,9 @@ private fun RoomCard(
                     rowDevices.forEach { device ->
                         DeviceCard(
                             device = device,
-                            isFavorite = device.id in favorites,
+                            isFavorite = device.isFavorite(),
                             onToggle = { newState -> onToggle(device, newState) },
-                            onFavoriteClick = { onToggleFavorite(device.id) },
+                            onFavoriteClick = { onToggleFavorite(device) },
                             modifier = Modifier.weight(1f)
                         )
                     }

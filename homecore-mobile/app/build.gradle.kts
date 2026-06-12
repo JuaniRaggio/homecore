@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    // OJO: NO agregar `kotlin-android` — AGP 9.x lo aplica automáticamente y declararlo
-    // dispara: "Cannot add extension with name 'kotlin', as there is an extension already registered"
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
@@ -30,6 +29,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true

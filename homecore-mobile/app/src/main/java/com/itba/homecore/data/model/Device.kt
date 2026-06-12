@@ -3,16 +3,21 @@ package com.itba.homecore.data.model
 import com.google.gson.annotations.SerializedName
 
 data class Device(
-    @SerializedName("id")    val id: String = "",
-    @SerializedName("name")  val name: String = "",
-    @SerializedName("type")  val type: DeviceType = DeviceType(),
-    @SerializedName("state") val state: DeviceState? = null,
-    @SerializedName("room")  val room: RoomRef? = null
+    @SerializedName("id")       val id: String = "",
+    @SerializedName("name")     val name: String = "",
+    @SerializedName("type")     val type: DeviceType = DeviceType(),
+    @SerializedName("state")    val state: DeviceState? = null,
+    @SerializedName("room")     val room: RoomRef? = null,
+    @SerializedName("metadata") val metadata: DeviceMeta? = null
 )
 
 data class DeviceType(
     @SerializedName("id")   val id: String = "",
     @SerializedName("name") val name: String = ""
+)
+
+data class DeviceMeta(
+    @SerializedName("favorite") val favorite: Boolean? = null
 )
 
 data class RoomRef(
@@ -60,3 +65,5 @@ fun Device.isOn(): Boolean {
     val s = state?.status?.lowercase() ?: return false
     return s in listOf("on", "opened", "active", "playing", "armedhome", "armedaway", "unlocked")
 }
+
+fun Device.isFavorite(): Boolean = metadata?.favorite == true

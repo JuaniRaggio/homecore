@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -37,6 +38,7 @@ fun UsuarioScreen(
     devicesVm: DevicesViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -51,17 +53,83 @@ fun UsuarioScreen(
 
         ProfileCard(userName = userName)
 
+
+        LogoutButton(onClick = { showLogoutDialog = true })
+
         ConsumptionCard(state = devicesState)
 
         HistoryCard(state = devicesState)
-
-        TextButton(
-            onClick = onLogout,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.logout), color = ErrorColor)
-        }
     }
+
+    if (showLogoutDialog) {
+        LogoutConfirmDialog(
+            onConfirm = {
+                showLogoutDialog = false
+                onLogout()
+            },
+            onDismiss = { showLogoutDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun LogoutButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = ErrorColor)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Logout,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.logout),
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp
+        )
+    }
+}
+
+@Composable
+private fun LogoutConfirmDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Surface,
+        title = {
+            Text(
+                text = stringResource(R.string.logout_title),
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.logout_message),
+                color = TextSecondary
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.logout), color = ErrorColor, fontWeight = FontWeight.SemiBold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel), color = TextSecondary)
+            }
+        }
+    )
 }
 
 @Composable
@@ -84,7 +152,7 @@ private fun ProfileCard(userName: String) {
                 fontWeight = FontWeight.Bold
             )
 
-            // Avatar (Box con superposición — patrón visto en clase)
+            // Avatar (Box con superposición)
             Box(contentAlignment = Alignment.BottomEnd) {
                 Box(
                     modifier = Modifier
@@ -271,7 +339,7 @@ private fun HistoryRow(device: Device, minutesAgo: Int) {
 
 private fun estimateConsumption(devices: List<Device>): String {
     val watts = devices.filter { it.isOn() }.sumOf { d ->
-        when (d.type.name.lowercase()) {
+        val w: Int = when (d.type.name.lowercase()) {
             "lamp" -> 8
             "ac" -> 1200
             "oven" -> 1500
@@ -280,6 +348,7 @@ private fun estimateConsumption(devices: List<Device>): String {
             "vacuum" -> 90
             else -> 5
         }
+        w
     }
     return "${watts}W"
 }

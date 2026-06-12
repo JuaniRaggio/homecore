@@ -57,4 +57,7 @@
     <string name="devices_running">Dispositivos\nfuncionando</string>
     <string name="history">Historial</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="logout_title">¿Cerrar sesión?</string>
+    <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>
+    <string name="cancel">Cancelar</string>
 </resources>

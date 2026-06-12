@@ -53,7 +53,6 @@ fun InicioScreen(
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
     val routinesState by routinesVm.state.collectAsStateWithLifecycle()
-    var deviceFavorites by remember { mutableStateOf(setOf<String>()) }
 
     Column(
         modifier = Modifier
@@ -109,7 +108,7 @@ fun InicioScreen(
                 is DevicesUiState.Error ->
                     Text(s.message, color = ErrorColor, fontSize = 13.sp)
                 is DevicesUiState.Success -> {
-                    val favs = s.devices.filter { it.id in deviceFavorites }
+                    val favs = s.devices.filter { it.isFavorite() }
                     if (favs.isEmpty()) {
                         Text(
                             text = stringResource(R.string.empty_fav_devices),
@@ -126,9 +125,7 @@ fun InicioScreen(
                                     FavoriteDeviceCard(
                                         device = d,
                                         onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
-                                        onFavoriteClick = {
-                                            deviceFavorites = deviceFavorites - d.id
-                                        },
+                                        onFavoriteClick = { devicesVm.toggleFavorite(d) },
                                         modifier = Modifier.weight(1f)
                                     )
                                 }

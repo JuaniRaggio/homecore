@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.Room
+import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.data.repository.DevicesRepository
+import com.itba.homecore.di.AppModule
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +21,17 @@ sealed class DevicesUiState {
     data class Error(val message: String) : DevicesUiState()
 }
 
-class DevicesViewModel : ViewModel() {
-    private val repository = DevicesRepository()
+/**
+ * Depende de la abstracción [DevicesRepository], no de una implementación concreta.
+ * El constructor secundario sin argumentos resuelve el repo desde [AppModule] para
+ * que `viewModel()` lo instancie por reflexión; el primario permite inyectar un
+ * fake en tests.
+ */
+class DevicesViewModel(
+    private val repository: DevicesRepository
+) : ViewModel() {
+
+    constructor() : this(AppModule.devicesRepository)
 
     private val _state = MutableStateFlow<DevicesUiState>(DevicesUiState.Loading)
     val state: StateFlow<DevicesUiState> = _state.asStateFlow()
@@ -59,8 +70,13 @@ class DevicesViewModel : ViewModel() {
                 "vacuum"                          -> if (turnOn) "start"  else "pause"
                 else                              -> if (turnOn) "turnOn" else "turnOff"
             }
-            // Optimistic refresh — execute, then reload to get the real state
             repository.executeAction(device.id, action).onSuccess { load() }
+        }
+    }
+
+    fun toggleFavorite(device: Device) {
+        viewModelScope.launch {
+            repository.setDeviceFavorite(device.id, !device.isFavorite()).onSuccess { load() }
         }
     }
 }
