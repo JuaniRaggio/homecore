@@ -3,8 +3,8 @@ package com.itba.homecore.data.model
 import com.google.gson.annotations.SerializedName
 
 /**
- * Wrapper genérico que devuelve la API HCI cuando hay error.
- * Para respuestas de éxito devuelve el objeto directo (sin wrapper).
+ * Generic wrapper the HCI API returns on error.
+ * For success responses it returns the object directly (no wrapper).
  */
 data class ApiResponse<T>(
     @SerializedName("result") val result: T?,
