@@ -18,7 +18,8 @@ import com.itba.homecore.data.model.RoutineMetadata
  */
 object MockData {
 
-    val rooms: List<Room> = listOf(
+    // Mutable: createRoom agrega habitaciones nuevas durante la sesión.
+    val rooms: MutableList<Room> = mutableListOf(
         Room(id = "r1", name = "Living"),
         Room(id = "r2", name = "Dormitorio"),
         Room(id = "r3", name = "Cocina")
@@ -113,6 +114,16 @@ object MockData {
             )
         )
     )
+
+    /** Estado inicial razonable para un dispositivo recién creado, según su tipo. */
+    fun defaultStatusFor(typeName: String): String = when (typeName.lowercase()) {
+        "door", "blinds", "faucet" -> "closed"
+        "lock"                     -> "locked"
+        "alarm"                    -> "off"
+        "speaker"                  -> "stopped"
+        "vacuum"                   -> "docked"
+        else                        -> "off"
+    }
 
     /** Traduce una acción a su estado resultante para reflejarlo en el prototipo. */
     fun statusForAction(action: String): String = when (action) {

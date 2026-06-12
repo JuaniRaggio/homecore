@@ -36,6 +36,10 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var search by remember { mutableStateOf("") }
+    var showAddDevice by remember { mutableStateOf(false) }
+    var showAddRoom by remember { mutableStateOf(false) }
+
+    val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
 
     Column(
         modifier = Modifier
@@ -48,7 +52,10 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
     ) {
         HouseHeader()
         SearchBar(value = search, onValueChange = { search = it })
-        FiltersRow()
+        FiltersRow(
+            onAddDevice = { showAddDevice = true },
+            onAddRoom = { showAddRoom = true }
+        )
 
         when (val s = state) {
             is DevicesUiState.Loading -> CenterMessage("Cargando…")
@@ -70,6 +77,24 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
                 }
             }
         }
+    }
+
+    if (showAddDevice) {
+        AddDeviceSheet(
+            rooms = rooms,
+            onDismiss = { showAddDevice = false },
+            onCreate = { name, typeName, roomId ->
+                viewModel.createDevice(name, typeName, roomId) { showAddDevice = false }
+            }
+        )
+    }
+    if (showAddRoom) {
+        AddRoomSheet(
+            onDismiss = { showAddRoom = false },
+            onCreate = { name ->
+                viewModel.createRoom(name) { showAddRoom = false }
+            }
+        )
     }
 }
 
@@ -205,7 +230,10 @@ private fun BasicTextFieldWithPlaceholder(
 
 // ─── Filters row ──────────────────────────────────────────────────────────────
 @Composable
-private fun FiltersRow() {
+private fun FiltersRow(
+    onAddDevice: () -> Unit,
+    onAddRoom: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -228,8 +256,8 @@ private fun FiltersRow() {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ActionPillButton(text = stringResource(R.string.new_device), onClick = { /* TODO */ })
-            ActionPillButton(text = stringResource(R.string.new_room),   onClick = { /* TODO */ })
+            ActionPillButton(text = stringResource(R.string.new_device), onClick = onAddDevice)
+            ActionPillButton(text = stringResource(R.string.new_room),   onClick = onAddRoom)
         }
     }
 }
@@ -309,17 +337,20 @@ private fun DeviceCard(
     val isLamp    = cat == DeviceCategory.LAMP
     val highlight = isDoor && device.state?.status?.lowercase() in listOf("locked", "closed")
 
-    val borderColor = if (highlight) AccentDark else Color.Transparent
+    // Cada dispositivo va en su propia box: las puertas trabadas se resaltan con el
+    // acento; el resto usa un borde neutro para que igual queden enmarcados.
+    val borderColor = if (highlight) AccentDark else Accent.copy(alpha = 0.4f)
     val iconBg      = if (isLamp) Color(0xFF3A2A1A) else Color.Transparent
     val iconTint    = when (cat) {
         DeviceCategory.LAMP -> Color(0xFFF5A623)
         else                 -> TextPrimary
     }
-    val icon: ImageVector = iconForCategory(cat)
+    val icon: ImageVector = deviceIconFor(cat)
     val roomLabel = device.room?.name ?: "Sin habitación"
 
     Box(
         modifier = modifier
+            .background(Surface, RoundedCornerShape(12.dp))
             .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(12.dp))
             .padding(12.dp)
     ) {
@@ -415,17 +446,3 @@ private fun DeviceCard(
     }
 }
 
-private fun iconForCategory(cat: DeviceCategory): ImageVector = when (cat) {
-    DeviceCategory.LAMP         -> Icons.Default.Lightbulb
-    DeviceCategory.DOOR         -> Icons.Default.DoorFront
-    DeviceCategory.ALARM        -> Icons.Default.Security
-    DeviceCategory.FAUCET       -> Icons.Default.WaterDrop
-    DeviceCategory.BLINDS       -> Icons.Default.Blinds
-    DeviceCategory.AC           -> Icons.Default.AcUnit
-    DeviceCategory.SPEAKER      -> Icons.Default.Speaker
-    DeviceCategory.VACUUM       -> Icons.Default.CleaningServices
-    DeviceCategory.REFRIGERATOR -> Icons.Default.Kitchen
-    DeviceCategory.OVEN         -> Icons.Default.Microwave
-    DeviceCategory.LOCK         -> Icons.Default.Lock
-    else                         -> Icons.Default.DevicesOther
-}

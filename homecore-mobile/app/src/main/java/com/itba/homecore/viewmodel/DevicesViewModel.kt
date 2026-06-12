@@ -79,4 +79,24 @@ class DevicesViewModel(
             repository.setDeviceFavorite(device.id, !device.isFavorite()).onSuccess { load() }
         }
     }
+
+    /** Crea un dispositivo y recarga la lista. [onDone] se invoca al terminar con éxito. */
+    fun createDevice(name: String, typeName: String, roomId: String?, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.createDevice(name, typeName, roomId).onSuccess {
+                load()
+                onDone()
+            }
+        }
+    }
+
+    /** Crea una habitación y recarga la lista. [onDone] se invoca al terminar con éxito. */
+    fun createRoom(name: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.createRoom(name).onSuccess {
+                load()
+                onDone()
+            }
+        }
+    }
 }

@@ -40,6 +40,7 @@ import com.itba.homecore.R
 import com.itba.homecore.data.model.*
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.PanelCard
+import com.itba.homecore.ui.screens.devices.deviceIconFor
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
@@ -208,12 +209,14 @@ private fun FavoriteDeviceCard(
     val isOn = device.isOn()
     val isLamp = cat == DeviceCategory.LAMP
     val isDoor = cat == DeviceCategory.DOOR || cat == DeviceCategory.LOCK
-    val borderColor = if (isDoor) AccentDark else Color.Transparent
+    // Cada dispositivo va en su propia box (igual que en DevicesScreen).
+    val borderColor = if (isDoor) AccentDark else Accent.copy(alpha = 0.4f)
     val iconTint = if (isLamp) DeviceLight else TextPrimary
     val iconBg = if (isLamp) Color(0xFF3A2A1A) else Color.Transparent
 
     Box(
         modifier = modifier
+            .background(Surface, RoundedCornerShape(12.dp))
             .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(12.dp))
             .padding(12.dp)
     ) {
@@ -229,7 +232,7 @@ private fun FavoriteDeviceCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = iconForCategory(cat),
+                        imageVector = deviceIconFor(cat),
                         contentDescription = null,
                         tint = iconTint,
                         modifier = Modifier.size(20.dp)
@@ -303,19 +306,4 @@ private fun routineSchedule(r: Routine): String {
     val dayNames = listOf("Dom", "Lun", "Mar", "Mier", "Juev", "Vier", "Sab")
     val dayStr = days.mapNotNull { dayNames.getOrNull(it) }.joinToString(", ")
     return listOf(time, dayStr).filter { it.isNotBlank() }.joinToString(" ")
-}
-
-private fun iconForCategory(cat: DeviceCategory): ImageVector = when (cat) {
-    DeviceCategory.LAMP -> Icons.Default.Lightbulb
-    DeviceCategory.DOOR -> Icons.Default.DoorFront
-    DeviceCategory.ALARM -> Icons.Default.Security
-    DeviceCategory.FAUCET -> Icons.Default.WaterDrop
-    DeviceCategory.BLINDS -> Icons.Default.Blinds
-    DeviceCategory.AC -> Icons.Default.AcUnit
-    DeviceCategory.SPEAKER -> Icons.Default.Speaker
-    DeviceCategory.VACUUM -> Icons.Default.CleaningServices
-    DeviceCategory.REFRIGERATOR -> Icons.Default.Kitchen
-    DeviceCategory.OVEN -> Icons.Default.Microwave
-    DeviceCategory.LOCK -> Icons.Default.Lock
-    else -> Icons.Default.DevicesOther
 }

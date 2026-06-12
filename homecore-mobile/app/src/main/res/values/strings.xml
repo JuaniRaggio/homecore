@@ -60,4 +60,34 @@
     <string name="logout_title">¿Cerrar sesión?</string>
     <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>
     <string name="cancel">Cancelar</string>
+
+    <!-- Alta de dispositivo -->
+    <string name="device_type_title">Tipo de dispositivo</string>
+    <string name="device_details_title">Detalles del dispositivo</string>
+    <string name="device_name_label">Nombre del dispositivo</string>
+    <string name="device_name_hint">Ej: Luz principal</string>
+    <string name="room_label">Habitación</string>
+    <string name="room_optional">Sin habitación</string>
+    <string name="next">Siguiente</string>
+    <string name="create_device">Crear dispositivo</string>
+    <string name="cd_close">Cerrar</string>
+
+    <!-- Tipos de dispositivo -->
+    <string name="dtype_lamp">Luz</string>
+    <string name="dtype_door">Puerta</string>
+    <string name="dtype_alarm">Alarma</string>
+    <string name="dtype_faucet">Canilla</string>
+    <string name="dtype_blinds">Persiana</string>
+    <string name="dtype_ac">Aire</string>
+    <string name="dtype_speaker">Parlante</string>
+    <string name="dtype_vacuum">Aspiradora</string>
+    <string name="dtype_refrigerator">Heladera</string>
+    <string name="dtype_oven">Horno</string>
+    <string name="dtype_lock">Cerradura</string>
+
+    <!-- Alta de habitación -->
+    <string name="room_create_title">Crear habitación</string>
+    <string name="room_name_label">Nombre de la habitación</string>
+    <string name="room_name_hint">Ej: Sala principal</string>
+    <string name="create_room">Crear habitación</string>
 </resources>

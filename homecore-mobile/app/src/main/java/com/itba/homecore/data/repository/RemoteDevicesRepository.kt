@@ -3,6 +3,7 @@ package com.itba.homecore.data.repository
 import com.itba.homecore.data.api.ApiClient
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.Room
+import com.itba.homecore.data.model.RoomRef
 import retrofit2.HttpException
 
 /**
@@ -32,6 +33,21 @@ class RemoteDevicesRepository : DevicesRepository {
         // TODO: la API HCI marca favoritos vía metadata del dispositivo (PUT /devices/{id}).
         // Por ahora es optimista: la UI ya refleja el cambio y al reconectar se agrega la llamada.
         Unit
+    }
+
+    override suspend fun createDevice(name: String, typeName: String, roomId: String?): Result<Device> = runCatching {
+        // TODO: POST /devices requiere el ID real del tipo (GET /devicetypes mapea nombre→id)
+        // y opcionalmente room: { id }. Se implementa al reconectar el backend.
+        throw NotImplementedError("createDevice remoto pendiente: requiere mapear tipo→id de /devicetypes")
+        @Suppress("UNREACHABLE_CODE")
+        Device(name = name, room = roomId?.let { RoomRef(id = it) })
+    }
+
+    override suspend fun createRoom(name: String): Result<Room> = runCatching {
+        // TODO: POST /rooms al reconectar el backend.
+        throw NotImplementedError("createRoom remoto pendiente")
+        @Suppress("UNREACHABLE_CODE")
+        Room(name = name)
     }
 
     private fun httpMsg(e: HttpException, fallback: String) =

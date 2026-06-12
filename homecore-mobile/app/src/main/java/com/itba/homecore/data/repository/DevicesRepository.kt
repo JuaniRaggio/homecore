@@ -14,4 +14,10 @@ interface DevicesRepository {
     suspend fun getRooms(): Result<List<Room>>
     suspend fun executeAction(deviceId: String, action: String, params: List<Any> = emptyList()): Result<Unit>
     suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit>
+
+    /** Crea un dispositivo del tipo indicado (clave canónica: "lamp", "door", …). */
+    suspend fun createDevice(name: String, typeName: String, roomId: String?): Result<Device>
+
+    /** Crea una habitación. */
+    suspend fun createRoom(name: String): Result<Room>
 }
