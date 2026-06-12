@@ -307,13 +307,15 @@ private fun RoomCard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     rowDevices.forEach { device ->
-                        DeviceCard(
-                            device = device,
-                            isFavorite = device.isFavorite(),
-                            onToggle = { newState -> onToggle(device, newState) },
-                            onFavoriteClick = { onToggleFavorite(device) },
-                            modifier = Modifier.weight(1f)
-                        )
+                        key(device.id) {
+                            DeviceCard(
+                                device = device,
+                                isFavorite = device.isFavorite(),
+                                onToggle = { newState -> onToggle(device, newState) },
+                                onFavoriteClick = { onToggleFavorite(device) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                     if (rowDevices.size == 1) Spacer(Modifier.weight(1f))
                 }
