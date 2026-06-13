@@ -120,4 +120,44 @@
     <string name="room_name_label">Nombre de la habitación</string>
     <string name="room_name_hint">Ej: Sala principal</string>
     <string name="create_room">Crear habitación</string>
+
+    <!-- Detalle de dispositivo: etiquetas de acciones (deben reflejar la web) -->
+    <string name="act_turn_on">Encender</string>
+    <string name="act_turn_off">Apagar</string>
+    <string name="act_brightness">Brillo</string>
+    <string name="act_color">Color</string>
+    <string name="act_open">Abrir</string>
+    <string name="act_close">Cerrar</string>
+    <string name="act_lock">Bloquear</string>
+    <string name="act_unlock">Desbloquear</string>
+    <string name="act_arm_away">Activar (modo regular)</string>
+    <string name="act_arm_stay">Activar (modo casa)</string>
+    <string name="act_disarm">Desactivar</string>
+    <string name="act_change_code">Cambiar código</string>
+    <string name="act_dispense">Dispensar</string>
+    <string name="act_up">Subir</string>
+    <string name="act_down">Bajar</string>
+    <string name="act_position">Posición</string>
+    <string name="act_temperature">Temperatura</string>
+    <string name="act_mode">Modo</string>
+    <string name="act_fan_speed">Velocidad del ventilador</string>
+    <string name="act_play">Reproducir</string>
+    <string name="act_stop">Detener</string>
+    <string name="act_pause">Pausar</string>
+    <string name="act_resume">Reanudar</string>
+    <string name="act_next">Siguiente canción</string>
+    <string name="act_previous">Canción anterior</string>
+    <string name="act_volume">Volumen</string>
+    <string name="act_genre">Género</string>
+    <string name="act_start">Iniciar</string>
+    <string name="act_dock">Regresar a la base</string>
+    <string name="act_location">Ubicación</string>
+    <string name="act_freezer_temp">Temperatura del freezer</string>
+    <string name="act_heat_source">Fuente de calor</string>
+    <string name="act_grill">Modo grill</string>
+    <string name="act_convection">Modo convección</string>
+    <string name="act_security_code">Código de seguridad</string>
+    <string name="act_amount">Cantidad</string>
+    <string name="act_unit">Unidad</string>
+    <string name="device_detail_title">Detalle del dispositivo</string>
 </resources>

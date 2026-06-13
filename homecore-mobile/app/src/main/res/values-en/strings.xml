@@ -120,4 +120,44 @@
     <string name="room_name_label">Room name</string>
     <string name="room_name_hint">E.g. Main hall</string>
     <string name="create_room">Create room</string>
+
+    <!-- Device detail: action labels (must mirror the web) -->
+    <string name="act_turn_on">Turn on</string>
+    <string name="act_turn_off">Turn off</string>
+    <string name="act_brightness">Brightness</string>
+    <string name="act_color">Color</string>
+    <string name="act_open">Open</string>
+    <string name="act_close">Close</string>
+    <string name="act_lock">Lock</string>
+    <string name="act_unlock">Unlock</string>
+    <string name="act_arm_away">Arm (away)</string>
+    <string name="act_arm_stay">Arm (home)</string>
+    <string name="act_disarm">Disarm</string>
+    <string name="act_change_code">Change code</string>
+    <string name="act_dispense">Dispense</string>
+    <string name="act_up">Open</string>
+    <string name="act_down">Close</string>
+    <string name="act_position">Position</string>
+    <string name="act_temperature">Temperature</string>
+    <string name="act_mode">Mode</string>
+    <string name="act_fan_speed">Fan speed</string>
+    <string name="act_play">Play</string>
+    <string name="act_stop">Stop</string>
+    <string name="act_pause">Pause</string>
+    <string name="act_resume">Resume</string>
+    <string name="act_next">Next song</string>
+    <string name="act_previous">Previous song</string>
+    <string name="act_volume">Volume</string>
+    <string name="act_genre">Genre</string>
+    <string name="act_start">Start</string>
+    <string name="act_dock">Return to dock</string>
+    <string name="act_location">Location</string>
+    <string name="act_freezer_temp">Freezer temperature</string>
+    <string name="act_heat_source">Heat source</string>
+    <string name="act_grill">Grill mode</string>
+    <string name="act_convection">Convection mode</string>
+    <string name="act_security_code">Security code</string>
+    <string name="act_amount">Amount</string>
+    <string name="act_unit">Unit</string>
+    <string name="device_detail_title">Device detail</string>
 </resources>

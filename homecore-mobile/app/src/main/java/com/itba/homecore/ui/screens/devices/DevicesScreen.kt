@@ -39,9 +39,22 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
     var search by rememberSaveable { mutableStateOf("") }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
+    var detailDeviceId by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
+    val successState = state as? DevicesUiState.Success
+    val rooms = successState?.rooms ?: emptyList()
     val noRoomLabel = stringResource(R.string.room_none)
+
+    // Tapping a device opens its detail (per-type controls); back returns to the list.
+    val detailDevice = detailDeviceId?.let { id -> successState?.devices?.firstOrNull { it.id == id } }
+    if (detailDevice != null) {
+        DeviceDetailScreen(
+            device = detailDevice,
+            onAction = { action, params -> viewModel.runAction(detailDevice.id, action, params) },
+            onBack = { detailDeviceId = null }
+        )
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -79,7 +92,8 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
                             roomName = roomName,
                             devices  = devices,
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
-                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) }
+                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
+                            onOpen = { device -> detailDeviceId = device.id }
                         )
                     }
                 }
@@ -181,7 +195,8 @@ private fun RoomCard(
     roomName: String,
     devices: List<Device>,
     onToggle: (Device, Boolean) -> Unit,
-    onToggleFavorite: (Device) -> Unit
+    onToggleFavorite: (Device) -> Unit,
+    onOpen: (Device) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -208,7 +223,8 @@ private fun RoomCard(
                                 device = device,
                                 onToggle = { newState -> onToggle(device, newState) },
                                 onFavoriteClick = { onToggleFavorite(device) },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                onClick = { onOpen(device) }
                             )
                         }
                     }

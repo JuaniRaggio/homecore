@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
@@ -86,7 +87,8 @@ fun DeviceCard(
     device: Device,
     onToggle: (Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     val cat        = device.category()
     val isOn       = device.isOn()
@@ -104,6 +106,7 @@ fun DeviceCard(
         modifier = modifier
             .background(Surface, RoundedCornerShape(Radius.xl))
             .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(Radius.xl))
+            .clickable(onClick = onClick)
             .padding(Spacing.base)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
@@ -150,23 +153,26 @@ fun DeviceCard(
                 lineHeight = 16.sp
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Switch(
-                    checked = isOn,
-                    onCheckedChange = onToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor    = Color.White,
-                        checkedTrackColor    = ToggleOn,
-                        uncheckedThumbColor  = Color.White,
-                        uncheckedTrackColor  = ToggleOff,
-                        uncheckedBorderColor = Color.Transparent
-                    ),
-                    modifier = Modifier.scale(0.85f)
-                )
+            // Quick switch only for types with an on/off-equivalent action (e.g. not a fridge).
+            if (DeviceCapabilities.quickToggle(cat) != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        checked = isOn,
+                        onCheckedChange = onToggle,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor    = Color.White,
+                            checkedTrackColor    = ToggleOn,
+                            uncheckedThumbColor  = Color.White,
+                            uncheckedTrackColor  = ToggleOff,
+                            uncheckedBorderColor = Color.Transparent
+                        ),
+                        modifier = Modifier.scale(0.85f)
+                    )
+                }
             }
 
             when {
