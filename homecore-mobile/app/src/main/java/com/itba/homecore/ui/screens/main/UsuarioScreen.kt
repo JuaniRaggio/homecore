@@ -157,7 +157,7 @@ private fun ProfileCard(userName: String) {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
-                        .background(Color(0xFF6C7080), CircleShape),
+                        .background(AvatarBackground, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -199,14 +199,14 @@ private fun ProfileCard(userName: String) {
 private fun PillAction(text: String, onClick: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(20.dp),
-        color = Color(0xFFE8E9F0),
+        color = PillBackground,
         modifier = Modifier
             .fillMaxWidth(0.85f)
             .clickable(onClick = onClick)
     ) {
         Text(
             text = text,
-            color = Color(0xFF1F2030),
+            color = PillText,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
@@ -298,7 +298,7 @@ private fun HistoryCard(state: DevicesUiState) {
             fontWeight = FontWeight.Bold
         )
         if (recent.isEmpty()) {
-            Text("Sin eventos recientes", color = TextSecondary, fontSize = 13.sp)
+            Text(stringResource(R.string.no_recent_events), color = TextSecondary, fontSize = 13.sp)
         } else {
             recent.forEachIndexed { idx, d ->
                 HistoryRow(device = d, minutesAgo = (idx + 1) * 5)
@@ -309,7 +309,10 @@ private fun HistoryCard(state: DevicesUiState) {
 
 @Composable
 private fun HistoryRow(device: Device, minutesAgo: Int) {
-    val verb = if (device.isOn()) "encendida" else "apagada"
+    val action = stringResource(
+        if (device.isOn()) R.string.history_turned_on else R.string.history_turned_off,
+        device.name
+    )
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -323,13 +326,13 @@ private fun HistoryRow(device: Device, minutesAgo: Int) {
         )
         Column {
             Text(
-                text = "${device.name} $verb",
+                text = action,
                 color = TextPrimary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "Hace $minutesAgo min",
+                text = stringResource(R.string.minutes_ago, minutesAgo),
                 color = TextSecondary,
                 fontSize = 12.sp
             )

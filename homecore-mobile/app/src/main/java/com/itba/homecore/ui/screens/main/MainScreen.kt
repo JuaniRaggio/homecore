@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -17,6 +18,7 @@ import com.itba.homecore.R
 import com.itba.homecore.ui.screens.devices.DevicesScreen
 import com.itba.homecore.ui.screens.routines.RoutinesScreen
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.viewmodel.UiMessages
 
 private enum class Tab(val icon: ImageVector, val labelRes: Int) {
     INICIO(Icons.Default.Home, R.string.nav_inicio),
@@ -27,10 +29,17 @@ private enum class Tab(val icon: ImageVector, val labelRes: Int) {
 
 @Composable
 fun MainScreen(onLogout: () -> Unit = {}) {
-    var selected by remember { mutableStateOf(Tab.INICIO) }
+    var selected by rememberSaveable { mutableStateOf(Tab.INICIO) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Transient action feedback (failed toggles, creations, etc.) surfaces as a snackbar.
+    LaunchedEffect(Unit) {
+        UiMessages.messages.collect { snackbarHostState.showSnackbar(it) }
+    }
 
     Scaffold(
         containerColor = Background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             NavigationBar(containerColor = Surface, tonalElevation = 0.dp) {
                 Tab.entries.forEach { tab ->
