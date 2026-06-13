@@ -23,6 +23,10 @@ sealed class AuthUiState {
     object Verified : AuthUiState()
     /** Email was already registered: send the user to the Login screen. */
     data class AlreadyRegistered(val message: String) : AuthUiState()
+    /** Recovery code was sent to the user's email (RF3 step 1 done). */
+    object CodeSent : AuthUiState()
+    /** Password was successfully reset (RF3 step 2 done). */
+    object PasswordReset : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }
 
@@ -162,6 +166,41 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             repository.sendVerification(email).fold(
                 onSuccess = { _resendState.value = ResendState.Sent },
                 onFailure = { e -> _resendState.value = ResendState.Error(e.message ?: "No se pudo reenviar el código") }
+            )
+        }
+    }
+
+    fun forgotPassword(email: String) {
+        if (email.isBlank()) {
+            _uiState.value = AuthUiState.Error("Ingresá tu email")
+            return
+        }
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            repository.forgotPassword(email).fold(
+                onSuccess = {
+                    _pendingEmail.value = email
+                    _uiState.value = AuthUiState.CodeSent
+                },
+                onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "No se pudo enviar el código") }
+            )
+        }
+    }
+
+    fun resetPassword(code: String, newPassword: String, confirmPassword: String) {
+        if (code.isBlank() || newPassword.isBlank()) {
+            _uiState.value = AuthUiState.Error("Completá todos los campos")
+            return
+        }
+        if (newPassword != confirmPassword) {
+            _uiState.value = AuthUiState.Error("Las contraseñas no coinciden")
+            return
+        }
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            repository.resetPassword(code, newPassword).fold(
+                onSuccess = { _uiState.value = AuthUiState.PasswordReset },
+                onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "No se pudo restablecer la contraseña") }
             )
         }
     }

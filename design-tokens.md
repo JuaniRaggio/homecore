@@ -38,6 +38,17 @@ Sistema de diseño compartido entre web y mobile.
 - **toggle_on**: `#6a78f5`
 - **toggle_off**: `#2e2e2e`
 
+### Superficies de autenticación (login, register, verify, recover)
+- **bg_auth_gradient_start**: `#1a1a3a`
+- **bg_auth_gradient_end**: `#0d0d1a`
+- **bg_auth_card**: `#2a2a4a`
+- **bg_auth_input**: `#3a3a5e`
+- **bg_auth_btn**: `#1a1a2e`
+- **bg_auth_btn_hover**: `#0f0f20`
+
+### Navegación
+- **bg_nav_hover**: `#1d1e35`
+
 ## Colores por tipo de dispositivo
 
 | Tipo     | Color     | Uso                    |
@@ -55,13 +66,15 @@ Sistema de diseño compartido entre web y mobile.
 | lock     | `#2196f3` | Cerraduras             |
 
 ### Paleta de fallback
-Para tipos de dispositivos sin color definido:
+Para tipos de dispositivos sin color definido (web: `homecore-web/src/config/device-types.js` → `FALLBACK_PALETTE`):
 - `#9c59d1`
 - `#2ecc71`
 - `#e67e22`
 - `#1abc9c`
 - `#e91e63`
 - `#00bcd4`
+
+> Nota: en la web, `DEVICE_COLORS` define hasta `oven`; `lock` (`#2196f3`) lo agrega mobile y no está en la web (allí caería en la paleta de fallback).
 
 ## Tipografía (adaptación móvil)
 
@@ -141,10 +154,21 @@ Ver archivo `homecore-web/src/config/device-types.js` para mapeo completo de:
 - WebSocket: Socket.IO para notificaciones en tiempo real
 - Autenticación: JWT en header `Authorization: Bearer <token>`
 
+## Layout (solo web)
+
+- **sidebar_w**: `220px`
+- **topbar_h**: `60px`
+
 ## Implementación
 
 ### Web (CSS Variables)
-Definidas en `homecore-web/src/assets/styles/variables.css`
+Definidas en `homecore-web/src/assets/styles/variables.css` (colores neutros/semánticos, tipografía, espaciado, radius) y `homecore-web/src/config/device-types.js` (colores e íconos por tipo de dispositivo).
 
-### Mobile (Android)
-Definir en `res/values/colors.xml` y `res/values/dimens.xml`
+### Mobile (Android, Jetpack Compose)
+La app mobile NO usa `res/values/*.xml` para esto: los tokens están en Kotlin, en el paquete `com.itba.homecore.ui.theme`:
+- **Colores**: `ui/theme/Color.kt` (paleta neutra/semántica + 11 colores por tipo de dispositivo).
+- **Tipografía**: `ui/theme/Type.kt` (estilos de Material 3) y tamaños sueltos en `ui/theme/Dimens.kt` (`TextSize`).
+- **Espaciado, radius y tamaños**: `ui/theme/Dimens.kt` (`Spacing`, `Radius`, `IconSize`, `TextSize`).
+- Los colores por tipo se mapean en `ui/screens/devices/DeviceUi.kt` (`deviceColorFor`).
+
+> Las constantes de `Dimens.kt` preservan exactamente los valores de este documento (los nombres se adaptan a identificadores válidos de Kotlin: `2xs` → `xs2`, `2xl..5xl` → `xl2..xl5`).

@@ -33,6 +33,7 @@ import com.itba.homecore.viewmodel.RoutinesViewModel
 
 @Composable
 fun DashboardScreen(
+    onDeviceClick: (String) -> Unit = {},
     devicesVm: DevicesViewModel = viewModel(),
     routinesVm: RoutinesViewModel = viewModel()
 ) {
@@ -44,9 +45,9 @@ fun DashboardScreen(
             .fillMaxSize()
             .background(Background)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = Spacing.xl)
+            .padding(bottom = Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
         HouseHeader(showNotifications = true)
 
@@ -58,16 +59,16 @@ fun DashboardScreen(
         ) {
             when (val s = routinesState) {
                 is RoutinesUiState.Loading ->
-                    Text(stringResource(R.string.loading), color = TextSecondary, fontSize = 13.sp)
+                    Text(stringResource(R.string.loading), color = TextSecondary, fontSize = TextSize.base)
                 is RoutinesUiState.Error ->
-                    Text(s.message, color = ErrorColor, fontSize = 13.sp)
+                    Text(s.message, color = ErrorColor, fontSize = TextSize.base)
                 is RoutinesUiState.Success -> {
                     val favs = s.routines.filter { it.isFavorite() }
                     if (favs.isEmpty()) {
                         Text(
                             text = stringResource(R.string.empty_fav_routines),
                             color = TextSecondary,
-                            fontSize = 13.sp
+                            fontSize = TextSize.base
                         )
                     } else {
                         favs.forEach { r ->
@@ -88,22 +89,22 @@ fun DashboardScreen(
         ) {
             when (val s = devicesState) {
                 is DevicesUiState.Loading ->
-                    Text(stringResource(R.string.loading), color = TextSecondary, fontSize = 13.sp)
+                    Text(stringResource(R.string.loading), color = TextSecondary, fontSize = TextSize.base)
                 is DevicesUiState.Error ->
-                    Text(s.message, color = ErrorColor, fontSize = 13.sp)
+                    Text(s.message, color = ErrorColor, fontSize = TextSize.base)
                 is DevicesUiState.Success -> {
                     val favs = s.devices.filter { it.isFavorite() }
                     if (favs.isEmpty()) {
                         Text(
                             text = stringResource(R.string.empty_fav_devices),
                             color = TextSecondary,
-                            fontSize = 13.sp
+                            fontSize = TextSize.base
                         )
                     } else {
                         favs.chunked(2).forEach { row ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.base)
                             ) {
                                 row.forEach { d ->
                                     key(d.id) {
@@ -111,7 +112,8 @@ fun DashboardScreen(
                                             device = d,
                                             onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
                                             onFavoriteClick = { devicesVm.toggleFavorite(d) },
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f),
+                                            onClick = { onDeviceClick(d.id) }
                                         )
                                     }
                                 }
@@ -133,23 +135,23 @@ private fun FavoriteRoutineCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SurfaceVariant, RoundedCornerShape(14.dp))
-            .padding(14.dp)
+            .background(SurfaceVariant, RoundedCornerShape(Radius.xl2))
+            .padding(Spacing.lg)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = routine.name,
                     color = TextPrimary,
-                    fontSize = 16.sp,
+                    fontSize = TextSize.xl,
                     fontWeight = FontWeight.SemiBold
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(Spacing.sm))
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
                     tint = FavoriteStar,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(IconSize.sm)
                 )
             }
             val sched = routineScheduleLabel(routine).ifBlank { routine.descriptionText() }
@@ -157,7 +159,7 @@ private fun FavoriteRoutineCard(
                 Text(
                     text = sched,
                     color = Accent,
-                    fontSize = 13.sp,
+                    fontSize = TextSize.base,
                     lineHeight = 16.sp
                 )
             }
@@ -166,16 +168,16 @@ private fun FavoriteRoutineCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(Radius.card),
                     color = AccentDark,
                     modifier = Modifier.clickable(onClick = onExecute)
                 ) {
                     Text(
                         text = stringResource(R.string.execute_now),
                         color = Color.White,
-                        fontSize = 12.sp,
+                        fontSize = TextSize.sm,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
                     )
                 }
             }

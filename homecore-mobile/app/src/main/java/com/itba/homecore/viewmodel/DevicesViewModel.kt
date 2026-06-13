@@ -3,7 +3,9 @@ package com.itba.homecore.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.Room
+import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.data.repository.DevicesRepository
 import com.itba.homecore.di.AppModule
@@ -70,18 +72,20 @@ class DevicesViewModel(
         }
     }
 
+    /**
+     * Card quick switch. The on/off-equivalent action per type comes from the shared
+     * [DeviceCapabilities] (mirrors the web), so e.g. a curtain sends up/down — never on/off.
+     */
     fun toggleDevice(device: Device, turnOn: Boolean) {
+        val toggle = DeviceCapabilities.quickToggle(device.category()) ?: return
+        val action = if (turnOn) toggle.onAction else toggle.offAction
+        runAction(device.id, action)
+    }
+
+    /** Runs an arbitrary device action (used by the detail screen) and refreshes on success. */
+    fun runAction(deviceId: String, action: String, params: List<Any> = emptyList()) {
         viewModelScope.launch {
-            val action = when (device.type.name.lowercase()) {
-                "lamp", "ac", "speaker", "oven" -> if (turnOn) "turnOn" else "turnOff"
-                "door", "faucet"                 -> if (turnOn) "open"   else "close"
-                "lock"                            -> if (turnOn) "unlock" else "lock"
-                "blinds"                          -> if (turnOn) "open"   else "close"
-                "alarm"                           -> if (turnOn) "armAway" else "disarm"
-                "vacuum"                          -> if (turnOn) "start"  else "pause"
-                else                              -> if (turnOn) "turnOn" else "turnOff"
-            }
-            repository.executeAction(device.id, action)
+            repository.executeAction(deviceId, action, params)
                 .onSuccess { refresh(showLoading = false) }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la acción") }
         }

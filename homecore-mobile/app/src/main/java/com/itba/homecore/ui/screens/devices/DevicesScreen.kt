@@ -34,7 +34,10 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 @Composable
-fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
+fun DevicesScreen(
+    onDeviceClick: (String) -> Unit,
+    viewModel: DevicesViewModel = viewModel()
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var search by rememberSaveable { mutableStateOf("") }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
@@ -48,9 +51,9 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
             .fillMaxSize()
             .background(Background)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(top = 8.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = Spacing.xl)
+            .padding(top = Spacing.sm, bottom = Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.base)
     ) {
         HouseHeader()
         HcSearchBar(
@@ -79,7 +82,8 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
                             roomName = roomName,
                             devices  = devices,
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
-                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) }
+                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
+                            onOpen = { device -> onDeviceClick(device.id) }
                         )
                     }
                 }
@@ -140,18 +144,18 @@ private fun FiltersRow(
                 imageVector = Icons.Default.FilterList,
                 contentDescription = null,
                 tint = TextPrimary,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(IconSize.sm)
             )
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(Spacing.xs))
             Text(
                 text = stringResource(R.string.filters),
                 color = TextPrimary,
-                fontSize = 14.sp,
+                fontSize = TextSize.md,
                 textDecoration = TextDecoration.Underline
             )
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             ActionPillButton(text = stringResource(R.string.new_device), onClick = onAddDevice)
             ActionPillButton(text = stringResource(R.string.new_room),   onClick = onAddRoom)
         }
@@ -161,16 +165,16 @@ private fun FiltersRow(
 @Composable
 private fun ActionPillButton(text: String, onClick: () -> Unit) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(Radius.card),
         color = AccentDark,
         modifier = Modifier.clickable(onClick = onClick)
     ) {
         Text(
             text = text,
             color = Color.White,
-            fontSize = 12.sp,
+            fontSize = TextSize.sm,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+            modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs)
         )
     }
 }
@@ -181,26 +185,27 @@ private fun RoomCard(
     roomName: String,
     devices: List<Device>,
     onToggle: (Device, Boolean) -> Unit,
-    onToggleFavorite: (Device) -> Unit
+    onToggleFavorite: (Device) -> Unit,
+    onOpen: (Device) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(BorderStroke(1.dp, AccentDark.copy(alpha = 0.6f)), RoundedCornerShape(16.dp))
-            .padding(12.dp)
+            .border(BorderStroke(1.dp, AccentDark.copy(alpha = 0.6f)), RoundedCornerShape(Radius.card))
+            .padding(Spacing.base)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
             Text(
                 text = roomName,
                 color = TextPrimary,
-                fontSize = 18.sp,
+                fontSize = TextSize.xxl,
                 fontWeight = FontWeight.SemiBold
             )
 
             devices.chunked(2).forEach { rowDevices ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.base)
                 ) {
                     rowDevices.forEach { device ->
                         key(device.id) {
@@ -208,7 +213,8 @@ private fun RoomCard(
                                 device = device,
                                 onToggle = { newState -> onToggle(device, newState) },
                                 onFavoriteClick = { onToggleFavorite(device) },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                onClick = { onOpen(device) }
                             )
                         }
                     }

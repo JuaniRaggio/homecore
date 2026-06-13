@@ -59,37 +59,37 @@ fun VerifyScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp, vertical = 64.dp)
+                .padding(horizontal = Spacing.huge, vertical = Spacing.huge3)
         ) {
             Box(
-                modifier = Modifier.size(84.dp).background(Accent, CircleShape),
+                modifier = Modifier.size(IconSize.logo).background(Accent, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.MarkEmailRead, contentDescription = null, tint = Color.White, modifier = Modifier.size(48.dp))
+                Icon(Icons.Default.MarkEmailRead, contentDescription = null, tint = Color.White, modifier = Modifier.size(IconSize.button))
             }
 
-            Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.title_verify), color = TextPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Spacing.xl))
+            Text(stringResource(R.string.title_verify), color = TextPrimary, fontSize = TextSize.headline, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(Spacing.sm))
             Text(
                 text = if (!pendingEmail.isNullOrBlank())
                     stringResource(R.string.verify_subtitle_email, pendingEmail!!)
                 else
                     stringResource(R.string.verify_subtitle),
                 color = TextSecondary,
-                fontSize = 14.sp,
+                fontSize = TextSize.md,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(Spacing.huge))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(Radius.card),
                 colors = CardDefaults.cardColors(containerColor = Surface)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(Spacing.xl4),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xl)
                 ) {
                     HcTextField(
                         label = stringResource(R.string.label_verification_code),
@@ -98,7 +98,7 @@ fun VerifyScreen(
                     )
 
                     if (errorMsg.isNotBlank()) {
-                        Text(errorMsg, color = ErrorColor, fontSize = 13.sp)
+                        Text(errorMsg, color = ErrorColor, fontSize = TextSize.base)
                     }
 
                     HcButton(
@@ -111,25 +111,25 @@ fun VerifyScreen(
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(Spacing.xs2)
                     ) {
                         val sending = resendState is ResendState.Sending
                         Text(
                             text = if (sending) stringResource(R.string.verify_resending)
                                    else stringResource(R.string.verify_resend),
                             color = Accent,
-                            fontSize = 14.sp,
+                            fontSize = TextSize.md,
                             textDecoration = TextDecoration.Underline,
                             modifier = Modifier.clickable(enabled = !sending) { viewModel.resendCode() }
                         )
                         when (val rs = resendState) {
                             is ResendState.Sent  -> Text(
                                 stringResource(R.string.verify_resend_sent),
-                                color = SuccessColor, fontSize = 13.sp, textAlign = TextAlign.Center
+                                color = SuccessColor, fontSize = TextSize.base, textAlign = TextAlign.Center
                             )
                             is ResendState.Error -> Text(
                                 rs.message,
-                                color = ErrorColor, fontSize = 13.sp, textAlign = TextAlign.Center
+                                color = ErrorColor, fontSize = TextSize.base, textAlign = TextAlign.Center
                             )
                             else -> {}
                         }
@@ -143,7 +143,7 @@ fun VerifyScreen(
             onClick = onBack,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(top = 12.dp, start = 8.dp)
+                .padding(top = Spacing.base, start = Spacing.sm)
                 .align(Alignment.TopStart)
         ) {
             Icon(

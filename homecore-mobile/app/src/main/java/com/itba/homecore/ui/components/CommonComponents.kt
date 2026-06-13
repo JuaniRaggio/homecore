@@ -49,15 +49,15 @@ fun HcTextField(
             text = label,
             style = MaterialTheme.typography.labelLarge,
             color = TextPrimary,
-            modifier = Modifier.padding(bottom = 4.dp)
+            modifier = Modifier.padding(bottom = Spacing.xs2)
         )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(text = placeholder, color = TextSecondary, fontSize = 14.sp) },
+            placeholder = { Text(text = placeholder, color = TextSecondary, fontSize = TextSize.md) },
             singleLine = singleLine,
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(Radius.md),
             visualTransformation = if (isPassword && !passwordVisible)
                 PasswordVisualTransformation() else VisualTransformation.None,
             trailingIcon = if (isPassword) {
@@ -97,14 +97,14 @@ fun HcButton(
     Button(
         onClick = onClick,
         enabled = enabled && !isLoading,
-        modifier = modifier.fillMaxWidth().height(48.dp),
-        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.fillMaxWidth().height(Spacing.huge2),
+        shape = RoundedCornerShape(Radius.md),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = OnAccent, strokeWidth = 2.dp)
+            CircularProgressIndicator(modifier = Modifier.size(IconSize.md), color = OnAccent, strokeWidth = 2.dp)
         } else {
-            Text(text = text, color = OnAccent, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text(text = text, color = OnAccent, fontWeight = FontWeight.SemiBold, fontSize = TextSize.xl)
         }
     }
 }
@@ -124,7 +124,7 @@ fun HouseHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = Spacing.base),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -134,13 +134,13 @@ fun HouseHeader(
             Text(
                 text = stringResource(R.string.house_default),
                 color = TextPrimary,
-                fontSize = 22.sp,
+                fontSize = TextSize.title,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(Spacing.sm))
             Box(
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(IconSize.box)
                     .background(SurfaceVariant, CircleShape)
                     .clickable(onClick = onHomePickerClick),
                 contentAlignment = Alignment.Center
@@ -149,7 +149,7 @@ fun HouseHeader(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = stringResource(R.string.cd_dropdown),
                     tint = TextPrimary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(IconSize.sm)
                 )
             }
         }
@@ -158,7 +158,7 @@ fun HouseHeader(
             Spacer(Modifier.weight(1f))
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(IconSize.bell)
                     .background(SurfaceVariant, CircleShape)
                     .clickable(onClick = onNotificationsClick),
                 contentAlignment = Alignment.Center
@@ -167,7 +167,7 @@ fun HouseHeader(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = stringResource(R.string.cd_notifications),
                     tint = AccentDark,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(IconSize.md)
                 )
             }
         }
@@ -186,30 +186,30 @@ fun HcSearchBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(Radius.round),
         color = InputBackground
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.sm),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = stringResource(R.string.cd_menu),
                 tint = TextPrimary,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(IconSize.lg)
             )
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(Spacing.base))
             Box(modifier = Modifier.weight(1f)) {
                 if (value.isEmpty()) {
-                    Text(text = placeholder, color = TextSecondary, fontSize = 15.sp)
+                    Text(text = placeholder, color = TextSecondary, fontSize = TextSize.lg)
                 }
                 BasicTextField(
                     value = value,
                     onValueChange = onValueChange,
                     singleLine = true,
                     cursorBrush = SolidColor(AccentDark),
-                    textStyle = TextStyle(color = TextPrimary, fontSize = 15.sp),
+                    textStyle = TextStyle(color = TextPrimary, fontSize = TextSize.lg),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -217,7 +217,7 @@ fun HcSearchBar(
                 imageVector = Icons.Default.Search,
                 contentDescription = stringResource(R.string.cd_search),
                 tint = TextPrimary,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(IconSize.lg)
             )
         }
     }
@@ -237,16 +237,16 @@ fun StatusMessage(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 48.dp),
+            .padding(vertical = Spacing.huge2),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = text,
             color = if (isError) ErrorColor else TextSecondary,
-            fontSize = 14.sp
+            fontSize = TextSize.md
         )
         if (onRetry != null) {
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Spacing.base))
             TextButton(onClick = onRetry) {
                 Text(stringResource(R.string.retry), color = AccentDark)
             }
@@ -279,10 +279,10 @@ fun PanelCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Surface, RoundedCornerShape(16.dp))
-            .padding(16.dp)
+            .background(Surface, RoundedCornerShape(Radius.card))
+            .padding(Spacing.xl)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -291,16 +291,16 @@ fun PanelCard(
                 Text(
                     text = title,
                     color = TextPrimary,
-                    fontSize = 16.sp,
+                    fontSize = TextSize.xl,
                     fontWeight = FontWeight.Bold
                 )
                 Box(
                     modifier = Modifier
-                        .background(SurfaceVariant, RoundedCornerShape(16.dp))
+                        .background(SurfaceVariant, RoundedCornerShape(Radius.card))
                         .clickable(onClick = onAction)
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                        .padding(horizontal = Spacing.base, vertical = Spacing.xs)
                 ) {
-                    Text(text = actionLabel, color = Accent, fontSize = 12.sp)
+                    Text(text = actionLabel, color = Accent, fontSize = TextSize.sm)
                 }
             }
             content()
