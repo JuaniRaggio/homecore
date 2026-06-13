@@ -34,27 +34,17 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 @Composable
-fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
+fun DevicesScreen(
+    onDeviceClick: (String) -> Unit,
+    viewModel: DevicesViewModel = viewModel()
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var search by rememberSaveable { mutableStateOf("") }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
-    var detailDeviceId by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val successState = state as? DevicesUiState.Success
-    val rooms = successState?.rooms ?: emptyList()
+    val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
     val noRoomLabel = stringResource(R.string.room_none)
-
-    // Tapping a device opens its detail (per-type controls); back returns to the list.
-    val detailDevice = detailDeviceId?.let { id -> successState?.devices?.firstOrNull { it.id == id } }
-    if (detailDevice != null) {
-        DeviceDetailScreen(
-            device = detailDevice,
-            onAction = { action, params -> viewModel.runAction(detailDevice.id, action, params) },
-            onBack = { detailDeviceId = null }
-        )
-        return
-    }
 
     Column(
         modifier = Modifier
@@ -93,7 +83,7 @@ fun DevicesScreen(viewModel: DevicesViewModel = viewModel()) {
                             devices  = devices,
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
                             onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
-                            onOpen = { device -> detailDeviceId = device.id }
+                            onOpen = { device -> onDeviceClick(device.id) }
                         )
                     }
                 }
