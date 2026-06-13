@@ -14,6 +14,16 @@
     <string name="title_register">Crear Cuenta</string>
     <string name="cd_back">Volver</string>
 
+    <!-- Recuperar contraseña -->
+    <string name="title_recover">Recuperar contraseña</string>
+    <string name="recover_subtitle">Te enviaremos un código a tu email para que puedas restablecer tu contraseña.</string>
+    <string name="btn_send_code">Enviar código</string>
+    <string name="title_reset_password">Nueva contraseña</string>
+    <string name="reset_subtitle_email">Ingresá el código que enviamos a %1$s y elegí una nueva contraseña.</string>
+    <string name="label_recovery_code">Código de recuperación</string>
+    <string name="label_new_password">Nueva contraseña</string>
+    <string name="btn_reset_password">Restablecer contraseña</string>
+
     <!-- Verificación de cuenta -->
     <string name="title_verify">Verificar cuenta</string>
     <string name="verify_subtitle">Ingresá el código que te enviamos por email.</string>
