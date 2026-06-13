@@ -1,0 +1,192 @@
+package com.itba.homecore.ui.screens.routines
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.itba.homecore.R
+import com.itba.homecore.data.model.Routine
+import com.itba.homecore.data.model.descriptionText
+import com.itba.homecore.data.model.isActive
+import com.itba.homecore.data.model.isFavorite
+import com.itba.homecore.ui.components.HcSearchBar
+import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.components.StatusMessage
+import com.itba.homecore.ui.components.routineScheduleLabel
+import com.itba.homecore.ui.theme.*
+import com.itba.homecore.viewmodel.RoutinesUiState
+import com.itba.homecore.viewmodel.RoutinesViewModel
+
+@Composable
+fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    var search by rememberSaveable { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Background)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        HouseHeader()
+        HcSearchBar(
+            value = search,
+            onValueChange = { search = it },
+            placeholder = stringResource(R.string.search_routine)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = AccentDark,
+                modifier = Modifier.clickable { /* TODO: new routine */ }
+            ) {
+                Text(
+                    text = stringResource(R.string.new_routine),
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+        }
+
+        when (val s = state) {
+            is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
+            is RoutinesUiState.Error -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
+            is RoutinesUiState.Success -> {
+                val filtered = remember(s.routines, search) {
+                    if (search.isBlank()) s.routines
+                    else s.routines.filter { it.name.contains(search, ignoreCase = true) }
+                }
+                if (filtered.isEmpty()) {
+                    StatusMessage(stringResource(R.string.empty_routines))
+                } else {
+                    filtered.forEach { r ->
+                        key(r.id) {
+                            RoutineCard(
+                                routine = r,
+                                onExecute = { viewModel.execute(r) },
+                                onToggleActive = { viewModel.toggleActive(r) },
+                                onToggleFavorite = { viewModel.toggleFavorite(r) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoutineCard(
+    routine: Routine,
+    onExecute: () -> Unit,
+    onToggleActive: () -> Unit,
+    onToggleFavorite: () -> Unit
+) {
+    val isActive = routine.isActive()
+    val titleColor = if (isActive) TextPrimary else TextSecondary
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(SurfaceVariant, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = routine.name,
+                    color = titleColor,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.width(8.dp))
+                Icon(
+                    imageVector = if (routine.isFavorite()) Icons.Default.Star else Icons.Default.StarBorder,
+                    contentDescription = stringResource(R.string.cd_favorite),
+                    tint = if (routine.isFavorite()) FavoriteStar else TextSecondary,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable(onClick = onToggleFavorite)
+                )
+                Spacer(Modifier.weight(1f))
+                Switch(
+                    checked = isActive,
+                    onCheckedChange = { onToggleActive() },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = AccentDark,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = SwitchTrackOff,
+                        uncheckedBorderColor = Color.Transparent
+                    ),
+                    modifier = Modifier.scale(0.85f)
+                )
+            }
+            val desc = routine.descriptionText()
+            if (desc.isNotBlank()) {
+                Text(
+                    text = desc,
+                    color = TextSecondary,
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp
+                )
+            }
+            val sched = routineScheduleLabel(routine)
+            if (sched.isNotBlank()) {
+                Text(
+                    text = sched,
+                    color = Accent,
+                    fontSize = 13.sp
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = AccentDark,
+                    modifier = Modifier.clickable(onClick = onExecute)
+                ) {
+                    Text(
+                        text = stringResource(R.string.execute_now),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
+            }
+        }
+    }
+}

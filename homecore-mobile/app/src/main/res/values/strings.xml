@@ -1,0 +1,123 @@
+<resources>
+    <string name="app_name">HomeCore</string>
+
+    <!-- Auth -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Contraseña</string>
+    <string name="label_name">Nombre</string>
+    <string name="label_lastname">Apellido</string>
+    <string name="label_confirm_password">Confirmar contraseña</string>
+    <string name="btn_login">Iniciar Sesión</string>
+    <string name="btn_register">Crear Cuenta</string>
+    <string name="btn_back">Volver</string>
+    <string name="link_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="title_register">Crear Cuenta</string>
+    <string name="cd_back">Volver</string>
+
+    <!-- Verificación de cuenta -->
+    <string name="title_verify">Verificar cuenta</string>
+    <string name="verify_subtitle">Ingresá el código que te enviamos por email.</string>
+    <string name="verify_subtitle_email">Te enviamos un código de verificación a %1$s</string>
+    <string name="label_verification_code">Código de verificación</string>
+    <string name="btn_verify">Verificar</string>
+    <string name="verify_resend">¿No te llegó? Reenviar código</string>
+    <string name="verify_resending">Enviando…</string>
+    <string name="verify_resend_sent">Código reenviado a tu email</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_devices">Dispositivos</string>
+    <string name="nav_routines">Rutinas</string>
+    <string name="nav_profile">Usuario</string>
+
+    <!-- Devices screen -->
+    <string name="house_default">Casa de Verano</string>
+    <string name="search_device">Buscar dispositivo</string>
+    <string name="filters">Filtros</string>
+    <string name="new_device">+ Nuevo Dispositivo</string>
+    <string name="new_room">+ Nueva Habitación</string>
+    <string name="device_on_pct">Encendida %d%%</string>
+    <string name="device_off_label">Apagada</string>
+    <string name="room_none">Sin habitación</string>
+    <string name="cd_favorite">Favorito</string>
+    <string name="cd_search">Buscar</string>
+    <string name="cd_menu">Menú</string>
+    <string name="cd_dropdown">Cambiar de hogar</string>
+
+    <!-- Estados comunes -->
+    <string name="loading">Cargando…</string>
+    <string name="retry">Reintentar</string>
+    <string name="empty_devices">No hay dispositivos</string>
+    <string name="empty_routines">No hay rutinas</string>
+
+    <!-- Días de la semana (índice 0 = domingo, según la API) -->
+    <string-array name="routine_days">
+        <item>Dom</item>
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+    </string-array>
+
+    <!-- Inicio -->
+    <string name="favorite_routines">Rutinas Favoritas</string>
+    <string name="favorite_devices">Dispositivos Favoritos</string>
+    <string name="see_all">Ver todas</string>
+    <string name="execute_now">Ejecutar ahora</string>
+    <string name="cd_notifications">Notificaciones</string>
+    <string name="empty_fav_routines">Sin rutinas favoritas</string>
+    <string name="empty_fav_devices">Sin dispositivos favoritos</string>
+
+    <!-- Rutinas -->
+    <string name="search_routine">Buscar rutina</string>
+    <string name="new_routine">+ Nueva Rutina</string>
+
+    <!-- Usuario -->
+    <string name="profile">Perfil</string>
+    <string name="manage_account">Gestión de la cuenta</string>
+    <string name="manage_password">Gestionar contraseña</string>
+    <string name="consumption">Consumo</string>
+    <string name="current_consumption">Consumo actual</string>
+    <string name="devices_running">Dispositivos\nfuncionando</string>
+    <string name="history">Historial</string>
+    <string name="no_recent_events">Sin eventos recientes</string>
+    <string name="history_turned_on">%1$s encendida</string>
+    <string name="history_turned_off">%1$s apagada</string>
+    <string name="minutes_ago">Hace %d min</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="logout_title">¿Cerrar sesión?</string>
+    <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Alta de dispositivo -->
+    <string name="device_type_title">Tipo de dispositivo</string>
+    <string name="device_details_title">Detalles del dispositivo</string>
+    <string name="device_name_label">Nombre del dispositivo</string>
+    <string name="device_name_hint">Ej: Luz principal</string>
+    <string name="room_label">Habitación</string>
+    <string name="room_optional">Sin habitación</string>
+    <string name="next">Siguiente</string>
+    <string name="create_device">Crear dispositivo</string>
+    <string name="cd_close">Cerrar</string>
+
+    <!-- Tipos de dispositivo -->
+    <string name="dtype_lamp">Luz</string>
+    <string name="dtype_door">Puerta</string>
+    <string name="dtype_alarm">Alarma</string>
+    <string name="dtype_faucet">Canilla</string>
+    <string name="dtype_blinds">Persiana</string>
+    <string name="dtype_ac">Aire</string>
+    <string name="dtype_speaker">Parlante</string>
+    <string name="dtype_vacuum">Aspiradora</string>
+    <string name="dtype_refrigerator">Heladera</string>
+    <string name="dtype_oven">Horno</string>
+    <string name="dtype_lock">Cerradura</string>
+
+    <!-- Alta de habitación -->
+    <string name="room_create_title">Crear habitación</string>
+    <string name="room_name_label">Nombre de la habitación</string>
+    <string name="room_name_hint">Ej: Sala principal</string>
+    <string name="create_room">Crear habitación</string>
+</resources>

@@ -1,15 +1,37 @@
+# ============================================
+# GLOBAL IGNORES (todo el repositorio)
+# ============================================
+
+# macOS
 .DS_Store
-.env
+.AppleDouble
+.LSOverride
 
-# Dependencies
-node_modules/
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Build output
-dist/
+# Linux
+*~
 
-# Logs
+# Logs (globales)
 *.log
-npm-debug.log*
 
+# Documentos temporales
 /docs/usuarios_representativos.pdf
 /docs/informe.pdf
+
+# IDEs (configuraciones locales - cada sub-proyecto tiene su propio .gitignore para cosas específicas)
+.vscode/
+.idea/
+
+# Claude Code context (SÍ commitear)
+# .claude/CLAUDE.md se debe versionar
+# Ignorar solo archivos temporales si los hay
+.claude/*.tmp
+
+# Environment files (pueden contener secrets)
+.env
+.env.local
+.env.*.local
