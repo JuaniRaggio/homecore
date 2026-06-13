@@ -4,8 +4,8 @@ import com.itba.homecore.data.model.User
 import kotlinx.coroutines.delay
 
 /**
- * Autenticación de prototipo: acepta cualquier credencial para poder testear el
- * flujo de la app sin backend. No persiste sesión, así que al reabrir muestra Login.
+ * Prototype authentication: accepts any credentials so the app flow can be tested
+ * without a backend. It does not persist the session, so reopening shows Login.
  */
 class MockAuthRepository : AuthRepository {
 
@@ -33,8 +33,40 @@ class MockAuthRepository : AuthRepository {
     }
 
     override suspend fun logout() {
-        // Sin estado persistente que limpiar en modo mock.
+        // No persistent state to clear in mock mode.
     }
 
     override suspend fun restoreSession(): Boolean = false
+
+    override suspend fun verifyAccount(code: String): Result<Unit> = runCatching {
+        delay(300)
+        require(code.isNotBlank()) { "Ingresá el código de verificación" }
+    }
+
+    override suspend fun sendVerification(email: String): Result<Unit> = runCatching {
+        delay(300)
+        require(email.isNotBlank()) { "Ingresá tu email" }
+    }
+
+    override suspend fun forgotPassword(email: String): Result<Unit> = runCatching {
+        delay(300)
+        require(email.isNotBlank()) { "Ingresá tu email" }
+    }
+
+    override suspend fun resetPassword(code: String, newPassword: String): Result<Unit> = runCatching {
+        delay(300)
+        require(code.isNotBlank()) { "Ingresá el código" }
+        require(newPassword.length >= 6) { "La contraseña debe tener al menos 6 caracteres" }
+    }
+
+    override suspend fun changePassword(oldPassword: String, newPassword: String): Result<Unit> = runCatching {
+        delay(300)
+        require(oldPassword.isNotBlank()) { "Ingresá tu contraseña actual" }
+        require(newPassword.length >= 6) { "La contraseña debe tener al menos 6 caracteres" }
+    }
+
+    override suspend fun getProfile(): Result<User> = runCatching {
+        delay(200)
+        User(id = "mock-user", name = "Maria Fernandez", email = "maria@example.com")
+    }
 }

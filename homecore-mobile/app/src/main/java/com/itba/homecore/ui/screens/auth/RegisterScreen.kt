@@ -53,7 +53,7 @@ fun RegisterScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
-        // Primero el contenido scrolleable
+        // Scrollable content first
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -100,12 +100,12 @@ fun RegisterScreen(
             }
         }
 
-        //Boton de volver
+        //Back button
         IconButton(
             onClick = onBack,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(top = 12.dp, start = 8.dp) // Aumentado el padding top para bajarlo un poco más
+                .padding(top = 12.dp, start = 8.dp) // Increased top padding to move it down a bit more
                 .align(Alignment.TopStart)
         ) {
             Icon(

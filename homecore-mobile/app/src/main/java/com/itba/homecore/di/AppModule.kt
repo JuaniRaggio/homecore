@@ -12,16 +12,16 @@ import com.itba.homecore.data.repository.RemoteRoutinesRepository
 import com.itba.homecore.data.repository.RoutinesRepository
 
 /**
- * Service locator: ÚNICO punto donde se decide entre datos mock y backend real.
+ * Service locator: the SINGLE place where mock data vs real backend is decided.
  *
- * Mientras [USE_MOCK] sea `true`, toda la app trabaja con datos de prototipo y no
- * toca la red. Para conectar la API HCI basta con poner `false`: ni la UI ni los
- * ViewModels cambian, porque dependen de las interfaces de repositorio, no de las
- * implementaciones concretas.
+ * While [USE_MOCK] is `true` the whole app works with prototype data and never
+ * touches the network. To connect the HCI API just set it to `false`: neither the
+ * UI nor the ViewModels change, because they depend on the repository interfaces,
+ * not on the concrete implementations.
  */
 object AppModule {
 
-    /** ⬅️ Cambiar a `true` para volver a datos mock (sin red). */
+    /** Set to `true` to work with prototype data instead of the real backend. */
     const val USE_MOCK = false
 
     val devicesRepository: DevicesRepository by lazy {
@@ -32,7 +32,7 @@ object AppModule {
         if (USE_MOCK) MockRoutinesRepository() else RemoteRoutinesRepository()
     }
 
-    /** Auth necesita Context para SessionManager/DataStore en el modo real. */
+    /** Auth needs a Context for SessionManager/DataStore in real mode. */
     fun authRepository(context: Context): AuthRepository =
         if (USE_MOCK) MockAuthRepository() else RemoteAuthRepository(context.applicationContext)
 }

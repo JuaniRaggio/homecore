@@ -5,9 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -15,13 +18,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
+import com.itba.homecore.data.model.Routine
+import com.itba.homecore.data.model.days
+import com.itba.homecore.data.model.time
 import com.itba.homecore.ui.theme.*
 
 @Composable
@@ -101,9 +110,9 @@ fun HcButton(
 }
 
 /**
- * Shared header con el nombre del hogar (dropdown) y opcionalmente la campana de notificaciones.
- * Aplica el patrón "API de slots" de Compose: el caller puede pasar [trailing] para
- * sustituir el ícono de la derecha (ej.: notificaciones en Inicio, nada en Usuario).
+ * Shared header with the home name (dropdown) and optionally the notifications bell.
+ * Applies Compose's "slot API" pattern: the caller can pass [trailing] to replace
+ * the right-hand icon (e.g.: notifications on Inicio, nothing on Usuario).
  */
 @Composable
 fun HouseHeader(
@@ -163,6 +172,100 @@ fun HouseHeader(
             }
         }
     }
+}
+
+/**
+ * Pill-shaped search bar shared by the Devices and Routines screens.
+ */
+@Composable
+fun HcSearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        color = InputBackground
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = stringResource(R.string.cd_menu),
+                tint = TextPrimary,
+                modifier = Modifier.size(22.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            Box(modifier = Modifier.weight(1f)) {
+                if (value.isEmpty()) {
+                    Text(text = placeholder, color = TextSecondary, fontSize = 15.sp)
+                }
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    singleLine = true,
+                    cursorBrush = SolidColor(AccentDark),
+                    textStyle = TextStyle(color = TextPrimary, fontSize = 15.sp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = stringResource(R.string.cd_search),
+                tint = TextPrimary,
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
+}
+
+/**
+ * Centered loading / empty / error message with an optional retry action.
+ * Shared by the Devices and Routines screens.
+ */
+@Composable
+fun StatusMessage(
+    text: String,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    onRetry: (() -> Unit)? = null
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = text,
+            color = if (isError) ErrorColor else TextSecondary,
+            fontSize = 14.sp
+        )
+        if (onRetry != null) {
+            Spacer(Modifier.height(12.dp))
+            TextButton(onClick = onRetry) {
+                Text(stringResource(R.string.retry), color = AccentDark)
+            }
+        }
+    }
+}
+
+/**
+ * Formats a routine schedule as "HH:MM Mon, Tue, ..." using localized day names.
+ * Returns an empty string when the routine has neither time nor days.
+ */
+@Composable
+fun routineScheduleLabel(routine: Routine): String {
+    val time = routine.time()
+    val days = routine.days()
+    if (time.isBlank() && days.isEmpty()) return ""
+    val dayNames = stringArrayResource(R.array.routine_days)
+    val dayStr = days.mapNotNull { dayNames.getOrNull(it) }.joinToString(", ")
+    return listOf(time, dayStr).filter { it.isNotBlank() }.joinToString(" ")
 }
 
 @Composable

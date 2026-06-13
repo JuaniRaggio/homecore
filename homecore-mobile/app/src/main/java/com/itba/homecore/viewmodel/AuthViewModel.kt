@@ -40,7 +40,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    /** null = chequeando sesión al arrancar, true/false = decisión tomada. */
+    /** null = checking the session at startup, true/false = decision made. */
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
     val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
 
@@ -59,7 +59,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             val hasSession = repository.restoreSession()
             _isLoggedIn.value = hasSession
         }
-        // Si cualquier llamada a la API recibe 401, la red emite acá y limpiamos sesión.
+        // If any API call gets a 401, the network layer emits here and we clear the session.
         viewModelScope.launch {
             SessionEvents.unauthorized.collect {
                 repository.logout()

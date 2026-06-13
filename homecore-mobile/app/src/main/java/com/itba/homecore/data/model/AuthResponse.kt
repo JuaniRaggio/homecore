@@ -26,3 +26,21 @@ data class VerifyAccountRequest(
 data class SendVerificationRequest(
     @SerializedName("email") val email: String
 )
+
+data class CodeRequest(
+    @SerializedName("code") val code: String
+)
+
+data class EmailRequest(
+    @SerializedName("email") val email: String
+)
+
+data class ResetPasswordRequest(
+    @SerializedName("code")     val code: String,
+    @SerializedName("password") val password: String
+)
+
+data class ChangePasswordRequest(
+    @SerializedName("oldPassword") val oldPassword: String,
+    @SerializedName("newPassword") val newPassword: String
+)

@@ -10,15 +10,15 @@ import com.itba.homecore.data.model.Routine
 import com.itba.homecore.data.model.RoutineMetadata
 
 /**
- * Fuente de datos de prototipo. Mantiene listas mutables en memoria para que las
- * acciones (toggle, favoritos, ejecutar) se reflejen durante la sesión sin backend.
+ * Prototype data source. Keeps mutable lists in memory so that actions
+ * (toggle, favorites, execute) are reflected during the session without a backend.
  *
- * Reproduce los mockups de la app: rutinas "Buenos días"/"Buenas noches"/"Riego
- * automático" y dispositivos favoritos "Lámpara principal"/"Puerta principal".
+ * Reproduces the app mockups: routines "Buenos días"/"Buenas noches"/"Riego
+ * automático" and favorite devices "Lámpara principal"/"Puerta principal".
  */
 object MockData {
 
-    // Mutable: createRoom agrega habitaciones nuevas durante la sesión.
+    // Mutable: createRoom adds new rooms during the session.
     val rooms: MutableList<Room> = mutableListOf(
         Room(id = "r1", name = "Living"),
         Room(id = "r2", name = "Dormitorio"),
@@ -28,7 +28,7 @@ object MockData {
     private fun ref(roomId: String) = rooms.first { it.id == roomId }
         .let { RoomRef(it.id, it.name) }
 
-    // Lista mutable: las acciones mock la modifican en el lugar.
+    // Mutable list: mock actions modify it in place.
     val devices: MutableList<Device> = mutableListOf(
         Device(
             id = "d1", name = "Lámpara principal",
@@ -115,7 +115,7 @@ object MockData {
         )
     )
 
-    /** Estado inicial razonable para un dispositivo recién creado, según su tipo. */
+    /** Reasonable initial state for a newly created device, based on its type. */
     fun defaultStatusFor(typeName: String): String = when (typeName.lowercase()) {
         "door", "blinds", "faucet" -> "closed"
         "lock"                     -> "locked"
@@ -125,7 +125,7 @@ object MockData {
         else                        -> "off"
     }
 
-    /** Traduce una acción a su estado resultante para reflejarlo en el prototipo. */
+    /** Maps an action to its resulting state so it is reflected in the prototype. */
     fun statusForAction(action: String): String = when (action) {
         "turnOn"  -> "on"
         "turnOff" -> "off"
@@ -133,7 +133,8 @@ object MockData {
         "close"   -> "closed"
         "unlock"  -> "unlocked"
         "lock"    -> "locked"
-        "armAway", "armStay" -> "armedaway"
+        "armAway" -> "armedAway"
+        "armStay" -> "armedStay"
         "disarm"  -> "off"
         "start"   -> "active"
         "pause", "dock" -> "off"

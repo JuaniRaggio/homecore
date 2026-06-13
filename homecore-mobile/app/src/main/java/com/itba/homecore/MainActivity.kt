@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
 
-                // currentScreen sólo aplica cuando NO hay sesión (login/register)
+                // currentScreen only applies when there is NO session (login/register)
                 var currentScreen by remember { mutableStateOf(AppScreen.LOGIN) }
 
                 when (isLoggedIn) {
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     false -> when (currentScreen) {
                         AppScreen.LOGIN -> LoginScreen(
                             viewModel            = authViewModel,
-                            onLoginSuccess       = { /* isLoggedIn pasa a true y se renderiza MainScreen */ },
+                            onLoginSuccess       = { /* isLoggedIn becomes true and MainScreen is rendered */ },
                             onNavigateToRegister = { currentScreen = AppScreen.REGISTER },
                             onNavigateToRecover  = { }
                         )
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                             onVerified = { currentScreen = AppScreen.LOGIN },
                             onBack     = { currentScreen = AppScreen.LOGIN }
                         )
-                        AppScreen.HOME -> { /* unreachable cuando isLoggedIn = false */ }
+                        AppScreen.HOME -> { /* unreachable when isLoggedIn = false */ }
                     }
                 }
             }

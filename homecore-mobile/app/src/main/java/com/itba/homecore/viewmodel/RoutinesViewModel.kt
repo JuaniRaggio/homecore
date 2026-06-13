@@ -16,7 +16,7 @@ sealed class RoutinesUiState {
     data class Error(val message: String) : RoutinesUiState()
 }
 
-/** Ver [DevicesViewModel] para el patrón de inyección por interfaz. */
+/** See [DevicesViewModel] for the interface-based injection pattern. */
 class RoutinesViewModel(
     private val repository: RoutinesRepository
 ) : ViewModel() {
@@ -44,19 +44,24 @@ class RoutinesViewModel(
         viewModelScope.launch {
             _executingId.value = routine.id
             repository.executeRoutine(routine.id)
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la rutina") }
             _executingId.value = null
         }
     }
 
     fun toggleFavorite(routine: Routine) {
         viewModelScope.launch {
-            repository.toggleFavorite(routine).onSuccess { load() }
+            repository.toggleFavorite(routine)
+                .onSuccess { load() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo marcar como favorita") }
         }
     }
 
     fun toggleActive(routine: Routine) {
         viewModelScope.launch {
-            repository.toggleActive(routine).onSuccess { load() }
+            repository.toggleActive(routine)
+                .onSuccess { load() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo cambiar el estado") }
         }
     }
 }

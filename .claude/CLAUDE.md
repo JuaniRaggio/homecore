@@ -2,6 +2,24 @@
 
 Este es un proyecto académico de HCI (Human-Computer Interaction) que consiste en un sistema de gestión de casas inteligentes con múltiples aplicaciones.
 
+---
+
+## Estado Actual del Proyecto Mobile (verificado 2026-06-12)
+
+La app Android está construida con **Jetpack Compose + Material 3** (UI 100% declarativa: NO hay XML de layouts ni Fragments). Las decisiones técnicas y sus justificaciones están documentadas en `homecore-mobile/docs/DECISIONES_ARQUITECTURA.md` (leerlo antes de tocar arquitectura).
+
+Puntos clave del estado actual:
+
+- **Arquitectura**: MVVM por capas. Compose observa `StateFlow` del ViewModel; el ViewModel depende de **interfaces** de repositorio; cada interfaz tiene implementación `Mock*` (datos de prototipo en memoria, `data/mock/MockData.kt`) y `Remote*` (Retrofit contra la API HCI).
+- **Selección mock/real**: `di/AppModule.kt` con `USE_MOCK = true`. **Hoy la app corre contra datos mock.** Reconectar el backend es poner `false` (y validar: ver riesgos en el plan).
+- **Navegación**: manual con `enum AppScreen` en `MainActivity.kt` + bottom navigation de 4 tabs en `MainScreen.kt` (Inicio, Dispositivos, Rutinas, Usuario). Navigation Compose está como dependencia pero NO se usa (`navigation/NavGraph.kt` y `Screen.kt` están vacíos).
+- **Implementado**: login y registro (RF1, RF5), logout con confirmación (RF6), feed de Inicio (rutinas y dispositivos favoritos), lista de dispositivos con búsqueda y agrupación por habitación (RF8), control on/off y acciones simples (RF9 parcial), alta de dispositivos y habitaciones vía bottom sheets (`DeviceSheets.kt`), lista y ejecución de rutinas (RF11, RF12), pantalla Usuario con consumo estimado e historial derivado, manejo global de 401 (`SessionEvents`), sesión persistida en DataStore.
+- **Faltante (RF obligatorios)**: verificar cuenta (RF2), recuperar contraseña (RF3), cambiar contraseña (RF4), editar/eliminar dispositivos (RF7 parcial), detalle de dispositivo con controles por tipo (RF9 completo), editar/eliminar habitaciones y su consulta como sección (RF14, RF15), vincular/desvincular dispositivos a habitaciones (RF16), notificaciones (RF20).
+- **Faltante (RNF)**: adaptabilidad a tablet (RNF4) y a orientación (RNF5) sin implementar (no hay WindowSizeClass); i18n incompleta (RNF1: `values/` tiene 73 strings, `values-en/` solo 29); app bar contextual parcial (RNF2: `HouseHeader` existe pero el nombre del hogar está hardcodeado).
+- **Build**: AGP 8.7.3, Kotlin 2.0.20, Gradle 8.10.2, Compose BOM 2024.12.01, minSdk 29, targetSdk 35.
+
+El plan vigente y priorizado está en `docs/tercera_entrega/plan_implementacion.md`.
+
 ## Estructura del Monorepo
 
 ```
@@ -71,19 +89,14 @@ Existe un archivo **`design-tokens.md`** en la raíz que define:
 
 **Mal:**
 ```kotlin
-// ❌ Hardcoded
-view.setBackgroundColor(Color.parseColor("#818cf8"))
+// ❌ Hardcoded en el composable
+Box(Modifier.background(Color(0xFF818CF8)))
 ```
 
 **Bien:**
 ```kotlin
-// ✅ Usando recursos
-view.setBackgroundColor(ContextCompat.getColor(context, R.color.accent))
-```
-
-```xml
-<!-- res/values/colors.xml -->
-<color name="accent">#818cf8</color>
+// ✅ Tokens del tema (ui/theme/Color.kt expuestos vía MaterialTheme)
+Box(Modifier.background(MaterialTheme.colorScheme.primary))
 ```
 
 ### Sincronización web ↔ mobile
@@ -91,8 +104,10 @@ view.setBackgroundColor(ContextCompat.getColor(context, R.color.accent))
 Los colores, espaciados, y tipografías deben estar sincronizados:
 
 - **Web**: `homecore-web/src/assets/styles/variables.css`
-- **Mobile**: `homecore-mobile/app/src/main/res/values/{colors,dimens}.xml`
+- **Mobile**: `homecore-mobile/app/src/main/java/com/itba/homecore/ui/theme/Color.kt` (+ `Theme.kt`, `Type.kt`)
 - **Referencia**: `design-tokens.md` (fuente de verdad)
+
+Nota: quedan colores hardcodeados sueltos en algunas pantallas (estrella de favorito `0xFFFFD43B`, fondos de avatar, etc.); al tocarlas, moverlos a `Color.kt`.
 
 Si cambias un color en web, actualiza `design-tokens.md` y propaga a mobile.
 
@@ -106,31 +121,41 @@ Si cambias un color en web, actualiza `design-tokens.md` y propaga a mobile.
 2. **Separación de responsabilidades**: Cada archivo/función tiene un propósito claro
 3. **Arquitectura por capas**: Data → Repository → ViewModel → UI
 
-### Android (Mobile)
+### Android (Mobile) - Jetpack Compose
 
-Usar arquitectura **MVVM** estricta:
+Usar arquitectura **MVVM** estricta. La app es 100% **Jetpack Compose + Material 3**. Estructura real del paquete:
 
 ```
 com.itba.homecore/
 ├── data/
-│   ├── api/           # Interfaces Retrofit (solo definiciones)
-│   ├── model/         # Data classes (Device, Room, etc.)
-│   └── repository/    # Repositorios (lógica de datos)
+│   ├── api/           # Interfaces Retrofit + ApiClient (OkHttp, interceptores) + SessionEvents (bus de 401)
+│   ├── model/         # Data classes (Device, Routine, Room, User) + extensiones de dominio
+│   ├── mock/          # MockData: datos de prototipo mutables en memoria
+│   ├── repository/    # Interfaces + implementaciones Mock* y Remote*
+│   └── local/         # SessionManager (DataStore Preferences: token y datos de usuario)
+├── di/                # AppModule: service locator, flag USE_MOCK elige Mock* o Remote*
+├── viewmodel/         # ViewModels con StateFlow + sealed UiState (Loading/Success/Error)
 ├── ui/
-│   ├── devices/       # Fragments y Adapters de dispositivos
-│   ├── rooms/         # Fragments y Adapters de habitaciones
-│   └── common/        # Componentes reutilizables
-├── viewmodel/         # ViewModels (estado de UI)
-└── utils/             # Funciones helper, extensions
+│   ├── screens/       # Pantallas Compose (auth/, main/, devices/, routines/, rooms/, homes/)
+│   ├── components/    # CommonComponents: HcButton, HcTextField, HouseHeader, PanelCard (API de slots)
+│   └── theme/         # Color.kt, Theme.kt (darkColorScheme fijo, sin dynamic color), Type.kt
+├── navigation/        # NavGraph.kt y Screen.kt (HOY VACIOS: la navegación es manual en MainActivity)
+└── MainActivity.kt    # Estado de navegación (enum AppScreen) + arranque de MainScreen
 ```
 
 **Reglas:**
-- ❌ **NO** hacer llamadas de API directamente desde Fragment o ViewModel
-- ✅ Fragment → ViewModel → Repository → API
-- ❌ **NO** hacer lógica de negocio en Fragments
-- ✅ Fragments solo observan LiveData y actualizan UI
+- ❌ **NO** hacer llamadas de API directamente desde composables NI desde ViewModels
+- ✅ Composable → ViewModel → Repository (interfaz) → API
+- ❌ **NO** hacer lógica de negocio en composables
+- ✅ Los composables solo observan StateFlow (`collectAsStateWithLifecycle`) y emiten eventos (clicks)
+- ❌ **NO** llamar al repositorio desde `LaunchedEffect`: los datos se cargan en el ViewModel con `viewModelScope.launch` (mala práctica marcada en la clase 20)
+- ✅ Los ViewModels dependen de las INTERFACES de repositorio. Patrón: constructor primario con la dependencia + constructor secundario sin argumentos que resuelve desde `AppModule` (así `viewModel()` funciona y los tests pueden inyectar fakes)
 - ❌ **NO** hardcodear strings, colores, o dimens
-- ✅ Usar recursos (R.string, R.color, R.dimen)
+- ✅ Usar recursos: `stringResource(R.string.x)`, `MaterialTheme.colorScheme` / `ui/theme/Color.kt`
+- ✅ **Todo el código en inglés: identificadores (clases, funciones, variables, enums, paquetes), nombres de archivo, claves de recursos (`R.string.*`) y comentarios.** Prohibido mezclar idiomas en un identificador (ej: `InicioScreen` está mal; es `DashboardScreen`). Mensajes visibles al usuario: SIEMPRE en español (vía recursos o, en la capa de datos, literales en español) — esos son el ÚNICO lugar con texto en español
+- ✅ Estado de UI que debe sobrevivir la rotación: `rememberSaveable` o subirlo al ViewModel (nunca `remember` pelado para datos que importan)
+- ✅ Lógica compartida entre pantallas (íconos por categoría, formato de horarios, etc.) va en un solo lugar, no duplicada por pantalla (feedback E2)
+- Ver justificaciones completas en `homecore-mobile/docs/DECISIONES_ARQUITECTURA.md`
 
 ### Vue (Web)
 
@@ -162,23 +187,25 @@ homecore-web/src/
 
 ### Mobile (Android)
 
-Todos los textos deben estar en archivos de recursos:
+Todos los textos deben estar en archivos de recursos. **Convención real del proyecto** (inversa a la típica): el idioma por defecto es ESPAÑOL.
 
 ```xml
-<!-- res/values/strings.xml (inglés) -->
-<string name="devices_title">Devices</string>
-
-<!-- res/values-es/strings.xml (español) -->
+<!-- res/values/strings.xml (ESPAÑOL, default) -->
 <string name="devices_title">Dispositivos</string>
+
+<!-- res/values-en/strings.xml (inglés) -->
+<string name="devices_title">Devices</string>
 ```
 
-**En código:**
+Al agregar un string nuevo, agregarlo SIEMPRE en ambos archivos. Estado al 2026-06-12: `values/` tiene 73 strings y `values-en/` solo 29; hay que completar la traducción antes de entregar (RNF1).
+
+**En código (Compose):**
 ```kotlin
 // ✅ Correcto
-textView.text = getString(R.string.devices_title)
+Text(text = stringResource(R.string.devices_title))
 
 // ❌ Incorrecto
-textView.text = "Devices"
+Text(text = "Dispositivos")
 ```
 
 ### Web (Vue)
@@ -193,29 +220,30 @@ Actualmente no está implementado, pero si lo agregan:
 
 ### URL base
 
+**No hay backend local.** Web y mobile usan la misma API remota hosteada por la cátedra:
+
 **Mobile:**
 ```kotlin
-// ApiClient.kt
-private const val BASE_URL = "http://10.0.2.2:8080/api/" // Emulador
-// private const val BASE_URL = "http://192.168.x.x:8080/api/" // Dispositivo físico
+// data/api/ApiClient.kt (valor real en el código)
+private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
 ```
 
 **Web:**
 ```env
 # .env.local
-VITE_API_URL=http://localhost:8080/api
-VITE_WS_URL=http://localhost:8080
+VITE_API_BASE_URL=https://hci.it.itba.edu.ar/api
+VITE_API_KEY=<api key del grupo>
 ```
 
 ### Autenticación
 
-Ambas apps usan **JWT** en header:
+Toda request lleva el header `X-API-Key` (constante `API_KEY` en `ApiClient.kt`). Las requests autenticadas agregan además **JWT**:
 ```
 Authorization: Bearer <token>
 ```
 
-- Mobile: Guardar en `DataStore` o `SharedPreferences`
-- Web: Guardar en `localStorage`
+- Mobile: token guardado en `DataStore` (`data/local/SessionManager.kt`); el interceptor de OkHttp agrega ambos headers y ante un 401 limpia el token y emite `SessionEvents.unauthorized` (la app vuelve a Login automáticamente)
+- Web: guardado en `localStorage`
 
 ---
 
@@ -287,10 +315,9 @@ Probar en:
 Seguir el plan detallado en:
 `docs/tercera_entrega/plan_implementacion.md`
 
-**11 fases** desde configuración inicial hasta entrega.
+Actualizado el 2026-06-12 a un **plan de sprint final** basado en el estado real del código (qué está hecho, qué falta por RF/RNF, riesgos de la reconexión al backend y cierre de entrega).
 
-Usar la guía de referencia rápida:
-`docs/tercera_entrega/guia_referencia_rapida.md`
+⚠️ La guía `docs/tercera_entrega/guia_referencia_rapida.md` quedó desactualizada: asume Fragments/XML/LiveData. Sirven sus snippets de Retrofit y los design tokens; ignorar lo demás.
 
 ---
 
@@ -366,9 +393,9 @@ Correcciones y feedback del profesor que **deben aplicarse en la tercera entrega
 
 2. **Comentarios inadecuados**
    - ❌ Comentarios obvios: `// Loading state for edit home modal`
-   - ❌ Comentarios en inglés mezclados con español
+   - ❌ Comentarios en inglés mezclados con español (el problema fue la MEZCLA de idiomas)
    - ❌ Comentarios desactualizados: `<!-- Vista principal "Inicio" - contiene todo lo que estaba en page-content del HTML original -->`
-   - ✅ Mobile: Comentarios en español, solo cuando agregan valor (lógica compleja, decisiones no obvias)
+   - ✅ Mobile (convención del equipo, 2026-06-12): comentarios TODOS en inglés, consistentes, y solo cuando agregan valor (lógica compleja, decisiones no obvias). Los mensajes visibles al usuario SIEMPRE en español
 
 3. **Llamadas redundantes a API**
    - ❌ Web llamaba `/send-verification` cuando `/register` ya lo hace automáticamente
@@ -689,69 +716,68 @@ El sistema soporta **11 tipos de dispositivos**:
 
 ### Base URL
 ```
-http://10.0.2.2:8080/api/   (Emulador Android)
-http://localhost:8080/api   (Web)
+https://hci.it.itba.edu.ar/api/   (API remota de la cátedra; la usan web y mobile)
 ```
 
 ### Autenticación
-Todas las requests (excepto login/register) requieren:
+Toda request lleva `X-API-Key`. Las autenticadas agregan:
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-### Endpoints principales
+### Endpoints (verificados contra `homecore-web/src/services/api/`, que ya funciona contra esta API)
 
-**Auth:**
-- `POST /user` - Registro
-- `POST /user/login` - Login
-- `POST /user/verify/{code}` - Verificación
-- `POST /user/logout` - Logout
+**Auth (`/users`):**
+- `POST /users/register` - Registro (la web envía name, email, password)
+- `POST /users/login` - Login (devuelve JWT)
+- `POST /users/logout` - Logout
+- `POST /users/verify-account` - Verificar cuenta (body: `{ code }`)
+- `POST /users/send-verification` - Reenviar código (body: `{ email }`). NO llamarlo después de register: register ya manda el mail (feedback E2)
+- `POST /users/forgot-password` - Pedir código de recupero (body: `{ email }`)
+- `POST /users/reset-password` - Resetear contraseña (body: `{ code, password }`)
+- `POST /users/change-password` - Cambiar contraseña (body: `{ oldPassword, newPassword }`)
+- `GET /users/profile` / `POST /users/profile` - Perfil del usuario
 
 **Devices:**
 - `GET /devices` - Listar dispositivos
-- `GET /devices/{id}` - Detalle de dispositivo
-- `PUT /devices/{id}/{action}` - Ejecutar acción
-- `POST /devices` - Crear dispositivo (opcional)
-- `PUT /devices/{id}` - Editar dispositivo (opcional)
-- `DELETE /devices/{id}` - Eliminar dispositivo (opcional)
+- `GET /devices/{id}` - Detalle (YA incluye el estado: NO llamar a `/state` aparte, feedback E2)
+- `POST /devices` - Crear dispositivo
+- `PUT /devices/{id}` - Editar dispositivo (nombre, metadata)
+- `DELETE /devices/{id}` - Eliminar dispositivo
+- `PATCH /devices/{id}/{action}` - Ejecutar acción (body: array de params, puede ser `[]`)
+- `GET /devices/logs/limit/{limit}/offset/{offset}` - Historial global (RF13)
+- `GET /devices/{id}/logs/limit/{limit}/offset/{offset}` - Historial por dispositivo
 
 **Rooms:**
 - `GET /rooms` - Listar habitaciones
 - `GET /rooms/{id}` - Detalle de habitación
-- `POST /rooms` - Crear habitación
+- `POST /rooms` - Crear (la web envía `{ ...data, home: { id } }`)
 - `PUT /rooms/{id}` - Editar habitación
 - `DELETE /rooms/{id}` - Eliminar habitación
+- `GET /rooms/{roomId}/devices` - Dispositivos de una habitación
+- `POST /rooms/{roomId}/devices/{deviceId}` - Vincular dispositivo (RF16)
+- `DELETE /rooms/devices/{deviceId}` - Desvincular dispositivo
 
 **Routines:**
 - `GET /routines` - Listar rutinas
 - `GET /routines/{id}` - Detalle de rutina
-- `PUT /routines/{id}/execute` - Ejecutar rutina
+- `POST /routines` - Crear rutina
+- `PUT /routines/{id}` - Editar rutina (se usa para toggles de favorite/active vía metadata)
+- `DELETE /routines/{id}` - Eliminar rutina
+- `PATCH /routines/{id}/execute` - Ejecutar rutina
 
-**Homes (opcional):**
-- `GET /homes` - Listar hogares
-- `GET /homes/{id}` - Detalle de hogar
-- `POST /homes` - Crear hogar
-- `PUT /homes/{id}` - Editar hogar
-- `DELETE /homes/{id}` - Eliminar hogar
-
-### WebSocket (Socket.IO)
-```
-URL: ws://10.0.2.2:8080
-Auth: Authorization header con Bearer token
-
-Eventos:
-- deviceUpdate: Estado de dispositivo cambió
-- routineExecuted: Rutina ejecutada
-- notification: Notificación general
-```
+**Homes (RF17-19, opcionales):**
+- CRUD en `/homes` (referencia: `homecore-web/src/services/api/homes.js`)
 
 ### Estructura de Response
-```json
-{
-  "result": { ... },  // Datos exitosos
-  "error": null       // O mensaje de error
-}
-```
+
+En éxito la API envuelve el payload: `{ "result": ... }`. En error: `{ "error": { "code", "description" } }`.
+
+⚠️ **Riesgo conocido para la reconexión del backend**: la web desenvuelve `result` en `client.js`; en mobile las interfaces Retrofit declaran tipos pelados (`List<Device>`, etc.). Al pasar `USE_MOCK = false` hay que verificar el contrato real y, si hace falta, envolver las respuestas con `ApiResponse<T>` (`data/model/ApiResponse.kt`) o un deserializador de Gson.
+
+### WebSocket
+
+La web usa Socket.IO (`homecore-web/src/services/socket.js`). En mobile NO está implementado; para RF20 (notificaciones) ver la estrategia elegida en `docs/tercera_entrega/plan_implementacion.md`.
 
 ---
 
@@ -767,67 +793,33 @@ Eventos:
 - **HTTP**: fetch nativo
 
 ### Mobile (homecore-mobile)
-- **Language**: Kotlin
-- **Min SDK**: API 29 (Android 10)
-- **Target SDK**: API 36 (Android 16)
-- **Architecture**: MVVM
-- **HTTP**: Retrofit 2.9.0 + OkHttp 4.11.0
-- **Coroutines**: kotlinx-coroutines-android 1.7.3
-- **Lifecycle**: lifecycle-viewmodel-ktx 2.7.0
-- **Navigation**: navigation-fragment-ktx 2.7.7
-- **Material**: material 1.11.0 (Material Design 3)
-- **DataStore**: datastore-preferences 1.0.0
-- **WebSocket**: Socket.IO Client 2.1.0
+
+Versiones reales en `homecore-mobile/gradle/libs.versions.toml`:
+
+- **Language**: Kotlin 2.0.20
+- **Build**: AGP 8.7.3, Gradle 8.10.2 (bajado de AGP 9.x; ver sección 10 de `DECISIONES_ARQUITECTURA.md` antes de tocar plugins)
+- **Min SDK**: API 29 (Android 10) / **Target y Compile SDK**: API 35
+- **UI**: Jetpack Compose (BOM 2024.12.01) + Material 3
+- **Architecture**: MVVM (StateFlow, sin LiveData)
+- **HTTP**: Retrofit 2.11.0 + OkHttp Logging 4.12.0 + Gson 2.11.0
+- **Coroutines**: kotlinx-coroutines 1.8.1
+- **Lifecycle**: lifecycle-viewmodel-compose / runtime-ktx 2.8.7
+- **Navigation**: Navigation Compose 2.8.5 (declarada, AÚN NO usada)
+- **DataStore**: datastore-preferences 1.1.1
+- **WebSocket**: no hay (Socket.IO no está integrado en mobile)
 
 ---
 
 ## Estructura de Datos
 
-### Device (modelo)
-```kotlin
-data class Device(
-    val id: String,
-    val name: String,
-    val type: DeviceType,    // enum: LIGHT, DOOR, etc.
-    val state: DeviceState,
-    val room: Room? = null,
-    val meta: Map<String, Any>? = null
-)
+Los modelos REALES viven en `homecore-mobile/app/src/main/java/com/itba/homecore/data/model/` (`Device.kt`, `Routine.kt`, `Room.kt`, `User.kt`, `AuthResponse.kt`, `ApiResponse.kt`). No duplicar sus definiciones acá: ante una duda, leer el archivo.
 
-data class DeviceState(
-    val status: String,           // "on", "off", "open", "closed", etc.
-    val brightness: Int? = null,  // 0-100
-    val temperature: Int? = null, // grados
-    val volume: Int? = null,      // 0-100
-    val mode: String? = null      // "cool", "heat", etc.
-)
-```
+Claves a respetar:
 
-### Room (modelo)
-```kotlin
-data class Room(
-    val id: String,
-    val name: String,
-    val home: Home? = null,
-    val meta: Map<String, Any>? = null
-)
-```
-
-### Routine (modelo)
-```kotlin
-data class Routine(
-    val id: String,
-    val name: String,
-    val actions: List<RoutineAction>,
-    val meta: Map<String, Any>? = null  // schedule, days, etc.
-)
-
-data class RoutineAction(
-    val device: Device,
-    val actionName: String,     // "turnOn", "setTemperature", etc.
-    val params: Map<String, Any>? = null
-)
-```
+- **`Device.metadata.favorite`** es la fuente de verdad de favoritos (viene del JSON del backend). NO volver a guardar favoritos en `Set`s locales de pantalla: eso causaba que se perdieran y que Inicio y Dispositivos quedaran inconsistentes.
+- **`DeviceCategory`** (enum en `Device.kt`) cubre los 11 tipos: LAMP, DOOR, ALARM, FAUCET, BLINDS, AC, SPEAKER, VACUUM, REFRIGERATOR, OVEN, LOCK. Ojo con el mapeo de nombres respecto al enunciado (lamp = Light, faucet = Water, blinds = Curtain, refrigerator = Fridge).
+- **`Routine` + `RoutineMetadata`** modelan `favorite`, `active`, `time`, `days`, `description`.
+- **Extensiones de dominio** (`isOn()`, `isFavorite()`, `category()`, `time()`, `days()`) centralizan la interpretación del estado. Usarlas SIEMPRE en vez de reimplementar la lógica por pantalla (feedback E2 sobre funciones duplicadas).
 
 ---
 
@@ -847,11 +839,10 @@ data class RoutineAction(
 2. Click en un dispositivo
 3. Pantalla de detalle con controles específicos del tipo
 4. Usuario interactúa (toggle, slider, botón)
-5. App envía acción a API → `PUT /devices/{id}/{action}`
+5. App envía acción a API → `PATCH /devices/{id}/{action}`
 6. Loading state mientras procesa
 7. API responde con estado actualizado
 8. UI actualiza el estado del dispositivo
-9. WebSocket notifica a otros clientes conectados
 
 ### Flujo de Gestión de Habitaciones
 1. Usuario navega a sección "Habitaciones"
@@ -879,15 +870,14 @@ data class RoutineAction(
 
 ## Patrones de Diseño Implementados
 
-### Mobile (MVVM)
+### Mobile (Compose + MVVM)
 ```
-Fragment observa ViewModel
-ViewModel expone LiveData/StateFlow
-ViewModel llama Repository
-Repository llama API
-API retorna Result<T>
-ViewModel actualiza LiveData
-Fragment reacciona a cambios
+Composable observa StateFlow del ViewModel (collectAsStateWithLifecycle)
+ViewModel llama a la INTERFAZ del repositorio (viewModelScope.launch)
+AppModule (USE_MOCK) resuelve MockXxxRepository o RemoteXxxRepository
+Remote* llama Retrofit y devuelve Result<T>
+ViewModel actualiza su StateFlow (sealed UiState)
+Compose recompone con el nuevo estado
 ```
 
 ### Web (Composition API + Pinia)
@@ -904,26 +894,23 @@ Component reactivo se actualiza
 
 ## Estados de UI
 
-Usar sealed classes para estados:
+Cada pantalla con datos asíncronos define su propia sealed class de estados (convención ya usada en `DevicesViewModel`, `RoutinesViewModel`, `AuthViewModel`):
 
 ```kotlin
-sealed class UiState<out T> {
-    object Idle : UiState<Nothing>()
-    object Loading : UiState<Nothing>()
-    data class Success<T>(val data: T) : UiState<T>()
-    data class Error(val message: String) : UiState<Nothing>()
+sealed class DevicesUiState {
+    object Loading : DevicesUiState()
+    data class Success(val rooms: List<Room>, val devices: List<Device>) : DevicesUiState()
+    data class Error(val message: String) : DevicesUiState()
 }
 ```
 
-En Fragment:
+En el composable:
 ```kotlin
-viewModel.uiState.observe(viewLifecycleOwner) { state ->
-    when (state) {
-        is UiState.Loading -> showLoading()
-        is UiState.Success -> showData(state.data)
-        is UiState.Error -> showError(state.message)
-        is UiState.Idle -> {}
-    }
+val state by viewModel.state.collectAsStateWithLifecycle()
+when (val s = state) {
+    is DevicesUiState.Loading -> LoadingIndicator()
+    is DevicesUiState.Success -> DevicesList(s.rooms, s.devices)
+    is DevicesUiState.Error -> ErrorMessage(s.message, onRetry = viewModel::load)
 }
 ```
 
@@ -950,12 +937,13 @@ viewModel.uiState.observe(viewLifecycleOwner) { state ->
 
 ## Optimizaciones
 
-### Mobile
-- **Imágenes**: Usar vectores (VectorDrawable) en lugar de PNG donde sea posible
-- **Layouts**: Preferir ConstraintLayout sobre LinearLayout anidados
-- **RecyclerView**: Usar DiffUtil para actualizaciones eficientes
-- **Coroutines**: Cancelar en onDestroy para evitar leaks
-- **Caché**: Implementar Room DB para caché offline (opcional)
+### Mobile (Compose)
+- **Listas**: `LazyColumn` / `LazyVerticalGrid` SIEMPRE con `key = { it.id }` para recomposición eficiente
+- **Estado derivado**: `remember` / `derivedStateOf` para cálculos costosos (filtros de búsqueda, agrupaciones)
+- **Rotación**: `rememberSaveable` para estado de UI local (texto de búsqueda, tab seleccionado)
+- **State hoisting**: subir el estado al ViewModel cuando lo comparten varias pantallas
+- **Imágenes**: vectores (`ImageVector` / Material Icons) en lugar de bitmaps
+- **Coroutines**: usar `viewModelScope` (se cancela solo); no lanzar corrutinas sueltas desde la UI
 
 ### Web
 - **Lazy loading**: Componentes pesados con `defineAsyncComponent`
@@ -993,26 +981,26 @@ localStorage.clear()           // Limpiar storage
 
 ## Troubleshooting Común
 
+### "La app muestra datos que no cambian / no pega a la red"
+1. Revisar `di/AppModule.kt`: si `USE_MOCK = true`, la app usa datos de prototipo y NUNCA toca la red (es intencional)
+2. Con `USE_MOCK = false`, mirar el logcat: el `HttpLoggingInterceptor` loguea request y response completos
+
 ### "Cannot connect to API"
-1. Verificar que backend esté corriendo
-2. En emulador: usar `10.0.2.2` no `localhost`
-3. En dispositivo físico: usar IP de la PC en la red
-4. Verificar firewall no bloquea puerto 8080
+1. La API es remota (`https://hci.it.itba.edu.ar/api/`): verificar conexión a internet del emulador/dispositivo
+2. Verificar que el header `X-API-Key` se esté enviando (interceptor en `ApiClient.kt`)
+3. Ver el body del error en logcat: la API responde `{ "error": { "code", "description" } }`
 
-### "Token expired"
-1. Verificar que API no cambió formato de JWT
-2. Verificar que tiempo de expiración sea razonable
-3. Implementar refresh token (opcional)
+### "Token expired / Invalid token"
+1. Ya está manejado: el interceptor detecta el 401, limpia el token y `SessionEvents` hace que `AuthViewModel` vuelva a Login
+2. Si no redirige, verificar que `AuthViewModel` esté observando `SessionEvents.unauthorized`
 
-### "WebSocket not connecting"
-1. Verificar URL correcta (ws:// no wss:// en desarrollo)
-2. Verificar que token se esté enviando en headers
-3. Ver logs del servidor para errores de conexión
+### "Las respuestas vienen vacías o Gson tira error al deserializar"
+1. Probable causa: la API envuelve el éxito en `{ "result": ... }` y la interfaz Retrofit declara el tipo pelado
+2. Comparar con cómo lo desenvuelve la web (`homecore-web/src/services/api/client.js`) y ajustar con `ApiResponse<T>`
 
-### "Layouts se ven mal en tablet"
-1. Crear layouts alternativos en `res/layout-sw600dp/`
-2. Usar porcentajes en ConstraintLayout
-3. Probar en múltiples tamaños de pantalla
+### "Layouts se ven mal en tablet / al rotar"
+1. En Compose NO existen `layout-sw600dp/`: usar `WindowSizeClass` (o `BoxWithConstraints`) y elegir composición según el ancho
+2. Estado que desaparece al rotar: cambiar `remember` por `rememberSaveable` o moverlo al ViewModel
 
 ---
 
@@ -1215,18 +1203,9 @@ Crear archivo `INSTALL.md` en `homecore-mobile/`:
 4. Confirmar instalación
 5. Esperar a que se complete
 
-### Paso 4: Configurar Backend
+### Paso 4: Conectividad
 
-⚠️ **IMPORTANTE**: La app necesita conectarse al backend.
-
-**Si el backend está en tu PC:**
-1. Asegurarse de que el dispositivo y la PC estén en la misma red WiFi
-2. Obtener IP de la PC:
-   - Windows: `ipconfig` (buscar IPv4)
-   - Mac/Linux: `ifconfig` o `ip addr` (buscar inet)
-3. La app debe configurarse para usar `http://[IP_PC]:8080/api/`
-
-**Nota**: Si la app tiene la URL hardcodeada a localhost, no funcionará en dispositivo físico.
+La app usa la API remota de la cátedra (`https://hci.it.itba.edu.ar/api/`): solo se necesita conexión a internet (WiFi o datos móviles). No hay que instalar ni configurar ningún backend local.
 
 ### Paso 5: Primera Ejecución
 
@@ -1257,14 +1236,14 @@ Crear archivo `INSTALL.md` en `homecore-mobile/`:
    adb install app-debug.apk
    ```
 
-**Nota**: En emulador, la URL del backend debe ser `http://10.0.2.2:8080/api/` (no localhost).
+**Nota**: La app usa la API remota de la cátedra; el emulador solo necesita salida a internet.
 
 ## Verificación de Instalación
 
 1. Abrir la app
 2. Intentar registrar una cuenta
 3. Si el registro funciona → instalación exitosa
-4. Si hay errores de red → verificar configuración del backend
+4. Si hay errores de red → verificar conexión a internet del dispositivo
 
 ## Troubleshooting
 
@@ -1274,9 +1253,8 @@ Crear archivo `INSTALL.md` en `homecore-mobile/`:
 - Desinstalar versión anterior si existe
 
 **"No se puede conectar al servidor"**
-- Verificar que backend está corriendo
-- Verificar URL correcta (10.0.2.2 para emulador)
-- Verificar firewall no bloquea puerto 8080
+- Verificar conexión a internet (WiFi o datos móviles)
+- La API es remota (https://hci.it.itba.edu.ar); no requiere configuración local
 
 **"La app se cierra al abrir"**
 - Verificar logs con `adb logcat`
@@ -1337,4 +1315,4 @@ zip -r homecore-mobile-source.zip . -x "*/build/*" "*.gradle/*" "*.idea/*" "loca
 
 ---
 
-**Última actualización**: 2026-05-16
+**Última actualización**: 2026-06-12 (sincronizado con el estado real del código: Jetpack Compose, arquitectura mock-first con AppModule, endpoints reales de la API HCI)

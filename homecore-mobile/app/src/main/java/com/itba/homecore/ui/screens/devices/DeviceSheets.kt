@@ -26,7 +26,7 @@ import com.itba.homecore.data.model.Room
 import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.theme.*
 
-// ─── Alta de dispositivo (2 pasos) ──────────────────────────────────────────────
+// ─── Device creation (2 steps) ──────────────────────────────────────────────────
 
 private enum class AddDeviceStep { TYPE, DETAILS }
 
@@ -205,7 +205,7 @@ private fun RoomChip(
     }
 }
 
-// ─── Alta de habitación ─────────────────────────────────────────────────────────
+// ─── Room creation ──────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -253,7 +253,7 @@ fun AddRoomSheet(
     }
 }
 
-// ─── Comunes ────────────────────────────────────────────────────────────────────
+// ─── Common ─────────────────────────────────────────────────────────────────────
 
 @Composable
 private fun SheetHeader(title: String, onClose: () -> Unit) {
