@@ -33,6 +33,7 @@ import com.itba.homecore.viewmodel.RoutinesViewModel
 
 @Composable
 fun DashboardScreen(
+    onDeviceClick: (String) -> Unit = {},
     devicesVm: DevicesViewModel = viewModel(),
     routinesVm: RoutinesViewModel = viewModel()
 ) {
@@ -111,7 +112,8 @@ fun DashboardScreen(
                                             device = d,
                                             onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
                                             onFavoriteClick = { devicesVm.toggleFavorite(d) },
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f),
+                                            onClick = { onDeviceClick(d.id) }
                                         )
                                     }
                                 }
