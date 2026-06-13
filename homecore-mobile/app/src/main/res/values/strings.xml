@@ -15,10 +15,10 @@
     <string name="cd_back">Volver</string>
 
     <!-- Bottom nav -->
-    <string name="nav_inicio">Inicio</string>
-    <string name="nav_dispositivos">Dispositivos</string>
-    <string name="nav_rutinas">Rutinas</string>
-    <string name="nav_usuario">Usuario</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_devices">Dispositivos</string>
+    <string name="nav_routines">Rutinas</string>
+    <string name="nav_profile">Usuario</string>
 
     <!-- Devices screen -->
     <string name="house_default">Casa de Verano</string>
