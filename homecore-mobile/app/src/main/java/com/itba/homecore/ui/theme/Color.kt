@@ -15,6 +15,16 @@ val ErrorColor     = Color(0xFFE05252)
 val SuccessColor   = Color(0xFF4CAF50)
 val OnAccent       = Color(0xFFFFFFFF)
 
+// Accent / semantic tokens reused across screens (previously hardcoded per screen)
+val FavoriteStar   = Color(0xFFFFD43B)
+val LampIconBg     = Color(0xFF3A2A1A)
+val SwitchTrackOff = Color(0xFF4A4A55)
+
+// Profile screen tokens
+val AvatarBackground = Color(0xFF6C7080)
+val PillBackground   = Color(0xFFE8E9F0)
+val PillText         = Color(0xFF1F2030)
+
 // Device type colors
 val DeviceLight     = Color(0xFFF5A623)
 val DeviceDoor      = Color(0xFF6C8EBF)
