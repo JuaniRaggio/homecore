@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 /**
- * Bus global para eventos de sesión. La capa de red emite acá cuando el backend
- * rechaza el token (HTTP 401) y AuthViewModel reacciona limpiando la sesión.
+ * Global bus for session events. The network layer emits here when the backend
+ * rejects the token (HTTP 401) and AuthViewModel reacts by clearing the session.
  *
- * Mantiene 1 evento en el replay buffer para que un observador que se suscribe
- * tarde igual reciba el último 401 si ya ocurrió.
+ * Keeps one event in the buffer so a subscriber that arrives late still receives
+ * the last 401 if it already happened.
  */
 object SessionEvents {
     private val _unauthorized = MutableSharedFlow<Unit>(

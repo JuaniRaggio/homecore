@@ -19,14 +19,8 @@ data class RegisterRequest(
     @SerializedName("metadata") val metadata: Map<String, Any> = emptyMap()
 )
 
-data class VerifyAccountRequest(
-    @SerializedName("code") val code: String
-)
-
-data class SendVerificationRequest(
-    @SerializedName("email") val email: String
-)
-
+// Single request body per shape, reused across endpoints (verify-account uses {code};
+// send-verification and forgot-password use {email}).
 data class CodeRequest(
     @SerializedName("code") val code: String
 )

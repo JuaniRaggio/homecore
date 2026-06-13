@@ -2,7 +2,7 @@ package com.itba.homecore.data.repository
 
 import com.itba.homecore.data.model.User
 
-/** El email ya tiene una cuenta asociada: el flujo debe llevar al usuario a iniciar sesión. */
+/** The email already has an account: the flow should send the user to sign in. */
 class EmailAlreadyRegisteredException(message: String) : Exception(message)
 
 /**
@@ -13,15 +13,13 @@ class EmailAlreadyRegisteredException(message: String) : Exception(message)
 interface AuthRepository {
     suspend fun login(email: String, password: String): Result<User>
     suspend fun register(name: String, lastName: String, email: String, password: String): Result<Unit>
-    suspend fun sendVerification(email: String): Result<Unit>
-    suspend fun verifyAccount(code: String): Result<Unit>
     suspend fun logout()
     suspend fun restoreSession(): Boolean
 
     /** Confirms the account with the code emailed on registration (RF2). */
     suspend fun verifyAccount(code: String): Result<Unit>
 
-    /** Resends the verification code. Register already sends it: this is ONLY for resending. */
+    /** Resends the verification code to the account email (RF2). */
     suspend fun sendVerification(email: String): Result<Unit>
 
     /** Requests a password-recovery code by email (RF3). */

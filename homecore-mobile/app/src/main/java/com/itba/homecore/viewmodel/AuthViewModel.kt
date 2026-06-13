@@ -17,16 +17,16 @@ sealed class AuthUiState {
     object Idle : AuthUiState()
     object Loading : AuthUiState()
     data class Success(val user: User? = null) : AuthUiState()
-    /** Registro OK: el código ya fue enviado por email, falta verificar. */
+    /** Registration OK: the code was already emailed; verification is pending. */
     object RegistrationPending : AuthUiState()
-    /** Cuenta verificada pero sin auto-login: el usuario debe iniciar sesión. */
+    /** Account verified but no auto-login: the user must sign in. */
     object Verified : AuthUiState()
-    /** El email ya estaba registrado: hay que mandar al usuario a la pantalla de inicio (Login). */
+    /** Email was already registered: send the user to the Login screen. */
     data class AlreadyRegistered(val message: String) : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }
 
-/** Estado del reenvío de código, separado de [AuthUiState] para no pisar el botón de verificar. */
+/** Resend-code state, separate from [AuthUiState] so it doesn't clobber the verify button. */
 sealed class ResendState {
     object Idle : ResendState()
     object Sending : ResendState()
@@ -44,11 +44,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoggedIn = MutableStateFlow<Boolean?>(null)
     val isLoggedIn: StateFlow<Boolean?> = _isLoggedIn.asStateFlow()
 
-    /** Email al que se envió el código, para mostrarlo en la pantalla de verificación. */
+    /** Email the code was sent to, shown on the verification screen. */
     private val _pendingEmail = MutableStateFlow<String?>(null)
     val pendingEmail: StateFlow<String?> = _pendingEmail.asStateFlow()
 
-    /** Contraseña retenida en memoria entre registro y verificación para el auto-login. */
+    /** Password held in memory between registration and verification for the auto-login. */
     private var pendingPassword: String? = null
 
     private val _resendState = MutableStateFlow<ResendState>(ResendState.Idle)
@@ -99,7 +99,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.value = AuthUiState.Loading
             repository.register(name, lastName, email, password).fold(
                 onSuccess = {
-                    // El registro ya disparó el envío del código: pasamos a verificar.
+                    // Registration already triggered the code email: move to verification.
                     _pendingEmail.value = email
                     pendingPassword = password
                     _resendState.value = ResendState.Idle
@@ -127,7 +127,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     val email = _pendingEmail.value
                     val password = pendingPassword
                     if (email != null && password != null) {
-                        // Auto-login con las credenciales del registro (igual que en web).
+                        // Auto-login with the registration credentials (same as on web).
                         repository.login(email, password).fold(
                             onSuccess = { user ->
                                 clearPending()
@@ -135,7 +135,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                                 _uiState.value = AuthUiState.Success(user)
                             },
                             onFailure = {
-                                // Verificó pero no pudo entrar solo: que inicie sesión a mano.
+                                // Verified but auto-login failed: have the user sign in manually.
                                 clearPending()
                                 _uiState.value = AuthUiState.Verified
                             }
@@ -149,7 +149,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Reenvía el código de verificación al email pendiente (botón "Reenviar código"). */
+    /** Resends the verification code to the pending email (the "Resend code" button). */
     fun resendCode() {
         if (_resendState.value is ResendState.Sending) return
         val email = _pendingEmail.value

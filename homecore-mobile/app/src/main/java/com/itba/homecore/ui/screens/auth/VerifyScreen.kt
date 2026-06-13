@@ -45,8 +45,8 @@ fun VerifyScreen(
 
     LaunchedEffect(uiState) {
         when (uiState) {
-            // Si hubo auto-login, MainActivity ya muestra MainScreen al cambiar isLoggedIn;
-            // acá sólo resolvemos el caso "verificado sin sesión".
+            // On auto-login, MainActivity already shows MainScreen when isLoggedIn flips;
+            // here we only handle the "verified without session" case.
             is AuthUiState.Verified -> { viewModel.clearState(); onVerified() }
             is AuthUiState.Error    -> errorMsg = (uiState as AuthUiState.Error).message
             else -> {}
@@ -107,7 +107,7 @@ fun VerifyScreen(
                         isLoading = uiState is AuthUiState.Loading
                     )
 
-                    // Reenviar código
+                    // Resend code
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,7 +138,7 @@ fun VerifyScreen(
             }
         }
 
-        // Botón de volver
+        // Back button
         IconButton(
             onClick = onBack,
             modifier = Modifier

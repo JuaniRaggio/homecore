@@ -45,7 +45,7 @@ fun RegisterScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is AuthUiState.RegistrationPending -> { viewModel.clearState(); onRegisterSuccess() }
-            // El email ya existe: dejamos el estado vivo para que Login muestre el mensaje al llegar.
+            // Email already exists: keep the state alive so Login shows the message on arrival.
             is AuthUiState.AlreadyRegistered   -> onAlreadyRegistered()
             is AuthUiState.Error               -> errorMsg = (uiState as AuthUiState.Error).message
             else -> {}

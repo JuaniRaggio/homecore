@@ -43,7 +43,7 @@ fun LoginScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is AuthUiState.Success -> { viewModel.clearState(); onLoginSuccess() }
-            // Llega desde Registro cuando el email ya existía: mostramos el motivo y limpiamos.
+            // Arrives from Register when the email already existed: show the reason and clear.
             is AuthUiState.AlreadyRegistered -> {
                 errorMsg = (uiState as AuthUiState.AlreadyRegistered).message
                 viewModel.clearState()

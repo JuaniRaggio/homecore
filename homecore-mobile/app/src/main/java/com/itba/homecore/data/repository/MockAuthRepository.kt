@@ -17,19 +17,10 @@ class MockAuthRepository : AuthRepository {
 
     override suspend fun register(name: String, lastName: String, email: String, password: String): Result<Unit> = runCatching {
         delay(300)
-        // Sentinela para probar el flujo "email ya registrado → ir a Login" sin backend.
+        // Sentinel to exercise the "email already registered -> go to Login" flow without a backend.
         if (email.trim().equals("registrado@homecore.com", ignoreCase = true)) {
             throw EmailAlreadyRegisteredException("Este email ya está registrado. Iniciá sesión.")
         }
-    }
-
-    override suspend fun sendVerification(email: String): Result<Unit> = runCatching {
-        delay(300)
-    }
-
-    override suspend fun verifyAccount(code: String): Result<Unit> = runCatching {
-        delay(300)
-        require(code.isNotBlank()) { "Ingresá el código de verificación" }
     }
 
     override suspend fun logout() {
