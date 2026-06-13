@@ -232,9 +232,9 @@ Se construyeron las tres pantallas del feed siguiendo los mockups:
 
 | Pantalla        | Contenido                                                        |
 |-----------------|-----------------------------------------------------------------|
-| `InicioScreen`  | Rutinas favoritas + dispositivos favoritos (grilla de 2 columnas) |
-| `RoutinesScreen`| Búsqueda, alta de rutina, cards con switch / estrella / "Ejecutar ahora" |
-| `UsuarioScreen` | Perfil, consumo, historial y cerrar sesión                      |
+| `DashboardScreen` | Rutinas favoritas + dispositivos favoritos (grilla de 2 columnas) |
+| `RoutinesScreen`  | Búsqueda, alta de rutina, cards con switch / estrella / "Ejecutar ahora" |
+| `ProfileScreen`   | Perfil, consumo, historial y cerrar sesión                      |
 
 **Componentes reutilizables** (`ui/components/CommonComponents.kt`):
 
