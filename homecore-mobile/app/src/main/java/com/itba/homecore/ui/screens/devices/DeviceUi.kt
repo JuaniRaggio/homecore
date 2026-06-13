@@ -102,11 +102,11 @@ fun DeviceCard(
 
     Box(
         modifier = modifier
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(12.dp))
-            .padding(12.dp)
+            .background(Surface, RoundedCornerShape(Radius.xl))
+            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(Radius.xl))
+            .padding(Spacing.base)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -114,15 +114,15 @@ fun DeviceCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(28.dp)
-                        .background(iconBg, RoundedCornerShape(6.dp)),
+                        .size(IconSize.box)
+                        .background(iconBg, RoundedCornerShape(Radius.sm)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = deviceIconFor(cat),
                         contentDescription = null,
                         tint = iconTint,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(IconSize.md)
                     )
                 }
                 Icon(
@@ -130,7 +130,7 @@ fun DeviceCard(
                     contentDescription = stringResource(R.string.cd_favorite),
                     tint = if (isFavorite) FavoriteStar else TextSecondary,
                     modifier = Modifier
-                        .size(22.dp)
+                        .size(IconSize.lg)
                         .clickable(onClick = onFavoriteClick)
                 )
             }
@@ -138,7 +138,7 @@ fun DeviceCard(
             Text(
                 text = device.name,
                 color = TextPrimary,
-                fontSize = 15.sp,
+                fontSize = TextSize.lg,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 18.sp
             )
@@ -146,7 +146,7 @@ fun DeviceCard(
             Text(
                 text = if (isDoor && !isOn) "$roomLabel\n${stringResource(R.string.device_off_label)}" else roomLabel,
                 color = TextSecondary,
-                fontSize = 12.sp,
+                fontSize = TextSize.sm,
                 lineHeight = 16.sp
             )
 
@@ -173,7 +173,7 @@ fun DeviceCard(
                 isLamp && isOn -> Text(
                     text = stringResource(R.string.device_on_pct, device.state?.brightness ?: 100),
                     color = SuccessColor,
-                    fontSize = 13.sp,
+                    fontSize = TextSize.base,
                     fontWeight = FontWeight.Medium
                 )
                 isDoor -> Box(
@@ -184,7 +184,7 @@ fun DeviceCard(
                         imageVector = if (isOn) Icons.Default.LockOpen else Icons.Default.Lock,
                         contentDescription = null,
                         tint = AccentDark,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(IconSize.md)
                     )
                 }
             }

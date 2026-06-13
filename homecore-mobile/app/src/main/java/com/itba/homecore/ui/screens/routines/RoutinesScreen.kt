@@ -45,9 +45,9 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             .fillMaxSize()
             .background(Background)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = Spacing.xl)
+            .padding(bottom = Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.base)
     ) {
         HouseHeader()
         HcSearchBar(
@@ -61,16 +61,16 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             horizontalArrangement = Arrangement.End
         ) {
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(Radius.card),
                 color = AccentDark,
                 modifier = Modifier.clickable { /* TODO: new routine */ }
             ) {
                 Text(
                     text = stringResource(R.string.new_routine),
                     color = Color.White,
-                    fontSize = 12.sp,
+                    fontSize = TextSize.sm,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
                 )
             }
         }
@@ -115,10 +115,10 @@ private fun RoutineCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SurfaceVariant, RoundedCornerShape(16.dp))
-            .padding(16.dp)
+            .background(SurfaceVariant, RoundedCornerShape(Radius.card))
+            .padding(Spacing.xl)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -126,16 +126,16 @@ private fun RoutineCard(
                 Text(
                     text = routine.name,
                     color = titleColor,
-                    fontSize = 18.sp,
+                    fontSize = TextSize.xxl,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(Spacing.sm))
                 Icon(
                     imageVector = if (routine.isFavorite()) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = stringResource(R.string.cd_favorite),
                     tint = if (routine.isFavorite()) FavoriteStar else TextSecondary,
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(IconSize.md)
                         .clickable(onClick = onToggleFavorite)
                 )
                 Spacer(Modifier.weight(1f))
@@ -157,7 +157,7 @@ private fun RoutineCard(
                 Text(
                     text = desc,
                     color = TextSecondary,
-                    fontSize = 14.sp,
+                    fontSize = TextSize.md,
                     lineHeight = 18.sp
                 )
             }
@@ -166,7 +166,7 @@ private fun RoutineCard(
                 Text(
                     text = sched,
                     color = Accent,
-                    fontSize = 13.sp
+                    fontSize = TextSize.base
                 )
             }
             Row(
@@ -174,16 +174,16 @@ private fun RoutineCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(Radius.card),
                     color = AccentDark,
                     modifier = Modifier.clickable(onClick = onExecute)
                 ) {
                     Text(
                         text = stringResource(R.string.execute_now),
                         color = Color.White,
-                        fontSize = 12.sp,
+                        fontSize = TextSize.sm,
                         fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
                     )
                 }
             }

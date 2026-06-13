@@ -45,9 +45,9 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(Background)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = Spacing.xl)
+            .padding(bottom = Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
         HouseHeader()
 
@@ -78,22 +78,22 @@ private fun LogoutButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        shape = RoundedCornerShape(12.dp),
+            .height(Spacing.huge2),
+        shape = RoundedCornerShape(Radius.xl),
         colors = ButtonDefaults.buttonColors(containerColor = ErrorColor)
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Logout,
             contentDescription = null,
             tint = Color.White,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(IconSize.sm)
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(Spacing.sm))
         Text(
             text = stringResource(R.string.logout),
             color = Color.White,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp
+            fontSize = TextSize.lg
         )
     }
 }
@@ -137,18 +137,18 @@ private fun ProfileCard(userName: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(SurfaceVariant, RoundedCornerShape(16.dp))
-            .padding(20.dp)
+            .background(SurfaceVariant, RoundedCornerShape(Radius.card))
+            .padding(Spacing.xl3)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
         ) {
             Text(
                 text = stringResource(R.string.profile),
                 color = TextPrimary,
-                fontSize = 16.sp,
+                fontSize = TextSize.xl,
                 fontWeight = FontWeight.Bold
             )
 
@@ -156,7 +156,7 @@ private fun ProfileCard(userName: String) {
             Box(contentAlignment = Alignment.BottomEnd) {
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(IconSize.avatar)
                         .background(AvatarBackground, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
@@ -164,12 +164,12 @@ private fun ProfileCard(userName: String) {
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(IconSize.button)
                     )
                 }
                 Box(
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(IconSize.xl)
                         .background(SurfaceVariant, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
@@ -177,7 +177,7 @@ private fun ProfileCard(userName: String) {
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
                         tint = TextPrimary,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(IconSize.xs)
                     )
                 }
             }
@@ -185,7 +185,7 @@ private fun ProfileCard(userName: String) {
             Text(
                 text = userName,
                 color = TextPrimary,
-                fontSize = 18.sp,
+                fontSize = TextSize.xxl,
                 fontWeight = FontWeight.Bold
             )
 
@@ -198,7 +198,7 @@ private fun ProfileCard(userName: String) {
 @Composable
 private fun PillAction(text: String, onClick: () -> Unit) {
     Surface(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(Radius.full),
         color = PillBackground,
         modifier = Modifier
             .fillMaxWidth(0.85f)
@@ -207,11 +207,11 @@ private fun PillAction(text: String, onClick: () -> Unit) {
         Text(
             text = text,
             color = PillText,
-            fontSize = 13.sp,
+            fontSize = TextSize.base,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 10.dp),
+                .padding(vertical = Spacing.md),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }
@@ -230,14 +230,14 @@ private fun ConsumptionCard(state: DevicesUiState) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
-            .padding(16.dp)
+            .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(Radius.card))
+            .padding(Spacing.xl)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
             Text(
                 text = stringResource(R.string.consumption),
                 color = TextPrimary,
-                fontSize = 16.sp,
+                fontSize = TextSize.xl,
                 fontWeight = FontWeight.Bold
             )
             Row(
@@ -249,32 +249,32 @@ private fun ConsumptionCard(state: DevicesUiState) {
                     Text(
                         text = wattsLabel,
                         color = Accent,
-                        fontSize = 28.sp,
+                        fontSize = TextSize.display,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = stringResource(R.string.current_consumption),
                         color = TextSecondary,
-                        fontSize = 12.sp
+                        fontSize = TextSize.sm
                     )
                 }
                 Box(
                     modifier = Modifier
                         .width(1.dp)
-                        .height(48.dp)
+                        .height(Spacing.huge2)
                         .background(SurfaceVariant)
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = runningCount.toString(),
                         color = Accent,
-                        fontSize = 28.sp,
+                        fontSize = TextSize.display,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = stringResource(R.string.devices_running),
                         color = TextSecondary,
-                        fontSize = 12.sp,
+                        fontSize = TextSize.sm,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
@@ -290,15 +290,15 @@ private fun HistoryCard(state: DevicesUiState) {
         else -> emptyList()
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Text(
             text = stringResource(R.string.history),
             color = TextPrimary,
-            fontSize = 18.sp,
+            fontSize = TextSize.xxl,
             fontWeight = FontWeight.Bold
         )
         if (recent.isEmpty()) {
-            Text(stringResource(R.string.no_recent_events), color = TextSecondary, fontSize = 13.sp)
+            Text(stringResource(R.string.no_recent_events), color = TextSecondary, fontSize = TextSize.base)
         } else {
             recent.forEachIndexed { idx, d ->
                 HistoryRow(device = d, minutesAgo = (idx + 1) * 5)
@@ -316,25 +316,25 @@ private fun HistoryRow(device: Device, minutesAgo: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
         Box(
             modifier = Modifier
-                .padding(top = 6.dp)
-                .size(8.dp)
+                .padding(top = Spacing.xs)
+                .size(IconSize.dot)
                 .background(Accent, CircleShape)
         )
         Column {
             Text(
                 text = action,
                 color = TextPrimary,
-                fontSize = 14.sp,
+                fontSize = TextSize.md,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = stringResource(R.string.minutes_ago, minutesAgo),
                 color = TextSecondary,
-                fontSize = 12.sp
+                fontSize = TextSize.sm
             )
         }
     }

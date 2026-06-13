@@ -65,6 +65,7 @@ object TextSize {
     val lg       = 15.sp
     val xl       = 16.sp
     val xxl      = 18.sp
+    val xxxl     = 20.sp
     val title    = 22.sp
     val headline = 24.sp
     val display  = 28.sp

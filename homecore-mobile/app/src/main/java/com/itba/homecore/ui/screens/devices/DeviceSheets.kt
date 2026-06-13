@@ -52,9 +52,9 @@ fun AddDeviceSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = Spacing.xl3)
+                .padding(bottom = Spacing.xl4),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
             SheetHeader(
                 title = stringResource(
@@ -67,7 +67,7 @@ fun AddDeviceSheet(
             when (step) {
                 AddDeviceStep.TYPE -> {
                     selectableDeviceTypes.chunked(2).forEach { row ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.base)) {
                             row.forEach { option ->
                                 DeviceTypeTile(
                                     option = option,
@@ -90,7 +90,7 @@ fun AddDeviceSheet(
                     Text(
                         text = stringResource(R.string.device_name_label),
                         color = TextPrimary,
-                        fontSize = 15.sp,
+                        fontSize = TextSize.lg,
                         fontWeight = FontWeight.SemiBold
                     )
                     SheetTextField(
@@ -102,7 +102,7 @@ fun AddDeviceSheet(
                     Text(
                         text = stringResource(R.string.room_label),
                         color = TextPrimary,
-                        fontSize = 15.sp,
+                        fontSize = TextSize.lg,
                         fontWeight = FontWeight.SemiBold
                     )
                     RoomChip(
@@ -112,7 +112,7 @@ fun AddDeviceSheet(
                         modifier = Modifier.fillMaxWidth()
                     )
                     rooms.chunked(2).forEach { row ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.base)) {
                             row.forEach { room ->
                                 RoomChip(
                                     label = room.name,
@@ -150,16 +150,16 @@ private fun DeviceTypeTile(
     val border = if (selected) accent else Accent.copy(alpha = 0.25f)
     Column(
         modifier = modifier
-            .background(Background, RoundedCornerShape(12.dp))
-            .border(BorderStroke(if (selected) 2.dp else 1.dp, border), RoundedCornerShape(12.dp))
+            .background(Background, RoundedCornerShape(Radius.xl))
+            .border(BorderStroke(if (selected) 2.dp else 1.dp, border), RoundedCornerShape(Radius.xl))
             .clickable(onClick = onClick)
-            .padding(vertical = 16.dp),
+            .padding(vertical = Spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(IconSize.tile)
                 .background(accent.copy(alpha = 0.18f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -167,13 +167,13 @@ private fun DeviceTypeTile(
                 imageVector = deviceIconFor(option.category),
                 contentDescription = null,
                 tint = accent,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(IconSize.lg)
             )
         }
         Text(
             text = stringResource(option.labelRes),
             color = TextPrimary,
-            fontSize = 14.sp,
+            fontSize = TextSize.md,
             fontWeight = FontWeight.Medium
         )
     }
@@ -190,16 +190,16 @@ private fun RoomChip(
     val bg = if (selected) AccentDark.copy(alpha = 0.15f) else Color.Transparent
     Box(
         modifier = modifier
-            .background(bg, RoundedCornerShape(10.dp))
-            .border(BorderStroke(1.dp, border), RoundedCornerShape(10.dp))
+            .background(bg, RoundedCornerShape(Radius.lg))
+            .border(BorderStroke(1.dp, border), RoundedCornerShape(Radius.lg))
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(vertical = Spacing.base),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
             color = if (selected) TextPrimary else TextSecondary,
-            fontSize = 14.sp,
+            fontSize = TextSize.md,
             fontWeight = FontWeight.Medium
         )
     }
@@ -225,9 +225,9 @@ fun AddRoomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = Spacing.xl3)
+                .padding(bottom = Spacing.xl4),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
             SheetHeader(
                 title = stringResource(R.string.room_create_title),
@@ -236,7 +236,7 @@ fun AddRoomSheet(
             Text(
                 text = stringResource(R.string.room_name_label),
                 color = TextPrimary,
-                fontSize = 15.sp,
+                fontSize = TextSize.lg,
                 fontWeight = FontWeight.SemiBold
             )
             SheetTextField(
@@ -260,13 +260,13 @@ private fun SheetHeader(title: String, onClose: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = Spacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = title,
             color = TextPrimary,
-            fontSize = 20.sp,
+            fontSize = TextSize.xxxl,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
@@ -275,7 +275,7 @@ private fun SheetHeader(title: String, onClose: () -> Unit) {
             contentDescription = stringResource(R.string.cd_close),
             tint = TextPrimary,
             modifier = Modifier
-                .size(24.dp)
+                .size(IconSize.xl)
                 .clickable(onClick = onClose)
         )
     }
@@ -290,18 +290,18 @@ private fun SheetTextField(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(InputBackground, RoundedCornerShape(10.dp))
-            .padding(horizontal = 14.dp, vertical = 14.dp)
+            .background(InputBackground, RoundedCornerShape(Radius.lg))
+            .padding(horizontal = Spacing.lg, vertical = Spacing.lg)
     ) {
         if (value.isEmpty()) {
-            Text(text = placeholder, color = TextSecondary, fontSize = 15.sp)
+            Text(text = placeholder, color = TextSecondary, fontSize = TextSize.lg)
         }
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
             cursorBrush = SolidColor(AccentDark),
-            textStyle = TextStyle(color = TextPrimary, fontSize = 15.sp),
+            textStyle = TextStyle(color = TextPrimary, fontSize = TextSize.lg),
             modifier = Modifier.fillMaxWidth()
         )
     }

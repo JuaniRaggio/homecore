@@ -59,27 +59,27 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 32.dp, vertical = 64.dp)
+                .padding(horizontal = Spacing.huge, vertical = Spacing.huge3)
         ) {
             Box(
-                modifier = Modifier.size(84.dp).background(Accent, CircleShape),
+                modifier = Modifier.size(IconSize.logo).background(Accent, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Home, contentDescription = null, tint = Color.White, modifier = Modifier.size(48.dp))
+                Icon(Icons.Default.Home, contentDescription = null, tint = Color.White, modifier = Modifier.size(IconSize.button))
             }
 
-            Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.title_register), color = TextPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(Spacing.xl))
+            Text(stringResource(R.string.title_register), color = TextPrimary, fontSize = TextSize.headline, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(Spacing.huge))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(Radius.card),
                 colors = CardDefaults.cardColors(containerColor = Surface)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(Spacing.xl4),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xl)
                 ) {
                     HcTextField(label = stringResource(R.string.label_name),     value = name,            onValueChange = { name = it;            errorMsg = "" })
                     HcTextField(label = stringResource(R.string.label_lastname),  value = lastName,        onValueChange = { lastName = it;        errorMsg = "" })
@@ -88,7 +88,7 @@ fun RegisterScreen(
                     HcTextField(label = stringResource(R.string.label_confirm_password), value = confirmPassword, onValueChange = { confirmPassword = it; errorMsg = "" }, isPassword = true)
 
                     if (errorMsg.isNotBlank()) {
-                        Text(errorMsg, color = ErrorColor, fontSize = 13.sp)
+                        Text(errorMsg, color = ErrorColor, fontSize = TextSize.base)
                     }
 
                     HcButton(
@@ -105,7 +105,7 @@ fun RegisterScreen(
             onClick = onBack,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(top = 12.dp, start = 8.dp) // Increased top padding to move it down a bit more
+                .padding(top = Spacing.base, start = Spacing.sm) // Increased top padding to move it down a bit more
                 .align(Alignment.TopStart)
         ) {
             Icon(
