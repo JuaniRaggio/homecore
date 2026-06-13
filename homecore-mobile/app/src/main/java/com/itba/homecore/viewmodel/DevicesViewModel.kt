@@ -81,7 +81,9 @@ class DevicesViewModel(
                 "vacuum"                          -> if (turnOn) "start"  else "pause"
                 else                              -> if (turnOn) "turnOn" else "turnOff"
             }
-            repository.executeAction(device.id, action).onSuccess { refresh(showLoading = false) }
+            repository.executeAction(device.id, action)
+                .onSuccess { refresh(showLoading = false) }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la acción") }
         }
     }
 
@@ -89,26 +91,31 @@ class DevicesViewModel(
         viewModelScope.launch {
             repository.setDeviceFavorite(device.id, !device.isFavorite())
                 .onSuccess { refresh(showLoading = false) }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo actualizar el favorito") }
         }
     }
 
-    /** Creates a device and reloads the list. [onDone] is invoked on successful completion. */
+    /** Creates a device and reloads the list. [onDone] runs only on success (keeps the sheet open on error). */
     fun createDevice(name: String, typeName: String, roomId: String?, onDone: () -> Unit = {}) {
         viewModelScope.launch {
-            repository.createDevice(name, typeName, roomId).onSuccess {
-                load()
-                onDone()
-            }
+            repository.createDevice(name, typeName, roomId)
+                .onSuccess {
+                    load()
+                    onDone()
+                }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo crear el dispositivo") }
         }
     }
 
-    /** Creates a room and reloads the list. [onDone] is invoked on successful completion. */
+    /** Creates a room and reloads the list. [onDone] runs only on success (keeps the sheet open on error). */
     fun createRoom(name: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
-            repository.createRoom(name).onSuccess {
-                load()
-                onDone()
-            }
+            repository.createRoom(name)
+                .onSuccess {
+                    load()
+                    onDone()
+                }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo crear la habitación") }
         }
     }
 }
