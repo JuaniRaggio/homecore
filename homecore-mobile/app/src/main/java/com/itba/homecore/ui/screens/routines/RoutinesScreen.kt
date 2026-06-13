@@ -144,9 +144,9 @@ private fun RoutineCard(
                     onCheckedChange = { onToggleActive() },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = AccentDark,
+                        checkedTrackColor = ToggleOn,
                         uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = SwitchTrackOff,
+                        uncheckedTrackColor = ToggleOff,
                         uncheckedBorderColor = Color.Transparent
                     ),
                     modifier = Modifier.scale(0.85f)

@@ -160,9 +160,9 @@ fun DeviceCard(
                     onCheckedChange = onToggle,
                     colors = SwitchDefaults.colors(
                         checkedThumbColor    = Color.White,
-                        checkedTrackColor    = AccentDark,
+                        checkedTrackColor    = ToggleOn,
                         uncheckedThumbColor  = Color.White,
-                        uncheckedTrackColor  = SurfaceVariant,
+                        uncheckedTrackColor  = ToggleOff,
                         uncheckedBorderColor = Color.Transparent
                     ),
                     modifier = Modifier.scale(0.85f)
