@@ -32,7 +32,7 @@ import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 
 @Composable
-fun UsuarioScreen(
+fun ProfileScreen(
     userName: String = "Maria Fernandez",
     onLogout: () -> Unit = {},
     devicesVm: DevicesViewModel = viewModel()

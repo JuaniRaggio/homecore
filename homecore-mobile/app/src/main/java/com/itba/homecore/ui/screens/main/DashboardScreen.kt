@@ -1,35 +1,18 @@
 package com.itba.homecore.ui.screens.main
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AcUnit
-import androidx.compose.material.icons.filled.Blinds
-import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.DevicesOther
-import androidx.compose.material.icons.filled.DoorFront
-import androidx.compose.material.icons.filled.Kitchen
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Microwave
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,7 +23,8 @@ import com.itba.homecore.R
 import com.itba.homecore.data.model.*
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.PanelCard
-import com.itba.homecore.ui.screens.devices.deviceIconFor
+import com.itba.homecore.ui.components.routineScheduleLabel
+import com.itba.homecore.ui.screens.devices.DeviceCard
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
@@ -48,7 +32,7 @@ import com.itba.homecore.viewmodel.RoutinesUiState
 import com.itba.homecore.viewmodel.RoutinesViewModel
 
 @Composable
-fun InicioScreen(
+fun DashboardScreen(
     devicesVm: DevicesViewModel = viewModel(),
     routinesVm: RoutinesViewModel = viewModel()
 ) {
@@ -74,7 +58,7 @@ fun InicioScreen(
         ) {
             when (val s = routinesState) {
                 is RoutinesUiState.Loading ->
-                    Text("Cargando…", color = TextSecondary, fontSize = 13.sp)
+                    Text(stringResource(R.string.loading), color = TextSecondary, fontSize = 13.sp)
                 is RoutinesUiState.Error ->
                     Text(s.message, color = ErrorColor, fontSize = 13.sp)
                 is RoutinesUiState.Success -> {
@@ -97,7 +81,6 @@ fun InicioScreen(
             }
         }
 
-        // ── Favorite devices ──────────────────────────────
         PanelCard(
             title = stringResource(R.string.favorite_devices),
             actionLabel = stringResource(R.string.see_all),
@@ -105,7 +88,7 @@ fun InicioScreen(
         ) {
             when (val s = devicesState) {
                 is DevicesUiState.Loading ->
-                    Text("Cargando…", color = TextSecondary, fontSize = 13.sp)
+                    Text(stringResource(R.string.loading), color = TextSecondary, fontSize = 13.sp)
                 is DevicesUiState.Error ->
                     Text(s.message, color = ErrorColor, fontSize = 13.sp)
                 is DevicesUiState.Success -> {
@@ -123,12 +106,14 @@ fun InicioScreen(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 row.forEach { d ->
-                                    FavoriteDeviceCard(
-                                        device = d,
-                                        onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
-                                        onFavoriteClick = { devicesVm.toggleFavorite(d) },
-                                        modifier = Modifier.weight(1f)
-                                    )
+                                    key(d.id) {
+                                        DeviceCard(
+                                            device = d,
+                                            onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
+                                            onFavoriteClick = { devicesVm.toggleFavorite(d) },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
                                 }
                                 if (row.size == 1) Spacer(Modifier.weight(1f))
                             }
@@ -163,11 +148,11 @@ private fun FavoriteRoutineCard(
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
-                    tint = Color(0xFFFFD43B),
+                    tint = FavoriteStar,
                     modifier = Modifier.size(18.dp)
                 )
             }
-            val sched = routineSchedule(routine)
+            val sched = routineScheduleLabel(routine).ifBlank { routine.descriptionText() }
             if (sched.isNotBlank()) {
                 Text(
                     text = sched,
@@ -196,114 +181,4 @@ private fun FavoriteRoutineCard(
             }
         }
     }
-}
-
-@Composable
-private fun FavoriteDeviceCard(
-    device: Device,
-    onToggle: (Boolean) -> Unit,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val cat = device.category()
-    val isOn = device.isOn()
-    val isLamp = cat == DeviceCategory.LAMP
-    val isDoor = cat == DeviceCategory.DOOR || cat == DeviceCategory.LOCK
-    // Each device goes in its own box (same as in DevicesScreen).
-    val borderColor = if (isDoor) AccentDark else Accent.copy(alpha = 0.4f)
-    val iconTint = if (isLamp) DeviceLight else TextPrimary
-    val iconBg = if (isLamp) Color(0xFF3A2A1A) else Color.Transparent
-
-    Box(
-        modifier = modifier
-            .background(Surface, RoundedCornerShape(12.dp))
-            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(12.dp))
-            .padding(12.dp)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .background(iconBg, RoundedCornerShape(6.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = deviceIconFor(cat),
-                        contentDescription = null,
-                        tint = iconTint,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = stringResource(R.string.cd_favorite),
-                    tint = Color(0xFFFFD43B),
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clickable(onClick = onFavoriteClick)
-                )
-            }
-            Text(
-                text = device.name,
-                color = TextPrimary,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 18.sp
-            )
-            Text(
-                text = device.room?.name ?: "Sin habitación",
-                color = TextSecondary,
-                fontSize = 12.sp
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Switch(
-                    checked = isOn,
-                    onCheckedChange = onToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = AccentDark,
-                        uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = SurfaceVariant,
-                        uncheckedBorderColor = Color.Transparent
-                    ),
-                    modifier = Modifier.scale(0.85f)
-                )
-            }
-            when {
-                isLamp && isOn -> Text(
-                    text = stringResource(R.string.device_on_pct, device.state?.brightness ?: 100),
-                    color = SuccessColor,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                isDoor -> Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Icon(
-                        imageVector = if (isOn) Icons.Default.LockOpen else Icons.Default.Lock,
-                        contentDescription = null,
-                        tint = AccentDark,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-private fun routineSchedule(r: Routine): String {
-    val time = r.time()
-    val days = r.days()
-    if (time.isBlank() && days.isEmpty()) return r.descriptionText()
-    val dayNames = listOf("Dom", "Lun", "Mar", "Mier", "Juev", "Vier", "Sab")
-    val dayStr = days.mapNotNull { dayNames.getOrNull(it) }.joinToString(", ")
-    return listOf(time, dayStr).filter { it.isNotBlank() }.joinToString(" ")
 }

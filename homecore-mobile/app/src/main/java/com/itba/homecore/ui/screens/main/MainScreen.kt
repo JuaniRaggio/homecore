@@ -21,15 +21,15 @@ import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.UiMessages
 
 private enum class Tab(val icon: ImageVector, val labelRes: Int) {
-    INICIO(Icons.Default.Home, R.string.nav_inicio),
-    DISPOSITIVOS(Icons.Default.Tv, R.string.nav_dispositivos),
-    RUTINAS(Icons.AutoMirrored.Filled.List, R.string.nav_rutinas),
-    USUARIO(Icons.Default.Person, R.string.nav_usuario)
+    HOME(Icons.Default.Home, R.string.nav_home),
+    DEVICES(Icons.Default.Tv, R.string.nav_devices),
+    ROUTINES(Icons.AutoMirrored.Filled.List, R.string.nav_routines),
+    PROFILE(Icons.Default.Person, R.string.nav_profile)
 }
 
 @Composable
 fun MainScreen(onLogout: () -> Unit = {}) {
-    var selected by rememberSaveable { mutableStateOf(Tab.INICIO) }
+    var selected by rememberSaveable { mutableStateOf(Tab.HOME) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Transient action feedback (failed toggles, creations, etc.) surfaces as a snackbar.
@@ -67,10 +67,10 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                 .background(Background)
         ) {
             when (selected) {
-                Tab.INICIO       -> InicioScreen()
-                Tab.DISPOSITIVOS -> DevicesScreen()
-                Tab.RUTINAS      -> RoutinesScreen()
-                Tab.USUARIO      -> UsuarioScreen(onLogout = onLogout)
+                Tab.HOME     -> DashboardScreen()
+                Tab.DEVICES  -> DevicesScreen()
+                Tab.ROUTINES -> RoutinesScreen()
+                Tab.PROFILE  -> ProfileScreen(onLogout = onLogout)
             }
         }
     }
