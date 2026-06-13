@@ -43,8 +43,12 @@ class RemoteAuthRepository(context: Context) : AuthRepository {
     }
 
     override suspend fun logout() {
-        // Best effort: invalidate the token server-side, but never block the local logout.
-        runCatching { api.logout() }
+        // Only hit the network when a token is still held in memory. A logout triggered
+        // by the 401 handler runs after the interceptor already cleared it, so an
+        // unauthenticated POST /users/logout would 401 again and re-emit in a loop.
+        if (ApiClient.hasToken()) {
+            runCatching { api.logout() }
+        }
         ApiClient.setToken(null)
         session.clearSession()
     }

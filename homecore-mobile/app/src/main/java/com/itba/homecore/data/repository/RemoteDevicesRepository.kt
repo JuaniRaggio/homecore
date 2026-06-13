@@ -29,8 +29,7 @@ class RemoteDevicesRepository : DevicesRepository {
     }
 
     override suspend fun executeAction(deviceId: String, action: String, params: List<Any>): Result<Unit> = runCatching {
-        apiCall("No se pudo ejecutar la acción") { devicesApi.executeAction(deviceId, action, params) }
-        Unit
+        apiCall("No se pudo ejecutar la acción") { devicesApi.executeAction(deviceId, action, params).close() }
     }
 
     override suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit> = runCatching {

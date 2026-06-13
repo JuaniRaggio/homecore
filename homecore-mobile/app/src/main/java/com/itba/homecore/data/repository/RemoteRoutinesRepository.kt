@@ -15,8 +15,7 @@ class RemoteRoutinesRepository : RoutinesRepository {
     }
 
     override suspend fun executeRoutine(id: String): Result<Unit> = runCatching {
-        apiCall("No se pudo ejecutar la rutina") { routinesApi.executeRoutine(id) }
-        Unit
+        apiCall("No se pudo ejecutar la rutina") { routinesApi.executeRoutine(id).close() }
     }
 
     override suspend fun toggleFavorite(routine: Routine): Result<Routine> = runCatching {

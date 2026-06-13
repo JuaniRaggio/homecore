@@ -7,6 +7,8 @@ import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.data.repository.DevicesRepository
 import com.itba.homecore.di.AppModule
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,11 +40,20 @@ class DevicesViewModel(
 
     init { load() }
 
-    fun load() {
+    fun load() = refresh(showLoading = true)
+
+    /**
+     * Loads rooms and devices. The two calls are independent, so they run concurrently.
+     * [showLoading] is false for refreshes after an action, to avoid flashing the spinner.
+     */
+    private fun refresh(showLoading: Boolean) {
         viewModelScope.launch {
-            _state.value = DevicesUiState.Loading
-            val roomsRes   = repository.getRooms()
-            val devicesRes = repository.getDevices()
+            if (showLoading) _state.value = DevicesUiState.Loading
+            val (roomsRes, devicesRes) = coroutineScope {
+                val rooms   = async { repository.getRooms() }
+                val devices = async { repository.getDevices() }
+                rooms.await() to devices.await()
+            }
 
             val rooms   = roomsRes.getOrNull()
             val devices = devicesRes.getOrNull()
@@ -70,31 +81,14 @@ class DevicesViewModel(
                 "vacuum"                          -> if (turnOn) "start"  else "pause"
                 else                              -> if (turnOn) "turnOn" else "turnOff"
             }
-            repository.executeAction(device.id, action).onSuccess { toggle()}
+            repository.executeAction(device.id, action).onSuccess { refresh(showLoading = false) }
         }
     }
-    fun toggle() {
-        viewModelScope.launch {
-            val roomsRes   = repository.getRooms()
-            val devicesRes = repository.getDevices()
 
-            val rooms   = roomsRes.getOrNull()
-            val devices = devicesRes.getOrNull()
-
-            if (rooms == null) {
-                _state.value = DevicesUiState.Error(roomsRes.exceptionOrNull()?.message ?: "Error al cargar")
-                return@launch
-            }
-            if (devices == null) {
-                _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
-                return@launch
-            }
-            _state.value = DevicesUiState.Success(rooms, devices)
-        }
-    }
     fun toggleFavorite(device: Device) {
         viewModelScope.launch {
-            repository.setDeviceFavorite(device.id, !device.isFavorite()).onSuccess { toggle() }
+            repository.setDeviceFavorite(device.id, !device.isFavorite())
+                .onSuccess { refresh(showLoading = false) }
         }
     }
 
