@@ -1,6 +1,7 @@
 package com.itba.homecore.data.api
 
 import com.google.gson.JsonParser
+import com.itba.homecore.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -20,10 +21,15 @@ object ApiClient {
         this.token = t
     }
 
+    /** True while an auth token is held in memory. The 401 interceptor clears it. */
+    fun hasToken(): Boolean = token != null
+
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
+                // Full bodies only in debug: release logs would leak the JWT and user data.
+                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                        else HttpLoggingInterceptor.Level.NONE
             })
             .addInterceptor { chain ->
                 val requestBuilder = chain.request().newBuilder()

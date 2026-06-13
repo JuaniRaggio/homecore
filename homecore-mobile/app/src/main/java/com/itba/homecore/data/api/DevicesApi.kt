@@ -3,6 +3,7 @@ package com.itba.homecore.data.api
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.DeviceType
+import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -31,12 +32,14 @@ interface DevicesApi {
     @DELETE("devices/{id}")
     suspend fun deleteDevice(@Path("id") id: String)
 
+    // Return the raw body: the API's response shape for an action is not used, and
+    // declaring a concrete type (e.g. Boolean) makes Gson throw if it differs.
     @PATCH("devices/{id}/{action}")
     suspend fun executeAction(
         @Path("id") id: String,
         @Path("action") action: String,
         @Body params: List<Any> = emptyList()
-    ): Boolean
+    ): ResponseBody
 
     /** Type catalog: maps the canonical name ("lamp", "door", ...) to the id required by POST /devices. */
     @GET("devicetypes")

@@ -1,6 +1,7 @@
 package com.itba.homecore.data.api
 
 import com.itba.homecore.data.model.Routine
+import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -22,8 +23,10 @@ interface RoutinesApi {
     @DELETE("routines/{id}")
     suspend fun deleteRoutine(@Path("id") id: String)
 
+    // Return the raw body: the per-action result array is not used, and a concrete
+    // type would make Gson throw on a shape mismatch.
     @PATCH("routines/{id}/execute")
-    suspend fun executeRoutine(@Path("id") id: String): Boolean
+    suspend fun executeRoutine(@Path("id") id: String): ResponseBody
 
     @PUT("routines/{id}")
     suspend fun updateRoutine(

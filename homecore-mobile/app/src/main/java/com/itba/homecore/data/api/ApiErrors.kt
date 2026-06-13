@@ -11,11 +11,14 @@ import java.io.IOException
  * about repeated helpers and generic error messages).
  */
 
+// Gson is thread-safe and meant to be shared: building it per error parse is wasteful.
+private val gson = Gson()
+
 /** Extracts `error.description` from the API error body { "error": { "code", "description" } }. */
 fun HttpException.friendlyMessage(fallback: String): String = try {
     val raw = response()?.errorBody()?.string()
     if (raw.isNullOrBlank()) fallback
-    else Gson().fromJson(raw, ApiResponse::class.java)?.error?.description ?: fallback
+    else gson.fromJson(raw, ApiResponse::class.java)?.error?.description ?: fallback
 } catch (_: Exception) {
     fallback
 }
