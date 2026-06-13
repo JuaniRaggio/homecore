@@ -11,8 +11,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
-    private const val API_KEY  = "sk_2ece0079ab8c2fb4fb03b5537aebf5b6"
+    // Provienen de local.properties vía BuildConfig (ver app/build.gradle.kts).
+    private val BASE_URL = BuildConfig.API_BASE_URL
+    private val API_KEY  = BuildConfig.API_KEY
 
     @Volatile
     private var token: String? = null

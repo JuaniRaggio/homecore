@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+// local.properties es el equivalente Android al .env del web: está gitignoreado, así
+// que la API key NO se commitea. Cada quien la define ahí (ver local.properties.example).
+// La URL base sí tiene fallback porque es pública; la API key NO (queda vacía si falta).
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+fun localProp(key: String, default: String): String =
+    localProperties.getProperty(key) ?: System.getenv(key) ?: default
 
 android {
     namespace = "com.itba.homecore"
@@ -15,6 +27,11 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Expuesto a Kotlin como BuildConfig.API_BASE_URL / BuildConfig.API_KEY.
+        // La API key sale solo de local.properties (sin fallback ⇒ no se commitea).
+        buildConfigField("String", "API_BASE_URL", "\"${localProp("API_BASE_URL", "https://hci.it.itba.edu.ar/api/")}\"")
+        buildConfigField("String", "API_KEY", "\"${localProp("API_KEY", "")}\"")
     }
 
     buildTypes {

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.ui.screens.auth.LoginScreen
+import com.itba.homecore.ui.screens.auth.RecoverScreen
 import com.itba.homecore.ui.screens.auth.RegisterScreen
 import com.itba.homecore.ui.screens.auth.VerifyScreen
 import com.itba.homecore.ui.screens.main.MainScreen
@@ -22,7 +23,7 @@ import com.itba.homecore.ui.theme.Background
 import com.itba.homecore.ui.theme.HomeCoreTheme
 import com.itba.homecore.viewmodel.AuthViewModel
 
-enum class AppScreen { LOGIN, REGISTER, VERIFY, HOME }
+enum class AppScreen { LOGIN, REGISTER, VERIFY, RECOVER, HOME }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                             viewModel            = authViewModel,
                             onLoginSuccess       = { /* isLoggedIn becomes true and MainScreen is rendered */ },
                             onNavigateToRegister = { currentScreen = AppScreen.REGISTER },
-                            onNavigateToRecover  = { }
+                            onNavigateToRecover  = { currentScreen = AppScreen.RECOVER }
                         )
                         AppScreen.REGISTER -> RegisterScreen(
                             viewModel           = authViewModel,
@@ -59,6 +60,11 @@ class MainActivity : ComponentActivity() {
                             viewModel  = authViewModel,
                             onVerified = { currentScreen = AppScreen.LOGIN },
                             onBack     = { currentScreen = AppScreen.LOGIN }
+                        )
+                        AppScreen.RECOVER -> RecoverScreen(
+                            viewModel = authViewModel,
+                            onDone    = { currentScreen = AppScreen.LOGIN },
+                            onBack    = { currentScreen = AppScreen.LOGIN }
                         )
                         AppScreen.HOME -> { /* unreachable when isLoggedIn = false */ }
                     }
