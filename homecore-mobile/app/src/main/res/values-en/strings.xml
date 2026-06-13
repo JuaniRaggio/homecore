@@ -26,12 +26,88 @@
     <string name="filters">Filters</string>
     <string name="new_device">+ New Device</string>
     <string name="new_room">+ New Room</string>
-    <string name="room_living">Living Room</string>
-    <string name="room_bedroom">Bedroom</string>
     <string name="device_on_pct">On %d%%</string>
     <string name="device_off_label">Off</string>
+    <string name="room_none">No room</string>
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>
     <string name="cd_dropdown">Switch home</string>
+
+    <!-- Common states -->
+    <string name="loading">Loading…</string>
+    <string name="retry">Retry</string>
+    <string name="empty_devices">No devices</string>
+    <string name="empty_routines">No routines</string>
+
+    <!-- Week days (index 0 = Sunday, as the API uses) -->
+    <string-array name="routine_days">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+
+    <!-- Home -->
+    <string name="favorite_routines">Favorite Routines</string>
+    <string name="favorite_devices">Favorite Devices</string>
+    <string name="see_all">See all</string>
+    <string name="execute_now">Run now</string>
+    <string name="cd_notifications">Notifications</string>
+    <string name="empty_fav_routines">No favorite routines</string>
+    <string name="empty_fav_devices">No favorite devices</string>
+
+    <!-- Routines -->
+    <string name="search_routine">Search routine</string>
+    <string name="new_routine">+ New Routine</string>
+
+    <!-- User -->
+    <string name="profile">Profile</string>
+    <string name="manage_account">Account settings</string>
+    <string name="manage_password">Change password</string>
+    <string name="consumption">Consumption</string>
+    <string name="current_consumption">Current consumption</string>
+    <string name="devices_running">Devices\nrunning</string>
+    <string name="history">History</string>
+    <string name="no_recent_events">No recent events</string>
+    <string name="history_turned_on">%1$s turned on</string>
+    <string name="history_turned_off">%1$s turned off</string>
+    <string name="minutes_ago">%d min ago</string>
+    <string name="logout">Sign out</string>
+    <string name="logout_title">Sign out?</string>
+    <string name="logout_message">You will need to sign in again the next time you open the app.</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Device creation -->
+    <string name="device_type_title">Device type</string>
+    <string name="device_details_title">Device details</string>
+    <string name="device_name_label">Device name</string>
+    <string name="device_name_hint">E.g. Main light</string>
+    <string name="room_label">Room</string>
+    <string name="room_optional">No room</string>
+    <string name="next">Next</string>
+    <string name="create_device">Create device</string>
+    <string name="cd_close">Close</string>
+
+    <!-- Device types -->
+    <string name="dtype_lamp">Light</string>
+    <string name="dtype_door">Door</string>
+    <string name="dtype_alarm">Alarm</string>
+    <string name="dtype_faucet">Faucet</string>
+    <string name="dtype_blinds">Blinds</string>
+    <string name="dtype_ac">AC</string>
+    <string name="dtype_speaker">Speaker</string>
+    <string name="dtype_vacuum">Vacuum</string>
+    <string name="dtype_refrigerator">Fridge</string>
+    <string name="dtype_oven">Oven</string>
+    <string name="dtype_lock">Lock</string>
+
+    <!-- Room creation -->
+    <string name="room_create_title">Create room</string>
+    <string name="room_name_label">Room name</string>
+    <string name="room_name_hint">E.g. Main hall</string>
+    <string name="create_room">Create room</string>
 </resources>

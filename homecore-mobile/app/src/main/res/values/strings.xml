@@ -25,15 +25,31 @@
     <string name="search_device">Buscar dispositivo</string>
     <string name="filters">Filtros</string>
     <string name="new_device">+ Nuevo Dispositivo</string>
-    <string name="new_room">+ Nueva Habitacion</string>
-    <string name="room_living">Living Room</string>
-    <string name="room_bedroom">Bedroom</string>
+    <string name="new_room">+ Nueva Habitación</string>
     <string name="device_on_pct">Encendida %d%%</string>
     <string name="device_off_label">Apagada</string>
+    <string name="room_none">Sin habitación</string>
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
     <string name="cd_dropdown">Cambiar de hogar</string>
+
+    <!-- Estados comunes -->
+    <string name="loading">Cargando…</string>
+    <string name="retry">Reintentar</string>
+    <string name="empty_devices">No hay dispositivos</string>
+    <string name="empty_routines">No hay rutinas</string>
+
+    <!-- Días de la semana (índice 0 = domingo, según la API) -->
+    <string-array name="routine_days">
+        <item>Dom</item>
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+    </string-array>
 
     <!-- Inicio -->
     <string name="favorite_routines">Rutinas Favoritas</string>
@@ -50,12 +66,16 @@
 
     <!-- Usuario -->
     <string name="profile">Perfil</string>
-    <string name="manage_account">Gestion de la cuenta</string>
-    <string name="manage_password">Gestionar contraseña dispositivos</string>
+    <string name="manage_account">Gestión de la cuenta</string>
+    <string name="manage_password">Gestionar contraseña</string>
     <string name="consumption">Consumo</string>
     <string name="current_consumption">Consumo actual</string>
     <string name="devices_running">Dispositivos\nfuncionando</string>
     <string name="history">Historial</string>
+    <string name="no_recent_events">Sin eventos recientes</string>
+    <string name="history_turned_on">%1$s encendida</string>
+    <string name="history_turned_off">%1$s apagada</string>
+    <string name="minutes_ago">Hace %d min</string>
     <string name="logout">Cerrar sesión</string>
     <string name="logout_title">¿Cerrar sesión?</string>
     <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>
