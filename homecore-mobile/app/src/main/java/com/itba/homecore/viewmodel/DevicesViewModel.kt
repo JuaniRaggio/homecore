@@ -138,7 +138,7 @@ class DevicesViewModel(
         }
     }
 
-    // ── Device management ──────────────────────────────────────────────────────────
+    // -- Device management ----------------------------------------------------------
     fun renameDevice(deviceId: String, newName: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.renameDevice(deviceId, newName)
@@ -166,7 +166,7 @@ class DevicesViewModel(
         }
     }
 
-    // ── Room management ────────────────────────────────────────────────────────────
+    // -- Room management ------------------------------------------------------------
     fun renameRoom(roomId: String, newName: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.renameRoom(roomId, newName)

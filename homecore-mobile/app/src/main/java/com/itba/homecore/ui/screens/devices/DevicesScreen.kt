@@ -27,7 +27,7 @@ import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
+// --- Screen -------------------------------------------------------------------
 @Composable
 fun DevicesScreen(
     onDeviceClick: (String) -> Unit,
@@ -166,7 +166,7 @@ private fun groupDevicesByRoom(
     return ordered
 }
 
-// ─── Room card ────────────────────────────────────────────────────────────────
+// --- Room card ----------------------------------------------------------------
 @Composable
 private fun RoomCard(
     group: RoomGroup,

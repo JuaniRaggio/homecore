@@ -59,7 +59,7 @@ fun DashboardScreen(
             onNotificationsClick = { UiMessages.emit(noNotifications) }
         )
 
-        // ── Favorite routines ─────────────────────────────
+        // -- Favorite routines -----------------------------
         PanelCard(
             title = stringResource(R.string.favorite_routines),
             actionLabel = stringResource(R.string.see_all),

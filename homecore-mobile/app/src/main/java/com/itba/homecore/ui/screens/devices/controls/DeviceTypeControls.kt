@@ -18,7 +18,7 @@ import com.itba.homecore.ui.theme.Spacing
 
 private typealias OnAction = (String, List<Any>) -> Unit
 
-// ── Light ───────────────────────────────────────────────────────────────────────
+// -- Light -----------------------------------------------------------------------
 @Composable
 fun LightControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
@@ -39,7 +39,7 @@ fun LightControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Door ────────────────────────────────────────────────────────────────────────
+// -- Door ------------------------------------------------------------------------
 @Composable
 fun DoorControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
@@ -54,7 +54,7 @@ fun DoorControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Lock ────────────────────────────────────────────────────────────────────────
+// -- Lock ------------------------------------------------------------------------
 @Composable
 fun LockControls(device: Device, onAction: OnAction) {
     ControlButtonsRow(
@@ -63,7 +63,7 @@ fun LockControls(device: Device, onAction: OnAction) {
     )
 }
 
-// ── Alarm ───────────────────────────────────────────────────────────────────────
+// -- Alarm -----------------------------------------------------------------------
 @Composable
 fun AlarmControls(device: Device, onAction: OnAction) {
     var code by rememberSaveable { mutableStateOf("") }
@@ -105,7 +105,7 @@ fun AlarmControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Water (faucet) ────────────────────────────────────────────────────────────────
+// -- Water (faucet) ----------------------------------------------------------------
 @Composable
 fun WaterControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
@@ -141,7 +141,7 @@ private fun DispenseControl(onAction: OnAction) {
     }
 }
 
-// ── Curtain (blinds) ──────────────────────────────────────────────────────────────
+// -- Curtain (blinds) --------------------------------------------------------------
 @Composable
 fun CurtainControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
@@ -157,7 +157,7 @@ fun CurtainControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── AC ──────────────────────────────────────────────────────────────────────────
+// -- AC --------------------------------------------------------------------------
 @Composable
 fun AcControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
@@ -183,7 +183,7 @@ fun AcControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Speaker ───────────────────────────────────────────────────────────────────────
+// -- Speaker -----------------------------------------------------------------------
 @Composable
 fun SpeakerControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
@@ -210,7 +210,7 @@ fun SpeakerControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Vacuum ────────────────────────────────────────────────────────────────────────
+// -- Vacuum ------------------------------------------------------------------------
 @Composable
 fun VacuumControls(device: Device, onAction: OnAction) {
     var location by rememberSaveable { mutableStateOf("") }
@@ -243,7 +243,7 @@ fun VacuumControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Fridge ────────────────────────────────────────────────────────────────────────
+// -- Fridge ------------------------------------------------------------------------
 @Composable
 fun FridgeControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
@@ -265,7 +265,7 @@ fun FridgeControls(device: Device, onAction: OnAction) {
     }
 }
 
-// ── Oven ──────────────────────────────────────────────────────────────────────────
+// -- Oven --------------------------------------------------------------------------
 @Composable
 fun OvenControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
