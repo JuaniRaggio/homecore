@@ -6,9 +6,8 @@ import com.itba.homecore.data.model.User
 class EmailAlreadyRegisteredException(message: String) : Exception(message)
 
 /**
- * Authentication contract. The mock implementation ([MockAuthRepository]) accepts any
- * credentials to test the UI without a backend; the real one ([RemoteAuthRepository])
- * uses the HCI API plus DataStore session persistence.
+ * Authentication contract. Implemented by [RemoteAuthRepository], which uses the HCI API
+ * plus DataStore session persistence.
  */
 interface AuthRepository {
     suspend fun login(email: String, password: String): Result<User>

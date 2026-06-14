@@ -49,41 +49,29 @@ app/build/outputs/apk/debug/app-debug.apk
 > exists separately in the project deliverables; this README stays focused on
 > developers.
 
-## Mock vs. real backend switch
+## Backend wiring
 
-The app decides between prototype (in-memory) data and the real HCI API in a
-**single place**: `com.itba.homecore.di.AppModule`.
-
-```kotlin
-object AppModule {
-    const val USE_MOCK = false   // true = prototype data, false = real HCI API
-    // ...
-}
-```
-
-`AppModule` is a lightweight service locator. Each repository is an **interface**
-with two implementations — `Mock*Repository` (local data) and
-`Remote*Repository` (Retrofit against the API). Flipping `USE_MOCK` swaps every
-data source without touching the UI or the ViewModels, since they depend on the
-interfaces, not the concrete classes.
+The app always talks to the real HCI API. Repositories are wired in a **single
+place**: `com.itba.homecore.di.AppModule`, a lightweight service locator. Each
+repository is an **interface** implemented by a `Remote*Repository` (Retrofit
+against the API); the UI and ViewModels depend on the interfaces, not the
+concrete classes.
 
 ## Architecture overview
 
 Strict **MVVM by layers**: the Compose UI only observes state and emits events;
 ViewModels expose a `StateFlow` of a sealed `UiState` (`Loading` / `Success` /
-`Error`) and call repository interfaces; repositories encapsulate the data
-source (mock or network).
+`Error`) and call repository interfaces; repositories encapsulate the network
+data source.
 
 ```
 app/src/main/java/com/itba/homecore/
 ├── data/
 │   ├── api/          # Retrofit service, ApiClient, session events (401 handling)
 │   ├── model/        # Data models (Device, Room, Routine, ...)
-│   ├── mock/         # MockData — in-memory prototype data
 │   ├── local/        # DataStore-backed session storage
-│   └── repository/   # Repository interfaces + Mock*/Remote* implementations
-├── di/               # AppModule (service locator + USE_MOCK switch)
-├── navigation/       # Navigation Compose graph
+│   └── repository/   # Repository interfaces + Remote* implementations
+├── di/               # AppModule (service locator)
 ├── viewmodel/        # ViewModels (StateFlow, viewModelScope)
 └── ui/
     ├── screens/      # Feature screens (auth, devices, rooms, routines, homes, main)
@@ -91,7 +79,6 @@ app/src/main/java/com/itba/homecore/
     └── theme/        # Material 3 dark color scheme + typography
 ```
 
-For the rationale behind these decisions (mock-first strategy, ViewModel
-injection, state modeling, the 401/"Invalid token" recovery, build tweaks for
-AGP 8.x, theming, i18n), see
+For the rationale behind these decisions (ViewModel injection, state modeling,
+the 401/"Invalid token" recovery, build tweaks for AGP 8.x, theming, i18n), see
 [`docs/DECISIONES_ARQUITECTURA.md`](./docs/DECISIONES_ARQUITECTURA.md).

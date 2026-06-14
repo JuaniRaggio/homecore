@@ -8,8 +8,7 @@ import com.itba.homecore.data.model.DeviceType
 import com.itba.homecore.data.model.Room
 
 /**
- * Real implementation against the HCI API (Retrofit). Enabled by setting
- * USE_MOCK = false in [com.itba.homecore.di.AppModule].
+ * Implementation against the HCI API (Retrofit), wired in [com.itba.homecore.di.AppModule].
  */
 class RemoteDevicesRepository : DevicesRepository {
     private val devicesApi = ApiClient.devicesApi

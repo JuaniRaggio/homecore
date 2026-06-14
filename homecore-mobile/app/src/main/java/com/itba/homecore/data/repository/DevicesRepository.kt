@@ -6,9 +6,8 @@ import com.itba.homecore.data.model.Room
 
 /**
  * Data-layer contract for devices and rooms. UI and ViewModels depend on this
- * abstraction, never on a concrete implementation: [com.itba.homecore.di.AppModule]
- * decides between [MockDevicesRepository] (prototype data) and
- * [RemoteDevicesRepository] (HCI API) — the UI does not change.
+ * abstraction, never on the concrete [RemoteDevicesRepository] (HCI API), which is
+ * wired in [com.itba.homecore.di.AppModule].
  */
 interface DevicesRepository {
     suspend fun getDevices(): Result<List<Device>>

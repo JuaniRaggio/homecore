@@ -168,7 +168,7 @@ Material de trazabilidad ya disponible: `homecore-mobile/docs/DECISIONES_ARQUITE
 
 ## 6. Checklist de entrega final
 
-- [ ] `USE_MOCK = false` en el commit final (verificarlo DOS veces)
+- [x] Capa mock eliminada: la app corre solo contra el backend real (ya no hay flag `USE_MOCK`)
 - [ ] Sin API keys nuevas hardcodeadas fuera de `ApiClient` (la key del grupo ya está ahí; evaluar moverla a `local.properties` si hay tiempo)
 - [ ] APK debug generado e instalado en limpio, flujo completo probado
 - [ ] ZIP sin `build/`, `.gradle/`, `.idea/`, `local.properties`

@@ -57,6 +57,14 @@ de red; este diseño lo garantiza estructuralmente.
 
 ## 3. Estrategia mock-first con interfaces intercambiables
 
+> **Actualización (2026-06-13): la capa mock fue eliminada.** Una vez validada la
+> integración con el backend real, se borraron `data/mock/MockData.kt` y las
+> implementaciones `Mock*Repository`, y `AppModule` quedó proveyendo directamente
+> las implementaciones `Remote*` (sin flag `USE_MOCK`). Las interfaces de
+> repositorio se mantienen (la UI y los ViewModels siguen dependiendo de la
+> abstracción). El resto de esta sección queda como registro histórico de por qué
+> se usó mock-first durante el desarrollo.
+
 ### Decisión
 
 Cada repositorio se definió como **interfaz** con **dos implementaciones**:
