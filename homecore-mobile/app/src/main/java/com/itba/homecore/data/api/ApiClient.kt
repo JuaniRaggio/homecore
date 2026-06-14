@@ -40,11 +40,14 @@ object ApiClient {
                     requestBuilder.addHeader("Authorization", "Bearer $it")
                 }
 
+                val hadToken = this@ApiClient.token != null
                 val response = chain.proceed(requestBuilder.build())
 
-                // 401 means the token expired or is invalid: notify so the session is
-                // cleared and the app navigates back to Login.
-                if (response.code == 401) {
+                // A 401 on an authenticated request means the session token expired or is
+                // invalid: clear it and notify so the app returns to Login. We require a
+                // prior token so 401s on auth endpoints (login/register/verify) are not
+                // misread as an expired session.
+                if (response.code == 401 && hadToken) {
                     this@ApiClient.token = null
                     SessionEvents.emitUnauthorized()
                 }
