@@ -6,39 +6,37 @@ import com.itba.homecore.data.model.Room
 
 /**
  * Data-layer contract for devices and rooms. UI and ViewModels depend on this
- * abstraction, never on a concrete implementation: [com.itba.homecore.di.AppModule]
- * decides between [MockDevicesRepository] (prototype data) and
- * [RemoteDevicesRepository] (HCI API) — the UI does not change.
+ * abstraction, never on the concrete [RemoteDevicesRepository] (HCI API), which is
+ * wired in [com.itba.homecore.di.AppModule].
  */
 interface DevicesRepository {
     suspend fun getDevices(): Result<List<Device>>
-    suspend fun getDevice(id: String): Result<Device>
     suspend fun executeAction(deviceId: String, action: String, params: List<Any> = emptyList()): Result<Unit>
     suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit>
 
     /** Creates a device of the given type (canonical key: "lamp", "door", ...). */
     suspend fun createDevice(name: String, typeName: String, roomId: String?): Result<Device>
 
-    /** Renames a device keeping the rest of its data (RF7). */
+    /** Renames a device keeping the rest of its data. */
     suspend fun renameDevice(deviceId: String, newName: String): Result<Device>
 
     suspend fun deleteDevice(deviceId: String): Result<Unit>
 
     suspend fun getRooms(): Result<List<Room>>
 
-    /** Creates a room. */
-    suspend fun createRoom(name: String): Result<Room>
+    /** Creates a room, linked to [homeId] or to the user's first home when null. */
+    suspend fun createRoom(name: String, homeId: String? = null): Result<Room>
 
     suspend fun renameRoom(roomId: String, newName: String): Result<Room>
 
     suspend fun deleteRoom(roomId: String): Result<Unit>
 
-    /** Links an existing device to a room (RF16). */
+    /** Links an existing device to a room. */
     suspend fun assignDeviceToRoom(deviceId: String, roomId: String): Result<Unit>
 
-    /** Unlinks a device from its current room (RF16). */
+    /** Unlinks a device from its current room. */
     suspend fun unassignDevice(deviceId: String): Result<Unit>
 
-    /** Global action history (RF13). */
+    /** Global action history. */
     suspend fun getLogs(limit: Int = 20, offset: Int = 0): Result<List<DeviceLog>>
 }

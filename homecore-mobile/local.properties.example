@@ -1,0 +1,12 @@
+# Plantilla de configuración local (equivalente al .env.example del web).
+#
+# Android genera automáticamente `local.properties` con la línea `sdk.dir`.
+# Agregá ABAJO estas claves para configurar la API. El archivo real
+# `local.properties` está gitignoreado (no se commitea), igual que el .env.
+#
+# API_BASE_URL tiene un valor por defecto (la URL pública de la cátedra), así que
+# es opcional. API_KEY es OBLIGATORIA: no tiene fallback (para no commitearla), si
+# falta la app no puede autenticarse contra la API. Pedile la key del grupo al equipo.
+
+API_BASE_URL=https://hci.it.itba.edu.ar/api/
+API_KEY=<API key del grupo>     # OBLIGATORIA — sin esto la app no conecta

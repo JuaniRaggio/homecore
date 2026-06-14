@@ -31,7 +31,7 @@ interface RoomsApi {
     @GET("rooms/{roomId}/devices")
     suspend fun getRoomDevices(@Path("roomId") roomId: String): List<Device>
 
-    /** Links an existing device to the room (RF16). */
+    /** Links an existing device to the room. */
     @POST("rooms/{roomId}/devices/{deviceId}")
     suspend fun addDeviceToRoom(
         @Path("roomId") roomId: String,

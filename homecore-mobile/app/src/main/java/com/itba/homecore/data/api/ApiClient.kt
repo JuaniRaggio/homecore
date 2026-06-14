@@ -11,8 +11,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
-    private const val API_KEY  = "sk_2ece0079ab8c2fb4fb03b5537aebf5b6"
+    // Injected at build time from local.properties / env vars (see app/build.gradle.kts).
+    private val BASE_URL: String = BuildConfig.API_BASE_URL
+    private val API_KEY: String = BuildConfig.API_KEY
 
     @Volatile
     private var token: String? = null
@@ -39,11 +40,14 @@ object ApiClient {
                     requestBuilder.addHeader("Authorization", "Bearer $it")
                 }
 
+                val hadToken = this@ApiClient.token != null
                 val response = chain.proceed(requestBuilder.build())
 
-                // 401 means the token expired or is invalid: notify so the session is
-                // cleared and the app navigates back to Login.
-                if (response.code == 401) {
+                // A 401 on an authenticated request means the session token expired or is
+                // invalid: clear it and notify so the app returns to Login. We require a
+                // prior token so 401s on auth endpoints (login/register/verify) are not
+                // misread as an expired session.
+                if (response.code == 401 && hadToken) {
                     this@ApiClient.token = null
                     SessionEvents.emitUnauthorized()
                 }

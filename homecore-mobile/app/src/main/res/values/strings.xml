@@ -18,11 +18,14 @@
     <string name="title_recover">Recuperar contraseña</string>
     <string name="recover_subtitle">Te enviaremos un código a tu email para que puedas restablecer tu contraseña.</string>
     <string name="btn_send_code">Enviar código</string>
-    <string name="title_reset_password">Nueva contraseña</string>
-    <string name="reset_subtitle_email">Ingresá el código que enviamos a %1$s y elegí una nueva contraseña.</string>
+    <string name="title_new_password">Nueva contraseña</string>
+    <string name="recover_reset_subtitle">Ingresá el código de recuperación y tu nueva contraseña.</string>
     <string name="label_recovery_code">Código de recuperación</string>
     <string name="label_new_password">Nueva contraseña</string>
+    <string name="label_confirm_new_password">Confirmar contraseña</string>
     <string name="btn_reset_password">Restablecer contraseña</string>
+    <string name="recover_done_title">¡Listo!</string>
+    <string name="recover_done_message">Tu contraseña se restableció correctamente.</string>
 
     <!-- Verificación de cuenta -->
     <string name="title_verify">Verificar cuenta</string>
@@ -38,12 +41,12 @@
     <string name="nav_home">Inicio</string>
     <string name="nav_devices">Dispositivos</string>
     <string name="nav_routines">Rutinas</string>
+    <string name="nav_homes">Hogares</string>
     <string name="nav_profile">Usuario</string>
 
     <!-- Devices screen -->
     <string name="house_default">Casa de Verano</string>
     <string name="search_device">Buscar dispositivo</string>
-    <string name="filters">Filtros</string>
     <string name="new_device">+ Nuevo Dispositivo</string>
     <string name="new_room">+ Nueva Habitación</string>
     <string name="device_on_pct">Encendida %d%%</string>
@@ -52,7 +55,6 @@
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
-    <string name="cd_dropdown">Cambiar de hogar</string>
 
     <!-- Estados comunes -->
     <string name="loading">Cargando…</string>
@@ -88,14 +90,16 @@
     <string name="profile">Perfil</string>
     <string name="manage_account">Gestión de la cuenta</string>
     <string name="manage_password">Gestionar contraseña</string>
+    <string name="change_password_title">Cambiar contraseña</string>
+    <string name="label_current_password">Contraseña actual</string>
+    <string name="btn_change_password">Cambiar contraseña</string>
+    <string name="change_password_done">Tu contraseña se actualizó correctamente.</string>
+    <string name="btn_ok">Listo</string>
     <string name="consumption">Consumo</string>
     <string name="current_consumption">Consumo actual</string>
     <string name="devices_running">Dispositivos\nfuncionando</string>
     <string name="history">Historial</string>
     <string name="no_recent_events">Sin eventos recientes</string>
-    <string name="history_turned_on">%1$s encendida</string>
-    <string name="history_turned_off">%1$s apagada</string>
-    <string name="minutes_ago">Hace %d min</string>
     <string name="logout">Cerrar sesión</string>
     <string name="logout_title">¿Cerrar sesión?</string>
     <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>
@@ -107,7 +111,6 @@
     <string name="device_name_label">Nombre del dispositivo</string>
     <string name="device_name_hint">Ej: Luz principal</string>
     <string name="room_label">Habitación</string>
-    <string name="room_optional">Sin habitación</string>
     <string name="next">Siguiente</string>
     <string name="create_device">Crear dispositivo</string>
     <string name="cd_close">Cerrar</string>
@@ -170,4 +173,41 @@
     <string name="act_amount">Cantidad</string>
     <string name="act_unit">Unidad</string>
     <string name="device_detail_title">Detalle del dispositivo</string>
+
+    <!-- Feedback / acciones varias -->
+    <string name="not_available_yet">Función no disponible todavía</string>
+    <string name="no_new_notifications">No tenés notificaciones nuevas</string>
+
+    <!-- Cambiar contraseña (RF4) -->
+    <string name="cp_title">Cambiar contraseña</string>
+    <string name="cp_current">Contraseña actual</string>
+    <string name="cp_save">Guardar</string>
+    <string name="cp_success">Contraseña actualizada</string>
+
+    <!-- Gestión de dispositivos y habitaciones (RF7/RF14/RF16) -->
+    <string name="act_rename">Renombrar</string>
+    <string name="act_delete">Eliminar</string>
+    <string name="move_to_room">Mover a habitación</string>
+    <string name="delete_confirm">Eliminar</string>
+    <string name="rename_device_title">Renombrar dispositivo</string>
+    <string name="rename_room_title">Renombrar habitación</string>
+    <string name="delete_device_title">¿Eliminar dispositivo?</string>
+    <string name="delete_device_message">¿Querés eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="delete_room_title">¿Eliminar habitación?</string>
+    <string name="delete_room_message">¿Querés eliminar \"%1$s\"? Sus dispositivos quedarán sin habitación.</string>
+    <string name="cd_room_options">Opciones de la habitación</string>
+
+    <!-- Hogares (RF17-RF19) -->
+    <string name="homes_title">Hogares</string>
+    <string name="new_home">+ Nuevo Hogar</string>
+    <string name="home_name_label">Nombre del hogar</string>
+    <string name="home_name_hint">Ej: Casa de verano</string>
+    <string name="create_home">Crear hogar</string>
+    <string name="rename_home_title">Renombrar hogar</string>
+    <string name="delete_home_title">¿Eliminar hogar?</string>
+    <string name="delete_home_message">¿Querés eliminar \"%1$s\"? Sus habitaciones quedarán sin hogar.</string>
+    <string name="empty_homes">No hay hogares</string>
+    <string name="add_room">Agregar habitación</string>
+    <string name="no_rooms_in_home">Sin habitaciones</string>
+    <string name="cd_home_options">Opciones del hogar</string>
 </resources>

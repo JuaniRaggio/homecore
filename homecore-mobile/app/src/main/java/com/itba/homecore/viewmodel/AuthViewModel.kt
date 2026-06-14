@@ -23,9 +23,9 @@ sealed class AuthUiState {
     object Verified : AuthUiState()
     /** Email was already registered: send the user to the Login screen. */
     data class AlreadyRegistered(val message: String) : AuthUiState()
-    /** Recovery code was sent to the user's email (RF3 step 1 done). */
+    /** Recovery code was sent to the user's email. */
     object CodeSent : AuthUiState()
-    /** Password was successfully reset (RF3 step 2 done). */
+    /** Password was successfully reset. */
     object PasswordReset : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }
@@ -36,6 +36,25 @@ sealed class ResendState {
     object Sending : ResendState()
     object Sent : ResendState()
     data class Error(val message: String) : ResendState()
+}
+
+/** Forgot-password flow state, independent of [AuthUiState] (it has its own screen). */
+sealed class RecoverState {
+    object Idle : RecoverState()
+    object Loading : RecoverState()
+    /** The recovery code was emailed: move to the "enter code + new password" step. */
+    object CodeSent : RecoverState()
+    /** Password reset OK: show success and let the user go to Login. */
+    object Done : RecoverState()
+    data class Error(val message: String) : RecoverState()
+}
+
+/** Change-password state (from the Profile tab while logged in). */
+sealed class ChangePasswordState {
+    object Idle : ChangePasswordState()
+    object Loading : ChangePasswordState()
+    object Done : ChangePasswordState()
+    data class Error(val message: String) : ChangePasswordState()
 }
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
@@ -57,6 +76,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _resendState = MutableStateFlow<ResendState>(ResendState.Idle)
     val resendState: StateFlow<ResendState> = _resendState.asStateFlow()
+
+    private val _recoverState = MutableStateFlow<RecoverState>(RecoverState.Idle)
+    val recoverState: StateFlow<RecoverState> = _recoverState.asStateFlow()
+
+    private val _changePasswordState = MutableStateFlow<ChangePasswordState>(ChangePasswordState.Idle)
+    val changePasswordState: StateFlow<ChangePasswordState> = _changePasswordState.asStateFlow()
+    /** Logged-in user's profile (RF: shown on the profile screen). Null until loaded. */
+    private val _profile = MutableStateFlow<User?>(null)
+    val profile: StateFlow<User?> = _profile.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -205,9 +233,90 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** Loads the logged-in user's profile from the API (replaces any placeholder name). */
+    fun loadProfile() {
+        viewModelScope.launch {
+            repository.getProfile().onSuccess { _profile.value = it }
+        }
+    }
+
+    /**
+     * Changes the password of the logged-in user. Validation/feedback is left to the
+     * caller via [onResult] (success, errorMessage) so the dialog can show inline errors.
+     */
+    fun changePassword(oldPassword: String, newPassword: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            repository.changePassword(oldPassword, newPassword).fold(
+                onSuccess = { onResult(true, null) },
+                onFailure = { e -> onResult(false, e.message) }
+            )
+        }
+    }
+
     private fun clearPending() {
         _pendingEmail.value = null
         pendingPassword = null
+    }
+
+    /** Step 1 of forgot-password: request the recovery code by email. */
+    fun forgotPassword(email: String) {
+        if (email.isBlank()) {
+            _recoverState.value = RecoverState.Error("Ingresá tu email")
+            return
+        }
+        viewModelScope.launch {
+            _recoverState.value = RecoverState.Loading
+            repository.forgotPassword(email).fold(
+                onSuccess = { _recoverState.value = RecoverState.CodeSent },
+                onFailure = { e -> _recoverState.value = RecoverState.Error(e.message ?: "No se pudo enviar el código") }
+            )
+        }
+    }
+
+    /** Step 2 of forgot-password: set the new password using the emailed code. */
+    fun resetPassword(code: String, newPassword: String, confirmPassword: String) {
+        when {
+            code.isBlank() ->
+                _recoverState.value = RecoverState.Error("Ingresá el código de recuperación")
+            newPassword.length < 8 ->
+                _recoverState.value = RecoverState.Error("La contraseña debe tener al menos 8 caracteres")
+            newPassword != confirmPassword ->
+                _recoverState.value = RecoverState.Error("Las contraseñas no coinciden")
+            else -> viewModelScope.launch {
+                _recoverState.value = RecoverState.Loading
+                repository.resetPassword(code, newPassword).fold(
+                    onSuccess = { _recoverState.value = RecoverState.Done },
+                    onFailure = { e -> _recoverState.value = RecoverState.Error(e.message ?: "No se pudo restablecer la contraseña") }
+                )
+            }
+        }
+    }
+
+    fun clearRecover() {
+        _recoverState.value = RecoverState.Idle
+    }
+
+    /** Changes the password of the logged-in user (Profile tab). */
+    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
+        when {
+            currentPassword.isBlank() ->
+                _changePasswordState.value = ChangePasswordState.Error("Ingresá tu contraseña actual")
+            newPassword.length < 8 ->
+                _changePasswordState.value = ChangePasswordState.Error("La nueva contraseña debe tener al menos 8 caracteres")
+            newPassword != confirmPassword ->
+                _changePasswordState.value = ChangePasswordState.Error("Las contraseñas no coinciden")
+            else -> viewModelScope.launch {
+                _changePasswordState.value = ChangePasswordState.Loading
+                repository.changePassword(currentPassword, newPassword).fold(
+                    onSuccess = { _changePasswordState.value = ChangePasswordState.Done },
+                    onFailure = { e -> _changePasswordState.value = ChangePasswordState.Error(e.message ?: "No se pudo cambiar la contraseña") }
+                )
+            }
+        }
+    }
+
+    fun clearChangePassword() {
+        _changePasswordState.value = ChangePasswordState.Idle
     }
 
     fun logout() {
