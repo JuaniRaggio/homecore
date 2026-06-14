@@ -30,15 +30,20 @@ import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 import com.itba.homecore.viewmodel.RoutinesUiState
 import com.itba.homecore.viewmodel.RoutinesViewModel
+import com.itba.homecore.viewmodel.UiMessages
 
 @Composable
 fun DashboardScreen(
     onDeviceClick: (String) -> Unit = {},
+    onSeeAllRoutines: () -> Unit = {},
+    onSeeAllDevices: () -> Unit = {},
+    columns: Int = 2,
     devicesVm: DevicesViewModel = viewModel(),
     routinesVm: RoutinesViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
     val routinesState by routinesVm.state.collectAsStateWithLifecycle()
+    val noNotifications = stringResource(R.string.no_new_notifications)
 
     Column(
         modifier = Modifier
@@ -49,13 +54,16 @@ fun DashboardScreen(
             .padding(bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
-        HouseHeader(showNotifications = true)
+        HouseHeader(
+            showNotifications = true,
+            onNotificationsClick = { UiMessages.emit(noNotifications) }
+        )
 
         // ── Favorite routines ─────────────────────────────
         PanelCard(
             title = stringResource(R.string.favorite_routines),
             actionLabel = stringResource(R.string.see_all),
-            onAction = { /* TODO: navigate to routines */ }
+            onAction = onSeeAllRoutines
         ) {
             when (val s = routinesState) {
                 is RoutinesUiState.Loading ->
@@ -85,7 +93,7 @@ fun DashboardScreen(
         PanelCard(
             title = stringResource(R.string.favorite_devices),
             actionLabel = stringResource(R.string.see_all),
-            onAction = { /* TODO: navigate to devices */ }
+            onAction = onSeeAllDevices
         ) {
             when (val s = devicesState) {
                 is DevicesUiState.Loading ->
@@ -101,7 +109,7 @@ fun DashboardScreen(
                             fontSize = TextSize.base
                         )
                     } else {
-                        favs.chunked(2).forEach { row ->
+                        favs.chunked(columns).forEach { row ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(Spacing.base)
@@ -117,7 +125,7 @@ fun DashboardScreen(
                                         )
                                     }
                                 }
-                                if (row.size == 1) Spacer(Modifier.weight(1f))
+                                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                             }
                         }
                     }
