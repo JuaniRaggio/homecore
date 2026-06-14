@@ -1,32 +1,27 @@
 package com.itba.homecore.ui.screens.devices
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.*
+import com.itba.homecore.ui.components.ActionPill
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
@@ -36,12 +31,18 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 @Composable
 fun DevicesScreen(
     onDeviceClick: (String) -> Unit,
+    columns: Int = 2,
     viewModel: DevicesViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var search by rememberSaveable { mutableStateOf("") }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
+    // Pending room actions kept as id+name strings so they survive rotation (RNF5).
+    var renameRoomId by rememberSaveable { mutableStateOf<String?>(null) }
+    var renameRoomName by rememberSaveable { mutableStateOf("") }
+    var deleteRoomId by rememberSaveable { mutableStateOf<String?>(null) }
+    var deleteRoomName by rememberSaveable { mutableStateOf("") }
 
     val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
     val noRoomLabel = stringResource(R.string.room_none)
@@ -61,10 +62,13 @@ fun DevicesScreen(
             onValueChange = { search = it },
             placeholder = stringResource(R.string.search_device)
         )
-        FiltersRow(
-            onAddDevice = { showAddDevice = true },
-            onAddRoom = { showAddRoom = true }
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.End)
+        ) {
+            ActionPill(text = stringResource(R.string.new_device), onClick = { showAddDevice = true })
+            ActionPill(text = stringResource(R.string.new_room), onClick = { showAddRoom = true })
+        }
 
         when (val s = state) {
             is DevicesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
@@ -77,13 +81,15 @@ fun DevicesScreen(
                 if (grouped.isEmpty()) {
                     StatusMessage(stringResource(R.string.empty_devices))
                 } else {
-                    grouped.forEach { (roomName, devices) ->
+                    grouped.forEach { group ->
                         RoomCard(
-                            roomName = roomName,
-                            devices  = devices,
+                            group    = group,
+                            columns  = columns,
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
                             onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
-                            onOpen = { device -> onDeviceClick(device.id) }
+                            onOpen = { device -> onDeviceClick(device.id) },
+                            onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
+                            onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
                         )
                     }
                 }
@@ -108,101 +114,95 @@ fun DevicesScreen(
             }
         )
     }
+
+    renameRoomId?.let { id ->
+        RenameDialog(
+            title = stringResource(R.string.rename_room_title),
+            label = stringResource(R.string.room_name_label),
+            initial = renameRoomName,
+            onConfirm = { newName -> viewModel.renameRoom(id, newName); renameRoomId = null },
+            onDismiss = { renameRoomId = null }
+        )
+    }
+
+    deleteRoomId?.let { id ->
+        AlertDialog(
+            onDismissRequest = { deleteRoomId = null },
+            containerColor = Surface,
+            title = { Text(stringResource(R.string.delete_room_title), color = TextPrimary, fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.delete_room_message, deleteRoomName), color = TextSecondary) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.deleteRoom(id); deleteRoomId = null }) {
+                    Text(stringResource(R.string.delete_confirm), color = ErrorColor, fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteRoomId = null }) {
+                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                }
+            }
+        )
+    }
 }
 
-/** Filters by search query and groups devices by room name. */
+/** A room (or the "no room" bucket, roomId = null) with the devices shown under it. */
+private data class RoomGroup(val roomId: String?, val name: String, val devices: List<Device>)
+
+/** Filters by search query and groups devices by room. */
 private fun groupDevicesByRoom(
     devices: List<Device>,
     rooms: List<Room>,
     search: String,
     noRoomLabel: String
-): List<Pair<String, List<Device>>> {
+): List<RoomGroup> {
     val filtered = if (search.isBlank()) devices
                    else devices.filter { it.name.contains(search, ignoreCase = true) }
     val byRoomId = filtered.groupBy { it.room?.id }
-    val ordered  = mutableListOf<Pair<String, List<Device>>>()
+    val ordered  = mutableListOf<RoomGroup>()
     rooms.forEach { r ->
-        byRoomId[r.id]?.takeIf { it.isNotEmpty() }?.let { ordered += r.name to it }
+        byRoomId[r.id]?.takeIf { it.isNotEmpty() }?.let { ordered += RoomGroup(r.id, r.name, it) }
     }
-    byRoomId[null]?.takeIf { it.isNotEmpty() }?.let { ordered += noRoomLabel to it }
+    byRoomId[null]?.takeIf { it.isNotEmpty() }?.let { ordered += RoomGroup(null, noRoomLabel, it) }
     return ordered
-}
-
-// ─── Filters row ──────────────────────────────────────────────────────────────
-@Composable
-private fun FiltersRow(
-    onAddDevice: () -> Unit,
-    onAddRoom: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = null,
-                tint = TextPrimary,
-                modifier = Modifier.size(IconSize.sm)
-            )
-            Spacer(Modifier.width(Spacing.xs))
-            Text(
-                text = stringResource(R.string.filters),
-                color = TextPrimary,
-                fontSize = TextSize.md,
-                textDecoration = TextDecoration.Underline
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            ActionPillButton(text = stringResource(R.string.new_device), onClick = onAddDevice)
-            ActionPillButton(text = stringResource(R.string.new_room),   onClick = onAddRoom)
-        }
-    }
-}
-
-@Composable
-private fun ActionPillButton(text: String, onClick: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(Radius.card),
-        color = AccentDark,
-        modifier = Modifier.clickable(onClick = onClick)
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = TextSize.sm,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs)
-        )
-    }
 }
 
 // ─── Room card ────────────────────────────────────────────────────────────────
 @Composable
 private fun RoomCard(
-    roomName: String,
-    devices: List<Device>,
+    group: RoomGroup,
+    columns: Int,
     onToggle: (Device, Boolean) -> Unit,
     onToggleFavorite: (Device) -> Unit,
-    onOpen: (Device) -> Unit
+    onOpen: (Device) -> Unit,
+    onRenameRoom: () -> Unit,
+    onDeleteRoom: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(BorderStroke(1.dp, AccentDark.copy(alpha = 0.6f)), RoundedCornerShape(Radius.card))
+            .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(Radius.card))
             .padding(Spacing.base)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
-            Text(
-                text = roomName,
-                color = TextPrimary,
-                fontSize = TextSize.xxl,
-                fontWeight = FontWeight.SemiBold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = group.name,
+                    color = TextPrimary,
+                    fontSize = TextSize.xxl,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+                // Rename/delete only for real rooms (not the "no room" bucket).
+                if (group.roomId != null) {
+                    OverflowMenu(
+                        contentDescription = stringResource(R.string.cd_room_options),
+                        onRename = onRenameRoom,
+                        onDelete = onDeleteRoom
+                    )
+                }
+            }
 
-            devices.chunked(2).forEach { rowDevices ->
+            group.devices.chunked(columns).forEach { rowDevices ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Spacing.base)
@@ -218,7 +218,7 @@ private fun RoomCard(
                             )
                         }
                     }
-                    if (rowDevices.size == 1) Spacer(Modifier.weight(1f))
+                    repeat(columns - rowDevices.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
         }

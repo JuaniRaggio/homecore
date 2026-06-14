@@ -30,6 +30,21 @@ decisions live in [`design-tokens.md`](../design-tokens.md).
 No local backend is required: the app uses the remote course API at
 `https://hci.it.itba.edu.ar/api/`.
 
+## Configuration (API key)
+
+The API key is **not** in source. Add it to `local.properties` (git-ignored) before
+building:
+
+```properties
+HCI_API_KEY=<your group API key>
+# optional, defaults to the course API:
+HCI_API_BASE_URL=https://hci.it.itba.edu.ar/api/
+```
+
+These are exposed to the app via `BuildConfig.API_KEY` / `BuildConfig.API_BASE_URL`
+(wired in `app/build.gradle.kts`). Without `HCI_API_KEY` the app still builds, but API
+requests will fail.
+
 ## Build & run
 
 Open the `homecore-mobile/` project in Android Studio and run it on an emulator

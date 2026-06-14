@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,10 +39,12 @@ fun AddDeviceSheet(
     onCreate: (name: String, typeName: String, roomId: String?) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var step by remember { mutableStateOf(AddDeviceStep.TYPE) }
-    var selectedType by remember { mutableStateOf<DeviceTypeOption?>(null) }
-    var name by remember { mutableStateOf("") }
-    var selectedRoomId by remember { mutableStateOf<String?>(null) }
+    var step by rememberSaveable { mutableStateOf(AddDeviceStep.TYPE) }
+    // Store the type by its stable name so the selection survives rotation (RNF5).
+    var selectedTypeName by rememberSaveable { mutableStateOf<String?>(null) }
+    var name by rememberSaveable { mutableStateOf("") }
+    var selectedRoomId by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedType = selectableDeviceTypes.firstOrNull { it.typeName == selectedTypeName }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -72,7 +75,7 @@ fun AddDeviceSheet(
                                 DeviceTypeTile(
                                     option = option,
                                     selected = option == selectedType,
-                                    onClick = { selectedType = option },
+                                    onClick = { selectedTypeName = option.typeName },
                                     modifier = Modifier.weight(1f)
                                 )
                             }
@@ -106,7 +109,7 @@ fun AddDeviceSheet(
                         fontWeight = FontWeight.SemiBold
                     )
                     RoomChip(
-                        label = stringResource(R.string.room_optional),
+                        label = stringResource(R.string.room_none),
                         selected = selectedRoomId == null,
                         onClick = { selectedRoomId = null },
                         modifier = Modifier.fillMaxWidth()
@@ -214,7 +217,7 @@ fun AddRoomSheet(
     onCreate: (name: String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var name by remember { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
