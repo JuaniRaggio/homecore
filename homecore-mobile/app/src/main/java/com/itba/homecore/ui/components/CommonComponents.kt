@@ -156,7 +156,7 @@ fun HcButton(
         colors = ButtonDefaults.buttonColors(containerColor = containerColor)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(IconSize.md), color = OnAccent, strokeWidth = 2.dp)
+            CircularProgressIndicator(modifier = Modifier.size(IconSize.md), color = OnAccent, strokeWidth = Stroke.indicator)
         } else {
             Text(text = text, color = OnAccent, fontWeight = FontWeight.SemiBold, fontSize = TextSize.xl)
         }
