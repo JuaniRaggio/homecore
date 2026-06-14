@@ -34,4 +34,6 @@ suspend fun <T> apiCall(fallback: String, block: suspend () -> T): T = try {
     throw Exception(e.friendlyMessage(fallback))
 } catch (e: IOException) {
     throw Exception("No se pudo conectar. Verificá tu conexión a internet.")
+} catch (e: Exception) {
+    throw Exception(fallback)
 }
