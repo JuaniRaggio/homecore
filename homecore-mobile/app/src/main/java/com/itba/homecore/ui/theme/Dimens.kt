@@ -73,6 +73,37 @@ object TextSize {
 
 /** Layout weights for Row/Column children, so call sites avoid the bare 1f literal. */
 object Weight {
-    /** One equal share: fills the remaining space (spacers) or distributes evenly (cells). */
     const val Fill = 1f
 }
+
+/** Opacity values for borders, washes and disabled states (named to convey intent). */
+object Alpha {
+    const val opaque = 1f          
+    const val disabled = 0.4f      
+    const val hairlineBorder = 0.4f
+    const val outlineBorder = 0.5f 
+    const val strongBorder = 0.6f  
+    const val chipBorder = 0.3f    
+    const val tileBorder = 0.25f   
+    const val iconWash = 0.18f     
+    const val selectedWash = 0.15f 
+}
+
+/** Stroke widths used for borders and progress indicators. */
+object Stroke {
+    val hairline = 1.dp   // default 1dp border
+    val selected = 2.dp   // emphasized border (selected tile)
+    val indicator = 2.dp  // circular progress indicator
+}
+
+/** Line heights for compact card text (paired with TextSize.sm/lg). */
+object LineHeight {
+    val compact = 16.sp
+    val normal = 18.sp
+}
+
+/** Scale factor applied to Material Switches so they fit the compact cards. */
+const val SwitchScale = 0.85f
+
+/** Curtain (blinds) open/close step, matching the web's 20% increments. */
+const val CurtainStep = 20

@@ -97,7 +97,7 @@ fun DeviceCard(
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onAction: (String) -> Unit = {}
+    onAction: (action: String, params: List<Any>) -> Unit = { _, _ -> }
 ) {
     val cat        = device.category()
     val isOn       = device.isOn()
@@ -215,7 +215,7 @@ private fun DeviceCardFooter(
     cat: DeviceCategory,
     isOn: Boolean,
     onToggle: (Boolean) -> Unit,
-    onAction: (String) -> Unit
+    onAction: (action: String, params: List<Any>) -> Unit
 ) {
     when (cat) {
         DeviceCategory.ALARM -> StatusBadge(
@@ -254,15 +254,23 @@ private fun DeviceCardFooter(
             ToggleRow(isOn, onToggle)
         }
 
-        DeviceCategory.BLINDS -> Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("${device.state?.level ?: 0}%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
-            Spacer(Modifier.weight(Weight.Fill))
-            CardIconButton(Icons.Default.KeyboardArrowUp) { onAction("up") }
-            Spacer(Modifier.width(Spacing.sm))
-            CardIconButton(Icons.Default.KeyboardArrowDown) { onAction("down") }
+        DeviceCategory.BLINDS -> {
+            // Step the level by CurtainStep (web parity) instead of fully opening/closing.
+            val level = device.state?.level ?: 0
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("$level%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
+                Spacer(Modifier.weight(Weight.Fill))
+                CardIconButton(Icons.Default.KeyboardArrowUp, enabled = level < 100) {
+                    onAction("setLevel", listOf((level + CurtainStep).coerceAtMost(100)))
+                }
+                Spacer(Modifier.width(Spacing.sm))
+                CardIconButton(Icons.Default.KeyboardArrowDown, enabled = level > 0) {
+                    onAction("setLevel", listOf((level - CurtainStep).coerceAtLeast(0)))
+                }
+            }
         }
 
         else -> if (DeviceCapabilities.quickToggle(cat) != null) ToggleRow(isOn, onToggle)
@@ -328,7 +336,7 @@ private fun SpeakerFooter(
     device: Device,
     isOn: Boolean,
     onToggle: (Boolean) -> Unit,
-    onAction: (String) -> Unit
+    onAction: (action: String, params: List<Any>) -> Unit
 ) {
     val playing = device.state?.status?.lowercase() == "playing"
     Row(
@@ -336,12 +344,12 @@ private fun SpeakerFooter(
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         CardIconButton(Icons.Default.PowerSettingsNew, highlighted = isOn) { onToggle(!isOn) }
-        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong") }
+        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong", emptyList()) }
         CardIconButton(
             if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
             accent = true
-        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume") }
-        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong") }
+        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume", emptyList()) }
+        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong", emptyList()) }
     }
 }
 

@@ -89,7 +89,7 @@ fun DevicesScreen(
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
                             onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
                             onOpen = { device -> onDeviceClick(device.id) },
-                            onDeviceAction = { device, action -> viewModel.runAction(device.id, action) },
+                            onDeviceAction = { device, action, params -> viewModel.runAction(device.id, action, params) },
                             onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
                             onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
                         )
@@ -176,7 +176,7 @@ private fun RoomCard(
     onToggle: (Device, Boolean) -> Unit,
     onToggleFavorite: (Device) -> Unit,
     onOpen: (Device) -> Unit,
-    onDeviceAction: (Device, String) -> Unit,
+    onDeviceAction: (Device, String, List<Any>) -> Unit,
     onRenameRoom: () -> Unit,
     onDeleteRoom: () -> Unit
 ) {
@@ -213,7 +213,7 @@ private fun RoomCard(
                         onFavoriteClick = { onToggleFavorite(device) },
                         modifier = cell,
                         onClick = { onOpen(device) },
-                        onAction = { action -> onDeviceAction(device, action) }
+                        onAction = { action, params -> onDeviceAction(device, action, params) }
                     )
                 }
             }

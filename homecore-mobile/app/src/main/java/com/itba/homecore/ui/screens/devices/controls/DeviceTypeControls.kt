@@ -164,14 +164,16 @@ private fun DispenseControl(onAction: OnAction) {
 // -- Curtain (blinds) --------------------------------------------------------------
 @Composable
 fun CurtainControls(device: Device, onAction: OnAction) {
+    val level = device.state?.level ?: 0
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
+        // Up/down step by CurtainStep (web parity) for precise control; the slider sets any value.
         ControlButtonsRow(
-            stringResource(R.string.act_up) to { onAction("up", emptyList()) },
-            stringResource(R.string.act_down) to { onAction("down", emptyList()) }
+            stringResource(R.string.act_up) to { onAction("setLevel", listOf((level + CurtainStep).coerceAtMost(100))) },
+            stringResource(R.string.act_down) to { onAction("setLevel", listOf((level - CurtainStep).coerceAtLeast(0))) }
         )
         ControlSlider(
             label = stringResource(R.string.act_position),
-            initial = device.state?.level ?: 0,
+            initial = level,
             min = 0, max = 100, unit = "%"
         ) { onAction("setLevel", listOf(it)) }
     }
