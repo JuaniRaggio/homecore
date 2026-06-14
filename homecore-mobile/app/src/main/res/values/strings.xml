@@ -91,6 +91,7 @@
     <string name="routine_delete_message">¿Eliminar la rutina \'%1$s\'?</string>
     <string name="routine_pick_device">Elegí un dispositivo</string>
     <string name="routine_pick_action">Elegí una acción</string>
+    <string name="routine_no_schedule_error">No se puede activar una rutina sin días programados. Usá \"Ejecutar ahora\" para correrla.</string>
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>

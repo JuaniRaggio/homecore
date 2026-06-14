@@ -91,6 +91,7 @@
     <string name="routine_delete_message">Delete routine \'%1$s\'?</string>
     <string name="routine_pick_device">Pick a device</string>
     <string name="routine_pick_action">Pick an action</string>
+    <string name="routine_no_schedule_error">A routine with no scheduled days can\'t be activated. Use \"Run now\" to run it.</string>
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>

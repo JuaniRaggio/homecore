@@ -150,11 +150,11 @@ private fun DeviceTypeTile(
     modifier: Modifier = Modifier
 ) {
     val accent = deviceColorFor(option.category)
-    val border = if (selected) accent else Accent.copy(alpha = 0.25f)
+    val border = if (selected) accent else Accent.copy(alpha = Alpha.tileBorder)
     Column(
         modifier = modifier
             .background(Background, RoundedCornerShape(Radius.xl))
-            .border(BorderStroke(if (selected) 2.dp else 1.dp, border), RoundedCornerShape(Radius.xl))
+            .border(BorderStroke(if (selected) Stroke.selected else Stroke.hairline, border), RoundedCornerShape(Radius.xl))
             .clickable(onClick = onClick)
             .padding(vertical = Spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -163,7 +163,7 @@ private fun DeviceTypeTile(
         Box(
             modifier = Modifier
                 .size(IconSize.tile)
-                .background(accent.copy(alpha = 0.18f), CircleShape),
+                .background(accent.copy(alpha = Alpha.iconWash), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -189,12 +189,12 @@ private fun RoomChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val border = if (selected) AccentDark else Accent.copy(alpha = 0.3f)
-    val bg = if (selected) AccentDark.copy(alpha = 0.15f) else Color.Transparent
+    val border = if (selected) AccentDark else Accent.copy(alpha = Alpha.chipBorder)
+    val bg = if (selected) AccentDark.copy(alpha = Alpha.selectedWash) else Color.Transparent
     Box(
         modifier = modifier
             .background(bg, RoundedCornerShape(Radius.lg))
-            .border(BorderStroke(1.dp, border), RoundedCornerShape(Radius.lg))
+            .border(BorderStroke(Stroke.hairline, border), RoundedCornerShape(Radius.lg))
             .clickable(onClick = onClick)
             .padding(vertical = Spacing.base),
         contentAlignment = Alignment.Center

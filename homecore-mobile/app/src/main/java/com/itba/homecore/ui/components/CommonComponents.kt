@@ -52,7 +52,7 @@ fun <T> UniformGrid(
     columns: Int,
     modifier: Modifier = Modifier,
     spacing: Dp = Spacing.base,
-    maxHeightFraction: Float = 0.32f,
+    maxHeightFraction: Float = Fraction.gridMaxHeight,
     itemContent: @Composable (item: T, cellModifier: Modifier) -> Unit
 ) {
     if (items.isEmpty()) return
@@ -156,7 +156,7 @@ fun HcButton(
         colors = ButtonDefaults.buttonColors(containerColor = containerColor)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(IconSize.md), color = OnAccent, strokeWidth = 2.dp)
+            CircularProgressIndicator(modifier = Modifier.size(IconSize.md), color = OnAccent, strokeWidth = Stroke.indicator)
         } else {
             Text(text = text, color = OnAccent, fontWeight = FontWeight.SemiBold, fontSize = TextSize.xl)
         }

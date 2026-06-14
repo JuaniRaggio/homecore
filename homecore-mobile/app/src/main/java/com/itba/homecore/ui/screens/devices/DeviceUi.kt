@@ -97,7 +97,7 @@ fun DeviceCard(
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    onAction: (String) -> Unit = {}
+    onAction: (action: String, params: List<Any>) -> Unit = { _, _ -> }
 ) {
     val cat        = device.category()
     val isOn       = device.isOn()
@@ -106,7 +106,7 @@ fun DeviceCard(
     val isLamp     = cat == DeviceCategory.LAMP
     val highlight  = isDoor && device.state?.status?.lowercase() in listOf("locked", "closed")
 
-    val borderColor = if (highlight) AccentDark else Accent.copy(alpha = 0.4f)
+    val borderColor = if (highlight) AccentDark else Accent.copy(alpha = Alpha.hairlineBorder)
     val iconBg      = if (isLamp) LampIconBg else Color.Transparent
     val iconTint    = if (isLamp) DeviceLight else TextPrimary
     val roomLabel   = device.room?.name ?: stringResource(R.string.room_none)
@@ -114,7 +114,7 @@ fun DeviceCard(
     Box(
         modifier = modifier
             .background(Surface, RoundedCornerShape(Radius.xl))
-            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(Radius.xl))
+            .border(BorderStroke(Stroke.hairline, borderColor), RoundedCornerShape(Radius.xl))
             .clickable(onClick = onClick)
             .padding(Spacing.base)
     ) {
@@ -157,14 +157,14 @@ fun DeviceCard(
                 color = TextPrimary,
                 fontSize = TextSize.lg,
                 fontWeight = FontWeight.SemiBold,
-                lineHeight = 18.sp
+                lineHeight = LineHeight.normal
             )
             Spacer(Modifier.height(Spacing.xs))
             Text(
                 text = roomLabel,
                 color = TextSecondary,
                 fontSize = TextSize.sm,
-                lineHeight = 16.sp
+                lineHeight = LineHeight.compact
             )
             Spacer(Modifier.height(Spacing.xs))
             Text(
@@ -215,7 +215,7 @@ private fun DeviceCardFooter(
     cat: DeviceCategory,
     isOn: Boolean,
     onToggle: (Boolean) -> Unit,
-    onAction: (String) -> Unit
+    onAction: (action: String, params: List<Any>) -> Unit
 ) {
     when (cat) {
         DeviceCategory.ALARM -> StatusBadge(
@@ -254,15 +254,23 @@ private fun DeviceCardFooter(
             ToggleRow(isOn, onToggle)
         }
 
-        DeviceCategory.BLINDS -> Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("${device.state?.level ?: 0}%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
-            Spacer(Modifier.weight(Weight.Fill))
-            CardIconButton(Icons.Default.KeyboardArrowUp) { onAction("up") }
-            Spacer(Modifier.width(Spacing.sm))
-            CardIconButton(Icons.Default.KeyboardArrowDown) { onAction("down") }
+        DeviceCategory.BLINDS -> {
+            // Step the level by CurtainStep (web parity) instead of fully opening/closing.
+            val level = device.state?.level ?: 0
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("$level%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
+                Spacer(Modifier.weight(Weight.Fill))
+                CardIconButton(Icons.Default.KeyboardArrowUp, enabled = level < 100) {
+                    onAction("setLevel", listOf((level + CurtainStep).coerceAtMost(100)))
+                }
+                Spacer(Modifier.width(Spacing.sm))
+                CardIconButton(Icons.Default.KeyboardArrowDown, enabled = level > 0) {
+                    onAction("setLevel", listOf((level - CurtainStep).coerceAtLeast(0)))
+                }
+            }
         }
 
         else -> if (DeviceCapabilities.quickToggle(cat) != null) ToggleRow(isOn, onToggle)
@@ -279,7 +287,7 @@ private fun StatusBadge(
 ) {
     Row(
         modifier = Modifier
-            .border(BorderStroke(1.dp, color), RoundedCornerShape(Radius.lg))
+            .border(BorderStroke(Stroke.hairline, color), RoundedCornerShape(Radius.lg))
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = Spacing.base, vertical = Spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
@@ -304,7 +312,7 @@ private fun ToggleRow(isOn: Boolean, onToggle: (Boolean) -> Unit) {
                 uncheckedTrackColor  = ToggleOff,
                 uncheckedBorderColor = Color.Transparent
             ),
-            modifier = Modifier.scale(0.85f)
+            modifier = Modifier.scale(SwitchScale)
         )
     }
 }
@@ -328,7 +336,7 @@ private fun SpeakerFooter(
     device: Device,
     isOn: Boolean,
     onToggle: (Boolean) -> Unit,
-    onAction: (String) -> Unit
+    onAction: (action: String, params: List<Any>) -> Unit
 ) {
     val playing = device.state?.status?.lowercase() == "playing"
     Row(
@@ -336,12 +344,12 @@ private fun SpeakerFooter(
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         CardIconButton(Icons.Default.PowerSettingsNew, highlighted = isOn) { onToggle(!isOn) }
-        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong") }
+        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong", emptyList()) }
         CardIconButton(
             if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
             accent = true
-        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume") }
-        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong") }
+        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume", emptyList()) }
+        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong", emptyList()) }
     }
 }
 
@@ -364,9 +372,9 @@ private fun CardIconButton(
         modifier = Modifier
             .size(IconSize.box)
             .background(bg, RoundedCornerShape(Radius.md))
-            .border(BorderStroke(1.dp, Accent.copy(alpha = 0.4f)), RoundedCornerShape(Radius.md))
+            .border(BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)), RoundedCornerShape(Radius.md))
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
-            .alpha(if (enabled) 1f else 0.4f),
+            .alpha(if (enabled) Alpha.opaque else Alpha.disabled),
         contentAlignment = Alignment.Center
     ) {
         Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(IconSize.md))

@@ -118,7 +118,7 @@ fun DashboardScreen(
                                     onFavoriteClick = { devicesVm.toggleFavorite(d) },
                                     modifier = cell,
                                     onClick = { onDeviceClick(d.id) },
-                                    onAction = { devicesVm.runAction(d.id, it) }
+                                    onAction = { action, params -> devicesVm.runAction(d.id, action, params) }
                                 )
                             }
                         }
@@ -162,7 +162,7 @@ private fun FavoriteRoutineCard(
                     text = sched,
                     color = Accent,
                     fontSize = TextSize.base,
-                    lineHeight = 16.sp
+                    lineHeight = LineHeight.compact
                 )
             }
             Row(

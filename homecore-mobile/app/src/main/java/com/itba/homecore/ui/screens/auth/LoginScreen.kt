@@ -64,7 +64,6 @@ fun LoginScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = Spacing.huge, vertical = Spacing.huge2)
         ) {
-            // Logo
             Box(
                 modifier = Modifier.size(IconSize.logo).background(Accent, CircleShape),
                 contentAlignment = Alignment.Center
