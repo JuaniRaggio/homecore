@@ -170,4 +170,15 @@
     <string name="act_amount">Amount</string>
     <string name="act_unit">Unit</string>
     <string name="device_detail_title">Device detail</string>
+
+    <!-- Feedback / misc actions -->
+    <string name="not_available_yet">Not available yet</string>
+    <string name="no_new_notifications">No new notifications</string>
+    <string name="routine_executed">Routine executed</string>
+
+    <!-- Change password (RF4) -->
+    <string name="cp_title">Change password</string>
+    <string name="cp_current">Current password</string>
+    <string name="cp_save">Save</string>
+    <string name="cp_success">Password updated</string>
 </resources>

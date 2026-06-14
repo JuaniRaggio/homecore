@@ -221,11 +221,13 @@ Actualmente no está implementado, pero si lo agregan:
 
 **No hay backend local.** Web y mobile usan la misma API remota hosteada por la cátedra:
 
-**Mobile:**
-```kotlin
-// data/api/ApiClient.kt (valor real en el código)
-private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
+**Mobile:** la base URL y la API key NO están en el código. Salen de `BuildConfig` (`app/build.gradle.kts`), que las lee de `local.properties` (git-ignored) o variables de entorno:
+```properties
+# homecore-mobile/local.properties
+HCI_API_KEY=<api key del grupo>
+HCI_API_BASE_URL=https://hci.it.itba.edu.ar/api/   # opcional; default ya apunta acá
 ```
+`ApiClient` usa `BuildConfig.API_KEY` y `BuildConfig.API_BASE_URL`. Si falta `HCI_API_KEY`, la app compila pero las requests fallan (hay que setearla).
 
 **Web:**
 ```env
@@ -236,7 +238,7 @@ VITE_API_KEY=<api key del grupo>
 
 ### Autenticación
 
-Toda request lleva el header `X-API-Key` (constante `API_KEY` en `ApiClient.kt`). Las requests autenticadas agregan además **JWT**:
+Toda request lleva el header `X-API-Key` (desde `BuildConfig.API_KEY`). Las requests autenticadas agregan además **JWT**:
 ```
 Authorization: Bearer <token>
 ```
@@ -719,7 +721,7 @@ https://hci.it.itba.edu.ar/api/   (API remota de la cátedra; la usan web y mobi
 ```
 
 ### Autenticación
-Toda request lleva `X-API-Key`. Las autenticadas agregan:
+Toda request lleva `X-API-Key` (inyectada desde `BuildConfig`, no hardcodeada). Las autenticadas agregan:
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```

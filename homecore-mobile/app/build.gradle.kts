@@ -1,8 +1,23 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+// Config is kept out of source: the API key (secret) and base URL are read from
+// local.properties (git-ignored) or env vars, and exposed via BuildConfig. The base
+// URL falls back to the course default so a fresh checkout builds without extra setup.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) FileInputStream(f).use { load(it) }
+}
+val hciApiKey: String = localProps.getProperty("HCI_API_KEY") ?: System.getenv("HCI_API_KEY") ?: ""
+val hciApiBaseUrl: String = localProps.getProperty("HCI_API_BASE_URL")
+    ?: System.getenv("HCI_API_BASE_URL")
+    ?: "https://hci.it.itba.edu.ar/api/"
 
 android {
     namespace = "com.itba.homecore"
@@ -15,6 +30,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", "\"$hciApiKey\"")
+        buildConfigField("String", "API_BASE_URL", "\"$hciApiBaseUrl\"")
     }
 
     buildTypes {
