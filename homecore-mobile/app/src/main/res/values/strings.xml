@@ -52,6 +52,45 @@
     <string name="device_on_pct">Encendida %d%%</string>
     <string name="device_off_label">Apagada</string>
     <string name="room_none">Sin habitación</string>
+
+    <!-- Estado y badges de la card de dispositivo (por tipo, espeja la web) -->
+    <string name="card_status_on">Encendido</string>
+    <string name="card_status_off">Apagado</string>
+    <string name="card_status_open">Abierta</string>
+    <string name="card_status_closed">Cerrada</string>
+    <string name="card_status_armed">Activada</string>
+    <string name="card_status_disarmed">Desactivada</string>
+    <string name="card_status_playing">Reproduciendo</string>
+    <string name="card_status_paused">Pausado</string>
+    <string name="card_status_stopped">Detenido</string>
+    <string name="card_status_active">Activa</string>
+    <string name="card_status_docked">En la base</string>
+    <string name="badge_armed">Armada</string>
+    <string name="badge_disarmed">Desarmada</string>
+    <string name="badge_open">Abierta</string>
+    <string name="badge_closed">Cerrada</string>
+    <string name="badge_locked">Bloqueada</string>
+    <string name="card_status_unlocked">Desbloqueada</string>
+    <string name="act_state">Estado</string>
+    <string name="card_label_mode">Modo</string>
+    <string name="card_label_temp">Temp</string>
+
+    <!-- Editor de rutinas -->
+    <string name="routine_new_title">Nueva rutina</string>
+    <string name="routine_edit_title">Editar rutina</string>
+    <string name="routine_name_label">Nombre</string>
+    <string name="routine_description_label">Descripción</string>
+    <string name="routine_time_label">Horario</string>
+    <string name="routine_days_label">Días</string>
+    <string name="routine_active_label">Activa</string>
+    <string name="routine_actions_label">Acciones</string>
+    <string name="routine_add_action">Agregar acción</string>
+    <string name="routine_no_actions">Todavía no hay acciones</string>
+    <string name="routine_execute">Ejecutar rutina</string>
+    <string name="routine_delete_title">¿Eliminar rutina?</string>
+    <string name="routine_delete_message">¿Eliminar la rutina \'%1$s\'?</string>
+    <string name="routine_pick_device">Elegí un dispositivo</string>
+    <string name="routine_pick_action">Elegí una acción</string>
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
@@ -100,6 +139,9 @@
     <string name="devices_running">Dispositivos\nfuncionando</string>
     <string name="history">Historial</string>
     <string name="no_recent_events">Sin eventos recientes</string>
+    <string name="history_turned_on">Encendiste %1$s</string>
+    <string name="history_turned_off">Apagaste %1$s</string>
+    <string name="minutes_ago">Hace %1$d min</string>
     <string name="logout">Cerrar sesión</string>
     <string name="logout_title">¿Cerrar sesión?</string>
     <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>
@@ -173,6 +215,35 @@
     <string name="act_amount">Cantidad</string>
     <string name="act_unit">Unidad</string>
     <string name="device_detail_title">Detalle del dispositivo</string>
+
+    <!-- Etiquetas para los valores canonicos que espera la API (modos, generos, unidades) -->
+    <string name="ac_mode_cool">Frío</string>
+    <string name="ac_mode_heat">Calor</string>
+    <string name="ac_mode_fan">Ventilación</string>
+    <string name="genre_classical">Clásica</string>
+    <string name="genre_country">Country</string>
+    <string name="genre_dance">Dance</string>
+    <string name="genre_latina">Latina</string>
+    <string name="genre_pop">Pop</string>
+    <string name="genre_rock">Rock</string>
+    <string name="vacuum_mode_vacuum">Aspirar</string>
+    <string name="vacuum_mode_mop">Trapear</string>
+    <string name="fridge_mode_default">Normal</string>
+    <string name="fridge_mode_vacation">Vacaciones</string>
+    <string name="fridge_mode_party">Fiesta</string>
+    <string name="oven_heat_conventional">Convencional</string>
+    <string name="oven_heat_bottom">Abajo</string>
+    <string name="oven_heat_top">Arriba</string>
+    <string name="oven_grill_large">Completo</string>
+    <string name="oven_grill_eco">Económico</string>
+    <string name="oven_grill_off">Apagado</string>
+    <string name="oven_conv_normal">Normal</string>
+    <string name="oven_conv_eco">Económico</string>
+    <string name="oven_conv_off">Apagado</string>
+    <string name="unit_ml">Mililitros</string>
+    <string name="unit_cl">Centilitros</string>
+    <string name="unit_dl">Decilitros</string>
+    <string name="unit_l">Litros</string>
 
     <!-- Feedback / acciones varias -->
     <string name="not_available_yet">Función no disponible todavía</string>

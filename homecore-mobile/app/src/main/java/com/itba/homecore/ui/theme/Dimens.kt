@@ -70,3 +70,9 @@ object TextSize {
     val headline = 24.sp
     val display  = 28.sp
 }
+
+/** Layout weights for Row/Column children, so call sites avoid the bare 1f literal. */
+object Weight {
+    /** One equal share: fills the remaining space (spacers) or distributes evenly (cells). */
+    const val Fill = 1f
+}

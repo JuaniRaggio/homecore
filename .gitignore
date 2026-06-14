@@ -25,6 +25,10 @@ Desktop.ini
 # IDEs (configuraciones locales - cada sub-proyecto tiene su propio .gitignore para cosas específicas)
 .vscode/
 .idea/
+# Eclipse / generated IDE project files
+.project
+.classpath
+.settings/
 
 # Claude Code context (SÍ commitear)
 # .claude/CLAUDE.md se debe versionar

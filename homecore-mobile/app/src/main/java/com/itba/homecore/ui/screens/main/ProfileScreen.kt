@@ -400,7 +400,7 @@ private fun ChangePasswordSheet(
                     color = TextPrimary,
                     fontSize = TextSize.xl,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(Weight.Fill)
                 )
                 Icon(
                     imageVector = Icons.Default.Close,

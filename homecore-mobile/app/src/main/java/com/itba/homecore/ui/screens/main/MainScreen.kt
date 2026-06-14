@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,9 +47,8 @@ fun MainScreen(onLogout: () -> Unit = {}) {
     var selected by rememberSaveable { mutableStateOf(Tab.HOME) }
     var detailDeviceId by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val tabStateHolder = rememberSaveableStateHolder()
 
-    // Shared instance across tabs and the detail screen, so an action in the detail
-    // reflects in the lists (Compose returns the same VM for the activity store owner).
     val devicesVm: DevicesViewModel = viewModel()
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
     val detailDevice = detailDeviceId?.let { id ->
@@ -84,17 +84,19 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                 onBack = { detailDeviceId = null }
             )
         } else {
-            when (selected) {
-                Tab.HOME     -> DashboardScreen(
-                    onDeviceClick = openDevice,
-                    onSeeAllRoutines = { selected = Tab.ROUTINES },
-                    onSeeAllDevices = { selected = Tab.DEVICES },
-                    columns = columns
-                )
-                Tab.DEVICES  -> DevicesScreen(onDeviceClick = openDevice, columns = columns)
-                Tab.ROUTINES -> RoutinesScreen()
-                Tab.HOMES    -> HomesScreen()
-                Tab.PROFILE  -> ProfileScreen(onLogout = onLogout)
+            tabStateHolder.SaveableStateProvider(selected) {
+                when (selected) {
+                    Tab.HOME     -> DashboardScreen(
+                        onDeviceClick = openDevice,
+                        onSeeAllRoutines = { selected = Tab.ROUTINES },
+                        onSeeAllDevices = { selected = Tab.DEVICES },
+                        columns = columns
+                    )
+                    Tab.DEVICES  -> DevicesScreen(onDeviceClick = openDevice, columns = columns)
+                    Tab.ROUTINES -> RoutinesScreen()
+                    Tab.HOMES    -> HomesScreen()
+                    Tab.PROFILE  -> ProfileScreen(onLogout = onLogout)
+                }
             }
         }
     }
@@ -120,7 +122,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                     }
                 }
             }
-            Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+            Box(modifier = Modifier.weight(Weight.Fill).fillMaxSize()) {
                 content()
                 SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
             }

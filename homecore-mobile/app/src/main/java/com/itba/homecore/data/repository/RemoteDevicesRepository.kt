@@ -20,7 +20,19 @@ class RemoteDevicesRepository : DevicesRepository {
     private var typesCache: List<DeviceType>? = null
 
     override suspend fun getDevices(): Result<List<Device>> = runCatching {
-        apiCall("Error al obtener dispositivos") { devicesApi.getAllDevices() }
+        apiCall("Error al obtener dispositivos") {
+            // The /devices payload carries the type id but not its name, so resolve the
+            // name from the /devicetypes catalog (same as the web). Without this every
+            // device falls back to OTHER and shows no type-specific controls.
+            val devices = devicesApi.getAllDevices()
+            val types = deviceTypes()
+            devices.map { d ->
+                if (d.type.name.isBlank() && d.type.id.isNotBlank()) {
+                    val name = types.firstOrNull { it.id == d.type.id }?.name
+                    if (name != null) d.copy(type = d.type.copy(name = name)) else d
+                } else d
+            }
+        }
     }
 
     override suspend fun executeAction(deviceId: String, action: String, params: List<Any>): Result<Unit> = runCatching {

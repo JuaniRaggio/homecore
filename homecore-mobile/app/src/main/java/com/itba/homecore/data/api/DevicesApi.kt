@@ -32,13 +32,11 @@ interface DevicesApi {
     @DELETE("devices/{id}")
     suspend fun deleteDevice(@Path("id") id: String)
 
-    // Return the raw body: the API's response shape for an action is not used, and
-    // declaring a concrete type (e.g. Boolean) makes Gson throw if it differs.
     @PATCH("devices/{id}/{action}")
     suspend fun executeAction(
         @Path("id") id: String,
         @Path("action") action: String,
-        @Body params: List<Any> = emptyList()
+        @Body params: List<@JvmSuppressWildcards Any> = emptyList()
     ): ResponseBody
 
     /** Type catalog: maps the canonical name ("lamp", "door", ...) to the id required by POST /devices. */

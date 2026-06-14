@@ -23,6 +23,7 @@ import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
+import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
@@ -88,6 +89,7 @@ fun DevicesScreen(
                             onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
                             onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
                             onOpen = { device -> onDeviceClick(device.id) },
+                            onDeviceAction = { device, action -> viewModel.runAction(device.id, action) },
                             onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
                             onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
                         )
@@ -174,6 +176,7 @@ private fun RoomCard(
     onToggle: (Device, Boolean) -> Unit,
     onToggleFavorite: (Device) -> Unit,
     onOpen: (Device) -> Unit,
+    onDeviceAction: (Device, String) -> Unit,
     onRenameRoom: () -> Unit,
     onDeleteRoom: () -> Unit
 ) {
@@ -190,7 +193,7 @@ private fun RoomCard(
                     color = TextPrimary,
                     fontSize = TextSize.xxl,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(Weight.Fill)
                 )
                 // Rename/delete only for real rooms (not the "no room" bucket).
                 if (group.roomId != null) {
@@ -202,23 +205,16 @@ private fun RoomCard(
                 }
             }
 
-            group.devices.chunked(columns).forEach { rowDevices ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.base)
-                ) {
-                    rowDevices.forEach { device ->
-                        key(device.id) {
-                            DeviceCard(
-                                device = device,
-                                onToggle = { newState -> onToggle(device, newState) },
-                                onFavoriteClick = { onToggleFavorite(device) },
-                                modifier = Modifier.weight(1f),
-                                onClick = { onOpen(device) }
-                            )
-                        }
-                    }
-                    repeat(columns - rowDevices.size) { Spacer(Modifier.weight(1f)) }
+            UniformGrid(items = group.devices, columns = columns) { device, cell ->
+                key(device.id) {
+                    DeviceCard(
+                        device = device,
+                        onToggle = { newState -> onToggle(device, newState) },
+                        onFavoriteClick = { onToggleFavorite(device) },
+                        modifier = cell,
+                        onClick = { onOpen(device) },
+                        onAction = { action -> onDeviceAction(device, action) }
+                    )
                 }
             }
         }

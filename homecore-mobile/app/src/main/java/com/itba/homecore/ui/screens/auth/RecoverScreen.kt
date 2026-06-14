@@ -118,13 +118,13 @@ fun RecoverScreen(
                     verticalArrangement = Arrangement.spacedBy(Spacing.xl)
                 ) {
                     when {
-                        // ── Paso 3: éxito ──────────────────────────────
+                        // -- Step 3: success --
                         done -> HcButton(
                             text = stringResource(R.string.btn_login),
                             onClick = onDone
                         )
 
-                        // ── Paso 2: código + nueva contraseña ──────────
+                        // -- Step 2: code + new password --
                         step2 -> {
                             HcTextField(
                                 label = stringResource(R.string.label_recovery_code),
@@ -153,7 +153,7 @@ fun RecoverScreen(
                             )
                         }
 
-                        // ── Paso 1: email ──────────────────────────────
+                        // -- Step 1: email --
                         else -> {
                             HcTextField(
                                 label = stringResource(R.string.label_email),

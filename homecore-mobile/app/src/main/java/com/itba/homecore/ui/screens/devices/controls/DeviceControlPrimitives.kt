@@ -66,7 +66,7 @@ fun ControlSlider(
                     activeTrackColor = Accent,
                     inactiveTrackColor = SurfaceVariant
                 ),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(Weight.Fill)
             )
             Spacer(Modifier.width(Spacing.base))
             Text(
@@ -79,19 +79,25 @@ fun ControlSlider(
     }
 }
 
-/** Single choice from a fixed set of API values (modes, genre, fan speed, ...). */
+/**
+ * Single choice from a fixed set of canonical API values (modes, genre, fan speed, ...).
+ * [options] are the exact values sent to the API; [labelFor] maps each to a display label
+ * (defaults to capitalizing the value), so the UI can show Spanish while the request keeps
+ * the canonical value the backend expects.
+ */
 @Composable
 fun SegmentedSelector(
     label: String,
     options: List<String>,
     selected: String?,
+    labelFor: (String) -> String = { it.replaceFirstChar { c -> c.uppercase() } },
     onSelect: (String) -> Unit
 ) {
     Column {
         SectionLabel(label)
         options.chunked(3).forEach { rowOptions ->
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = Spacing.sm),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(bottom = Spacing.sm),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
             ) {
                 rowOptions.forEach { option ->
@@ -100,18 +106,21 @@ fun SegmentedSelector(
                         shape = RoundedCornerShape(Radius.lg),
                         color = if (isSelected) AccentDark else Color.Transparent,
                         border = if (isSelected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
-                        modifier = Modifier.weight(1f).clickable { onSelect(option) }
+                        modifier = Modifier.weight(Weight.Fill).fillMaxHeight().clickable { onSelect(option) }
                     ) {
-                        Text(
-                            text = option.replaceFirstChar { it.uppercase() },
-                            color = if (isSelected) Color.White else TextSecondary,
-                            fontSize = TextSize.md,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
-                        )
+                        // Center so single-line options align with siblings that wrap to two lines.
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
+                            Text(
+                                text = labelFor(option),
+                                color = if (isSelected) Color.White else TextSecondary,
+                                fontSize = TextSize.md,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
+                            )
+                        }
                     }
                 }
-                repeat(3 - rowOptions.size) { Spacer(Modifier.weight(1f)) }
+                repeat(3 - rowOptions.size) { Spacer(Modifier.weight(Weight.Fill)) }
             }
         }
     }
@@ -173,7 +182,7 @@ fun ControlButtonsRow(vararg buttons: Pair<String, () -> Unit>) {
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         buttons.forEach { (label, action) ->
-            ControlButton(text = label, onClick = action, modifier = Modifier.weight(1f))
+            ControlButton(text = label, onClick = action, modifier = Modifier.weight(Weight.Fill))
         }
     }
 }

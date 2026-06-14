@@ -80,7 +80,16 @@ class DevicesViewModel(
                 _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            _state.value = DevicesUiState.Success(rooms, devices)
+            // The /devices payload carries the room id but not its name, so resolve the
+            // name from the rooms list (otherwise every device shows "No room").
+            val enriched = devices.map { d ->
+                val roomId = d.room?.id
+                if (roomId != null && d.room?.name == null) {
+                    val roomName = rooms.firstOrNull { it.id == roomId }?.name
+                    if (roomName != null) d.copy(room = d.room!!.copy(name = roomName)) else d
+                } else d
+            }
+            _state.value = DevicesUiState.Success(rooms, enriched)
         }
     }
 

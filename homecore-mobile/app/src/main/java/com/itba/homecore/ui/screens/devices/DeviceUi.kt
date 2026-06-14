@@ -14,10 +14,17 @@ import androidx.compose.material.icons.filled.DevicesOther
 import androidx.compose.material.icons.filled.DoorFront
 import androidx.compose.material.icons.filled.Kitchen
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Microwave
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -29,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -88,7 +96,8 @@ fun DeviceCard(
     onToggle: (Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onAction: (String) -> Unit = {}
 ) {
     val cat        = device.category()
     val isOn       = device.isOn()
@@ -109,7 +118,10 @@ fun DeviceCard(
             .clickable(onClick = onClick)
             .padding(Spacing.base)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        // Fills the cell (UniformGrid gives every card the same height); a weighted spacer
+        // pushes the status + toggle to the bottom so the toggle sits bottom-right on every
+        // card regardless of how many lines the name takes.
+        Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,6 +150,8 @@ fun DeviceCard(
                 )
             }
 
+            Spacer(Modifier.height(Spacing.md))
+
             Text(
                 text = device.name,
                 color = TextPrimary,
@@ -145,56 +159,217 @@ fun DeviceCard(
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 18.sp
             )
-
+            Spacer(Modifier.height(Spacing.xs))
             Text(
-                text = if (isDoor && !isOn) "$roomLabel\n${stringResource(R.string.device_off_label)}" else roomLabel,
+                text = roomLabel,
                 color = TextSecondary,
                 fontSize = TextSize.sm,
                 lineHeight = 16.sp
             )
+            Spacer(Modifier.height(Spacing.xs))
+            Text(
+                text = deviceStatusText(device, cat, isOn),
+                color = if (isOn) SuccessColor else TextSecondary,
+                fontSize = TextSize.sm
+            )
 
-            // Quick switch only for types with an on/off-equivalent action (e.g. not a fridge).
-            if (DeviceCapabilities.quickToggle(cat) != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Switch(
-                        checked = isOn,
-                        onCheckedChange = onToggle,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor    = Color.White,
-                            checkedTrackColor    = ToggleOn,
-                            uncheckedThumbColor  = Color.White,
-                            uncheckedTrackColor  = ToggleOff,
-                            uncheckedBorderColor = Color.Transparent
-                        ),
-                        modifier = Modifier.scale(0.85f)
-                    )
-                }
-            }
+            Spacer(Modifier.weight(Weight.Fill))
+            DeviceCardFooter(device, cat, isOn, onToggle, onAction)
+        }
+    }
+}
 
-            when {
-                isLamp && isOn -> Text(
-                    text = stringResource(R.string.device_on_pct, device.state?.brightness ?: 100),
-                    color = SuccessColor,
-                    fontSize = TextSize.base,
-                    fontWeight = FontWeight.Medium
+/** Short, state-aware status line shown on the card (mirrors the web statusText). */
+@Composable
+private fun deviceStatusText(device: Device, cat: DeviceCategory, isOn: Boolean): String = when (cat) {
+    DeviceCategory.DOOR, DeviceCategory.BLINDS ->
+        stringResource(if (isOn) R.string.card_status_open else R.string.card_status_closed)
+    DeviceCategory.ALARM ->
+        stringResource(if (isOn) R.string.card_status_armed else R.string.card_status_disarmed)
+    DeviceCategory.SPEAKER -> stringResource(
+        when (device.state?.status?.lowercase()) {
+            "playing" -> R.string.card_status_playing
+            "paused"  -> R.string.card_status_paused
+            else      -> R.string.card_status_stopped
+        }
+    )
+    DeviceCategory.VACUUM -> stringResource(
+        when (device.state?.status?.lowercase()) {
+            "docked" -> R.string.card_status_docked
+            "active" -> R.string.card_status_active
+            else     -> R.string.card_status_off
+        }
+    )
+    else -> stringResource(if (isOn) R.string.card_status_on else R.string.card_status_off)
+}
+
+/**
+ * Per-type footer for the device card. Alarm and door show a status badge; speaker shows
+ * playback controls; fridge and AC show their key state; blinds show level + up/down; the
+ * rest get a plain on/off toggle. Arming the alarm (with a security code) is done from the
+ * detail screen, so the card only reflects the armed/disarmed state.
+ */
+@Composable
+private fun DeviceCardFooter(
+    device: Device,
+    cat: DeviceCategory,
+    isOn: Boolean,
+    onToggle: (Boolean) -> Unit,
+    onAction: (String) -> Unit
+) {
+    when (cat) {
+        DeviceCategory.ALARM -> StatusBadge(
+            text = stringResource(if (isOn) R.string.badge_armed else R.string.badge_disarmed),
+            color = if (isOn) SuccessColor else ErrorColor,
+            icon = Icons.Default.Security
+        )
+
+        DeviceCategory.DOOR -> {
+            val locked = device.state?.lock?.lowercase() == "locked"
+            StatusBadge(
+                text = stringResource(
+                    when { locked -> R.string.badge_locked; isOn -> R.string.badge_open; else -> R.string.badge_closed }
+                ),
+                color = if (locked) TextSecondary else if (isOn) SuccessColor else ErrorColor,
+                icon = if (locked) Icons.Default.Lock else if (isOn) Icons.Default.LockOpen else Icons.Default.DoorFront,
+                onClick = if (locked) null else { { onToggle(!isOn) } }
+            )
+        }
+
+        DeviceCategory.SPEAKER -> SpeakerFooter(device, isOn, onToggle, onAction)
+
+        DeviceCategory.REFRIGERATOR -> InfoRows(
+            stringResource(R.string.card_label_mode) to (device.state?.mode ?: "-"),
+            stringResource(R.string.card_label_temp) to "${device.state?.temperature ?: 0}°C"
+        )
+
+        DeviceCategory.AC -> {
+            if (isOn) {
+                InfoRows(
+                    stringResource(R.string.card_label_temp) to "${device.state?.temperature ?: 0}°C",
+                    stringResource(R.string.card_label_mode) to (device.state?.mode ?: "-")
                 )
-                isDoor -> Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Icon(
-                        imageVector = if (isOn) Icons.Default.LockOpen else Icons.Default.Lock,
-                        contentDescription = null,
-                        tint = AccentDark,
-                        modifier = Modifier.size(IconSize.md)
-                    )
-                }
+                Spacer(Modifier.height(Spacing.sm))
+            }
+            ToggleRow(isOn, onToggle)
+        }
+
+        DeviceCategory.BLINDS -> Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("${device.state?.level ?: 0}%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
+            Spacer(Modifier.weight(Weight.Fill))
+            CardIconButton(Icons.Default.KeyboardArrowUp) { onAction("up") }
+            Spacer(Modifier.width(Spacing.sm))
+            CardIconButton(Icons.Default.KeyboardArrowDown) { onAction("down") }
+        }
+
+        else -> if (DeviceCapabilities.quickToggle(cat) != null) ToggleRow(isOn, onToggle)
+    }
+}
+
+/** Pill badge with an optional leading icon; clickable when [onClick] is provided. */
+@Composable
+private fun StatusBadge(
+    text: String,
+    color: Color,
+    icon: ImageVector? = null,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier
+            .border(BorderStroke(1.dp, color), RoundedCornerShape(Radius.lg))
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = Spacing.base, vertical = Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
+    ) {
+        if (icon != null) Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(IconSize.sm))
+        Text(text, color = color, fontSize = TextSize.sm, fontWeight = FontWeight.Medium)
+    }
+}
+
+/** Bottom-right on/off toggle, consistent across all toggle-type cards. */
+@Composable
+private fun ToggleRow(isOn: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        Switch(
+            checked = isOn,
+            onCheckedChange = onToggle,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor    = Color.White,
+                checkedTrackColor    = ToggleOn,
+                uncheckedThumbColor  = Color.White,
+                uncheckedTrackColor  = ToggleOff,
+                uncheckedBorderColor = Color.Transparent
+            ),
+            modifier = Modifier.scale(0.85f)
+        )
+    }
+}
+
+/** Label/value rows used for fridge and AC state. */
+@Composable
+private fun InfoRows(vararg rows: Pair<String, String>) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        rows.forEach { (label, value) ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(label, color = TextSecondary, fontSize = TextSize.sm)
+                Text(value, color = TextPrimary, fontSize = TextSize.sm, fontWeight = FontWeight.SemiBold)
             }
         }
+    }
+}
+
+/** Speaker playback row: power, previous, play/pause, next. */
+@Composable
+private fun SpeakerFooter(
+    device: Device,
+    isOn: Boolean,
+    onToggle: (Boolean) -> Unit,
+    onAction: (String) -> Unit
+) {
+    val playing = device.state?.status?.lowercase() == "playing"
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+    ) {
+        CardIconButton(Icons.Default.PowerSettingsNew, highlighted = isOn) { onToggle(!isOn) }
+        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong") }
+        CardIconButton(
+            if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
+            accent = true
+        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume") }
+        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong") }
+    }
+}
+
+/** Small square icon button used by the speaker and blinds card controls. */
+@Composable
+private fun CardIconButton(
+    icon: ImageVector,
+    enabled: Boolean = true,
+    accent: Boolean = false,
+    highlighted: Boolean = false,
+    onClick: () -> Unit
+) {
+    val bg = when {
+        accent      -> AccentDark
+        highlighted -> SuccessColor
+        else        -> Color.Transparent
+    }
+    val tint = if (accent || highlighted) Color.White else TextPrimary
+    Box(
+        modifier = Modifier
+            .size(IconSize.box)
+            .background(bg, RoundedCornerShape(Radius.md))
+            .border(BorderStroke(1.dp, Accent.copy(alpha = 0.4f)), RoundedCornerShape(Radius.md))
+            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
+            .alpha(if (enabled) 1f else 0.4f),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(IconSize.md))
     }
 }
 

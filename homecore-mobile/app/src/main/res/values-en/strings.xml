@@ -52,6 +52,45 @@
     <string name="device_on_pct">On %d%%</string>
     <string name="device_off_label">Off</string>
     <string name="room_none">No room</string>
+
+    <!-- Device card status and badges (per type, mirrors the web) -->
+    <string name="card_status_on">On</string>
+    <string name="card_status_off">Off</string>
+    <string name="card_status_open">Open</string>
+    <string name="card_status_closed">Closed</string>
+    <string name="card_status_armed">Armed</string>
+    <string name="card_status_disarmed">Disarmed</string>
+    <string name="card_status_playing">Playing</string>
+    <string name="card_status_paused">Paused</string>
+    <string name="card_status_stopped">Stopped</string>
+    <string name="card_status_active">Active</string>
+    <string name="card_status_docked">Docked</string>
+    <string name="badge_armed">Armed</string>
+    <string name="badge_disarmed">Disarmed</string>
+    <string name="badge_open">Open</string>
+    <string name="badge_closed">Closed</string>
+    <string name="badge_locked">Locked</string>
+    <string name="card_status_unlocked">Unlocked</string>
+    <string name="act_state">State</string>
+    <string name="card_label_mode">Mode</string>
+    <string name="card_label_temp">Temp</string>
+
+    <!-- Routine editor -->
+    <string name="routine_new_title">New routine</string>
+    <string name="routine_edit_title">Edit routine</string>
+    <string name="routine_name_label">Name</string>
+    <string name="routine_description_label">Description</string>
+    <string name="routine_time_label">Time</string>
+    <string name="routine_days_label">Days</string>
+    <string name="routine_active_label">Active</string>
+    <string name="routine_actions_label">Actions</string>
+    <string name="routine_add_action">Add action</string>
+    <string name="routine_no_actions">No actions yet</string>
+    <string name="routine_execute">Run routine</string>
+    <string name="routine_delete_title">Delete routine?</string>
+    <string name="routine_delete_message">Delete routine \'%1$s\'?</string>
+    <string name="routine_pick_device">Pick a device</string>
+    <string name="routine_pick_action">Pick an action</string>
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>
@@ -100,6 +139,9 @@
     <string name="devices_running">Devices\nrunning</string>
     <string name="history">History</string>
     <string name="no_recent_events">No recent events</string>
+    <string name="history_turned_on">Turned on %1$s</string>
+    <string name="history_turned_off">Turned off %1$s</string>
+    <string name="minutes_ago">%1$d min ago</string>
     <string name="logout">Sign out</string>
     <string name="logout_title">Sign out?</string>
     <string name="logout_message">You will need to sign in again the next time you open the app.</string>
@@ -173,6 +215,35 @@
     <string name="act_amount">Amount</string>
     <string name="act_unit">Unit</string>
     <string name="device_detail_title">Device detail</string>
+
+    <!-- Labels for the canonical values the API expects (modes, genres, units) -->
+    <string name="ac_mode_cool">Cool</string>
+    <string name="ac_mode_heat">Heat</string>
+    <string name="ac_mode_fan">Fan</string>
+    <string name="genre_classical">Classical</string>
+    <string name="genre_country">Country</string>
+    <string name="genre_dance">Dance</string>
+    <string name="genre_latina">Latin</string>
+    <string name="genre_pop">Pop</string>
+    <string name="genre_rock">Rock</string>
+    <string name="vacuum_mode_vacuum">Vacuum</string>
+    <string name="vacuum_mode_mop">Mop</string>
+    <string name="fridge_mode_default">Normal</string>
+    <string name="fridge_mode_vacation">Vacation</string>
+    <string name="fridge_mode_party">Party</string>
+    <string name="oven_heat_conventional">Conventional</string>
+    <string name="oven_heat_bottom">Bottom</string>
+    <string name="oven_heat_top">Top</string>
+    <string name="oven_grill_large">Full</string>
+    <string name="oven_grill_eco">Eco</string>
+    <string name="oven_grill_off">Off</string>
+    <string name="oven_conv_normal">Normal</string>
+    <string name="oven_conv_eco">Eco</string>
+    <string name="oven_conv_off">Off</string>
+    <string name="unit_ml">Milliliters</string>
+    <string name="unit_cl">Centiliters</string>
+    <string name="unit_dl">Deciliters</string>
+    <string name="unit_l">Liters</string>
 
     <!-- Feedback / misc actions -->
     <string name="not_available_yet">Not available yet</string>

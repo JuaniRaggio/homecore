@@ -23,6 +23,7 @@ import com.itba.homecore.R
 import com.itba.homecore.data.model.*
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.PanelCard
+import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.screens.devices.DeviceCard
 import com.itba.homecore.ui.theme.*
@@ -109,23 +110,16 @@ fun DashboardScreen(
                             fontSize = TextSize.base
                         )
                     } else {
-                        favs.chunked(columns).forEach { row ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(Spacing.base)
-                            ) {
-                                row.forEach { d ->
-                                    key(d.id) {
-                                        DeviceCard(
-                                            device = d,
-                                            onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
-                                            onFavoriteClick = { devicesVm.toggleFavorite(d) },
-                                            modifier = Modifier.weight(1f),
-                                            onClick = { onDeviceClick(d.id) }
-                                        )
-                                    }
-                                }
-                                repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+                        UniformGrid(items = favs, columns = columns) { d, cell ->
+                            key(d.id) {
+                                DeviceCard(
+                                    device = d,
+                                    onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
+                                    onFavoriteClick = { devicesVm.toggleFavorite(d) },
+                                    modifier = cell,
+                                    onClick = { onDeviceClick(d.id) },
+                                    onAction = { devicesVm.runAction(d.id, it) }
+                                )
                             }
                         }
                     }

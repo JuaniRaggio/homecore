@@ -57,7 +57,7 @@ class RoutinesViewModel(
     fun toggleFavorite(routine: Routine) {
         viewModelScope.launch {
             repository.toggleFavorite(routine)
-                .onSuccess { load() }
+                .onSuccess { replaceRoutine(it) }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo marcar como favorita") }
         }
     }
@@ -65,8 +65,16 @@ class RoutinesViewModel(
     fun toggleActive(routine: Routine) {
         viewModelScope.launch {
             repository.toggleActive(routine)
-                .onSuccess { load() }
+                .onSuccess { replaceRoutine(it) }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo cambiar el estado") }
         }
+    }
+
+    /** Swaps a single routine in the loaded list in place, avoiding a full reload (no flicker). */
+    private fun replaceRoutine(updated: Routine) {
+        val current = _state.value as? RoutinesUiState.Success ?: return
+        _state.value = current.copy(
+            routines = current.routines.map { if (it.id == updated.id) updated else it }
+        )
     }
 }
