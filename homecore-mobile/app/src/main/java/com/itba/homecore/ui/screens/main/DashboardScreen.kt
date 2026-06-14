@@ -117,7 +117,8 @@ fun DashboardScreen(
                                     onToggle = { newState -> devicesVm.toggleDevice(d, newState) },
                                     onFavoriteClick = { devicesVm.toggleFavorite(d) },
                                     modifier = cell,
-                                    onClick = { onDeviceClick(d.id) }
+                                    onClick = { onDeviceClick(d.id) },
+                                    onAction = { devicesVm.runAction(d.id, it) }
                                 )
                             }
                         }
