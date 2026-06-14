@@ -45,7 +45,6 @@ fun ProfileScreen(
     val profile by authVm.profile.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
-    var showUserInfo by remember { mutableStateOf(false) }
 
     // Load the logged-in user's name/email (session first, then API refresh).
     LaunchedEffect(Unit) { authVm.loadProfile() }
@@ -64,18 +63,40 @@ fun ProfileScreen(
     ) {
         HouseHeader()
 
-        ProfileCard(
-            name = displayName,
-            onShowInfo = { showUserInfo = true },
-            onChangePassword = { showChangePassword = true }
-        )
+        // Darker outer box that contains all content below header.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Surface, RoundedCornerShape(Radius.card))
+                .padding(Spacing.sm)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            ) {
+                // Lighter inner box (SurfaceVariant) containing only ProfileCard.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(SurfaceVariant, RoundedCornerShape(Radius.xl2))
+                        .padding(vertical = Spacing.xl4, horizontal = Spacing.xl)
+                ) {
+                    ProfileCard(
+                        name = displayName,
+                        email = email,
+                        onChangePassword = { showChangePassword = true }
+                    )
+                }
 
+                LogoutButton(onClick = { showLogoutDialog = true })
 
-        LogoutButton(onClick = { showLogoutDialog = true })
+                ConsumptionCard(state = devicesState)
 
-        ConsumptionCard(state = devicesState)
-
-        HistoryCard(state = devicesState)
+                HistoryCard(state = devicesState)
+            }
+        }
     }
 
     if (showLogoutDialog) {
@@ -92,14 +113,6 @@ fun ProfileScreen(
         ChangePasswordSheet(
             viewModel = authVm,
             onDismiss = { showChangePassword = false }
-        )
-    }
-
-    if (showUserInfo) {
-        UserInfoDialog(
-            name = displayName,
-            email = email,
-            onDismiss = { showUserInfo = false }
         )
     }
 }
@@ -167,52 +180,54 @@ private fun LogoutConfirmDialog(
 @Composable
 private fun ProfileCard(
     name: String,
-    onShowInfo: () -> Unit,
+    email: String,
     onChangePassword: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(SurfaceVariant, RoundedCornerShape(Radius.card))
-            .padding(Spacing.xl3)
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.base)
+        Text(
+            text = stringResource(R.string.profile),
+            color = TextPrimary,
+            fontSize = TextSize.xxl,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Avatar = initials of the user's name + last name.
+        Box(
+            modifier = Modifier
+                .size(IconSize.avatar)
+                .background(AvatarBackground, CircleShape),
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.profile),
-                color = TextPrimary,
-                fontSize = TextSize.xl,
+                text = initialsOf(name),
+                color = Color.White,
+                fontSize = TextSize.headline,
                 fontWeight = FontWeight.Bold
             )
-
-            // Avatar = initials of the user's name + last name.
-            Box(
-                modifier = Modifier
-                    .size(IconSize.avatar)
-                    .background(AvatarBackground, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = initialsOf(name),
-                    color = Color.White,
-                    fontSize = TextSize.xxl,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Text(
-                text = name,
-                color = TextPrimary,
-                fontSize = TextSize.xxl,
-                fontWeight = FontWeight.Bold
-            )
-
-            PillAction(stringResource(R.string.manage_account), onClick = onShowInfo)
-            PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
         }
+
+        Text(
+            text = name,
+            color = TextPrimary,
+            fontSize = TextSize.title,
+            fontWeight = FontWeight.Bold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Text(
+            text = email.ifBlank { "—" },
+            color = TextSecondary,
+            fontSize = TextSize.md,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(Modifier.height(Spacing.xs2))
+
+        PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
     }
 }
 
@@ -226,44 +241,6 @@ private fun initialsOf(name: String): String {
     }
 }
 
-@Composable
-private fun UserInfoDialog(name: String, email: String, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Surface,
-        title = {
-            Text(
-                text = stringResource(R.string.manage_account),
-                color = TextPrimary,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
-                InfoRow(label = stringResource(R.string.label_full_name), value = name)
-                InfoRow(label = stringResource(R.string.label_email), value = email)
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.btn_ok), color = AccentDark, fontWeight = FontWeight.SemiBold)
-            }
-        }
-    )
-}
-
-@Composable
-private fun InfoRow(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        Text(label, color = TextSecondary, fontSize = TextSize.sm)
-        Text(
-            text = value.ifBlank { "—" },
-            color = TextPrimary,
-            fontSize = TextSize.md,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
 
 @Composable
 private fun PillAction(text: String, onClick: () -> Unit) {
@@ -271,13 +248,13 @@ private fun PillAction(text: String, onClick: () -> Unit) {
         shape = RoundedCornerShape(Radius.full),
         color = PillBackground,
         modifier = Modifier
-            .fillMaxWidth(0.85f)
+            .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
         Text(
             text = text,
             color = PillText,
-            fontSize = TextSize.base,
+            fontSize = TextSize.md,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .fillMaxWidth()
