@@ -12,7 +12,8 @@ data class DeviceLog(
     @SerializedName("device")     val device: Device? = null,
     @SerializedName("actionName") val actionName: String? = null,
     @SerializedName("action")     val action: String? = null,
-    @SerializedName("params")     val params: List<Any>? = null,
+    // params is intentionally omitted: the API returns it as either an array or a bare
+    // number depending on the action, which breaks Gson if typed; it is not displayed.
     @SerializedName("timestamp")  val timestamp: String? = null
 )
 

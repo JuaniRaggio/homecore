@@ -102,9 +102,10 @@
     <string name="devices_running">Devices\nrunning</string>
     <string name="history">History</string>
     <string name="no_recent_events">No recent events</string>
-    <string name="history_turned_on">Turned on %1$s</string>
-    <string name="history_turned_off">Turned off %1$s</string>
-    <string name="minutes_ago">%1$d min ago</string>
+    <string name="device_generic">Device</string>
+    <string name="language_title">Language</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
     <string name="logout">Sign out</string>
     <string name="logout_title">Sign out?</string>
     <string name="logout_message">You will need to sign in again the next time you open the app.</string>
