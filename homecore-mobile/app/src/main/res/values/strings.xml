@@ -70,8 +70,27 @@
     <string name="badge_open">Abierta</string>
     <string name="badge_closed">Cerrada</string>
     <string name="badge_locked">Bloqueada</string>
+    <string name="card_status_unlocked">Desbloqueada</string>
+    <string name="act_state">Estado</string>
     <string name="card_label_mode">Modo</string>
     <string name="card_label_temp">Temp</string>
+
+    <!-- Editor de rutinas -->
+    <string name="routine_new_title">Nueva rutina</string>
+    <string name="routine_edit_title">Editar rutina</string>
+    <string name="routine_name_label">Nombre</string>
+    <string name="routine_description_label">Descripción</string>
+    <string name="routine_time_label">Horario</string>
+    <string name="routine_days_label">Días</string>
+    <string name="routine_active_label">Activa</string>
+    <string name="routine_actions_label">Acciones</string>
+    <string name="routine_add_action">Agregar acción</string>
+    <string name="routine_no_actions">Todavía no hay acciones</string>
+    <string name="routine_execute">Ejecutar rutina</string>
+    <string name="routine_delete_title">¿Eliminar rutina?</string>
+    <string name="routine_delete_message">¿Eliminar la rutina \'%1$s\'?</string>
+    <string name="routine_pick_device">Elegí un dispositivo</string>
+    <string name="routine_pick_action">Elegí una acción</string>
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>

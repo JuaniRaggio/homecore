@@ -42,7 +42,17 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val executingId by viewModel.executingId.collectAsStateWithLifecycle()
     var search by rememberSaveable { mutableStateOf("") }
-    val notAvailable = stringResource(R.string.not_available_yet)
+
+    // Routine editor shown over the list (create when id is null, edit otherwise).
+    var editorOpen by rememberSaveable { mutableStateOf(false) }
+    var editorId by rememberSaveable { mutableStateOf<String?>(null) }
+    if (editorOpen) {
+        RoutineEditorScreen(
+            routineId = editorId,
+            onBack = { editorOpen = false; viewModel.load() }
+        )
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -67,7 +77,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             Surface(
                 shape = RoundedCornerShape(Radius.card),
                 color = AccentDark,
-                modifier = Modifier.clickable { UiMessages.emit(notAvailable) }
+                modifier = Modifier.clickable { editorId = null; editorOpen = true }
             ) {
                 Text(
                     text = stringResource(R.string.new_routine),
@@ -98,6 +108,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
                                 onExecute = { viewModel.execute(r) },
                                 onToggleActive = { viewModel.toggleActive(r) },
                                 onToggleFavorite = { viewModel.toggleFavorite(r) },
+                                onOpen = { editorId = r.id; editorOpen = true },
                                 modifier = cell
                             )
                         }
@@ -115,6 +126,7 @@ private fun RoutineCard(
     onExecute: () -> Unit,
     onToggleActive: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onOpen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isActive = routine.isActive()
@@ -123,9 +135,13 @@ private fun RoutineCard(
     Box(
         modifier = modifier
             .background(SurfaceVariant, RoundedCornerShape(Radius.card))
+            .clickable(onClick = onOpen)
             .padding(Spacing.xl)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -176,6 +192,9 @@ private fun RoutineCard(
                     fontSize = TextSize.base
                 )
             }
+            // Push "Run now" to the bottom so it sits at the same place on every card,
+            // regardless of whether the routine has a description/schedule above.
+            Spacer(Modifier.weight(1f))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End

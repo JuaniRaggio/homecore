@@ -70,8 +70,27 @@
     <string name="badge_open">Open</string>
     <string name="badge_closed">Closed</string>
     <string name="badge_locked">Locked</string>
+    <string name="card_status_unlocked">Unlocked</string>
+    <string name="act_state">State</string>
     <string name="card_label_mode">Mode</string>
     <string name="card_label_temp">Temp</string>
+
+    <!-- Routine editor -->
+    <string name="routine_new_title">New routine</string>
+    <string name="routine_edit_title">Edit routine</string>
+    <string name="routine_name_label">Name</string>
+    <string name="routine_description_label">Description</string>
+    <string name="routine_time_label">Time</string>
+    <string name="routine_days_label">Days</string>
+    <string name="routine_active_label">Active</string>
+    <string name="routine_actions_label">Actions</string>
+    <string name="routine_add_action">Add action</string>
+    <string name="routine_no_actions">No actions yet</string>
+    <string name="routine_execute">Run routine</string>
+    <string name="routine_delete_title">Delete routine?</string>
+    <string name="routine_delete_message">Delete routine \'%1$s\'?</string>
+    <string name="routine_pick_device">Pick a device</string>
+    <string name="routine_pick_action">Pick an action</string>
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>
