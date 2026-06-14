@@ -34,6 +34,10 @@ class SessionManager(private val context: Context) {
 
     suspend fun getToken(): String? = context.dataStore.data.first()[TOKEN_KEY]
 
+    suspend fun getUserName(): String? = context.dataStore.data.first()[USER_NAME_KEY]
+
+    suspend fun getUserEmail(): String? = context.dataStore.data.first()[USER_EMAIL_KEY]
+
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }
     }

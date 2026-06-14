@@ -88,7 +88,9 @@
 
     <!-- Usuario -->
     <string name="profile">Perfil</string>
-    <string name="manage_account">Gestión de la cuenta</string>
+    <string name="profile_default_name">Usuario</string>
+    <string name="manage_account">Información del usuario</string>
+    <string name="label_full_name">Nombre completo</string>
     <string name="manage_password">Gestionar contraseña</string>
     <string name="change_password_title">Cambiar contraseña</string>
     <string name="label_current_password">Contraseña actual</string>

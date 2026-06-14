@@ -12,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,14 +37,21 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 
 @Composable
 fun ProfileScreen(
-    userName: String = "Maria Fernandez",
     onLogout: () -> Unit = {},
     devicesVm: DevicesViewModel = viewModel(),
     authVm: AuthViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
+    val profile by authVm.profile.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
+    var showUserInfo by remember { mutableStateOf(false) }
+
+    // Load the logged-in user's name/email (session first, then API refresh).
+    LaunchedEffect(Unit) { authVm.loadProfile() }
+
+    val displayName = profile?.fullName?.ifBlank { null } ?: stringResource(R.string.profile_default_name)
+    val email = profile?.email.orEmpty()
 
     Column(
         modifier = Modifier
@@ -60,7 +65,8 @@ fun ProfileScreen(
         HouseHeader()
 
         ProfileCard(
-            userName = userName,
+            name = displayName,
+            onShowInfo = { showUserInfo = true },
             onChangePassword = { showChangePassword = true }
         )
 
@@ -86,6 +92,14 @@ fun ProfileScreen(
         ChangePasswordSheet(
             viewModel = authVm,
             onDismiss = { showChangePassword = false }
+        )
+    }
+
+    if (showUserInfo) {
+        UserInfoDialog(
+            name = displayName,
+            email = email,
+            onDismiss = { showUserInfo = false }
         )
     }
 }
@@ -151,7 +165,11 @@ private fun LogoutConfirmDialog(
 }
 
 @Composable
-private fun ProfileCard(userName: String, onChangePassword: () -> Unit) {
+private fun ProfileCard(
+    name: String,
+    onShowInfo: () -> Unit,
+    onChangePassword: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,46 +188,80 @@ private fun ProfileCard(userName: String, onChangePassword: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
 
-            // Avatar (Box with overlay)
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.avatar)
-                        .background(AvatarBackground, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(IconSize.button)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.xl)
-                        .background(SurfaceVariant, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = TextPrimary,
-                        modifier = Modifier.size(IconSize.xs)
-                    )
-                }
+            // Avatar = initials of the user's name + last name.
+            Box(
+                modifier = Modifier
+                    .size(IconSize.avatar)
+                    .background(AvatarBackground, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = initialsOf(name),
+                    color = Color.White,
+                    fontSize = TextSize.xxl,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Text(
-                text = userName,
+                text = name,
                 color = TextPrimary,
                 fontSize = TextSize.xxl,
                 fontWeight = FontWeight.Bold
             )
 
-            PillAction(stringResource(R.string.manage_account)) { /* TODO */ }
+            PillAction(stringResource(R.string.manage_account), onClick = onShowInfo)
             PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
         }
+    }
+}
+
+/** Initials from a full name: "Juan García" → "JG", "Juan" → "J". */
+private fun initialsOf(name: String): String {
+    val parts = name.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+    return when {
+        parts.isEmpty()   -> "?"
+        parts.size == 1   -> parts[0].take(1).uppercase()
+        else              -> "${parts.first().first()}${parts.last().first()}".uppercase()
+    }
+}
+
+@Composable
+private fun UserInfoDialog(name: String, email: String, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Surface,
+        title = {
+            Text(
+                text = stringResource(R.string.manage_account),
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
+                InfoRow(label = stringResource(R.string.label_full_name), value = name)
+                InfoRow(label = stringResource(R.string.label_email), value = email)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.btn_ok), color = AccentDark, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    )
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        Text(label, color = TextSecondary, fontSize = TextSize.sm)
+        Text(
+            text = value.ifBlank { "—" },
+            color = TextPrimary,
+            fontSize = TextSize.md,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

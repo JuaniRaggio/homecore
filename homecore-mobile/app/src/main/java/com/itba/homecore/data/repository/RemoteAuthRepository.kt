@@ -102,4 +102,11 @@ class RemoteAuthRepository(context: Context) : AuthRepository {
     override suspend fun getProfile(): Result<User> = runCatching {
         apiCall("No se pudo obtener el perfil") { api.getProfile() }
     }
+
+    override suspend fun getSessionUser(): User? {
+        val name  = session.getUserName()
+        val email = session.getUserEmail()
+        return if (name.isNullOrBlank() && email.isNullOrBlank()) null
+               else User(name = name.orEmpty(), email = email.orEmpty())
+    }
 }
