@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
@@ -33,6 +34,38 @@ import com.itba.homecore.data.model.Routine
 import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.time
 import com.itba.homecore.ui.theme.*
+
+/**
+ * Fixed-column grid where every cell in a row shares the tallest cell's height, so cards
+ * stay aligned even when one has a longer name that wraps to two lines. Used everywhere a
+ * grid of cards/chips is shown (favorites, devices, room chips). [itemContent] receives a
+ * cell modifier it must apply to its root so the content stretches to fill the cell.
+ */
+@Composable
+fun <T> UniformGrid(
+    items: List<T>,
+    columns: Int,
+    modifier: Modifier = Modifier,
+    spacing: Dp = Spacing.base,
+    itemContent: @Composable (item: T, cellModifier: Modifier) -> Unit
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(spacing)) {
+        items.chunked(columns).forEach { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                horizontalArrangement = Arrangement.spacedBy(spacing)
+            ) {
+                rowItems.forEach { item ->
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        itemContent(item, Modifier.fillMaxSize())
+                    }
+                }
+                // Pad the last row so trailing cells keep the same width as full rows.
+                repeat(columns - rowItems.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
 
 @Composable
 fun HcTextField(

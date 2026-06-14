@@ -97,7 +97,7 @@ fun SegmentedSelector(
         SectionLabel(label)
         options.chunked(3).forEach { rowOptions ->
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = Spacing.sm),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).padding(bottom = Spacing.sm),
                 horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
             ) {
                 rowOptions.forEach { option ->
@@ -106,16 +106,18 @@ fun SegmentedSelector(
                         shape = RoundedCornerShape(Radius.lg),
                         color = if (isSelected) AccentDark else Color.Transparent,
                         border = if (isSelected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
-                        modifier = Modifier.weight(1f).clickable { onSelect(option) }
+                        modifier = Modifier.weight(1f).fillMaxHeight().clickable { onSelect(option) }
                     ) {
-                        Text(
-                            text = labelFor(option),
-                            color = if (isSelected) Color.White else TextSecondary,
-                            fontSize = TextSize.md,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
-                        )
+                        // Center so single-line options align with siblings that wrap to two lines.
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
+                            Text(
+                                text = labelFor(option),
+                                color = if (isSelected) Color.White else TextSecondary,
+                                fontSize = TextSize.md,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
+                            )
+                        }
                     }
                 }
                 repeat(3 - rowOptions.size) { Spacer(Modifier.weight(1f)) }

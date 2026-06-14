@@ -23,6 +23,7 @@ import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
+import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
@@ -202,23 +203,15 @@ private fun RoomCard(
                 }
             }
 
-            group.devices.chunked(columns).forEach { rowDevices ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.base)
-                ) {
-                    rowDevices.forEach { device ->
-                        key(device.id) {
-                            DeviceCard(
-                                device = device,
-                                onToggle = { newState -> onToggle(device, newState) },
-                                onFavoriteClick = { onToggleFavorite(device) },
-                                modifier = Modifier.weight(1f),
-                                onClick = { onOpen(device) }
-                            )
-                        }
-                    }
-                    repeat(columns - rowDevices.size) { Spacer(Modifier.weight(1f)) }
+            UniformGrid(items = group.devices, columns = columns) { device, cell ->
+                key(device.id) {
+                    DeviceCard(
+                        device = device,
+                        onToggle = { newState -> onToggle(device, newState) },
+                        onFavoriteClick = { onToggleFavorite(device) },
+                        modifier = cell,
+                        onClick = { onOpen(device) }
+                    )
                 }
             }
         }
