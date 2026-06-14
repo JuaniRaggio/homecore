@@ -66,7 +66,7 @@ fun ControlSlider(
                     activeTrackColor = Accent,
                     inactiveTrackColor = SurfaceVariant
                 ),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(Weight.Fill)
             )
             Spacer(Modifier.width(Spacing.base))
             Text(
@@ -106,7 +106,7 @@ fun SegmentedSelector(
                         shape = RoundedCornerShape(Radius.lg),
                         color = if (isSelected) AccentDark else Color.Transparent,
                         border = if (isSelected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
-                        modifier = Modifier.weight(1f).fillMaxHeight().clickable { onSelect(option) }
+                        modifier = Modifier.weight(Weight.Fill).fillMaxHeight().clickable { onSelect(option) }
                     ) {
                         // Center so single-line options align with siblings that wrap to two lines.
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
@@ -120,7 +120,7 @@ fun SegmentedSelector(
                         }
                     }
                 }
-                repeat(3 - rowOptions.size) { Spacer(Modifier.weight(1f)) }
+                repeat(3 - rowOptions.size) { Spacer(Modifier.weight(Weight.Fill)) }
             }
         }
     }
@@ -182,7 +182,7 @@ fun ControlButtonsRow(vararg buttons: Pair<String, () -> Unit>) {
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         buttons.forEach { (label, action) ->
-            ControlButton(text = label, onClick = action, modifier = Modifier.weight(1f))
+            ControlButton(text = label, onClick = action, modifier = Modifier.weight(Weight.Fill))
         }
     }
 }

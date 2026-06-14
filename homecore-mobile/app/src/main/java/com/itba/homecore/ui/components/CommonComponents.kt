@@ -181,7 +181,7 @@ fun HouseHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        if (showNotifications) Spacer(Modifier.weight(1f))
+        if (showNotifications) Spacer(Modifier.weight(Weight.Fill))
 
         Text(
             text = stringResource(R.string.house_default),
@@ -191,7 +191,7 @@ fun HouseHeader(
         )
 
         if (showNotifications) {
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(Weight.Fill))
             Box(
                 modifier = Modifier
                     .size(IconSize.bell)
@@ -236,7 +236,7 @@ fun HcSearchBar(
                 modifier = Modifier.size(IconSize.lg)
             )
             Spacer(Modifier.width(Spacing.base))
-            Box(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier.weight(Weight.Fill)) {
                 if (value.isEmpty()) {
                     Text(text = placeholder, color = TextSecondary, fontSize = TextSize.lg)
                 }

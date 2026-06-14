@@ -76,10 +76,10 @@ fun AddDeviceSheet(
                                     option = option,
                                     selected = option == selectedType,
                                     onClick = { selectedTypeName = option.typeName },
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(Weight.Fill)
                                 )
                             }
-                            if (row.size == 1) Spacer(Modifier.weight(1f))
+                            if (row.size == 1) Spacer(Modifier.weight(Weight.Fill))
                         }
                     }
                     HcButton(
@@ -121,10 +121,10 @@ fun AddDeviceSheet(
                                     label = room.name,
                                     selected = selectedRoomId == room.id,
                                     onClick = { selectedRoomId = room.id },
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(Weight.Fill)
                                 )
                             }
-                            if (row.size == 1) Spacer(Modifier.weight(1f))
+                            if (row.size == 1) Spacer(Modifier.weight(Weight.Fill))
                         }
                     }
 
@@ -271,7 +271,7 @@ private fun SheetHeader(title: String, onClose: () -> Unit) {
             color = TextPrimary,
             fontSize = TextSize.xxxl,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(Weight.Fill)
         )
         Icon(
             imageVector = Icons.Default.Close,

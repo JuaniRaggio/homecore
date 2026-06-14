@@ -173,7 +173,7 @@ fun DeviceCard(
                 fontSize = TextSize.sm
             )
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(Weight.Fill))
             DeviceCardFooter(device, cat, isOn, onToggle, onAction)
         }
     }
@@ -259,7 +259,7 @@ private fun DeviceCardFooter(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("${device.state?.level ?: 0}%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(Weight.Fill))
             CardIconButton(Icons.Default.KeyboardArrowUp) { onAction("up") }
             Spacer(Modifier.width(Spacing.sm))
             CardIconButton(Icons.Default.KeyboardArrowDown) { onAction("down") }

@@ -193,7 +193,7 @@ private fun RoomCard(
                     color = TextPrimary,
                     fontSize = TextSize.xxl,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(Weight.Fill)
                 )
                 // Rename/delete only for real rooms (not the "no room" bucket).
                 if (group.roomId != null) {

@@ -1,13 +1,15 @@
 package com.itba.homecore.ui.screens.devices.controls
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
-import com.itba.homecore.ui.theme.Spacing
+import com.itba.homecore.data.model.isOn
+import com.itba.homecore.ui.theme.*
 
 /**
  * Bespoke controls per device type, one composable each — mirroring the web's
@@ -42,15 +44,26 @@ fun LightControls(device: Device, onAction: OnAction) {
 // -- Door ------------------------------------------------------------------------
 @Composable
 fun DoorControls(device: Device, onAction: OnAction) {
+    val opened = device.isOn()
+    val locked = device.state?.lock?.lowercase() == "locked"
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
-        ControlButtonsRow(
-            stringResource(R.string.act_open) to { onAction("open", emptyList()) },
-            stringResource(R.string.act_close) to { onAction("close", emptyList()) }
+        SectionLabel(stringResource(R.string.act_state))
+        Text(
+            text = stringResource(if (opened) R.string.card_status_open else R.string.card_status_closed) +
+                "  ·  " + stringResource(if (locked) R.string.badge_locked else R.string.card_status_unlocked),
+            color = if (opened) SuccessColor else TextSecondary,
+            fontSize = TextSize.md
         )
-        ControlButtonsRow(
-            stringResource(R.string.act_lock) to { onAction("lock", emptyList()) },
-            stringResource(R.string.act_unlock) to { onAction("unlock", emptyList()) }
-        )
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            ControlButton(stringResource(R.string.act_open), { onAction("open", emptyList()) }, Modifier.weight(Weight.Fill), enabled = !locked && !opened)
+            ControlButton(stringResource(R.string.act_close), { onAction("close", emptyList()) }, Modifier.weight(Weight.Fill), enabled = !locked && opened)
+        }
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            ControlButton(stringResource(R.string.act_lock), { onAction("lock", emptyList()) }, Modifier.weight(Weight.Fill), enabled = !opened && !locked, filled = false)
+            ControlButton(stringResource(R.string.act_unlock), { onAction("unlock", emptyList()) }, Modifier.weight(Weight.Fill), enabled = locked, filled = false)
+        }
     }
 }
 
