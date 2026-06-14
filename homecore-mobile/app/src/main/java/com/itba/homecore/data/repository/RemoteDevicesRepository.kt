@@ -23,10 +23,6 @@ class RemoteDevicesRepository : DevicesRepository {
         apiCall("Error al obtener dispositivos") { devicesApi.getAllDevices() }
     }
 
-    override suspend fun getDevice(id: String): Result<Device> = runCatching {
-        apiCall("Error al obtener el dispositivo") { devicesApi.getDevice(id) }
-    }
-
     override suspend fun executeAction(deviceId: String, action: String, params: List<Any>): Result<Unit> = runCatching {
         apiCall("No se pudo ejecutar la acción") { devicesApi.executeAction(deviceId, action, params).close() }
     }
@@ -70,14 +66,13 @@ class RemoteDevicesRepository : DevicesRepository {
         apiCall("Error al obtener habitaciones") { roomsApi.getAllRooms() }
     }
 
-    override suspend fun createRoom(name: String): Result<Room> = runCatching {
+    override suspend fun createRoom(name: String, homeId: String?): Result<Room> = runCatching {
         apiCall("No se pudo crear la habitación") {
             val body = mutableMapOf<String, Any?>("name" to name.trim())
-            // POST /rooms accepts an optional home reference; attach the user's first
-            // home when there is one, mirroring how the web app creates rooms.
-            runCatching { homesApi.getAllHomes().firstOrNull() }.getOrNull()?.let {
-                body["home"] = mapOf("id" to it.id)
-            }
+            // POST /rooms takes a home reference: use the one chosen by the caller (RF19)
+            // or fall back to the user's first home, mirroring how the web creates rooms.
+            val resolvedHomeId = homeId ?: runCatching { homesApi.getAllHomes().firstOrNull() }.getOrNull()?.id
+            resolvedHomeId?.let { body["home"] = mapOf("id" to it) }
             roomsApi.createRoom(body)
         }
     }

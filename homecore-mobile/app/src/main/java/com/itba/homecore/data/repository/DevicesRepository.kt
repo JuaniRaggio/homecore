@@ -11,7 +11,6 @@ import com.itba.homecore.data.model.Room
  */
 interface DevicesRepository {
     suspend fun getDevices(): Result<List<Device>>
-    suspend fun getDevice(id: String): Result<Device>
     suspend fun executeAction(deviceId: String, action: String, params: List<Any> = emptyList()): Result<Unit>
     suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit>
 
@@ -25,8 +24,8 @@ interface DevicesRepository {
 
     suspend fun getRooms(): Result<List<Room>>
 
-    /** Creates a room. */
-    suspend fun createRoom(name: String): Result<Room>
+    /** Creates a room, linked to [homeId] (RF19) or to the user's first home when null. */
+    suspend fun createRoom(name: String, homeId: String? = null): Result<Room>
 
     suspend fun renameRoom(roomId: String, newName: String): Result<Room>
 
