@@ -73,7 +73,7 @@ fun ControlSlider(
                 text = "${value.roundToInt()}$unit",
                 color = TextPrimary,
                 fontSize = TextSize.md,
-                modifier = Modifier.widthIn(min = 48.dp)
+                modifier = Modifier.widthIn(min = Size.sliderValueMinWidth)
             )
         }
     }

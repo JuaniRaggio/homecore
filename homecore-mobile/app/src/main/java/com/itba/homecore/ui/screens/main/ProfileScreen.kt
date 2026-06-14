@@ -219,7 +219,7 @@ private fun PillAction(text: String, onClick: () -> Unit) {
         shape = RoundedCornerShape(Radius.full),
         color = PillBackground,
         modifier = Modifier
-            .fillMaxWidth(0.85f)
+            .fillMaxWidth(Fraction.actionWidth)
             .clickable(onClick = onClick)
     ) {
         Text(
@@ -278,7 +278,7 @@ private fun ConsumptionCard(state: DevicesUiState) {
                 }
                 Box(
                     modifier = Modifier
-                        .width(1.dp)
+                        .width(Stroke.hairline)
                         .height(Spacing.huge2)
                         .background(SurfaceVariant)
                 )

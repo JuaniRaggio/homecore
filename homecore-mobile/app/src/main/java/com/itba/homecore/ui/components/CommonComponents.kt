@@ -52,7 +52,7 @@ fun <T> UniformGrid(
     columns: Int,
     modifier: Modifier = Modifier,
     spacing: Dp = Spacing.base,
-    maxHeightFraction: Float = 0.32f,
+    maxHeightFraction: Float = Fraction.gridMaxHeight,
     itemContent: @Composable (item: T, cellModifier: Modifier) -> Unit
 ) {
     if (items.isEmpty()) return

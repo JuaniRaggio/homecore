@@ -134,7 +134,6 @@ fun RoutineEditorScreen(
             placeholder = "08:00"
         )
 
-        // Days
         Text(stringResource(R.string.routine_days_label), color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = TextSize.lg)
         val dayNames = stringArrayResource(R.array.routine_days)
         Row(
@@ -160,7 +159,6 @@ fun RoutineEditorScreen(
             }
         }
 
-        // Active toggle
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.routine_active_label), color = TextPrimary, fontSize = TextSize.lg, modifier = Modifier.weight(Weight.Fill))
             Switch(
@@ -176,7 +174,6 @@ fun RoutineEditorScreen(
 
         HorizontalDivider(color = SurfaceVariant)
 
-        // Actions
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.routine_actions_label), color = TextPrimary, fontSize = TextSize.lg, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(Weight.Fill))
             IconButton(onClick = { showActionPicker = true }) {
