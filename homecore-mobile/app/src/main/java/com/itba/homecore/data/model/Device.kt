@@ -83,7 +83,6 @@ fun Device.category(): DeviceCategory {
 
 fun Device.isOn(): Boolean {
     val s = state?.status?.lowercase() ?: return false
-    // Alarm statuses reported by the API are armedStay/armedAway (see homecore-web).
     return s in listOf("on", "opened", "active", "playing", "armedstay", "armedaway", "unlocked")
 }
 
