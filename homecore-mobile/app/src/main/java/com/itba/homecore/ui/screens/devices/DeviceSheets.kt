@@ -40,7 +40,7 @@ fun AddDeviceSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var step by rememberSaveable { mutableStateOf(AddDeviceStep.TYPE) }
-    // Store the type by its stable name so the selection survives rotation (RNF5).
+    // Store the type by its stable name so the selection survives rotation.
     var selectedTypeName by rememberSaveable { mutableStateOf<String?>(null) }
     var name by rememberSaveable { mutableStateOf("") }
     var selectedRoomId by rememberSaveable { mutableStateOf<String?>(null) }

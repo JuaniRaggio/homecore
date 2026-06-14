@@ -66,7 +66,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
         UiMessages.messages.collect { snackbarHostState.showSnackbar(it) }
     }
 
-    // Adaptability (RNF4/RNF5): on wide screens (tablets / phone landscape) navigation
+    // Adaptability: on wide screens (tablets / phone landscape) navigation
     // moves to a side rail and grids use more columns; on phones it's a bottom bar.
     val wide = LocalConfiguration.current.screenWidthDp >= WIDE_BREAKPOINT_DP
     val columns = if (wide) 3 else 2

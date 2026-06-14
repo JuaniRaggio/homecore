@@ -38,7 +38,7 @@ fun DevicesScreen(
     var search by rememberSaveable { mutableStateOf("") }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
-    // Pending room actions kept as id+name strings so they survive rotation (RNF5).
+    // Pending room actions kept as id+name strings so they survive rotation.
     var renameRoomId by rememberSaveable { mutableStateOf<String?>(null) }
     var renameRoomName by rememberSaveable { mutableStateOf("") }
     var deleteRoomId by rememberSaveable { mutableStateOf<String?>(null) }

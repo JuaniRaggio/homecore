@@ -86,7 +86,7 @@ fun DeviceDetailScreen(
         HorizontalDivider(color = SurfaceVariant)
         Spacer(Modifier.height(Spacing.xl))
 
-        // ── Management (RF7 / RF16) ───────────────────────────────────────────────
+        // ── Management ────────────────────────────────────────────────────────────
         val roomNone = stringResource(R.string.room_none)
         SegmentedSelector(
             label = stringResource(R.string.move_to_room),
