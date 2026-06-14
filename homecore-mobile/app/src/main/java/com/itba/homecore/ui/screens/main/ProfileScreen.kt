@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -26,8 +28,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.isOn
+import com.itba.homecore.ui.components.HcButton
+import com.itba.homecore.ui.components.HcTextField
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.viewmodel.AuthViewModel
+import com.itba.homecore.viewmodel.ChangePasswordState
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 
@@ -35,10 +41,12 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 fun ProfileScreen(
     userName: String = "Maria Fernandez",
     onLogout: () -> Unit = {},
-    devicesVm: DevicesViewModel = viewModel()
+    devicesVm: DevicesViewModel = viewModel(),
+    authVm: AuthViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showChangePassword by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -51,7 +59,10 @@ fun ProfileScreen(
     ) {
         HouseHeader()
 
-        ProfileCard(userName = userName)
+        ProfileCard(
+            userName = userName,
+            onChangePassword = { showChangePassword = true }
+        )
 
 
         LogoutButton(onClick = { showLogoutDialog = true })
@@ -68,6 +79,13 @@ fun ProfileScreen(
                 onLogout()
             },
             onDismiss = { showLogoutDialog = false }
+        )
+    }
+
+    if (showChangePassword) {
+        ChangePasswordSheet(
+            viewModel = authVm,
+            onDismiss = { showChangePassword = false }
         )
     }
 }
@@ -133,7 +151,7 @@ private fun LogoutConfirmDialog(
 }
 
 @Composable
-private fun ProfileCard(userName: String) {
+private fun ProfileCard(userName: String, onChangePassword: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -190,7 +208,7 @@ private fun ProfileCard(userName: String) {
             )
 
             PillAction(stringResource(R.string.manage_account)) { /* TODO */ }
-            PillAction(stringResource(R.string.manage_password)) { /* TODO */ }
+            PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
         }
     }
 }
@@ -336,6 +354,110 @@ private fun HistoryRow(device: Device, minutesAgo: Int) {
                 color = TextSecondary,
                 fontSize = TextSize.sm
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChangePasswordSheet(
+    viewModel: AuthViewModel,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val state by viewModel.changePasswordState.collectAsStateWithLifecycle()
+
+    var current by remember { mutableStateOf("") }
+    var newPass by remember { mutableStateOf("") }
+    var confirm by remember { mutableStateOf("") }
+
+    // Clean the shared state when the sheet leaves so it starts fresh next time.
+    DisposableEffect(Unit) { onDispose { viewModel.clearChangePassword() } }
+
+    val isLoading = state is ChangePasswordState.Loading
+    val errorMsg = (state as? ChangePasswordState.Error)?.message.orEmpty()
+    val done = state is ChangePasswordState.Done
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Surface,
+        dragHandle = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.xl)
+                .padding(bottom = Spacing.xl3),
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.change_password_title),
+                    color = TextPrimary,
+                    fontSize = TextSize.xl,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.cd_close),
+                    tint = TextPrimary,
+                    modifier = Modifier
+                        .size(IconSize.lg)
+                        .clickable(onClick = onDismiss)
+                )
+            }
+
+            if (done) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = SuccessColor,
+                        modifier = Modifier.size(IconSize.md)
+                    )
+                    Text(
+                        text = stringResource(R.string.change_password_done),
+                        color = TextSecondary,
+                        fontSize = TextSize.md
+                    )
+                }
+                HcButton(text = stringResource(R.string.btn_ok), onClick = onDismiss)
+            } else {
+                HcTextField(
+                    label = stringResource(R.string.label_current_password),
+                    value = current,
+                    onValueChange = { current = it },
+                    isPassword = true
+                )
+                HcTextField(
+                    label = stringResource(R.string.label_new_password),
+                    value = newPass,
+                    onValueChange = { newPass = it },
+                    isPassword = true
+                )
+                HcTextField(
+                    label = stringResource(R.string.label_confirm_new_password),
+                    value = confirm,
+                    onValueChange = { confirm = it },
+                    isPassword = true
+                )
+                if (errorMsg.isNotBlank()) {
+                    Text(errorMsg, color = ErrorColor, fontSize = TextSize.base)
+                }
+                HcButton(
+                    text = stringResource(R.string.btn_change_password),
+                    onClick = { viewModel.changePassword(current, newPass, confirm) },
+                    isLoading = isLoading
+                )
+            }
         }
     }
 }

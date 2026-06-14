@@ -34,6 +34,19 @@
     <string name="verify_resending">Sending…</string>
     <string name="verify_resend_sent">Code resent to your email</string>
 
+    <!-- Password recovery -->
+    <string name="title_recover">Recover account</string>
+    <string name="recover_subtitle">Enter your email and we\'ll send you a code to reset your password.</string>
+    <string name="btn_send_code">Send code</string>
+    <string name="title_new_password">New password</string>
+    <string name="recover_reset_subtitle">Enter the recovery code and your new password.</string>
+    <string name="label_recovery_code">Recovery code</string>
+    <string name="label_new_password">New password</string>
+    <string name="label_confirm_new_password">Confirm password</string>
+    <string name="btn_reset_password">Reset password</string>
+    <string name="recover_done_title">Done!</string>
+    <string name="recover_done_message">Your password was reset successfully.</string>
+
     <!-- Bottom nav -->
     <string name="nav_home">Home</string>
     <string name="nav_devices">Devices</string>
@@ -88,6 +101,11 @@
     <string name="profile">Profile</string>
     <string name="manage_account">Account settings</string>
     <string name="manage_password">Change password</string>
+    <string name="change_password_title">Change password</string>
+    <string name="label_current_password">Current password</string>
+    <string name="btn_change_password">Change password</string>
+    <string name="change_password_done">Your password was updated successfully.</string>
+    <string name="btn_ok">Done</string>
     <string name="consumption">Consumption</string>
     <string name="current_consumption">Current consumption</string>
     <string name="devices_running">Devices\nrunning</string>

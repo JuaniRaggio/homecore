@@ -34,6 +34,19 @@
     <string name="verify_resending">Enviando…</string>
     <string name="verify_resend_sent">Código reenviado a tu email</string>
 
+    <!-- Recuperar contraseña -->
+    <string name="title_recover">Recuperar cuenta</string>
+    <string name="recover_subtitle">Ingresá tu email y te enviaremos un código para restablecer tu contraseña.</string>
+    <string name="btn_send_code">Enviar código</string>
+    <string name="title_new_password">Nueva contraseña</string>
+    <string name="recover_reset_subtitle">Ingresá el código de recuperación y tu nueva contraseña.</string>
+    <string name="label_recovery_code">Código de recuperación</string>
+    <string name="label_new_password">Nueva contraseña</string>
+    <string name="label_confirm_new_password">Confirmar contraseña</string>
+    <string name="btn_reset_password">Restablecer contraseña</string>
+    <string name="recover_done_title">¡Listo!</string>
+    <string name="recover_done_message">Tu contraseña se restableció correctamente.</string>
+
     <!-- Bottom nav -->
     <string name="nav_home">Inicio</string>
     <string name="nav_devices">Dispositivos</string>
@@ -88,6 +101,11 @@
     <string name="profile">Perfil</string>
     <string name="manage_account">Gestión de la cuenta</string>
     <string name="manage_password">Gestionar contraseña</string>
+    <string name="change_password_title">Cambiar contraseña</string>
+    <string name="label_current_password">Contraseña actual</string>
+    <string name="btn_change_password">Cambiar contraseña</string>
+    <string name="change_password_done">Tu contraseña se actualizó correctamente.</string>
+    <string name="btn_ok">Listo</string>
     <string name="consumption">Consumo</string>
     <string name="current_consumption">Consumo actual</string>
     <string name="devices_running">Dispositivos\nfuncionando</string>
