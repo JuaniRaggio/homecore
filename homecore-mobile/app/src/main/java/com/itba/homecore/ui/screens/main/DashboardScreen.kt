@@ -49,6 +49,10 @@ fun DashboardScreen(
     val homesState by homesVm.state.collectAsStateWithLifecycle()
     val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
     val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
+    LaunchedEffect(selectedHome?.id) {
+        devicesVm.loadForHome(selectedHome?.id)
+        routinesVm.loadForHome(selectedHome?.id)
+    }
     val noNotifications = stringResource(R.string.no_new_notifications)
 
     Column(

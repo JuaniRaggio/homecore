@@ -29,7 +29,15 @@ class RoutinesViewModel(
     private val _executingId = MutableStateFlow<String?>(null)
     val executingId: StateFlow<String?> = _executingId.asStateFlow()
 
+    private var currentHomeId: String? = null
+
     init { load() }
+
+    /** Switches the active home filter and reloads. Passing null shows all homes. */
+    fun loadForHome(homeId: String?) {
+        currentHomeId = homeId
+        load()
+    }
 
     fun load() {
         viewModelScope.launch {

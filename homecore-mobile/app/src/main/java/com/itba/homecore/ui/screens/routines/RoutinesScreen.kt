@@ -48,6 +48,7 @@ fun RoutinesScreen(
     val homesState by homesVm.state.collectAsStateWithLifecycle()
     val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
     val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
+    LaunchedEffect(selectedHome?.id) { viewModel.loadForHome(selectedHome?.id) }
     var search by rememberSaveable { mutableStateOf("") }
     val notAvailable = stringResource(R.string.not_available_yet)
 

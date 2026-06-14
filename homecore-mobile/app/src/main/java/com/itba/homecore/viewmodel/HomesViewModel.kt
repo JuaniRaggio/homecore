@@ -16,7 +16,11 @@ import kotlinx.coroutines.launch
 
 sealed class HomesUiState {
     object Loading : HomesUiState()
-    data class Success(val homes: List<Home>, val rooms: List<Room>) : HomesUiState()
+    data class Success(
+        val homes: List<Home>,
+        val rooms: List<Room>,
+        val selectedHome: Home? = null
+    ) : HomesUiState()
     data class Error(val message: String) : HomesUiState()
 }
 
@@ -35,6 +39,8 @@ class HomesViewModel(
     private val _state = MutableStateFlow<HomesUiState>(HomesUiState.Loading)
     val state: StateFlow<HomesUiState> = _state.asStateFlow()
 
+    private var currentSelectedHome: Home? = null
+
     init { load() }
 
     fun load() {
@@ -50,8 +56,18 @@ class HomesViewModel(
                 _state.value = HomesUiState.Error(homesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            _state.value = HomesUiState.Success(homes, roomsRes.getOrNull() ?: emptyList())
+            // Preserve the selection if the home still exists after reload.
+            val selection = currentSelectedHome?.let { sel -> homes.find { it.id == sel.id } }
+            currentSelectedHome = selection
+            _state.value = HomesUiState.Success(homes, roomsRes.getOrNull() ?: emptyList(), selection)
         }
+    }
+
+    /** Marks [home] as the active home and notifies all observers. */
+    fun selectHome(home: Home) {
+        currentSelectedHome = home
+        val current = _state.value as? HomesUiState.Success ?: return
+        _state.value = current.copy(selectedHome = home)
     }
 
     fun createHome(name: String, onDone: () -> Unit = {}) {
