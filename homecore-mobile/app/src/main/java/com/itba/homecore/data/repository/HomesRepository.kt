@@ -3,7 +3,7 @@ package com.itba.homecore.data.repository
 import com.itba.homecore.data.model.Home
 
 /**
- * Data-layer contract for homes (RF17-RF19). Implemented by [RemoteHomesRepository]
+ * Data-layer contract for homes. Implemented by [RemoteHomesRepository]
  * against the HCI API and wired in [com.itba.homecore.di.AppModule].
  */
 interface HomesRepository {

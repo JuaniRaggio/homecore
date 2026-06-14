@@ -23,9 +23,9 @@ sealed class AuthUiState {
     object Verified : AuthUiState()
     /** Email was already registered: send the user to the Login screen. */
     data class AlreadyRegistered(val message: String) : AuthUiState()
-    /** Recovery code was sent to the user's email (RF3 step 1 done). */
+    /** Recovery code was sent to the user's email. */
     object CodeSent : AuthUiState()
-    /** Password was successfully reset (RF3 step 2 done). */
+    /** Password was successfully reset. */
     object PasswordReset : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }
@@ -57,6 +57,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _resendState = MutableStateFlow<ResendState>(ResendState.Idle)
     val resendState: StateFlow<ResendState> = _resendState.asStateFlow()
+
+    /** Logged-in user's profile (RF: shown on the profile screen). Null until loaded. */
+    private val _profile = MutableStateFlow<User?>(null)
+    val profile: StateFlow<User?> = _profile.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -201,6 +205,26 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             repository.resetPassword(code, newPassword).fold(
                 onSuccess = { _uiState.value = AuthUiState.PasswordReset },
                 onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "No se pudo restablecer la contraseña") }
+            )
+        }
+    }
+
+    /** Loads the logged-in user's profile from the API (replaces any placeholder name). */
+    fun loadProfile() {
+        viewModelScope.launch {
+            repository.getProfile().onSuccess { _profile.value = it }
+        }
+    }
+
+    /**
+     * Changes the password of the logged-in user. Validation/feedback is left to the
+     * caller via [onResult] (success, errorMessage) so the dialog can show inline errors.
+     */
+    fun changePassword(oldPassword: String, newPassword: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            repository.changePassword(oldPassword, newPassword).fold(
+                onSuccess = { onResult(true, null) },
+                onFailure = { e -> onResult(false, e.message) }
             )
         }
     }

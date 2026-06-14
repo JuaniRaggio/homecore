@@ -46,7 +46,7 @@ class RoutinesViewModel(
             repository.executeRoutine(routine.id)
                 .onSuccess {
                     UiMessages.emit("Rutina ejecutada")
-                    // RF20: also surface it as a system notification.
+                    // Also surface it as a system notification.
                     NotificationEvents.emit("HomeCore", "Rutina ejecutada: ${routine.name}")
                 }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la rutina") }

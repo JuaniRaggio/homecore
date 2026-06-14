@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceCapabilities
+import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
@@ -40,7 +41,18 @@ class DevicesViewModel(
     private val _state = MutableStateFlow<DevicesUiState>(DevicesUiState.Loading)
     val state: StateFlow<DevicesUiState> = _state.asStateFlow()
 
+    /** Action history, shown on the profile screen. */
+    private val _logs = MutableStateFlow<List<DeviceLog>>(emptyList())
+    val logs: StateFlow<List<DeviceLog>> = _logs.asStateFlow()
+
     init { load() }
+
+    /** Loads the recent action history from the API. */
+    fun loadLogs(limit: Int = 10) {
+        viewModelScope.launch {
+            repository.getLogs(limit, 0).onSuccess { _logs.value = it }
+        }
+    }
 
     fun load() = refresh(showLoading = true)
 
@@ -111,15 +123,63 @@ class DevicesViewModel(
         }
     }
 
-    /** Creates a room and reloads the list. [onDone] runs only on success (keeps the sheet open on error). */
-    fun createRoom(name: String, onDone: () -> Unit = {}) {
+    /**
+     * Creates a room (optionally linked to [homeId]) and reloads the list.
+     * [onDone] runs only on success (keeps the sheet open on error).
+     */
+    fun createRoom(name: String, homeId: String? = null, onDone: () -> Unit = {}) {
         viewModelScope.launch {
-            repository.createRoom(name)
+            repository.createRoom(name, homeId)
                 .onSuccess {
                     load()
                     onDone()
                 }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo crear la habitación") }
+        }
+    }
+
+    // ── Device management ──────────────────────────────────────────────────────────
+    fun renameDevice(deviceId: String, newName: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.renameDevice(deviceId, newName)
+                .onSuccess { refresh(showLoading = false); onDone() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo renombrar el dispositivo") }
+        }
+    }
+
+    fun deleteDevice(deviceId: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.deleteDevice(deviceId)
+                .onSuccess { refresh(showLoading = false); onDone() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo eliminar el dispositivo") }
+        }
+    }
+
+    /** Links the device to [roomId], or unlinks it when [roomId] is null. */
+    fun setDeviceRoom(deviceId: String, roomId: String?, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            val result = if (roomId == null) repository.unassignDevice(deviceId)
+                         else repository.assignDeviceToRoom(deviceId, roomId)
+            result
+                .onSuccess { refresh(showLoading = false); onDone() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo mover el dispositivo") }
+        }
+    }
+
+    // ── Room management ────────────────────────────────────────────────────────────
+    fun renameRoom(roomId: String, newName: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.renameRoom(roomId, newName)
+                .onSuccess { refresh(showLoading = false); onDone() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo renombrar la habitación") }
+        }
+    }
+
+    fun deleteRoom(roomId: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.deleteRoom(roomId)
+                .onSuccess { refresh(showLoading = false); onDone() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo eliminar la habitación") }
         }
     }
 }

@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import com.itba.homecore.R
 
 /**
- * Posts local system notifications (RF20). Creates the channel on first use and respects
+ * Posts local system notifications. Creates the channel on first use and respects
  * the runtime POST_NOTIFICATIONS permission (API 33+); if it's not granted, it no-ops.
  */
 object AppNotifier {

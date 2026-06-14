@@ -9,7 +9,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 /**
- * Homes endpoints (RF17-RF19, optional). Methods are defined because POST /rooms
+ * Homes endpoints (optional). Methods are defined because POST /rooms
  * accepts a home reference and the feed header needs the real home name.
  */
 interface HomesApi {

@@ -21,9 +21,9 @@ sealed class HomesUiState {
 }
 
 /**
- * Homes feature (RF17-RF19). Manages homes (CRUD) and creates rooms linked to a home.
+ * Homes feature. Manages homes (CRUD) and creates rooms linked to a home.
  * Rooms come from [DevicesRepository] so the screen can show which rooms belong to each
- * home (RF18/RF19), without duplicating the rooms data source.
+ * home, without duplicating the rooms data source.
  */
 class HomesViewModel(
     private val homesRepository: HomesRepository,
@@ -78,7 +78,7 @@ class HomesViewModel(
         }
     }
 
-    /** Creates a room linked to [homeId] (RF19) and reloads. */
+    /** Creates a room linked to [homeId] and reloads. */
     fun createRoom(name: String, homeId: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             devicesRepository.createRoom(name, homeId)

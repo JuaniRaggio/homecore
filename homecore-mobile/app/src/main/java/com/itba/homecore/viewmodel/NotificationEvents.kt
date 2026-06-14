@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-/** A user-facing notification to post to the system tray (RF20). */
+/** A user-facing notification to post to the system tray. */
 data class AppNotification(val title: String, val message: String)
 
 /**
- * App-wide channel for system notifications (RF20). ViewModels emit here on relevant
+ * App-wide channel for system notifications. ViewModels emit here on relevant
  * events (e.g. a routine executed); MainActivity collects and posts them via the
  * NotificationManager (it has the Context the data layer lacks). Same buffered-event
  * pattern as [UiMessages] / [com.itba.homecore.data.api.SessionEvents].
