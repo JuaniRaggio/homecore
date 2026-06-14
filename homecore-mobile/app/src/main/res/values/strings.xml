@@ -142,9 +142,10 @@
     <string name="devices_running">Dispositivos\nfuncionando</string>
     <string name="history">Historial</string>
     <string name="no_recent_events">Sin eventos recientes</string>
-    <string name="history_turned_on">Encendiste %1$s</string>
-    <string name="history_turned_off">Apagaste %1$s</string>
-    <string name="minutes_ago">Hace %1$d min</string>
+    <string name="device_generic">Dispositivo</string>
+    <string name="language_title">Idioma</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
     <string name="logout">Cerrar sesión</string>
     <string name="logout_title">¿Cerrar sesión?</string>
     <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>

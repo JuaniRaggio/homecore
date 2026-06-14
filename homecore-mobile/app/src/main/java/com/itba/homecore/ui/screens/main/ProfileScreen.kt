@@ -25,11 +25,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.isOn
+import com.itba.homecore.data.model.resolvedAction
 import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.components.HcTextField
 import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.components.LanguageSelector
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.deviceActionLabel
+import com.itba.homecore.ui.util.formatLogTimestamp
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ChangePasswordState
 import com.itba.homecore.viewmodel.DevicesUiState
@@ -42,12 +47,16 @@ fun ProfileScreen(
     authVm: AuthViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
+    val logs by devicesVm.logs.collectAsStateWithLifecycle()
     val profile by authVm.profile.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
 
-    // Load the logged-in user's name/email (session first, then API refresh).
-    LaunchedEffect(Unit) { authVm.loadProfile() }
+    // Load the logged-in user's name/email and the real activity history.
+    LaunchedEffect(Unit) {
+        authVm.loadProfile()
+        devicesVm.loadLogs()
+    }
 
     val displayName = profile?.fullName?.ifBlank { null } ?: stringResource(R.string.profile_default_name)
     val email = profile?.email.orEmpty()
@@ -90,11 +99,16 @@ fun ProfileScreen(
                     )
                 }
 
+                LanguageSelector()
+
                 LogoutButton(onClick = { showLogoutDialog = true })
 
                 ConsumptionCard(state = devicesState)
 
-                HistoryCard(state = devicesState)
+                HistoryCard(
+                    logs = logs,
+                    devices = (devicesState as? DevicesUiState.Success)?.devices ?: emptyList()
+                )
             }
         }
     }
@@ -330,12 +344,10 @@ private fun ConsumptionCard(state: DevicesUiState) {
     }
 }
 
+/** Real activity history from /devices/logs; the device name is resolved from [devices]. */
 @Composable
-private fun HistoryCard(state: DevicesUiState) {
-    val recent = when (state) {
-        is DevicesUiState.Success -> state.devices.take(5)
-        else -> emptyList()
-    }
+private fun HistoryCard(logs: List<DeviceLog>, devices: List<Device>) {
+    val deviceNamesById = remember(devices) { devices.associate { it.id to it.name } }
 
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Text(
@@ -344,22 +356,21 @@ private fun HistoryCard(state: DevicesUiState) {
             fontSize = TextSize.xxl,
             fontWeight = FontWeight.Bold
         )
-        if (recent.isEmpty()) {
+        if (logs.isEmpty()) {
             Text(stringResource(R.string.no_recent_events), color = TextSecondary, fontSize = TextSize.base)
         } else {
-            recent.forEachIndexed { idx, d ->
-                HistoryRow(device = d, minutesAgo = (idx + 1) * 5)
+            logs.forEach { log ->
+                val deviceName = deviceNamesById[log.deviceId] ?: stringResource(R.string.device_generic)
+                HistoryRow(log = log, deviceName = deviceName)
             }
         }
     }
 }
 
 @Composable
-private fun HistoryRow(device: Device, minutesAgo: Int) {
-    val action = stringResource(
-        if (device.isOn()) R.string.history_turned_on else R.string.history_turned_off,
-        device.name
-    )
+private fun HistoryRow(log: DeviceLog, deviceName: String) {
+    val action = deviceActionLabel(log.resolvedAction())
+    val time = formatLogTimestamp(log.timestamp)
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -373,13 +384,13 @@ private fun HistoryRow(device: Device, minutesAgo: Int) {
         )
         Column {
             Text(
-                text = action,
+                text = deviceName,
                 color = TextPrimary,
                 fontSize = TextSize.md,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = stringResource(R.string.minutes_ago, minutesAgo),
+                text = listOf(action, time).filter { it.isNotBlank() }.joinToString("  ·  "),
                 color = TextSecondary,
                 fontSize = TextSize.sm
             )
