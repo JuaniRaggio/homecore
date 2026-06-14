@@ -26,15 +26,21 @@ import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
+import com.itba.homecore.viewmodel.HomesUiState
+import com.itba.homecore.viewmodel.HomesViewModel
 
 // --- Screen -------------------------------------------------------------------
 @Composable
 fun DevicesScreen(
     onDeviceClick: (String) -> Unit,
     columns: Int = 2,
-    viewModel: DevicesViewModel = viewModel()
+    viewModel: DevicesViewModel = viewModel(),
+    homesVm: HomesViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val homesState by homesVm.state.collectAsStateWithLifecycle()
+    val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
+    val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
     var search by rememberSaveable { mutableStateOf("") }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
@@ -56,7 +62,11 @@ fun DevicesScreen(
             .padding(top = Spacing.sm, bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.base)
     ) {
-        HouseHeader()
+        HouseHeader(
+            homes = homes,
+            selectedHome = selectedHome,
+            onHomeSelect = { homesVm.selectHome(it) }
+        )
         HcSearchBar(
             value = search,
             onValueChange = { search = it },

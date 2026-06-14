@@ -32,14 +32,22 @@ import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.viewmodel.HomesUiState
+import com.itba.homecore.viewmodel.HomesViewModel
 import com.itba.homecore.viewmodel.RoutinesUiState
 import com.itba.homecore.viewmodel.RoutinesViewModel
 import com.itba.homecore.viewmodel.UiMessages
 
 @Composable
-fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
+fun RoutinesScreen(
+    viewModel: RoutinesViewModel = viewModel(),
+    homesVm: HomesViewModel = viewModel()
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val executingId by viewModel.executingId.collectAsStateWithLifecycle()
+    val homesState by homesVm.state.collectAsStateWithLifecycle()
+    val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
+    val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
     var search by rememberSaveable { mutableStateOf("") }
     val notAvailable = stringResource(R.string.not_available_yet)
 
@@ -52,7 +60,11 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             .padding(bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.base)
     ) {
-        HouseHeader()
+        HouseHeader(
+            homes = homes,
+            selectedHome = selectedHome,
+            onHomeSelect = { homesVm.selectHome(it) }
+        )
         HcSearchBar(
             value = search,
             onValueChange = { search = it },
