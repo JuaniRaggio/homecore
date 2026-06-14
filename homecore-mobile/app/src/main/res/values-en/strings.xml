@@ -52,6 +52,26 @@
     <string name="device_on_pct">On %d%%</string>
     <string name="device_off_label">Off</string>
     <string name="room_none">No room</string>
+
+    <!-- Device card status and badges (per type, mirrors the web) -->
+    <string name="card_status_on">On</string>
+    <string name="card_status_off">Off</string>
+    <string name="card_status_open">Open</string>
+    <string name="card_status_closed">Closed</string>
+    <string name="card_status_armed">Armed</string>
+    <string name="card_status_disarmed">Disarmed</string>
+    <string name="card_status_playing">Playing</string>
+    <string name="card_status_paused">Paused</string>
+    <string name="card_status_stopped">Stopped</string>
+    <string name="card_status_active">Active</string>
+    <string name="card_status_docked">Docked</string>
+    <string name="badge_armed">Armed</string>
+    <string name="badge_disarmed">Disarmed</string>
+    <string name="badge_open">Open</string>
+    <string name="badge_closed">Closed</string>
+    <string name="badge_locked">Locked</string>
+    <string name="card_label_mode">Mode</string>
+    <string name="card_label_temp">Temp</string>
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>

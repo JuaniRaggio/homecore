@@ -52,6 +52,26 @@
     <string name="device_on_pct">Encendida %d%%</string>
     <string name="device_off_label">Apagada</string>
     <string name="room_none">Sin habitación</string>
+
+    <!-- Estado y badges de la card de dispositivo (por tipo, espeja la web) -->
+    <string name="card_status_on">Encendido</string>
+    <string name="card_status_off">Apagado</string>
+    <string name="card_status_open">Abierta</string>
+    <string name="card_status_closed">Cerrada</string>
+    <string name="card_status_armed">Activada</string>
+    <string name="card_status_disarmed">Desactivada</string>
+    <string name="card_status_playing">Reproduciendo</string>
+    <string name="card_status_paused">Pausado</string>
+    <string name="card_status_stopped">Detenido</string>
+    <string name="card_status_active">Activa</string>
+    <string name="card_status_docked">En la base</string>
+    <string name="badge_armed">Armada</string>
+    <string name="badge_disarmed">Desarmada</string>
+    <string name="badge_open">Abierta</string>
+    <string name="badge_closed">Cerrada</string>
+    <string name="badge_locked">Bloqueada</string>
+    <string name="card_label_mode">Modo</string>
+    <string name="card_label_temp">Temp</string>
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
