@@ -52,6 +52,8 @@
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
+    <string name="cd_dropdown">Cambiar hogar</string>
+    <string name="add_home">+ Nueva Propiedad</string>
 
     <!-- Estados comunes -->
     <string name="loading">Cargando…</string>
