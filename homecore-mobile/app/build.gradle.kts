@@ -1,3 +1,4 @@
+import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -6,15 +7,17 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// local.properties es el equivalente Android al .env del web: está gitignoreado, así
-// que la API key NO se commitea. Cada quien la define ahí (ver local.properties.example).
-// La URL base sí tiene fallback porque es pública; la API key NO (queda vacía si falta).
-val localProperties = Properties().apply {
-    val file = rootProject.file("local.properties")
-    if (file.exists()) file.inputStream().use { load(it) }
+// Config is kept out of source: the API key (secret) and base URL are read from
+// local.properties (git-ignored) or env vars, and exposed via BuildConfig. The base
+// URL falls back to the course default so a fresh checkout builds without extra setup.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) FileInputStream(f).use { load(it) }
 }
-fun localProp(key: String, default: String): String =
-    localProperties.getProperty(key) ?: System.getenv(key) ?: default
+val hciApiKey: String = localProps.getProperty("HCI_API_KEY") ?: System.getenv("HCI_API_KEY") ?: ""
+val hciApiBaseUrl: String = localProps.getProperty("HCI_API_BASE_URL")
+    ?: System.getenv("HCI_API_BASE_URL")
+    ?: "https://hci.it.itba.edu.ar/api/"
 
 android {
     namespace = "com.itba.homecore"
@@ -27,11 +30,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // Expuesto a Kotlin como BuildConfig.API_BASE_URL / BuildConfig.API_KEY.
-        // La API key sale solo de local.properties (sin fallback ⇒ no se commitea).
-        buildConfigField("String", "API_BASE_URL", "\"${localProp("API_BASE_URL", "https://hci.it.itba.edu.ar/api/")}\"")
-        buildConfigField("String", "API_KEY", "\"${localProp("API_KEY", "")}\"")
+        buildConfigField("String", "API_KEY", "\"$hciApiKey\"")
+        buildConfigField("String", "API_BASE_URL", "\"$hciApiBaseUrl\"")
     }
 
     buildTypes {

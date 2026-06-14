@@ -34,11 +34,14 @@ import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.RoutinesUiState
 import com.itba.homecore.viewmodel.RoutinesViewModel
+import com.itba.homecore.viewmodel.UiMessages
 
 @Composable
 fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val executingId by viewModel.executingId.collectAsStateWithLifecycle()
     var search by rememberSaveable { mutableStateOf("") }
+    val notAvailable = stringResource(R.string.not_available_yet)
 
     Column(
         modifier = Modifier
@@ -63,7 +66,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             Surface(
                 shape = RoundedCornerShape(Radius.card),
                 color = AccentDark,
-                modifier = Modifier.clickable { /* TODO: new routine */ }
+                modifier = Modifier.clickable { UiMessages.emit(notAvailable) }
             ) {
                 Text(
                     text = stringResource(R.string.new_routine),
@@ -90,6 +93,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
                         key(r.id) {
                             RoutineCard(
                                 routine = r,
+                                isExecuting = r.id == executingId,
                                 onExecute = { viewModel.execute(r) },
                                 onToggleActive = { viewModel.toggleActive(r) },
                                 onToggleFavorite = { viewModel.toggleFavorite(r) }
@@ -105,6 +109,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
 @Composable
 private fun RoutineCard(
     routine: Routine,
+    isExecuting: Boolean,
     onExecute: () -> Unit,
     onToggleActive: () -> Unit,
     onToggleFavorite: () -> Unit
@@ -176,15 +181,25 @@ private fun RoutineCard(
                 Surface(
                     shape = RoundedCornerShape(Radius.card),
                     color = AccentDark,
-                    modifier = Modifier.clickable(onClick = onExecute)
+                    modifier = Modifier.clickable(enabled = !isExecuting, onClick = onExecute)
                 ) {
-                    Text(
-                        text = stringResource(R.string.execute_now),
-                        color = Color.White,
-                        fontSize = TextSize.sm,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
-                    )
+                    if (isExecuting) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier
+                                .padding(horizontal = Spacing.xl, vertical = Spacing.xs)
+                                .size(IconSize.xs)
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.execute_now),
+                            color = Color.White,
+                            fontSize = TextSize.sm,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
+                        )
+                    }
                 }
             }
         }

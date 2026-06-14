@@ -41,12 +41,12 @@
     <string name="nav_home">Home</string>
     <string name="nav_devices">Devices</string>
     <string name="nav_routines">Routines</string>
+    <string name="nav_homes">Homes</string>
     <string name="nav_profile">User</string>
 
     <!-- Devices screen -->
     <string name="house_default">Summer House</string>
     <string name="search_device">Search device</string>
-    <string name="filters">Filters</string>
     <string name="new_device">+ New Device</string>
     <string name="new_room">+ New Room</string>
     <string name="device_on_pct">On %d%%</string>
@@ -55,7 +55,6 @@
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>
-    <string name="cd_dropdown">Switch home</string>
 
     <!-- Common states -->
     <string name="loading">Loading…</string>
@@ -101,9 +100,6 @@
     <string name="devices_running">Devices\nrunning</string>
     <string name="history">History</string>
     <string name="no_recent_events">No recent events</string>
-    <string name="history_turned_on">%1$s turned on</string>
-    <string name="history_turned_off">%1$s turned off</string>
-    <string name="minutes_ago">%d min ago</string>
     <string name="logout">Sign out</string>
     <string name="logout_title">Sign out?</string>
     <string name="logout_message">You will need to sign in again the next time you open the app.</string>
@@ -115,7 +111,6 @@
     <string name="device_name_label">Device name</string>
     <string name="device_name_hint">E.g. Main light</string>
     <string name="room_label">Room</string>
-    <string name="room_optional">No room</string>
     <string name="next">Next</string>
     <string name="create_device">Create device</string>
     <string name="cd_close">Close</string>
@@ -178,4 +173,41 @@
     <string name="act_amount">Amount</string>
     <string name="act_unit">Unit</string>
     <string name="device_detail_title">Device detail</string>
+
+    <!-- Feedback / misc actions -->
+    <string name="not_available_yet">Not available yet</string>
+    <string name="no_new_notifications">No new notifications</string>
+
+    <!-- Change password (RF4) -->
+    <string name="cp_title">Change password</string>
+    <string name="cp_current">Current password</string>
+    <string name="cp_save">Save</string>
+    <string name="cp_success">Password updated</string>
+
+    <!-- Device & room management (RF7/RF14/RF16) -->
+    <string name="act_rename">Rename</string>
+    <string name="act_delete">Delete</string>
+    <string name="move_to_room">Move to room</string>
+    <string name="delete_confirm">Delete</string>
+    <string name="rename_device_title">Rename device</string>
+    <string name="rename_room_title">Rename room</string>
+    <string name="delete_device_title">Delete device?</string>
+    <string name="delete_device_message">Delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="delete_room_title">Delete room?</string>
+    <string name="delete_room_message">Delete \"%1$s\"? Its devices will be left without a room.</string>
+    <string name="cd_room_options">Room options</string>
+
+    <!-- Homes (RF17-RF19) -->
+    <string name="homes_title">Homes</string>
+    <string name="new_home">+ New Home</string>
+    <string name="home_name_label">Home name</string>
+    <string name="home_name_hint">E.g. Summer house</string>
+    <string name="create_home">Create home</string>
+    <string name="rename_home_title">Rename home</string>
+    <string name="delete_home_title">Delete home?</string>
+    <string name="delete_home_message">Delete \"%1$s\"? Its rooms will be left without a home.</string>
+    <string name="empty_homes">No homes</string>
+    <string name="add_room">Add room</string>
+    <string name="no_rooms_in_home">No rooms</string>
+    <string name="cd_home_options">Home options</string>
 </resources>

@@ -10,8 +10,8 @@ La app Android está construida con **Jetpack Compose + Material 3** (UI 100% de
 
 Puntos clave del estado actual:
 
-- **Arquitectura**: MVVM por capas. Compose observa `StateFlow` del ViewModel; el ViewModel depende de **interfaces** de repositorio; cada interfaz tiene implementación `Mock*` (datos de prototipo en memoria, `data/mock/MockData.kt`) y `Remote*` (Retrofit contra la API HCI).
-- **Selección mock/real**: `di/AppModule.kt` con `USE_MOCK = true`. **Hoy la app corre contra datos mock.** Reconectar el backend es poner `false` (y validar: ver riesgos en el plan).
+- **Arquitectura**: MVVM por capas. Compose observa `StateFlow` del ViewModel; el ViewModel depende de **interfaces** de repositorio, implementadas por las clases `Remote*` (Retrofit contra la API HCI). La capa mock fue eliminada: la app corre siempre contra el backend real.
+- **Wiring**: `di/AppModule.kt` (service locator) provee las implementaciones `Remote*`. No hay flag mock.
 - **Navegación**: manual con `enum AppScreen` en `MainActivity.kt` + bottom navigation de 4 tabs en `MainScreen.kt` (Inicio, Dispositivos, Rutinas, Usuario). Navigation Compose está como dependencia pero NO se usa (`navigation/NavGraph.kt` y `Screen.kt` están vacíos).
 - **Implementado**: login y registro (RF1, RF5), logout con confirmación (RF6), feed de Inicio (rutinas y dispositivos favoritos), lista de dispositivos con búsqueda y agrupación por habitación (RF8), control on/off y acciones simples (RF9 parcial), alta de dispositivos y habitaciones vía bottom sheets (`DeviceSheets.kt`), lista y ejecución de rutinas (RF11, RF12), pantalla Usuario con consumo estimado e historial derivado, manejo global de 401 (`SessionEvents`), sesión persistida en DataStore.
 - **Faltante (RF obligatorios)**: verificar cuenta (RF2), recuperar contraseña (RF3), cambiar contraseña (RF4), editar/eliminar dispositivos (RF7 parcial), detalle de dispositivo con controles por tipo (RF9 completo), editar/eliminar habitaciones y su consulta como sección (RF14, RF15), vincular/desvincular dispositivos a habitaciones (RF16), notificaciones (RF20).
@@ -130,10 +130,9 @@ com.itba.homecore/
 ├── data/
 │   ├── api/           # Interfaces Retrofit + ApiClient (OkHttp, interceptores) + SessionEvents (bus de 401)
 │   ├── model/         # Data classes (Device, Routine, Room, User) + extensiones de dominio
-│   ├── mock/          # MockData: datos de prototipo mutables en memoria
-│   ├── repository/    # Interfaces + implementaciones Mock* y Remote*
+│   ├── repository/    # Interfaces + implementaciones Remote* (Retrofit)
 │   └── local/         # SessionManager (DataStore Preferences: token y datos de usuario)
-├── di/                # AppModule: service locator, flag USE_MOCK elige Mock* o Remote*
+├── di/                # AppModule: service locator que provee los repositorios Remote*
 ├── viewmodel/         # ViewModels con StateFlow + sealed UiState (Loading/Success/Error)
 ├── ui/
 │   ├── screens/       # Pantallas Compose (auth/, main/, devices/, routines/, rooms/, homes/)
@@ -222,11 +221,13 @@ Actualmente no está implementado, pero si lo agregan:
 
 **No hay backend local.** Web y mobile usan la misma API remota hosteada por la cátedra:
 
-**Mobile:**
-```kotlin
-// data/api/ApiClient.kt (valor real en el código)
-private const val BASE_URL = "https://hci.it.itba.edu.ar/api/"
+**Mobile:** la base URL y la API key NO están en el código. Salen de `BuildConfig` (`app/build.gradle.kts`), que las lee de `local.properties` (git-ignored) o variables de entorno:
+```properties
+# homecore-mobile/local.properties
+HCI_API_KEY=<api key del grupo>
+HCI_API_BASE_URL=https://hci.it.itba.edu.ar/api/   # opcional; default ya apunta acá
 ```
+`ApiClient` usa `BuildConfig.API_KEY` y `BuildConfig.API_BASE_URL`. Si falta `HCI_API_KEY`, la app compila pero las requests fallan (hay que setearla).
 
 **Web:**
 ```env
@@ -237,7 +238,7 @@ VITE_API_KEY=<api key del grupo>
 
 ### Autenticación
 
-Toda request lleva el header `X-API-Key` (constante `API_KEY` en `ApiClient.kt`). Las requests autenticadas agregan además **JWT**:
+Toda request lleva el header `X-API-Key` (desde `BuildConfig.API_KEY`). Las requests autenticadas agregan además **JWT**:
 ```
 Authorization: Bearer <token>
 ```
@@ -720,7 +721,7 @@ https://hci.it.itba.edu.ar/api/   (API remota de la cátedra; la usan web y mobi
 ```
 
 ### Autenticación
-Toda request lleva `X-API-Key`. Las autenticadas agregan:
+Toda request lleva `X-API-Key` (inyectada desde `BuildConfig`, no hardcodeada). Las autenticadas agregan:
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -773,7 +774,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 En éxito la API envuelve el payload: `{ "result": ... }`. En error: `{ "error": { "code", "description" } }`.
 
-⚠️ **Riesgo conocido para la reconexión del backend**: la web desenvuelve `result` en `client.js`; en mobile las interfaces Retrofit declaran tipos pelados (`List<Device>`, etc.). Al pasar `USE_MOCK = false` hay que verificar el contrato real y, si hace falta, envolver las respuestas con `ApiResponse<T>` (`data/model/ApiResponse.kt`) o un deserializador de Gson.
+El envoltorio `{ "result": ... }` se desempaqueta en un único lugar: el interceptor `unwrapResult` de `ApiClient`, igual que la web en `client.js`. Por eso las interfaces Retrofit declaran los tipos directos (`List<Device>`, etc.).
 
 ### WebSocket
 
@@ -874,7 +875,7 @@ Claves a respetar:
 ```
 Composable observa StateFlow del ViewModel (collectAsStateWithLifecycle)
 ViewModel llama a la INTERFAZ del repositorio (viewModelScope.launch)
-AppModule (USE_MOCK) resuelve MockXxxRepository o RemoteXxxRepository
+AppModule provee la implementacion RemoteXxxRepository
 Remote* llama Retrofit y devuelve Result<T>
 ViewModel actualiza su StateFlow (sealed UiState)
 Compose recompone con el nuevo estado

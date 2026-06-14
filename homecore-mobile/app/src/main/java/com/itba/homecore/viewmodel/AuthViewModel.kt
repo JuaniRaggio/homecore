@@ -23,6 +23,10 @@ sealed class AuthUiState {
     object Verified : AuthUiState()
     /** Email was already registered: send the user to the Login screen. */
     data class AlreadyRegistered(val message: String) : AuthUiState()
+    /** Recovery code was sent to the user's email. */
+    object CodeSent : AuthUiState()
+    /** Password was successfully reset. */
+    object PasswordReset : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }
 
@@ -78,6 +82,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _changePasswordState = MutableStateFlow<ChangePasswordState>(ChangePasswordState.Idle)
     val changePasswordState: StateFlow<ChangePasswordState> = _changePasswordState.asStateFlow()
+    /** Logged-in user's profile (RF: shown on the profile screen). Null until loaded. */
+    private val _profile = MutableStateFlow<User?>(null)
+    val profile: StateFlow<User?> = _profile.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -187,6 +194,61 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             repository.sendVerification(email).fold(
                 onSuccess = { _resendState.value = ResendState.Sent },
                 onFailure = { e -> _resendState.value = ResendState.Error(e.message ?: "No se pudo reenviar el código") }
+            )
+        }
+    }
+
+    fun forgotPassword(email: String) {
+        if (email.isBlank()) {
+            _uiState.value = AuthUiState.Error("Ingresá tu email")
+            return
+        }
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            repository.forgotPassword(email).fold(
+                onSuccess = {
+                    _pendingEmail.value = email
+                    _uiState.value = AuthUiState.CodeSent
+                },
+                onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "No se pudo enviar el código") }
+            )
+        }
+    }
+
+    fun resetPassword(code: String, newPassword: String, confirmPassword: String) {
+        if (code.isBlank() || newPassword.isBlank()) {
+            _uiState.value = AuthUiState.Error("Completá todos los campos")
+            return
+        }
+        if (newPassword != confirmPassword) {
+            _uiState.value = AuthUiState.Error("Las contraseñas no coinciden")
+            return
+        }
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            repository.resetPassword(code, newPassword).fold(
+                onSuccess = { _uiState.value = AuthUiState.PasswordReset },
+                onFailure = { e -> _uiState.value = AuthUiState.Error(e.message ?: "No se pudo restablecer la contraseña") }
+            )
+        }
+    }
+
+    /** Loads the logged-in user's profile from the API (replaces any placeholder name). */
+    fun loadProfile() {
+        viewModelScope.launch {
+            repository.getProfile().onSuccess { _profile.value = it }
+        }
+    }
+
+    /**
+     * Changes the password of the logged-in user. Validation/feedback is left to the
+     * caller via [onResult] (success, errorMessage) so the dialog can show inline errors.
+     */
+    fun changePassword(oldPassword: String, newPassword: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            repository.changePassword(oldPassword, newPassword).fold(
+                onSuccess = { onResult(true, null) },
+                onFailure = { e -> onResult(false, e.message) }
             )
         }
     }

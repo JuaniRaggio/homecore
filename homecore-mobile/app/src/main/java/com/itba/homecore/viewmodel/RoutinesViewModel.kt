@@ -44,6 +44,11 @@ class RoutinesViewModel(
         viewModelScope.launch {
             _executingId.value = routine.id
             repository.executeRoutine(routine.id)
+                .onSuccess {
+                    UiMessages.emit("Rutina ejecutada")
+                    // Also surface it as a system notification.
+                    NotificationEvents.emit("HomeCore", "Rutina ejecutada: ${routine.name}")
+                }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la rutina") }
             _executingId.value = null
         }

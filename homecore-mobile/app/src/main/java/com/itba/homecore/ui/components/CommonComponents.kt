@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Visibility
@@ -110,16 +111,15 @@ fun HcButton(
 }
 
 /**
- * Shared header with the home name (dropdown) and optionally the notifications bell.
- * Applies Compose's "slot API" pattern: the caller can pass [trailing] to replace
- * the right-hand icon (e.g.: notifications on Inicio, nothing on Usuario).
+ * Shared header with the home name and optionally the notifications bell. The home
+ * dropdown affordance was removed because multi-home is not implemented (it would be
+ * a button that does nothing); the home name is shown as plain text.
  */
 @Composable
 fun HouseHeader(
     modifier: Modifier = Modifier,
     showNotifications: Boolean = false,
-    onNotificationsClick: () -> Unit = {},
-    onHomePickerClick: () -> Unit = {}
+    onNotificationsClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -130,29 +130,12 @@ fun HouseHeader(
     ) {
         if (showNotifications) Spacer(Modifier.weight(1f))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.house_default),
-                color = TextPrimary,
-                fontSize = TextSize.title,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.width(Spacing.sm))
-            Box(
-                modifier = Modifier
-                    .size(IconSize.box)
-                    .background(SurfaceVariant, CircleShape)
-                    .clickable(onClick = onHomePickerClick),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.cd_dropdown),
-                    tint = TextPrimary,
-                    modifier = Modifier.size(IconSize.sm)
-                )
-            }
-        }
+        Text(
+            text = stringResource(R.string.house_default),
+            color = TextPrimary,
+            fontSize = TextSize.title,
+            fontWeight = FontWeight.Bold
+        )
 
         if (showNotifications) {
             Spacer(Modifier.weight(1f))
@@ -266,6 +249,56 @@ fun routineScheduleLabel(routine: Routine): String {
     val dayNames = stringArrayResource(R.array.routine_days)
     val dayStr = days.mapNotNull { dayNames.getOrNull(it) }.joinToString(", ")
     return listOf(time, dayStr).filter { it.isNotBlank() }.joinToString(" ")
+}
+
+/** Small accent "pill" button used for top-level actions (+ New device/room/home, etc.). */
+@Composable
+fun ActionPill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        shape = RoundedCornerShape(Radius.card),
+        color = AccentDark,
+        modifier = modifier.clickable(onClick = onClick)
+    ) {
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = TextSize.sm,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs)
+        )
+    }
+}
+
+/**
+ * Overflow (⋮) menu with Rename / Delete actions. Shared by rooms and homes so the
+ * affordance stays consistent.
+ */
+@Composable
+fun OverflowMenu(
+    contentDescription: String,
+    onRename: () -> Unit,
+    onDelete: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Default.MoreVert, contentDescription = contentDescription, tint = TextSecondary)
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = Surface
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.act_rename), color = TextPrimary) },
+                onClick = { expanded = false; onRename() }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.act_delete), color = ErrorColor) },
+                onClick = { expanded = false; onDelete() }
+            )
+        }
+    }
 }
 
 @Composable

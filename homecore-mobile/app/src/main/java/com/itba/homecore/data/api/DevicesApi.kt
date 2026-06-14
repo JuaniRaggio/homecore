@@ -50,11 +50,4 @@ interface DevicesApi {
         @Path("limit") limit: Int,
         @Path("offset") offset: Int
     ): List<DeviceLog>
-
-    @GET("devices/{id}/logs/limit/{limit}/offset/{offset}")
-    suspend fun getDeviceLogs(
-        @Path("id") id: String,
-        @Path("limit") limit: Int,
-        @Path("offset") offset: Int
-    ): List<DeviceLog>
 }
