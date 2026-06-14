@@ -16,5 +16,4 @@ data class DeviceLog(
     @SerializedName("timestamp")  val timestamp: String? = null
 )
 
-fun DeviceLog.resolvedDeviceId(): String? = deviceId ?: device?.id
 fun DeviceLog.resolvedAction(): String = actionName ?: action ?: ""
