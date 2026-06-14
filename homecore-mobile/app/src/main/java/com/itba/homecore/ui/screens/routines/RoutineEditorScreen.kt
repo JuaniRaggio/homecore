@@ -134,7 +134,6 @@ fun RoutineEditorScreen(
             placeholder = "08:00"
         )
 
-        // Days
         Text(stringResource(R.string.routine_days_label), color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = TextSize.lg)
         val dayNames = stringArrayResource(R.array.routine_days)
         Row(
@@ -146,7 +145,7 @@ fun RoutineEditorScreen(
                 Surface(
                     shape = RoundedCornerShape(Radius.lg),
                     color = if (selected) AccentDark else Color.Transparent,
-                    border = if (selected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
+                    border = if (selected) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
                     modifier = Modifier.weight(Weight.Fill).clickable { viewModel.toggleDay(day) }
                 ) {
                     Text(
@@ -160,7 +159,6 @@ fun RoutineEditorScreen(
             }
         }
 
-        // Active toggle
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.routine_active_label), color = TextPrimary, fontSize = TextSize.lg, modifier = Modifier.weight(Weight.Fill))
             Switch(
@@ -176,7 +174,6 @@ fun RoutineEditorScreen(
 
         HorizontalDivider(color = SurfaceVariant)
 
-        // Actions
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.routine_actions_label), color = TextPrimary, fontSize = TextSize.lg, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(Weight.Fill))
             IconButton(onClick = { showActionPicker = true }) {
@@ -310,7 +307,7 @@ private fun ActionPickerDialog(
                         Surface(
                             shape = RoundedCornerShape(Radius.lg),
                             color = Color.Transparent,
-                            border = BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
+                            border = BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
                             modifier = Modifier.fillMaxWidth().clickable { onPick(device, action) }
                         ) {
                             Text(

@@ -183,7 +183,7 @@ private fun RoomCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(Radius.card))
+            .border(Stroke.hairline, AccentDark.copy(alpha = Alpha.strongBorder), RoundedCornerShape(Radius.card))
             .padding(Spacing.base)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {

@@ -219,7 +219,7 @@ private fun PillAction(text: String, onClick: () -> Unit) {
         shape = RoundedCornerShape(Radius.full),
         color = PillBackground,
         modifier = Modifier
-            .fillMaxWidth(0.85f)
+            .fillMaxWidth(Fraction.actionWidth)
             .clickable(onClick = onClick)
     ) {
         Text(
@@ -248,7 +248,7 @@ private fun ConsumptionCard(state: DevicesUiState) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(Radius.card))
+            .border(Stroke.hairline, AccentDark.copy(alpha = Alpha.strongBorder), RoundedCornerShape(Radius.card))
             .padding(Spacing.xl)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
@@ -278,7 +278,7 @@ private fun ConsumptionCard(state: DevicesUiState) {
                 }
                 Box(
                     modifier = Modifier
-                        .width(1.dp)
+                        .width(Stroke.hairline)
                         .height(Spacing.huge2)
                         .background(SurfaceVariant)
                 )

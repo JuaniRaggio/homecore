@@ -100,7 +100,6 @@ fun RegisterScreen(
             }
         }
 
-        //Back button
         IconButton(
             onClick = onBack,
             modifier = Modifier

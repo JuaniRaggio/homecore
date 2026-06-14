@@ -107,7 +107,6 @@ fun VerifyScreen(
                         isLoading = uiState is AuthUiState.Loading
                     )
 
-                    // Resend code
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,7 +137,6 @@ fun VerifyScreen(
             }
         }
 
-        // Back button
         IconButton(
             onClick = onBack,
             modifier = Modifier

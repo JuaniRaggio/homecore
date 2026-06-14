@@ -73,7 +73,7 @@ fun ControlSlider(
                 text = "${value.roundToInt()}$unit",
                 color = TextPrimary,
                 fontSize = TextSize.md,
-                modifier = Modifier.widthIn(min = 48.dp)
+                modifier = Modifier.widthIn(min = Size.sliderValueMinWidth)
             )
         }
     }
@@ -105,7 +105,7 @@ fun SegmentedSelector(
                     Surface(
                         shape = RoundedCornerShape(Radius.lg),
                         color = if (isSelected) AccentDark else Color.Transparent,
-                        border = if (isSelected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
+                        border = if (isSelected) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
                         modifier = Modifier.weight(Weight.Fill).fillMaxHeight().clickable { onSelect(option) }
                     ) {
                         // Center so single-line options align with siblings that wrap to two lines.
@@ -139,7 +139,7 @@ fun ColorSwatchRow(onPick: (String) -> Unit) {
                 modifier = Modifier
                     .size(IconSize.bell)
                     .background(Color(android.graphics.Color.parseColor(hex)), CircleShape)
-                    .border(1.dp, TextSecondary.copy(alpha = 0.4f), CircleShape)
+                    .border(Stroke.hairline, TextSecondary.copy(alpha = Alpha.hairlineBorder), CircleShape)
                     .clickable { onPick(hex) }
             )
         }
@@ -158,9 +158,9 @@ fun ControlButton(
     Surface(
         shape = RoundedCornerShape(Radius.lg),
         color = if (filled) AccentDark else Color.Transparent,
-        border = if (filled) null else BorderStroke(1.dp, Accent.copy(alpha = 0.5f)),
+        border = if (filled) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.outlineBorder)),
         modifier = modifier
-            .alpha(if (enabled) 1f else 0.4f)
+            .alpha(if (enabled) Alpha.opaque else Alpha.disabled)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
     ) {
         Text(
