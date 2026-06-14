@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Routine
+import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.descriptionText
 import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
@@ -42,6 +43,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val executingId by viewModel.executingId.collectAsStateWithLifecycle()
     var search by rememberSaveable { mutableStateOf("") }
+    val noScheduleMsg = stringResource(R.string.routine_no_schedule_error)
 
     // Routine editor shown over the list (create when id is null, edit otherwise).
     var editorOpen by rememberSaveable { mutableStateOf(false) }
@@ -107,6 +109,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
                                 isExecuting = r.id == executingId,
                                 onExecute = { viewModel.execute(r) },
                                 onToggleActive = { viewModel.toggleActive(r) },
+                                onToggleBlocked = { UiMessages.emit(noScheduleMsg) },
                                 onToggleFavorite = { viewModel.toggleFavorite(r) },
                                 onOpen = { editorId = r.id; editorOpen = true },
                                 modifier = cell
@@ -125,12 +128,15 @@ private fun RoutineCard(
     isExecuting: Boolean,
     onExecute: () -> Unit,
     onToggleActive: () -> Unit,
+    onToggleBlocked: () -> Unit,
     onToggleFavorite: () -> Unit,
     onOpen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isActive = routine.isActive()
     val titleColor = if (isActive) TextPrimary else TextSecondary
+    // A routine with no scheduled days can only be run on demand, not "activated".
+    val schedulable = routine.days().isNotEmpty()
 
     Box(
         modifier = modifier
@@ -162,18 +168,30 @@ private fun RoutineCard(
                         .clickable(onClick = onToggleFavorite)
                 )
                 Spacer(Modifier.weight(Weight.Fill))
-                Switch(
-                    checked = isActive,
-                    onCheckedChange = { onToggleActive() },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = ToggleOn,
-                        uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = ToggleOff,
-                        uncheckedBorderColor = Color.Transparent
-                    ),
-                    modifier = Modifier.scale(0.85f)
-                )
+                if (schedulable) {
+                    Switch(
+                        checked = isActive,
+                        onCheckedChange = { onToggleActive() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = ToggleOn,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = ToggleOff,
+                            uncheckedBorderColor = Color.Transparent
+                        ),
+                        modifier = Modifier.scale(SwitchScale)
+                    )
+                } else {
+                    // Greyed, non-interactive switch; tapping shows why it's disabled.
+                    Box(modifier = Modifier.clickable(onClick = onToggleBlocked)) {
+                        Switch(
+                            checked = false,
+                            onCheckedChange = null,
+                            enabled = false,
+                            modifier = Modifier.scale(SwitchScale)
+                        )
+                    }
+                }
             }
             val desc = routine.descriptionText()
             if (desc.isNotBlank()) {
@@ -181,7 +199,7 @@ private fun RoutineCard(
                     text = desc,
                     color = TextSecondary,
                     fontSize = TextSize.md,
-                    lineHeight = 18.sp
+                    lineHeight = LineHeight.normal
                 )
             }
             val sched = routineScheduleLabel(routine)
@@ -207,7 +225,7 @@ private fun RoutineCard(
                     if (isExecuting) {
                         CircularProgressIndicator(
                             color = Color.White,
-                            strokeWidth = 2.dp,
+                            strokeWidth = Stroke.indicator,
                             modifier = Modifier
                                 .padding(horizontal = Spacing.xl, vertical = Spacing.xs)
                                 .size(IconSize.xs)

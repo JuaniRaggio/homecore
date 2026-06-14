@@ -106,7 +106,7 @@ fun DeviceCard(
     val isLamp     = cat == DeviceCategory.LAMP
     val highlight  = isDoor && device.state?.status?.lowercase() in listOf("locked", "closed")
 
-    val borderColor = if (highlight) AccentDark else Accent.copy(alpha = 0.4f)
+    val borderColor = if (highlight) AccentDark else Accent.copy(alpha = Alpha.hairlineBorder)
     val iconBg      = if (isLamp) LampIconBg else Color.Transparent
     val iconTint    = if (isLamp) DeviceLight else TextPrimary
     val roomLabel   = device.room?.name ?: stringResource(R.string.room_none)
@@ -114,7 +114,7 @@ fun DeviceCard(
     Box(
         modifier = modifier
             .background(Surface, RoundedCornerShape(Radius.xl))
-            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(Radius.xl))
+            .border(BorderStroke(Stroke.hairline, borderColor), RoundedCornerShape(Radius.xl))
             .clickable(onClick = onClick)
             .padding(Spacing.base)
     ) {
@@ -157,14 +157,14 @@ fun DeviceCard(
                 color = TextPrimary,
                 fontSize = TextSize.lg,
                 fontWeight = FontWeight.SemiBold,
-                lineHeight = 18.sp
+                lineHeight = LineHeight.normal
             )
             Spacer(Modifier.height(Spacing.xs))
             Text(
                 text = roomLabel,
                 color = TextSecondary,
                 fontSize = TextSize.sm,
-                lineHeight = 16.sp
+                lineHeight = LineHeight.compact
             )
             Spacer(Modifier.height(Spacing.xs))
             Text(
@@ -279,7 +279,7 @@ private fun StatusBadge(
 ) {
     Row(
         modifier = Modifier
-            .border(BorderStroke(1.dp, color), RoundedCornerShape(Radius.lg))
+            .border(BorderStroke(Stroke.hairline, color), RoundedCornerShape(Radius.lg))
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = Spacing.base, vertical = Spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
@@ -304,7 +304,7 @@ private fun ToggleRow(isOn: Boolean, onToggle: (Boolean) -> Unit) {
                 uncheckedTrackColor  = ToggleOff,
                 uncheckedBorderColor = Color.Transparent
             ),
-            modifier = Modifier.scale(0.85f)
+            modifier = Modifier.scale(SwitchScale)
         )
     }
 }
@@ -364,9 +364,9 @@ private fun CardIconButton(
         modifier = Modifier
             .size(IconSize.box)
             .background(bg, RoundedCornerShape(Radius.md))
-            .border(BorderStroke(1.dp, Accent.copy(alpha = 0.4f)), RoundedCornerShape(Radius.md))
+            .border(BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)), RoundedCornerShape(Radius.md))
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
-            .alpha(if (enabled) 1f else 0.4f),
+            .alpha(if (enabled) Alpha.opaque else Alpha.disabled),
         contentAlignment = Alignment.Center
     ) {
         Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(IconSize.md))

@@ -162,7 +162,7 @@ private fun FavoriteRoutineCard(
                     text = sched,
                     color = Accent,
                     fontSize = TextSize.base,
-                    lineHeight = 16.sp
+                    lineHeight = LineHeight.compact
                 )
             }
             Row(

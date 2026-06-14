@@ -146,7 +146,7 @@ fun RoutineEditorScreen(
                 Surface(
                     shape = RoundedCornerShape(Radius.lg),
                     color = if (selected) AccentDark else Color.Transparent,
-                    border = if (selected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
+                    border = if (selected) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
                     modifier = Modifier.weight(Weight.Fill).clickable { viewModel.toggleDay(day) }
                 ) {
                     Text(
@@ -310,7 +310,7 @@ private fun ActionPickerDialog(
                         Surface(
                             shape = RoundedCornerShape(Radius.lg),
                             color = Color.Transparent,
-                            border = BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
+                            border = BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
                             modifier = Modifier.fillMaxWidth().clickable { onPick(device, action) }
                         ) {
                             Text(
