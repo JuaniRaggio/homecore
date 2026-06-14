@@ -22,6 +22,7 @@ import com.itba.homecore.data.model.Room
 import com.itba.homecore.ui.components.ActionPill
 import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
+import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.HomesUiState
@@ -67,14 +68,15 @@ fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
                 if (s.homes.isEmpty()) {
                     StatusMessage(stringResource(R.string.empty_homes))
                 } else {
-                    s.homes.forEach { home ->
+                    UniformGrid(items = s.homes, columns = 1) { home, cell ->
                         val rooms = s.rooms.filter { it.home?.id == home.id }
                         HomeCard(
                             home = home,
                             rooms = rooms,
                             onRename = { renameHomeId = home.id; renameHomeName = home.name },
                             onDelete = { deleteHomeId = home.id; deleteHomeName = home.name },
-                            onAddRoom = { addRoomHomeId = home.id }
+                            onAddRoom = { addRoomHomeId = home.id },
+                            modifier = cell
                         )
                     }
                 }
@@ -138,11 +140,11 @@ private fun HomeCard(
     rooms: List<Room>,
     onRename: () -> Unit,
     onDelete: () -> Unit,
-    onAddRoom: () -> Unit
+    onAddRoom: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(Radius.card))
             .padding(Spacing.base)
     ) {

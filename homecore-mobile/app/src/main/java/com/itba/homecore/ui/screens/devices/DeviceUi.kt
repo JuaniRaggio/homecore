@@ -109,7 +109,10 @@ fun DeviceCard(
             .clickable(onClick = onClick)
             .padding(Spacing.base)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        // Fills the cell (UniformGrid gives every card the same height); a weighted spacer
+        // pushes the status + toggle to the bottom so the toggle sits bottom-right on every
+        // card regardless of how many lines the name takes.
+        Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,6 +141,8 @@ fun DeviceCard(
                 )
             }
 
+            Spacer(Modifier.height(Spacing.md))
+
             Text(
                 text = device.name,
                 color = TextPrimary,
@@ -145,7 +150,7 @@ fun DeviceCard(
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 18.sp
             )
-
+            Spacer(Modifier.height(Spacing.xs))
             Text(
                 text = if (isDoor && !isOn) "$roomLabel\n${stringResource(R.string.device_off_label)}" else roomLabel,
                 color = TextSecondary,
@@ -153,13 +158,30 @@ fun DeviceCard(
                 lineHeight = 16.sp
             )
 
-            // Quick switch only for types with an on/off-equivalent action (e.g. not a fridge).
-            if (DeviceCapabilities.quickToggle(cat) != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            Spacer(Modifier.weight(1f))
+
+            // Bottom row: status on the left, toggle anchored bottom-right.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    when {
+                        isLamp && isOn -> Text(
+                            text = stringResource(R.string.device_on_pct, device.state?.brightness ?: 100),
+                            color = SuccessColor,
+                            fontSize = TextSize.base,
+                            fontWeight = FontWeight.Medium
+                        )
+                        isDoor -> Icon(
+                            imageVector = if (isOn) Icons.Default.LockOpen else Icons.Default.Lock,
+                            contentDescription = null,
+                            tint = AccentDark,
+                            modifier = Modifier.size(IconSize.md)
+                        )
+                    }
+                }
+                if (DeviceCapabilities.quickToggle(cat) != null) {
                     Switch(
                         checked = isOn,
                         onCheckedChange = onToggle,
@@ -171,26 +193,6 @@ fun DeviceCard(
                             uncheckedBorderColor = Color.Transparent
                         ),
                         modifier = Modifier.scale(0.85f)
-                    )
-                }
-            }
-
-            when {
-                isLamp && isOn -> Text(
-                    text = stringResource(R.string.device_on_pct, device.state?.brightness ?: 100),
-                    color = SuccessColor,
-                    fontSize = TextSize.base,
-                    fontWeight = FontWeight.Medium
-                )
-                isDoor -> Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Icon(
-                        imageVector = if (isOn) Icons.Default.LockOpen else Icons.Default.Lock,
-                        contentDescription = null,
-                        tint = AccentDark,
-                        modifier = Modifier.size(IconSize.md)
                     )
                 }
             }

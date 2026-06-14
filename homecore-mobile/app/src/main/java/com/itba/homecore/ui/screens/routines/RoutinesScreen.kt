@@ -30,6 +30,7 @@ import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.StatusMessage
+import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.RoutinesUiState
@@ -89,14 +90,15 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
                 if (filtered.isEmpty()) {
                     StatusMessage(stringResource(R.string.empty_routines))
                 } else {
-                    filtered.forEach { r ->
+                    UniformGrid(items = filtered, columns = 1) { r, cell ->
                         key(r.id) {
                             RoutineCard(
                                 routine = r,
                                 isExecuting = r.id == executingId,
                                 onExecute = { viewModel.execute(r) },
                                 onToggleActive = { viewModel.toggleActive(r) },
-                                onToggleFavorite = { viewModel.toggleFavorite(r) }
+                                onToggleFavorite = { viewModel.toggleFavorite(r) },
+                                modifier = cell
                             )
                         }
                     }
@@ -112,14 +114,14 @@ private fun RoutineCard(
     isExecuting: Boolean,
     onExecute: () -> Unit,
     onToggleActive: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val isActive = routine.isActive()
     val titleColor = if (isActive) TextPrimary else TextSecondary
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .background(SurfaceVariant, RoundedCornerShape(Radius.card))
             .padding(Spacing.xl)
     ) {
