@@ -18,11 +18,14 @@
     <string name="title_recover">Recuperar contraseña</string>
     <string name="recover_subtitle">Te enviaremos un código a tu email para que puedas restablecer tu contraseña.</string>
     <string name="btn_send_code">Enviar código</string>
-    <string name="title_reset_password">Nueva contraseña</string>
-    <string name="reset_subtitle_email">Ingresá el código que enviamos a %1$s y elegí una nueva contraseña.</string>
+    <string name="title_new_password">Nueva contraseña</string>
+    <string name="recover_reset_subtitle">Ingresá el código de recuperación y tu nueva contraseña.</string>
     <string name="label_recovery_code">Código de recuperación</string>
     <string name="label_new_password">Nueva contraseña</string>
+    <string name="label_confirm_new_password">Confirmar contraseña</string>
     <string name="btn_reset_password">Restablecer contraseña</string>
+    <string name="recover_done_title">¡Listo!</string>
+    <string name="recover_done_message">Tu contraseña se restableció correctamente.</string>
 
     <!-- Verificación de cuenta -->
     <string name="title_verify">Verificar cuenta</string>
@@ -33,19 +36,6 @@
     <string name="verify_resend">¿No te llegó? Reenviar código</string>
     <string name="verify_resending">Enviando…</string>
     <string name="verify_resend_sent">Código reenviado a tu email</string>
-
-    <!-- Recuperar contraseña -->
-    <string name="title_recover">Recuperar cuenta</string>
-    <string name="recover_subtitle">Ingresá tu email y te enviaremos un código para restablecer tu contraseña.</string>
-    <string name="btn_send_code">Enviar código</string>
-    <string name="title_new_password">Nueva contraseña</string>
-    <string name="recover_reset_subtitle">Ingresá el código de recuperación y tu nueva contraseña.</string>
-    <string name="label_recovery_code">Código de recuperación</string>
-    <string name="label_new_password">Nueva contraseña</string>
-    <string name="label_confirm_new_password">Confirmar contraseña</string>
-    <string name="btn_reset_password">Restablecer contraseña</string>
-    <string name="recover_done_title">¡Listo!</string>
-    <string name="recover_done_message">Tu contraseña se restableció correctamente.</string>
 
     <!-- Bottom nav -->
     <string name="nav_home">Inicio</string>
