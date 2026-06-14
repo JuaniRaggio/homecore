@@ -79,12 +79,18 @@ fun ControlSlider(
     }
 }
 
-/** Single choice from a fixed set of API values (modes, genre, fan speed, ...). */
+/**
+ * Single choice from a fixed set of canonical API values (modes, genre, fan speed, ...).
+ * [options] are the exact values sent to the API; [labelFor] maps each to a display label
+ * (defaults to capitalizing the value), so the UI can show Spanish while the request keeps
+ * the canonical value the backend expects.
+ */
 @Composable
 fun SegmentedSelector(
     label: String,
     options: List<String>,
     selected: String?,
+    labelFor: (String) -> String = { it.replaceFirstChar { c -> c.uppercase() } },
     onSelect: (String) -> Unit
 ) {
     Column {
@@ -103,10 +109,11 @@ fun SegmentedSelector(
                         modifier = Modifier.weight(1f).clickable { onSelect(option) }
                     ) {
                         Text(
-                            text = option.replaceFirstChar { it.uppercase() },
+                            text = labelFor(option),
                             color = if (isSelected) Color.White else TextSecondary,
                             fontSize = TextSize.md,
                             textAlign = TextAlign.Center,
+                            maxLines = 1,
                             modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
                         )
                     }

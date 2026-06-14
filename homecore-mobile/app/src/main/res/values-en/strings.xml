@@ -177,6 +177,35 @@
     <string name="act_unit">Unit</string>
     <string name="device_detail_title">Device detail</string>
 
+    <!-- Labels for the canonical values the API expects (modes, genres, units) -->
+    <string name="ac_mode_cool">Cool</string>
+    <string name="ac_mode_heat">Heat</string>
+    <string name="ac_mode_fan">Fan</string>
+    <string name="genre_classical">Classical</string>
+    <string name="genre_country">Country</string>
+    <string name="genre_dance">Dance</string>
+    <string name="genre_latina">Latin</string>
+    <string name="genre_pop">Pop</string>
+    <string name="genre_rock">Rock</string>
+    <string name="vacuum_mode_vacuum">Vacuum</string>
+    <string name="vacuum_mode_mop">Mop</string>
+    <string name="fridge_mode_default">Normal</string>
+    <string name="fridge_mode_vacation">Vacation</string>
+    <string name="fridge_mode_party">Party</string>
+    <string name="oven_heat_conventional">Conventional</string>
+    <string name="oven_heat_bottom">Bottom</string>
+    <string name="oven_heat_top">Top</string>
+    <string name="oven_grill_large">Full</string>
+    <string name="oven_grill_eco">Eco</string>
+    <string name="oven_grill_off">Off</string>
+    <string name="oven_conv_normal">Normal</string>
+    <string name="oven_conv_eco">Eco</string>
+    <string name="oven_conv_off">Off</string>
+    <string name="unit_ml">Milliliters</string>
+    <string name="unit_cl">Centiliters</string>
+    <string name="unit_dl">Deciliters</string>
+    <string name="unit_l">Liters</string>
+
     <!-- Feedback / misc actions -->
     <string name="not_available_yet">Not available yet</string>
     <string name="no_new_notifications">No new notifications</string>

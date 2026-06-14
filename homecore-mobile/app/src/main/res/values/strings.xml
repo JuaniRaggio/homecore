@@ -177,6 +177,35 @@
     <string name="act_unit">Unidad</string>
     <string name="device_detail_title">Detalle del dispositivo</string>
 
+    <!-- Etiquetas para los valores canonicos que espera la API (modos, generos, unidades) -->
+    <string name="ac_mode_cool">Frío</string>
+    <string name="ac_mode_heat">Calor</string>
+    <string name="ac_mode_fan">Ventilación</string>
+    <string name="genre_classical">Clásica</string>
+    <string name="genre_country">Country</string>
+    <string name="genre_dance">Dance</string>
+    <string name="genre_latina">Latina</string>
+    <string name="genre_pop">Pop</string>
+    <string name="genre_rock">Rock</string>
+    <string name="vacuum_mode_vacuum">Aspirar</string>
+    <string name="vacuum_mode_mop">Trapear</string>
+    <string name="fridge_mode_default">Normal</string>
+    <string name="fridge_mode_vacation">Vacaciones</string>
+    <string name="fridge_mode_party">Fiesta</string>
+    <string name="oven_heat_conventional">Convencional</string>
+    <string name="oven_heat_bottom">Abajo</string>
+    <string name="oven_heat_top">Arriba</string>
+    <string name="oven_grill_large">Completo</string>
+    <string name="oven_grill_eco">Económico</string>
+    <string name="oven_grill_off">Apagado</string>
+    <string name="oven_conv_normal">Normal</string>
+    <string name="oven_conv_eco">Económico</string>
+    <string name="oven_conv_off">Apagado</string>
+    <string name="unit_ml">Mililitros</string>
+    <string name="unit_cl">Centilitros</string>
+    <string name="unit_dl">Decilitros</string>
+    <string name="unit_l">Litros</string>
+
     <!-- Feedback / acciones varias -->
     <string name="not_available_yet">Función no disponible todavía</string>
     <string name="no_new_notifications">No tenés notificaciones nuevas</string>
