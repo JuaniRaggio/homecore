@@ -194,9 +194,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Loads the logged-in user's profile from the API (replaces any placeholder name). */
+    /**
+     * Loads the logged-in user's profile. Shows the name/email saved at login first
+     * (instant, offline) and then refreshes from the API when reachable.
+     */
     fun loadProfile() {
         viewModelScope.launch {
+            repository.getSessionUser()?.let { _profile.value = it }
             repository.getProfile().onSuccess { _profile.value = it }
         }
     }

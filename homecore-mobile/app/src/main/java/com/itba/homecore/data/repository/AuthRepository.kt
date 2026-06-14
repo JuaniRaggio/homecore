@@ -32,4 +32,7 @@ interface AuthRepository {
 
     /** Profile of the logged-in user. */
     suspend fun getProfile(): Result<User>
+
+    /** Locally persisted user (name + email saved at login), or null if there is no session. */
+    suspend fun getSessionUser(): User?
 }

@@ -128,7 +128,9 @@
 
     <!-- User -->
     <string name="profile">Profile</string>
-    <string name="manage_account">Account settings</string>
+    <string name="profile_default_name">User</string>
+    <string name="manage_account">User information</string>
+    <string name="label_full_name">Full name</string>
     <string name="manage_password">Change password</string>
     <string name="change_password_title">Change password</string>
     <string name="label_current_password">Current password</string>

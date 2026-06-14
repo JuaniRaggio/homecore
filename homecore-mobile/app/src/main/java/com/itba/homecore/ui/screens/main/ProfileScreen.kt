@@ -12,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,14 +37,20 @@ import com.itba.homecore.viewmodel.DevicesViewModel
 
 @Composable
 fun ProfileScreen(
-    userName: String = "Maria Fernandez",
     onLogout: () -> Unit = {},
     devicesVm: DevicesViewModel = viewModel(),
     authVm: AuthViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
+    val profile by authVm.profile.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
+
+    // Load the logged-in user's name/email (session first, then API refresh).
+    LaunchedEffect(Unit) { authVm.loadProfile() }
+
+    val displayName = profile?.fullName?.ifBlank { null } ?: stringResource(R.string.profile_default_name)
+    val email = profile?.email.orEmpty()
 
     Column(
         modifier = Modifier
@@ -59,17 +63,40 @@ fun ProfileScreen(
     ) {
         HouseHeader()
 
-        ProfileCard(
-            userName = userName,
-            onChangePassword = { showChangePassword = true }
-        )
+        // Darker outer box that contains all content below header.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Surface, RoundedCornerShape(Radius.card))
+                .padding(Spacing.sm)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            ) {
+                // Lighter inner box (SurfaceVariant) containing only ProfileCard.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(SurfaceVariant, RoundedCornerShape(Radius.xl2))
+                        .padding(vertical = Spacing.xl4, horizontal = Spacing.xl)
+                ) {
+                    ProfileCard(
+                        name = displayName,
+                        email = email,
+                        onChangePassword = { showChangePassword = true }
+                    )
+                }
 
+                LogoutButton(onClick = { showLogoutDialog = true })
 
-        LogoutButton(onClick = { showLogoutDialog = true })
+                ConsumptionCard(state = devicesState)
 
-        ConsumptionCard(state = devicesState)
-
-        HistoryCard(state = devicesState)
+                HistoryCard(state = devicesState)
+            }
+        }
     }
 
     if (showLogoutDialog) {
@@ -151,67 +178,69 @@ private fun LogoutConfirmDialog(
 }
 
 @Composable
-private fun ProfileCard(userName: String, onChangePassword: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(SurfaceVariant, RoundedCornerShape(Radius.card))
-            .padding(Spacing.xl3)
+private fun ProfileCard(
+    name: String,
+    email: String,
+    onChangePassword: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.base)
+        Text(
+            text = stringResource(R.string.profile),
+            color = TextPrimary,
+            fontSize = TextSize.xxl,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Avatar = initials of the user's name + last name.
+        Box(
+            modifier = Modifier
+                .size(IconSize.avatar)
+                .background(AvatarBackground, CircleShape),
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.profile),
-                color = TextPrimary,
-                fontSize = TextSize.xl,
+                text = initialsOf(name),
+                color = Color.White,
+                fontSize = TextSize.headline,
                 fontWeight = FontWeight.Bold
             )
-
-            // Avatar (Box with overlay)
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.avatar)
-                        .background(AvatarBackground, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(IconSize.button)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.xl)
-                        .background(SurfaceVariant, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = TextPrimary,
-                        modifier = Modifier.size(IconSize.xs)
-                    )
-                }
-            }
-
-            Text(
-                text = userName,
-                color = TextPrimary,
-                fontSize = TextSize.xxl,
-                fontWeight = FontWeight.Bold
-            )
-
-            PillAction(stringResource(R.string.manage_account)) { /* TODO */ }
-            PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
         }
+
+        Text(
+            text = name,
+            color = TextPrimary,
+            fontSize = TextSize.title,
+            fontWeight = FontWeight.Bold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Text(
+            text = email.ifBlank { "—" },
+            color = TextSecondary,
+            fontSize = TextSize.md,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Spacer(Modifier.height(Spacing.xs2))
+
+        PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
     }
 }
+
+/** Initials from a full name: "Juan García" → "JG", "Juan" → "J". */
+private fun initialsOf(name: String): String {
+    val parts = name.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+    return when {
+        parts.isEmpty()   -> "?"
+        parts.size == 1   -> parts[0].take(1).uppercase()
+        else              -> "${parts.first().first()}${parts.last().first()}".uppercase()
+    }
+}
+
 
 @Composable
 private fun PillAction(text: String, onClick: () -> Unit) {
@@ -225,7 +254,7 @@ private fun PillAction(text: String, onClick: () -> Unit) {
         Text(
             text = text,
             color = PillText,
-            fontSize = TextSize.base,
+            fontSize = TextSize.md,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .fillMaxWidth()
