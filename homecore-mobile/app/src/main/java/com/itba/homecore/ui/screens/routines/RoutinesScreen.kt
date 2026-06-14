@@ -161,7 +161,7 @@ private fun RoutineCard(
                         .size(IconSize.md)
                         .clickable(onClick = onToggleFavorite)
                 )
-                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(Weight.Fill))
                 Switch(
                     checked = isActive,
                     onCheckedChange = { onToggleActive() },
@@ -194,7 +194,7 @@ private fun RoutineCard(
             }
             // Push "Run now" to the bottom so it sits at the same place on every card,
             // regardless of whether the routine has a description/schedule above.
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(Weight.Fill))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End

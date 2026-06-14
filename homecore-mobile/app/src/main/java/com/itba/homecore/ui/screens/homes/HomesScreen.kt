@@ -56,7 +56,7 @@ fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
                 color = TextPrimary,
                 fontSize = TextSize.title,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(Weight.Fill)
             )
             ActionPill(text = stringResource(R.string.new_home), onClick = { showCreateHome = true })
         }
@@ -155,7 +155,7 @@ private fun HomeCard(
                     color = TextPrimary,
                     fontSize = TextSize.xxl,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(Weight.Fill)
                 )
                 OverflowMenu(
                     contentDescription = stringResource(R.string.cd_home_options),
