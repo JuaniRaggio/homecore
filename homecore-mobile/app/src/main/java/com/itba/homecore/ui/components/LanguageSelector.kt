@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.itba.homecore.R
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.util.LocaleManager
@@ -42,13 +41,13 @@ fun LanguageSelector(modifier: Modifier = Modifier) {
                 label = stringResource(R.string.language_spanish),
                 selected = current == Language.SPANISH,
                 onClick = { LocaleManager.set(Language.SPANISH) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(Weight.Fill)
             )
             LanguageOption(
                 label = stringResource(R.string.language_english),
                 selected = current == Language.ENGLISH,
                 onClick = { LocaleManager.set(Language.ENGLISH) },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(Weight.Fill)
             )
         }
     }
@@ -64,7 +63,7 @@ private fun LanguageOption(
     Surface(
         shape = RoundedCornerShape(Radius.lg),
         color = if (selected) AccentDark else Color.Transparent,
-        border = if (selected) null else BorderStroke(1.dp, Accent.copy(alpha = 0.4f)),
+        border = if (selected) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
         modifier = modifier.clickable(onClick = onClick)
     ) {
         Text(
