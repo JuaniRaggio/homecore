@@ -19,7 +19,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.data.model.DeviceLog
+import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isOn
 import com.itba.homecore.data.model.resolvedAction
 import com.itba.homecore.ui.components.HouseHeader
@@ -207,18 +209,19 @@ private fun HistoryRow(log: DeviceLog, deviceName: String) {
     }
 }
 
+/** Rough per-type power draw (W) for the running-devices estimate; keyed by [DeviceCategory]. */
 private fun estimateConsumption(devices: List<Device>): String {
     val watts = devices.filter { it.isOn() }.sumOf { d ->
-        val w: Int = when (d.type.name.lowercase()) {
-            "lamp" -> 8
-            "ac" -> 1200
-            "oven" -> 1500
-            "refrigerator" -> 150
-            "speaker" -> 20
-            "vacuum" -> 90
+        val w: Int = when (d.category()) {
+            DeviceCategory.LAMP -> 8
+            DeviceCategory.AC -> 1200
+            DeviceCategory.OVEN -> 1500
+            DeviceCategory.REFRIGERATOR -> 150
+            DeviceCategory.SPEAKER -> 20
+            DeviceCategory.VACUUM -> 90
             else -> 5
         }
         w
     }
-    return "${watts} W"
+    return "$watts W"
 }
