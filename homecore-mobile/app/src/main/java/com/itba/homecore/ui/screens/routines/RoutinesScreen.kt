@@ -2,7 +2,9 @@ package com.itba.homecore.ui.screens.routines
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +30,7 @@ import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.descriptionText
 import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
+import com.itba.homecore.ui.components.ActionPill
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.StatusMessage
@@ -60,7 +63,6 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .verticalScroll(rememberScrollState())
             .padding(horizontal = Spacing.xl)
             .padding(bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.base)
