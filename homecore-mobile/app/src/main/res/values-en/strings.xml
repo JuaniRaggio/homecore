@@ -146,6 +146,9 @@
     <string name="language_title">Language</string>
     <string name="language_spanish">Español</string>
     <string name="language_english">English</string>
+    <string name="theme_title">Theme</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
     <string name="logout">Sign out</string>
     <string name="logout_title">Sign out?</string>
     <string name="logout_message">You will need to sign in again the next time you open the app.</string>
