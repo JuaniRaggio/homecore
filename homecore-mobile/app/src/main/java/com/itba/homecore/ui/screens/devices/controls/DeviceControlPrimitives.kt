@@ -39,7 +39,7 @@ fun SectionLabel(text: String) {
     )
 }
 
-/** Labeled numeric slider that applies on release (matches the web). */
+/** Labeled numeric slider that applies its value on release, not while dragging (avoids spamming the API). */
 @Composable
 fun ControlSlider(
     label: String,

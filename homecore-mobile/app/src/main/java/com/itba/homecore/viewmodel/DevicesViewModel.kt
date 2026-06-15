@@ -97,12 +97,9 @@ class DevicesViewModel(
                 _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            // Filter by the selected home (when set), then resolve each device's room name
-            // from the rooms list (the /devices payload only carries the room id).
             val homeId = currentHomeId
-            // Within a home, show only its rooms and the devices in those rooms. Orphan rooms
-            // (no home) and orphan devices (no room) are not shown in a home view, mirroring the
-            // web, which lists devices by walking each home's rooms.
+            // Within a home, orphan rooms (no home) and orphan devices (no room) are hidden.
+            // The /devices payload carries the room id but not its name, so it is resolved below.
             val rooms = if (homeId == null) allRooms
                         else allRooms.filter { r -> r.home?.id == homeId }
             val roomIds = rooms.map { it.id }.toSet()
@@ -121,8 +118,8 @@ class DevicesViewModel(
     }
 
     /**
-     * Card quick switch. The on/off-equivalent action per type comes from the shared
-     * [DeviceCapabilities] (mirrors the web), so e.g. a curtain sends up/down — never on/off.
+     * Card quick switch. The on/off-equivalent action per type comes from [DeviceCapabilities],
+     * so e.g. a curtain sends up/down — never on/off.
      */
     fun toggleDevice(device: Device, turnOn: Boolean) {
         val toggle = DeviceCapabilities.quickToggle(device.category()) ?: return

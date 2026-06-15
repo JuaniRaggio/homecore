@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 /**
  * Editable state for a single routine, used both to create a new one and to edit an
  * existing one (detail screen). Holds the working copy of every field plus the device
- * list needed by the action picker, mirroring the web new/edit/detail views.
+ * list needed by the action picker.
  */
 data class RoutineEditorState(
     val loading: Boolean = true,

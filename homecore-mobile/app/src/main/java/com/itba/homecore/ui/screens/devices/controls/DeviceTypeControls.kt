@@ -24,8 +24,7 @@ import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.theme.*
 
 /**
- * Bespoke controls per device type, one composable each — mirroring the web's
- * dedicated control components (LightControls, AcControls, ...). They all share the
+ * Bespoke controls per device type, one composable each. They all share the
  * primitives in DeviceControlPrimitives.kt and take the same contract:
  * the current [device] and an [onAction] that sends (apiAction, params) to the API.
  * The action name always comes from [DeviceAction] so it stays aligned with the backend.

@@ -188,7 +188,7 @@ fun DeviceCard(
     }
 }
 
-/** Short, state-aware status line shown on the card (mirrors the web statusText). */
+/** Short, state-aware status line shown on the card. */
 @Composable
 private fun deviceStatusText(device: Device, cat: DeviceCategory, isOn: Boolean): String = when (cat) {
     DeviceCategory.DOOR, DeviceCategory.BLINDS ->

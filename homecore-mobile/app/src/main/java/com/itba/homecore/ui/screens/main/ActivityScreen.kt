@@ -209,8 +209,7 @@ private fun HistoryRow(log: DeviceLog, deviceName: String) {
 
 /**
  * Sums the per-type [com.itba.homecore.data.model.DeviceType.powerUsage] (from the /devicetypes
- * catalog) of every device that is on, mirroring the web's calcConsumption. Devices whose type
- * has no powerUsage contribute 0.
+ * catalog) of every device that is on. Devices whose type has no powerUsage contribute 0.
  */
 private fun estimateConsumption(devices: List<Device>): String {
     val watts = devices.filter { it.isOn() }.sumOf { it.type.powerUsage ?: 0.0 }

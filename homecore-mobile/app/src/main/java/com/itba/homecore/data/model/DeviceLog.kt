@@ -3,8 +3,7 @@ package com.itba.homecore.data.model
 import com.google.gson.annotations.SerializedName
 
 /**
- * Action history entry. The API sometimes embeds the device and sometimes
- * only its id, matching how the web app consumes it in HistoryView.
+ * Action history entry. The API sometimes embeds the full device and sometimes only its id.
  */
 data class DeviceLog(
     @SerializedName("id")         val id: String = "",

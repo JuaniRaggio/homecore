@@ -54,8 +54,8 @@ private fun availableActions(cat: DeviceCategory): List<DeviceAction> = when (ca
 }
 
 /**
- * Create / edit / detail of a routine. Mirrors the web's new-edit-detail scope: name,
- * description, schedule (time + days), active flag, the action steps, execute and delete.
+ * Create / edit / detail of a routine: name, description, schedule (time + days),
+ * active flag, the action steps, execute and delete.
  */
 @Composable
 fun RoutineEditorScreen(
