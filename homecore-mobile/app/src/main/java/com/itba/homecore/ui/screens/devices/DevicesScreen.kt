@@ -3,8 +3,6 @@ package com.itba.homecore.ui.screens.devices
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -15,14 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.itba.homecore.R
 import com.itba.homecore.data.model.*
-import com.itba.homecore.ui.components.ActionPill
+import com.itba.homecore.ui.components.AddFab
+import com.itba.homecore.ui.components.FabAction
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.OverflowMenu
@@ -61,83 +58,61 @@ fun DevicesScreen(
     val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
     val noRoomLabel = stringResource(R.string.room_none)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .padding(horizontal = Spacing.xl)
-            .padding(top = Spacing.sm, bottom = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.base)
-    ) {
-        HouseHeader(
-            homes = homes,
-            selectedHome = selectedHome,
-            onHomeSelect = { homesVm.selectHome(it) },
-            onAddHome = { showCreateHome = true }
-        )
-        HcSearchBar(
-            value = search,
-            onValueChange = { search = it },
-            placeholder = stringResource(R.string.search_device)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.End)
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.xl)
+                .padding(top = Spacing.sm, bottom = Spacing.huge),
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
         ) {
-            ActionPill(text = stringResource(R.string.new_device), onClick = { showAddDevice = true })
-            ActionPill(text = stringResource(R.string.new_room), onClick = { showAddRoom = true })
-        }
+            HouseHeader(
+                homes = homes,
+                selectedHome = selectedHome,
+                onHomeSelect = { homesVm.selectHome(it) },
+                onAddHome = { showCreateHome = true }
+            )
+            HcSearchBar(
+                value = search,
+                onValueChange = { search = it },
+                placeholder = stringResource(R.string.search_device)
+            )
 
-
-            Box(){
-                Box() {
-                    when (val s = state) {
-                        is DevicesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
-                        is DevicesUiState.Error   -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
-                        is DevicesUiState.Success -> {
-                            val grouped = remember(s.devices, s.rooms, search, noRoomLabel) {
-                                groupDevicesByRoom(s.devices, s.rooms, search, noRoomLabel)
-                            }
-
-                            if (grouped.isEmpty()) {
-                                StatusMessage(stringResource(R.string.empty_devices))
-                            } else {
-                                LazyColumn() {
-                                    items(grouped){
-                                        RoomCard(
-                                            group    = it,
-                                            columns  = columns,
-                                            onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
-                                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
-                                            onOpen = { device -> onDeviceClick(device.id) },
-                                            onDeviceAction = { device, action, params -> viewModel.runAction(device.id, action, params) },
-                                            onRenameRoom = { renameRoomId = it.roomId; renameRoomName = it.name },
-                                            onDeleteRoom = { deleteRoomId = it.roomId; deleteRoomName = it.name }
-                                        )
-                                    }
-                                }
-                                //      grouped.forEach { group ->
-
-                                // }
-                            }
+            when (val s = state) {
+                is DevicesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
+                is DevicesUiState.Error   -> StatusMessage(s.message, isError = true, onRetry = { viewModel.loadForHome(selectedHome?.id) })
+                is DevicesUiState.Success -> {
+                    val grouped = remember(s.devices, s.rooms, search, noRoomLabel) {
+                        groupDevicesByRoom(s.devices, s.rooms, search, noRoomLabel)
+                    }
+                    if (grouped.isEmpty()) {
+                        StatusMessage(stringResource(R.string.empty_devices))
+                    } else {
+                        grouped.forEach { group ->
+                            RoomCard(
+                                group = group,
+                                columns = columns,
+                                onToggle = { device, newState -> viewModel.toggleDevice(device, newState) },
+                                onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
+                                onOpen = { device -> onDeviceClick(device.id) },
+                                onDeviceAction = { device, action, params -> viewModel.runAction(device.id, action, params) },
+                                onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
+                                onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
+                            )
                         }
-
                     }
-
-                }
-                FloatingActionButton(onClick = {},
-                    modifier = Modifier.align(Alignment.BottomEnd)) {
-                    Column() {
-                            ActionPill(modifier = Modifier.padding(Spacing.sm),text = stringResource(R.string.new_device), onClick = { showAddDevice = true })
-                            ActionPill(modifier = Modifier.padding(Spacing.sm),text = stringResource(R.string.new_room), onClick = { showAddRoom = true })
-
-                    }
-
-
                 }
             }
+        }
 
-
+        AddFab(
+            actions = listOf(
+                FabAction(stringResource(R.string.new_device)) { showAddDevice = true },
+                FabAction(stringResource(R.string.new_room)) { showAddRoom = true }
+            ),
+            contentDescription = stringResource(R.string.cd_add)
+        )
     }
 
     if (showAddDevice) {

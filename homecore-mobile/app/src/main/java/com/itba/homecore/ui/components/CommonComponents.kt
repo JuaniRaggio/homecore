@@ -7,6 +7,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -87,6 +90,61 @@ fun <T> UniformGrid(
                 p.placeRelative(x, y)
             }
         }
+    }
+}
+
+/** One option offered by [AddFab]. */
+data class FabAction(val label: String, val onClick: () -> Unit)
+
+/**
+ * Bottom-right "add" floating button. With a single [actions] entry it fires it directly;
+ * with several it expands into a labeled speed-dial. Must be placed inside a Box (it aligns
+ * itself to the bottom-end), so screens have one consistent add affordance.
+ */
+@Composable
+fun BoxScope.AddFab(actions: List<FabAction>, contentDescription: String) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    Column(
+        modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.xl),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+    ) {
+        if (expanded && actions.size > 1) {
+            actions.forEach { action ->
+                FabActionChip(action.label) { expanded = false; action.onClick() }
+            }
+        }
+        FloatingActionButton(
+            onClick = {
+                if (actions.size > 1) expanded = !expanded
+                else actions.firstOrNull()?.onClick()
+            },
+            containerColor = AccentDark,
+            contentColor = Color.White,
+            shape = CircleShape
+        ) {
+            Icon(
+                imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,
+                contentDescription = contentDescription
+            )
+        }
+    }
+}
+
+@Composable
+private fun FabActionChip(label: String, onClick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(Radius.card),
+        color = AccentDark,
+        onClick = onClick
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = TextSize.sm,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.base)
+        )
     }
 }
 

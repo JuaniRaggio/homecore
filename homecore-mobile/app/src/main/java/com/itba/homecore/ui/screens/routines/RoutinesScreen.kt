@@ -26,7 +26,8 @@ import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.descriptionText
 import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
-import com.itba.homecore.ui.components.ActionPill
+import com.itba.homecore.ui.components.AddFab
+import com.itba.homecore.ui.components.FabAction
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.OverflowMenu
@@ -72,31 +73,28 @@ fun RoutinesScreen(
     var deleteRoutineId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteRoutineName by rememberSaveable { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.xl)
-            .padding(bottom = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.base)
-    ) {
-        HouseHeader(
-            homes = homes,
-            selectedHome = selectedHome,
-            onHomeSelect = { homesVm.selectHome(it) },
-            onAddHome = { showCreateHome = true }
-        )
-        HcSearchBar(
-            value = search,
-            onValueChange = { search = it },
-            placeholder = stringResource(R.string.search_routine)
-        )
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            ActionPill(text = stringResource(R.string.new_routine), onClick = { editorId = null; editorOpen = true })
-        }
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.xl)
+                .padding(bottom = Spacing.huge),
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
+        ) {
+            HouseHeader(
+                homes = homes,
+                selectedHome = selectedHome,
+                onHomeSelect = { homesVm.selectHome(it) },
+                onAddHome = { showCreateHome = true }
+            )
+            HcSearchBar(
+                value = search,
+                onValueChange = { search = it },
+                placeholder = stringResource(R.string.search_routine)
+            )
 
-        when (val s = state) {
+            when (val s = state) {
             is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
             is RoutinesUiState.Error ->
                 StatusMessage(s.message, isError = true, onRetry = { viewModel.loadForHome(selectedHome?.id) })
@@ -126,6 +124,12 @@ fun RoutinesScreen(
                 }
             }
         }
+        }
+
+        AddFab(
+            actions = listOf(FabAction(stringResource(R.string.new_routine)) { editorId = null; editorOpen = true }),
+            contentDescription = stringResource(R.string.cd_add)
+        )
     }
 
     if (showCreateHome) {

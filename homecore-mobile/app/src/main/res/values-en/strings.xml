@@ -97,6 +97,7 @@
     <string name="cd_favorite">Favorite</string>
     <string name="cd_search">Search</string>
     <string name="cd_menu">Menu</string>
+    <string name="cd_add">Add</string>
     <string name="cd_dropdown">Switch home</string>
     <string name="add_home">+ New Property</string>
 

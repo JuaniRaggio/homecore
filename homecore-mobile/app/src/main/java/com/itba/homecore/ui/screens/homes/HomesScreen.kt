@@ -22,6 +22,8 @@ import com.itba.homecore.R
 import com.itba.homecore.data.model.Home
 import com.itba.homecore.data.model.Room
 import com.itba.homecore.ui.components.ActionPill
+import com.itba.homecore.ui.components.AddFab
+import com.itba.homecore.ui.components.FabAction
 import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.UniformGrid
@@ -43,30 +45,24 @@ fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
     var deleteHomeName by rememberSaveable { mutableStateOf("") }
     var addRoomHomeId by rememberSaveable { mutableStateOf<String?>(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.xl)
-            .padding(top = Spacing.base, bottom = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.base)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.sm),
-            verticalAlignment = Alignment.CenterVertically
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.xl)
+                .padding(top = Spacing.base, bottom = Spacing.huge),
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
         ) {
             Text(
                 text = stringResource(R.string.homes_title),
                 color = TextPrimary,
                 fontSize = TextSize.title,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(Weight.Fill)
+                modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.sm)
             )
-            ActionPill(text = stringResource(R.string.new_home), onClick = { showCreateHome = true })
-        }
 
-        when (val s = state) {
+            when (val s = state) {
             is HomesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
             is HomesUiState.Error -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
             is HomesUiState.Success -> {
@@ -89,6 +85,12 @@ fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
                 }
             }
         }
+        }
+
+        AddFab(
+            actions = listOf(FabAction(stringResource(R.string.new_home)) { showCreateHome = true }),
+            contentDescription = stringResource(R.string.cd_add)
+        )
     }
 
     if (showCreateHome) {
