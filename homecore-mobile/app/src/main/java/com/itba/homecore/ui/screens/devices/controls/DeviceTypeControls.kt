@@ -253,16 +253,16 @@ fun SpeakerControls(device: Device, onAction: OnAction) {
             min = 0, max = 10
         ) { onAction(DeviceAction.SET_VOLUME.api, listOf(it)) }
         val genres = mapOf(
-            "classical" to stringResource(R.string.genre_classical),
-            "country" to stringResource(R.string.genre_country),
-            "dance" to stringResource(R.string.genre_dance),
-            "latina" to stringResource(R.string.genre_latina),
-            "pop" to stringResource(R.string.genre_pop),
-            "rock" to stringResource(R.string.genre_rock)
+            SpeakerGenre.CLASSICAL to stringResource(R.string.genre_classical),
+            SpeakerGenre.COUNTRY to stringResource(R.string.genre_country),
+            SpeakerGenre.DANCE to stringResource(R.string.genre_dance),
+            SpeakerGenre.LATINA to stringResource(R.string.genre_latina),
+            SpeakerGenre.POP to stringResource(R.string.genre_pop),
+            SpeakerGenre.ROCK to stringResource(R.string.genre_rock)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_genre),
-            options = listOf("classical", "country", "dance", "latina", "pop", "rock"),
+            options = SpeakerGenre.all,
             selected = device.state?.genre,
             labelFor = { genres[it] ?: it }
         ) { onAction(DeviceAction.SET_GENRE.api, listOf(it)) }
@@ -279,12 +279,12 @@ fun VacuumControls(device: Device, rooms: List<Room>, onAction: OnAction) {
             stringResource(R.string.act_dock) to { onAction(DeviceAction.DOCK.api, emptyList()) }
         )
         val vacuumModes = mapOf(
-            "vacuum" to stringResource(R.string.vacuum_mode_vacuum),
-            "mop" to stringResource(R.string.vacuum_mode_mop)
+            VacuumMode.VACUUM to stringResource(R.string.vacuum_mode_vacuum),
+            VacuumMode.MOP to stringResource(R.string.vacuum_mode_mop)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_mode),
-            options = listOf("vacuum", "mop"),
+            options = VacuumMode.all,
             selected = device.state?.mode,
             labelFor = { vacuumModes[it] ?: it }
         ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
@@ -321,13 +321,13 @@ fun FridgeControls(device: Device, onAction: OnAction) {
             min = -20, max = -8, unit = "°C"
         ) { onAction(DeviceAction.SET_FREEZER_TEMPERATURE.api, listOf(it)) }
         val fridgeModes = mapOf(
-            "default" to stringResource(R.string.fridge_mode_default),
-            "vacation" to stringResource(R.string.fridge_mode_vacation),
-            "party" to stringResource(R.string.fridge_mode_party)
+            FridgeMode.DEFAULT to stringResource(R.string.fridge_mode_default),
+            FridgeMode.VACATION to stringResource(R.string.fridge_mode_vacation),
+            FridgeMode.PARTY to stringResource(R.string.fridge_mode_party)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_mode),
-            options = listOf("default", "vacation", "party"),
+            options = FridgeMode.all,
             selected = device.state?.mode,
             labelFor = { fridgeModes[it] ?: it }
         ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
@@ -348,35 +348,35 @@ fun OvenControls(device: Device, onAction: OnAction) {
             min = 90, max = 230, step = 10, unit = "°C"
         ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
         val heatSources = mapOf(
-            "conventional" to stringResource(R.string.oven_heat_conventional),
-            "bottom" to stringResource(R.string.oven_heat_bottom),
-            "top" to stringResource(R.string.oven_heat_top)
+            OvenHeat.CONVENTIONAL to stringResource(R.string.oven_heat_conventional),
+            OvenHeat.BOTTOM to stringResource(R.string.oven_heat_bottom),
+            OvenHeat.TOP to stringResource(R.string.oven_heat_top)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_heat_source),
-            options = listOf("conventional", "bottom", "top"),
+            options = OvenHeat.all,
             selected = device.state?.heat,
             labelFor = { heatSources[it] ?: it }
         ) { onAction(DeviceAction.SET_HEAT.api, listOf(it)) }
         val grillModes = mapOf(
-            "large" to stringResource(R.string.oven_grill_large),
-            "eco" to stringResource(R.string.oven_grill_eco),
-            "off" to stringResource(R.string.oven_grill_off)
+            OvenGrill.LARGE to stringResource(R.string.oven_grill_large),
+            OvenGrill.ECO to stringResource(R.string.oven_grill_eco),
+            OvenGrill.OFF to stringResource(R.string.oven_grill_off)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_grill),
-            options = listOf("large", "eco", "off"),
+            options = OvenGrill.all,
             selected = device.state?.grill,
             labelFor = { grillModes[it] ?: it }
         ) { onAction(DeviceAction.SET_GRILL.api, listOf(it)) }
         val convectionModes = mapOf(
-            "normal" to stringResource(R.string.oven_conv_normal),
-            "eco" to stringResource(R.string.oven_conv_eco),
-            "off" to stringResource(R.string.oven_conv_off)
+            OvenConvection.NORMAL to stringResource(R.string.oven_conv_normal),
+            OvenConvection.ECO to stringResource(R.string.oven_conv_eco),
+            OvenConvection.OFF to stringResource(R.string.oven_conv_off)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_convection),
-            options = listOf("normal", "eco", "off"),
+            options = OvenConvection.all,
             selected = device.state?.convection,
             labelFor = { convectionModes[it] ?: it }
         ) { onAction(DeviceAction.SET_CONVECTION.api, listOf(it)) }

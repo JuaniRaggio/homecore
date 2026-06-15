@@ -339,7 +339,7 @@ private fun SpeakerFooter(
     onToggle: (Boolean) -> Unit,
     onAction: (action: String, params: List<Any>) -> Unit
 ) {
-    val playing = device.state?.status?.lowercase() == "playing"
+    val playing = device.state?.status?.lowercase() == DeviceStatus.PLAYING
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
