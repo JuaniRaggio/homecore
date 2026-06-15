@@ -100,6 +100,11 @@ class RoutineEditorViewModel(
             UiMessages.emit("La rutina necesita un nombre")
             return
         }
+        // The API rejects routines with no actions ("Actions array cannot be empty").
+        if (s.actions.isEmpty()) {
+            UiMessages.emit("Agregá al menos una acción a la rutina")
+            return
+        }
         val routine = Routine(
             id = routineId.orEmpty(),
             name = s.name.trim(),

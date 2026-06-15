@@ -76,7 +76,7 @@ fun DeviceDetailScreen(
             DeviceCategory.BLINDS       -> CurtainControls(device, onAction)
             DeviceCategory.AC           -> AcControls(device, onAction)
             DeviceCategory.SPEAKER      -> SpeakerControls(device, onAction)
-            DeviceCategory.VACUUM       -> VacuumControls(device, onAction)
+            DeviceCategory.VACUUM       -> VacuumControls(device, rooms, onAction)
             DeviceCategory.REFRIGERATOR -> FridgeControls(device, onAction)
             DeviceCategory.OVEN         -> OvenControls(device, onAction)
             DeviceCategory.OTHER        -> { /* Unknown type: header + management only. */ }

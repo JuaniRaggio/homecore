@@ -50,7 +50,9 @@ class DevicesViewModel(
     /** Loads the recent action history from the API. */
     fun loadLogs(limit: Int = 10) {
         viewModelScope.launch {
-            repository.getLogs(limit, 0).onSuccess { _logs.value = it }
+            repository.getLogs(limit, 0)
+                .onSuccess { _logs.value = it }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo cargar el historial") }
         }
     }
 

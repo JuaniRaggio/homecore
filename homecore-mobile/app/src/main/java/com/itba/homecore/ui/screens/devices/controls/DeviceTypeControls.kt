@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.theme.*
 
@@ -80,6 +81,7 @@ fun LockControls(device: Device, onAction: OnAction) {
 @Composable
 fun AlarmControls(device: Device, onAction: OnAction) {
     var code by rememberSaveable { mutableStateOf("") }
+    var newCode by rememberSaveable { mutableStateOf("") }
     val hasCode = code.isNotBlank()
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
         SectionLabel(stringResource(R.string.act_security_code))
@@ -108,11 +110,19 @@ fun AlarmControls(device: Device, onAction: OnAction) {
             enabled = hasCode,
             filled = false
         )
+        // changeSecurityCode needs both the current and the new code (API: old, new).
+        SectionLabel(stringResource(R.string.act_new_code))
+        ControlTextField(
+            value = newCode,
+            onValueChange = { newCode = it.filter { c -> c.isDigit() }.take(4) },
+            placeholder = stringResource(R.string.act_new_code),
+            modifier = Modifier.fillMaxWidth()
+        )
         ControlButton(
             text = stringResource(R.string.act_change_code),
-            onClick = { onAction("changeSecurityCode", listOf(code)) },
+            onClick = { onAction("changeSecurityCode", listOf(code, newCode)) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = hasCode,
+            enabled = hasCode && newCode.isNotBlank(),
             filled = false
         )
     }
@@ -249,8 +259,7 @@ fun SpeakerControls(device: Device, onAction: OnAction) {
 
 // -- Vacuum ------------------------------------------------------------------------
 @Composable
-fun VacuumControls(device: Device, onAction: OnAction) {
-    var location by rememberSaveable { mutableStateOf("") }
+fun VacuumControls(device: Device, rooms: List<Room>, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         ControlButtonsRow(
             stringResource(R.string.act_start) to { onAction("start", emptyList()) },
@@ -267,20 +276,20 @@ fun VacuumControls(device: Device, onAction: OnAction) {
             selected = device.state?.mode,
             labelFor = { vacuumModes[it] ?: it }
         ) { onAction("setMode", listOf(it)) }
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            SectionLabel(stringResource(R.string.act_location))
-            ControlTextField(
-                value = location,
-                onValueChange = { location = it },
-                placeholder = stringResource(R.string.act_location),
-                modifier = Modifier.fillMaxWidth()
-            )
-            ControlButton(
-                text = stringResource(R.string.act_location),
-                onClick = { onAction("setLocation", listOf(location.trim())) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = location.isNotBlank()
-            )
+        // setLocation takes a room id, so pick from the user's rooms (not free text).
+        if (rooms.isEmpty()) {
+            Column {
+                SectionLabel(stringResource(R.string.act_location))
+                Text(stringResource(R.string.act_no_rooms), color = TextSecondary, fontSize = TextSize.md)
+            }
+        } else {
+            val roomNames = rooms.associate { it.id to it.name }
+            SegmentedSelector(
+                label = stringResource(R.string.act_location),
+                options = rooms.map { it.id },
+                selected = device.state?.location,
+                labelFor = { roomNames[it] ?: it }
+            ) { onAction("setLocation", listOf(it)) }
         }
     }
 }

@@ -44,7 +44,8 @@ data class DeviceState(
     @SerializedName("fanSpeed")           val fanSpeed: String? = null,
     @SerializedName("heat")               val heat: String? = null,
     @SerializedName("grill")              val grill: String? = null,
-    @SerializedName("convection")         val convection: String? = null
+    @SerializedName("convection")         val convection: String? = null,
+    @SerializedName("location")           val location: String? = null
 )
 
 /**

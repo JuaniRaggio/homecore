@@ -72,6 +72,8 @@
     <string name="badge_locked">Locked</string>
     <string name="card_status_unlocked">Unlocked</string>
     <string name="act_state">State</string>
+    <string name="act_new_code">New code</string>
+    <string name="act_no_rooms">No rooms</string>
     <string name="card_label_mode">Mode</string>
     <string name="card_label_temp">Temp</string>
 
