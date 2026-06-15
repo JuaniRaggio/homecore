@@ -209,19 +209,18 @@ private fun HistoryRow(log: DeviceLog, deviceName: String) {
     }
 }
 
-/** Rough per-type power draw (W) for the running-devices estimate; keyed by [DeviceCategory]. */
+/** Rough per-type power draw in watts, used only for the running-devices estimate. */
+private fun wattsFor(category: DeviceCategory): Int = when (category) {
+    DeviceCategory.LAMP -> 8
+    DeviceCategory.AC -> 1200
+    DeviceCategory.OVEN -> 1500
+    DeviceCategory.REFRIGERATOR -> 150
+    DeviceCategory.SPEAKER -> 20
+    DeviceCategory.VACUUM -> 90
+    else -> 5
+}
+
 private fun estimateConsumption(devices: List<Device>): String {
-    val watts = devices.filter { it.isOn() }.sumOf { d ->
-        val w: Int = when (d.category()) {
-            DeviceCategory.LAMP -> 8
-            DeviceCategory.AC -> 1200
-            DeviceCategory.OVEN -> 1500
-            DeviceCategory.REFRIGERATOR -> 150
-            DeviceCategory.SPEAKER -> 20
-            DeviceCategory.VACUUM -> 90
-            else -> 5
-        }
-        w
-    }
+    val watts = devices.filter { it.isOn() }.sumOf { wattsFor(it.category()) }
     return "$watts W"
 }
