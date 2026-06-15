@@ -27,6 +27,7 @@ import com.itba.homecore.ui.theme.Accent
 import com.itba.homecore.ui.theme.Background
 import com.itba.homecore.ui.theme.HomeCoreTheme
 import com.itba.homecore.util.AppNotifier
+import com.itba.homecore.util.RoutineScheduler
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.NotificationEvents
 
@@ -54,6 +55,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 LaunchedEffect(Unit) {
                     NotificationEvents.events.collect { AppNotifier.notify(context, it.title, it.message) }
+                }
+
+                // Run the in-app routine scheduler only while the user is logged in.
+                LaunchedEffect(isLoggedIn) {
+                    if (isLoggedIn == true) RoutineScheduler.start() else RoutineScheduler.stop()
                 }
 
                 // currentScreen only applies when there is NO session (login/register)

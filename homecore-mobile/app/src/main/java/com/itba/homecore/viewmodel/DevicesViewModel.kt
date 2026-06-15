@@ -45,7 +45,13 @@ class DevicesViewModel(
     private val _logs = MutableStateFlow<List<DeviceLog>>(emptyList())
     val logs: StateFlow<List<DeviceLog>> = _logs.asStateFlow()
 
-    init { load() }
+    init {
+        load()
+        // Refresh devices after any routine fires so the UI shows the new state.
+        viewModelScope.launch {
+            RoutineExecutionEvents.events.collect { refresh(showLoading = false) }
+        }
+    }
 
     /** Loads the recent action history from the API. */
     fun loadLogs(limit: Int = 10) {

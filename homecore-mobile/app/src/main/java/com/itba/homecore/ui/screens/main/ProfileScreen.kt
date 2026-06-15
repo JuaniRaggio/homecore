@@ -515,5 +515,5 @@ private fun estimateConsumption(devices: List<Device>): String {
         }
         w
     }
-    return "${watts}W"
+    return "${watts} W"
 }

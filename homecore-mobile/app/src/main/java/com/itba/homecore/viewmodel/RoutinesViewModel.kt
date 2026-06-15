@@ -46,8 +46,11 @@ class RoutinesViewModel(
             repository.executeRoutine(routine.id)
                 .onSuccess {
                     UiMessages.emit("Rutina ejecutada")
-                    // Also surface it as a system notification.
                     NotificationEvents.emit("HomeCore", "Rutina ejecutada: ${routine.name}")
+                    // Tell DevicesViewModel to refetch: the execute endpoint does not
+                    // return new device state, so without this the UI stays stale even
+                    // when the backend did fire the actions.
+                    RoutineExecutionEvents.emit()
                 }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la rutina") }
             _executingId.value = null

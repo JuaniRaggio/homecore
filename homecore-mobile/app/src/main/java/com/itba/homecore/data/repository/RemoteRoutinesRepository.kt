@@ -61,16 +61,21 @@ class RemoteRoutinesRepository : RoutinesRepository {
     )
 
     /**
-     * Full routine body for POST/PUT. Actions are reduced to the shape the API expects
-     * ({ device: { id }, actionName, params }) rather than the full embedded device.
+     * Full routine body for POST/PUT. Mirrors the web's payload exactly:
+     * top-level name/description/actions/time/days plus metadata. The HCI API
+     * reads schedule from the top level (not metadata), so missing them there
+     * leaves the routine unschedulable. Actions reduced to { device:{id}, actionName, params }.
      */
     private fun fullBody(routine: Routine): Map<String, Any?> {
+        val description = routine.description ?: routine.metadata?.description
+        val time = routine.metadata?.time
+        val days = routine.metadata?.days
         val meta = mapOf(
             "favorite"    to (routine.metadata?.favorite ?: false),
             "active"      to (routine.metadata?.active ?: true),
-            "time"        to routine.metadata?.time,
-            "days"        to routine.metadata?.days,
-            "description" to (routine.description ?: routine.metadata?.description),
+            "time"        to time,
+            "days"        to days,
+            "description" to description,
             "homeId"      to routine.metadata?.homeId
         )
         val actions = routine.actions.map { a ->
@@ -81,9 +86,12 @@ class RemoteRoutinesRepository : RoutinesRepository {
             )
         }
         return mapOf(
-            "name"     to routine.name,
-            "actions"  to actions,
-            "metadata" to meta
+            "name"        to routine.name,
+            "description" to description,
+            "actions"     to actions,
+            "time"        to time,
+            "days"        to days,
+            "metadata"    to meta
         )
     }
 }
