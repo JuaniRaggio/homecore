@@ -215,19 +215,19 @@ fun AcControls(device: Device, onAction: OnAction) {
             min = 18, max = 38, unit = "°C"
         ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
         val acModes = mapOf(
-            "cool" to stringResource(R.string.ac_mode_cool),
-            "heat" to stringResource(R.string.ac_mode_heat),
-            "fan" to stringResource(R.string.ac_mode_fan)
+            AcMode.COOL to stringResource(R.string.ac_mode_cool),
+            AcMode.HEAT to stringResource(R.string.ac_mode_heat),
+            AcMode.FAN to stringResource(R.string.ac_mode_fan)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_mode),
-            options = listOf("cool", "heat", "fan"),
+            options = AcMode.all,
             selected = device.state?.mode,
             labelFor = { acModes[it] ?: it }
         ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
         SegmentedSelector(
             label = stringResource(R.string.act_fan_speed),
-            options = listOf("auto", "25", "50", "75", "100"),
+            options = AcFanSpeed.all,
             selected = null
         ) { onAction(DeviceAction.SET_FAN_SPEED.api, listOf(it)) }
     }
