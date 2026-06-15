@@ -94,8 +94,8 @@ class RoutineEditorViewModel(
         it.copy(days = if (day in it.days) it.days - day else it.days + day)
     }
 
-    fun addAction(device: Device, actionName: String) = _state.update {
-        it.copy(actions = it.actions + RoutineAction(device = device, actionName = actionName, params = emptyList()))
+    fun addAction(device: Device, actionName: String, params: List<Any>) = _state.update {
+        it.copy(actions = it.actions + RoutineAction(device = device, actionName = actionName, params = params))
     }
 
     fun removeAction(index: Int) = _state.update {
