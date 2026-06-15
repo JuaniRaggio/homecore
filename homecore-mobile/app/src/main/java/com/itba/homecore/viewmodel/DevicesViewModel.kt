@@ -49,9 +49,13 @@ class DevicesViewModel(
 
     init {
         load()
-        // Refresh devices after any routine fires so the UI shows the new state.
+        // Refresh devices after any routine fires, or when the WebSocket reports an external
+        // change, so the UI shows the new state without a manual reload.
         viewModelScope.launch {
             RoutineExecutionEvents.events.collect { refresh(showLoading = false) }
+        }
+        viewModelScope.launch {
+            DeviceSyncEvents.events.collect { refresh(showLoading = false) }
         }
     }
 

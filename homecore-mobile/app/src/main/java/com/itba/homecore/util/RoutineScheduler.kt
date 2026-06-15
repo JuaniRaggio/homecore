@@ -95,15 +95,24 @@ object RoutineScheduler {
     private suspend fun fire(r: Routine, stamp: String) {
         Log.d(TAG, "fire '${r.name}' id=${r.id}")
         lastFiredAt[r.id] = stamp
-        AppModule.routinesRepository.executeRoutine(r.id)
-            .onSuccess {
-                NotificationEvents.emit("HomeCore", "Rutina ejecutada: ${r.name}")
-                RoutineExecutionEvents.emit()
-            }
-            .onFailure {
-                Log.w(TAG, "execute failed for ${r.id}", it)
-                // Allow a retry next minute if the API call failed.
-                lastFiredAt.remove(r.id)
-            }
+        val result = AppModule.routinesRepository.executeRoutine(r.id)
+        if (result.isSuccess) {
+            NotificationEvents.emit("HomeCore", executedMessage(r))
+            RoutineExecutionEvents.emit()
+        } else {
+            Log.w(TAG, "execute failed for ${r.id}", result.exceptionOrNull())
+            // Allow a retry next minute if the API call failed.
+            lastFiredAt.remove(r.id)
+        }
+    }
+
+    /** "Se ejecutó la rutina 'X' en 'Casa Y'", omitting the home if it can't be resolved. */
+    private suspend fun executedMessage(r: Routine): String {
+        val homeName = r.metadata?.homeId?.let { homeId ->
+            AppModule.homesRepository.getHomes().getOrNull()
+                ?.firstOrNull { it.id == homeId }?.name
+        }
+        return if (homeName != null) "Se ejecutó la rutina '${r.name}' en '$homeName'"
+               else "Se ejecutó la rutina '${r.name}'"
     }
 }

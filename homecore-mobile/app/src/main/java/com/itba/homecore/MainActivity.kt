@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.itba.homecore.data.api.SocketManager
 import com.itba.homecore.data.local.SessionManager
 import com.itba.homecore.ui.screens.auth.LoginScreen
 import com.itba.homecore.ui.screens.auth.RecoverScreen
@@ -62,7 +63,13 @@ class MainActivity : AppCompatActivity() {
                     NotificationEvents.events.collect { AppNotifier.notify(context, it.title, it.message) }
                 }
                 LaunchedEffect(isLoggedIn) {
-                    if (isLoggedIn == true) RoutineScheduler.start() else RoutineScheduler.stop()
+                    if (isLoggedIn == true) {
+                        RoutineScheduler.start()
+                        SessionManager(context).getToken()?.let { SocketManager.connect(it) }
+                    } else {
+                        RoutineScheduler.stop()
+                        SocketManager.disconnect()
+                    }
                 }
 
                 var currentScreen by remember { mutableStateOf(AppScreen.LOGIN) }
