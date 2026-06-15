@@ -45,6 +45,8 @@ class DevicesViewModel(
     private val _logs = MutableStateFlow<List<DeviceLog>>(emptyList())
     val logs: StateFlow<List<DeviceLog>> = _logs.asStateFlow()
 
+    private var currentHomeId: String? = null
+
     init {
         load()
         // Refresh devices after any routine fires so the UI shows the new state.
@@ -64,9 +66,16 @@ class DevicesViewModel(
 
     fun load() = refresh(showLoading = true)
 
+    /** Switches the active home filter and reloads. Passing null shows all homes. */
+    fun loadForHome(homeId: String?) {
+        currentHomeId = homeId
+        refresh(showLoading = true)
+    }
+
     /**
      * Loads rooms and devices. The two calls are independent, so they run concurrently.
      * [showLoading] is false for refreshes after an action, to avoid flashing the spinner.
+     * Results are filtered by [currentHomeId] when set.
      */
     private fun refresh(showLoading: Boolean) {
         viewModelScope.launch {
@@ -77,19 +86,26 @@ class DevicesViewModel(
                 rooms.await() to devices.await()
             }
 
-            val rooms   = roomsRes.getOrNull()
-            val devices = devicesRes.getOrNull()
+            val allRooms   = roomsRes.getOrNull()
+            val allDevices = devicesRes.getOrNull()
 
-            if (rooms == null) {
+            if (allRooms == null) {
                 _state.value = DevicesUiState.Error(roomsRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            if (devices == null) {
+            if (allDevices == null) {
                 _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            // The /devices payload carries the room id but not its name, so resolve the
-            // name from the rooms list (otherwise every device shows "No room").
+            // Filter by the selected home (when set), then resolve each device's room name
+            // from the rooms list (the /devices payload only carries the room id).
+            val homeId = currentHomeId
+            val rooms = if (homeId == null) allRooms
+                        else allRooms.filter { r -> r.home == null || r.home.id == homeId }
+            val roomIds = rooms.map { it.id }.toSet()
+            val devices = if (homeId == null) allDevices
+                          else allDevices.filter { d -> d.room == null || d.room.id in roomIds }
+
             val enriched = devices.map { d ->
                 val roomId = d.room?.id
                 if (roomId != null && d.room?.name == null) {

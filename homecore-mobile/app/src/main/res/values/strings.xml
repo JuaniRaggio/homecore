@@ -97,6 +97,8 @@
     <string name="cd_favorite">Favorito</string>
     <string name="cd_search">Buscar</string>
     <string name="cd_menu">Menú</string>
+    <string name="cd_dropdown">Cambiar hogar</string>
+    <string name="add_home">+ Nueva Propiedad</string>
 
     <!-- Estados comunes -->
     <string name="loading">Cargando…</string>
@@ -276,6 +278,9 @@
     <string name="delete_room_title">¿Eliminar habitación?</string>
     <string name="delete_room_message">¿Querés eliminar \"%1$s\"? Sus dispositivos quedarán sin habitación.</string>
     <string name="cd_room_options">Opciones de la habitación</string>
+    <string name="delete_routine_title">¿Eliminar rutina?</string>
+    <string name="delete_routine_message">¿Querés eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="cd_routine_options">Opciones de la rutina</string>
 
     <!-- Hogares (RF17-RF19) -->
     <string name="homes_title">Hogares</string>

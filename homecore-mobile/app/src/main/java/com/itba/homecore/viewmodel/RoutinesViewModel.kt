@@ -29,13 +29,34 @@ class RoutinesViewModel(
     private val _executingId = MutableStateFlow<String?>(null)
     val executingId: StateFlow<String?> = _executingId.asStateFlow()
 
+    // Null means "no home selected → show all". When set, only routines with
+    // metadata.homeId == currentHomeId (or with no homeId assigned yet) are shown.
+    private var currentHomeId: String? = null
+
     init { load() }
+
+    /**
+     * Switches the active home filter and reloads.
+     * Routines are scoped to a home via [com.itba.homecore.data.model.RoutineMetadata.homeId].
+     * Passing null clears the filter and shows all routines.
+     */
+    fun loadForHome(homeId: String?) {
+        currentHomeId = homeId
+        load()
+    }
 
     fun load() {
         viewModelScope.launch {
             _state.value = RoutinesUiState.Loading
             repository.getRoutines()
-                .onSuccess { _state.value = RoutinesUiState.Success(it) }
+                .onSuccess { all ->
+                    val homeId = currentHomeId
+                    // Routines with homeId == null are treated as shared (visible in every home).
+                    // Routines with a homeId are exclusive to that home.
+                    val routines = if (homeId == null) all
+                        else all.filter { r -> r.metadata?.homeId == null || r.metadata.homeId == homeId }
+                    _state.value = RoutinesUiState.Success(routines)
+                }
                 .onFailure { _state.value = RoutinesUiState.Error(it.message ?: "Error al cargar rutinas") }
         }
     }
@@ -79,5 +100,17 @@ class RoutinesViewModel(
         _state.value = current.copy(
             routines = current.routines.map { if (it.id == updated.id) updated else it }
         )
+    }
+
+    /**
+     * Deletes the routine from the API. Because [com.itba.homecore.data.model.RoutineMetadata.homeId]
+     * ties each routine to a home, removing it from the API removes it from this home's view.
+     */
+    fun deleteRoutine(routineId: String) {
+        viewModelScope.launch {
+            repository.deleteRoutine(routineId)
+                .onSuccess { load() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo eliminar la rutina") }
+        }
     }
 }

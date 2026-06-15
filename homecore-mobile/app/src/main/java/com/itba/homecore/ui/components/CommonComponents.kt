@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
@@ -29,10 +30,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
+import com.itba.homecore.data.model.Home
 import com.itba.homecore.data.model.Routine
 import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.time
@@ -164,48 +167,118 @@ fun HcButton(
 }
 
 /**
- * Shared header with the home name and optionally the notifications bell. The home
- * dropdown affordance was removed because multi-home is not implemented (it would be
- * a button that does nothing); the home name is shown as plain text.
+ * Shared header with a home-picker dropdown and optional notifications bell.
+ * Tapping the chevron opens a full-width menu listing [homes]; the selected home is
+ * highlighted. An "+ Nueva Propiedad" entry at the bottom fires [onAddHome].
  */
 @Composable
 fun HouseHeader(
     modifier: Modifier = Modifier,
+    homes: List<Home> = emptyList(),
+    selectedHome: Home? = null,
+    onHomeSelect: (Home) -> Unit = {},
+    onAddHome: () -> Unit = {},
     showNotifications: Boolean = false,
     onNotificationsClick: () -> Unit = {}
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = Spacing.base),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        if (showNotifications) Spacer(Modifier.weight(Weight.Fill))
+    var expanded by remember { mutableStateOf(false) }
 
-        Text(
-            text = stringResource(R.string.house_default),
-            color = TextPrimary,
-            fontSize = TextSize.title,
-            fontWeight = FontWeight.Bold
-        )
+    // Full-width Box as anchor so the DropdownMenu spans the same width.
+    Box(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.base),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (showNotifications) Spacer(Modifier.weight(Weight.Fill))
 
-        if (showNotifications) {
-            Spacer(Modifier.weight(Weight.Fill))
-            Box(
-                modifier = Modifier
-                    .size(IconSize.bell)
-                    .background(SurfaceVariant, CircleShape)
-                    .clickable(onClick = onNotificationsClick),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = if (showNotifications) Modifier else Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = stringResource(R.string.cd_notifications),
-                    tint = AccentDark,
-                    modifier = Modifier.size(IconSize.md)
+                Text(
+                    text = selectedHome?.name ?: stringResource(R.string.house_default),
+                    color = TextPrimary,
+                    fontSize = TextSize.title,
+                    fontWeight = FontWeight.Bold
                 )
+                Spacer(Modifier.width(Spacing.sm))
+                Box(
+                    modifier = Modifier
+                        .size(IconSize.box)
+                        .background(SurfaceVariant, CircleShape)
+                        .clickable { expanded = !expanded },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp
+                                      else Icons.Default.KeyboardArrowDown,
+                        contentDescription = stringResource(R.string.cd_dropdown),
+                        tint = TextPrimary,
+                        modifier = Modifier.size(IconSize.sm)
+                    )
+                }
             }
+
+            if (showNotifications) {
+                Spacer(Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .size(IconSize.bell)
+                        .background(SurfaceVariant, CircleShape)
+                        .clickable(onClick = onNotificationsClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = stringResource(R.string.cd_notifications),
+                        tint = AccentDark,
+                        modifier = Modifier.size(IconSize.md)
+                    )
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = Surface,
+            shape = RoundedCornerShape(Radius.card),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            homes.forEach { home ->
+                val isSelected = selectedHome?.id == home.id
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = home.name,
+                            color = TextPrimary,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    },
+                    onClick = { onHomeSelect(home); expanded = false },
+                    modifier = if (isSelected) Modifier.background(AccentDark) else Modifier,
+                    colors = MenuDefaults.itemColors(textColor = TextPrimary)
+                )
+                HorizontalDivider(color = Border, thickness = 0.5.dp)
+            }
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = stringResource(R.string.add_home),
+                        color = Accent,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                onClick = { onAddHome(); expanded = false },
+                colors = MenuDefaults.itemColors(textColor = Accent)
+            )
         }
     }
 }
@@ -326,11 +399,15 @@ fun ActionPill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier)
  * Overflow (⋮) menu with Rename / Delete actions. Shared by rooms and homes so the
  * affordance stays consistent.
  */
+/**
+ * Overflow (⋮) menu. [onRename] is optional — omit it to hide the rename entry,
+ * e.g. for routines where only delete is supported.
+ */
 @Composable
 fun OverflowMenu(
     contentDescription: String,
-    onRename: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onRename: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -342,10 +419,12 @@ fun OverflowMenu(
             onDismissRequest = { expanded = false },
             containerColor = Surface
         ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.act_rename), color = TextPrimary) },
-                onClick = { expanded = false; onRename() }
-            )
+            if (onRename != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.act_rename), color = TextPrimary) },
+                    onClick = { expanded = false; onRename() }
+                )
+            }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.act_delete), color = ErrorColor) },
                 onClick = { expanded = false; onDelete() }

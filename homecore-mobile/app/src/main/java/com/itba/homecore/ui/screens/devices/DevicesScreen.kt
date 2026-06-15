@@ -31,16 +31,24 @@ import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
+import com.itba.homecore.viewmodel.HomesUiState
+import com.itba.homecore.viewmodel.HomesViewModel
 
 // --- Screen -------------------------------------------------------------------
 @Composable
 fun DevicesScreen(
     onDeviceClick: (String) -> Unit,
     columns: Int = 2,
-    viewModel: DevicesViewModel = viewModel()
+    viewModel: DevicesViewModel = viewModel(),
+    homesVm: HomesViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val homesState by homesVm.state.collectAsStateWithLifecycle()
+    val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
+    val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
+    LaunchedEffect(selectedHome?.id) { viewModel.loadForHome(selectedHome?.id) }
     var search by rememberSaveable { mutableStateOf("") }
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
 
@@ -61,12 +69,24 @@ fun DevicesScreen(
             .padding(top = Spacing.sm, bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.base)
     ) {
-        HouseHeader()
-            HcSearchBar(
-                value = search,
-                onValueChange = { search = it },
-                placeholder = stringResource(R.string.search_device)
-            )
+        HouseHeader(
+            homes = homes,
+            selectedHome = selectedHome,
+            onHomeSelect = { homesVm.selectHome(it) },
+            onAddHome = { showCreateHome = true }
+        )
+        HcSearchBar(
+            value = search,
+            onValueChange = { search = it },
+            placeholder = stringResource(R.string.search_device)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.End)
+        ) {
+            ActionPill(text = stringResource(R.string.new_device), onClick = { showAddDevice = true })
+            ActionPill(text = stringResource(R.string.new_room), onClick = { showAddRoom = true })
+        }
 
 
             Box(){
@@ -145,6 +165,16 @@ fun DevicesScreen(
             initial = renameRoomName,
             onConfirm = { newName -> viewModel.renameRoom(id, newName); renameRoomId = null },
             onDismiss = { renameRoomId = null }
+        )
+    }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
         )
     }
 
