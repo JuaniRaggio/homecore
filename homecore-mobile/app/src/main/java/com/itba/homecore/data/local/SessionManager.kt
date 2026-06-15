@@ -17,6 +17,7 @@ class SessionManager(private val context: Context) {
         private val USER_ID_KEY    = stringPreferencesKey("user_id")
         private val USER_NAME_KEY  = stringPreferencesKey("user_name")
         private val USER_EMAIL_KEY = stringPreferencesKey("user_email")
+        private val LANGUAGE_KEY   = stringPreferencesKey("language")
     }
 
     suspend fun saveToken(token: String) {
@@ -37,6 +38,9 @@ class SessionManager(private val context: Context) {
     suspend fun getUserName(): String? = context.dataStore.data.first()[USER_NAME_KEY]
 
     suspend fun getUserEmail(): String? = context.dataStore.data.first()[USER_EMAIL_KEY]
+
+    suspend fun saveLanguage(code: String) { context.dataStore.edit { it[LANGUAGE_KEY] = code } }
+    suspend fun getLanguage(): String? = context.dataStore.data.first()[LANGUAGE_KEY]
 
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }

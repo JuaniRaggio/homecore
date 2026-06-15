@@ -30,12 +30,19 @@ import com.itba.homecore.util.AppNotifier
 import com.itba.homecore.util.RoutineScheduler
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.NotificationEvents
+import com.itba.homecore.data.local.SessionManager
+import kotlinx.coroutines.runBlocking
 
 enum class AppScreen { LOGIN, REGISTER, VERIFY, RECOVER, HOME }
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Apply the user-chosen language (if any). If none was saved, Android
+        // already uses the device locale by default — nothing extra needed.
+        applyPersistedLocale()
+
         enableEdgeToEdge()
         setContent {
             HomeCoreTheme {
@@ -100,6 +107,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+}
+
+/**
+ * Reads the user-selected language from DataStore and applies it before the first
+ * frame is drawn. Falls back silently to the device locale if nothing was saved.
+ */
+private fun AppCompatActivity.applyPersistedLocale() {
+    val saved = runBlocking { SessionManager(applicationContext).getLanguage() }
+        ?: return  // no saved language → use device locale (Android default)
+
+    val locale = java.util.Locale(saved)
+    java.util.Locale.setDefault(locale)
+    val config = android.content.res.Configuration(resources.configuration)
+    config.setLocale(locale)
+    @Suppress("DEPRECATION")
+    resources.updateConfiguration(config, resources.displayMetrics)
 }
 
 @Composable
