@@ -2,6 +2,7 @@ package com.itba.homecore.ui.screens.homes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,6 +28,9 @@ import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.HomesUiState
 import com.itba.homecore.viewmodel.HomesViewModel
+
+private val BorderWidthDefault  = 1.dp
+private val BorderWidthSelected = 3.dp
 
 @Composable
 fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
@@ -72,6 +77,8 @@ fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
                         HomeCard(
                             home = home,
                             rooms = rooms,
+                            isSelected = s.selectedHome?.id == home.id,
+                            onSelect = { viewModel.selectHome(home) },
                             onRename = { renameHomeId = home.id; renameHomeName = home.name },
                             onDelete = { deleteHomeId = home.id; deleteHomeName = home.name },
                             onAddRoom = { addRoomHomeId = home.id }
@@ -136,14 +143,20 @@ fun HomesScreen(viewModel: HomesViewModel = viewModel()) {
 private fun HomeCard(
     home: Home,
     rooms: List<Room>,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
     onAddRoom: () -> Unit
 ) {
+    val borderWidth = if (isSelected) BorderWidthSelected else BorderWidthDefault
+    val borderColor = if (isSelected) AccentDark else AccentDark.copy(alpha = 0.6f)
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, AccentDark.copy(alpha = 0.6f), RoundedCornerShape(Radius.card))
+            .border(borderWidth, borderColor, RoundedCornerShape(Radius.card))
+            .clickable(role = Role.Button, onClick = onSelect)
             .padding(Spacing.base)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
