@@ -33,7 +33,6 @@ object AcMode {
     const val COOL = "cool"
     const val HEAT = "heat"
     const val FAN = "fan"
-    val all = listOf(COOL, HEAT, FAN)
 }
 
 object AcFanSpeed {
@@ -50,41 +49,35 @@ object SpeakerGenre {
     const val LATINA = "latina"
     const val POP = "pop"
     const val ROCK = "rock"
-    val all = listOf(CLASSICAL, COUNTRY, DANCE, LATINA, POP, ROCK)
 }
 
 object VacuumMode {
     const val VACUUM = "vacuum"
     const val MOP = "mop"
-    val all = listOf(VACUUM, MOP)
 }
 
 object FridgeMode {
     const val DEFAULT = "default"
     const val VACATION = "vacation"
     const val PARTY = "party"
-    val all = listOf(DEFAULT, VACATION, PARTY)
 }
 
 object OvenHeat {
     const val CONVENTIONAL = "conventional"
     const val BOTTOM = "bottom"
     const val TOP = "top"
-    val all = listOf(CONVENTIONAL, BOTTOM, TOP)
 }
 
 object OvenGrill {
     const val LARGE = "large"
     const val ECO = "eco"
     const val OFF = "off"
-    val all = listOf(LARGE, ECO, OFF)
 }
 
 object OvenConvection {
     const val NORMAL = "normal"
     const val ECO = "eco"
     const val OFF = "off"
-    val all = listOf(NORMAL, ECO, OFF)
 }
 
 object DispenseUnit {
