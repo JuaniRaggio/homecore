@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -139,7 +140,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                                 selected = selected == tab,
                                 onClick = { selected = tab },
                                 icon = { Icon(tab.icon, contentDescription = null) },
-                                label = { Text(stringResource(tab.labelRes)) },
+                                label = { Text(stringResource(tab.labelRes), maxLines = 1, fontSize = TextSize.sm) },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor   = AccentDark,
                                     selectedTextColor   = AccentDark,

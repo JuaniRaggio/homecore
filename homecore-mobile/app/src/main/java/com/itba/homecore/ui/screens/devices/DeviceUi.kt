@@ -167,11 +167,18 @@ fun DeviceCard(
                 lineHeight = LineHeight.compact
             )
             Spacer(Modifier.height(Spacing.xs))
-            Text(
-                text = deviceStatusText(device, cat, isOn),
-                color = if (isOn) SuccessColor else TextSecondary,
-                fontSize = TextSize.sm
-            )
+            val statusColor = if (isOn) SuccessColor else TextSecondary
+            Box(
+                modifier = Modifier
+                    .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(Radius.xl))
+                    .padding(horizontal = Spacing.sm, vertical = 2.dp)
+            ) {
+                Text(
+                    text = deviceStatusText(device, cat, isOn),
+                    color = statusColor,
+                    fontSize = TextSize.sm
+                )
+            }
 
             Spacer(Modifier.weight(Weight.Fill))
             DeviceCardFooter(device, cat, isOn, onToggle, onAction)
