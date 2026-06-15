@@ -130,24 +130,24 @@ fun DeviceCard(
 
 /** Short, state-aware status line shown on the card. */
 @Composable
-private fun deviceStatusText(device: Device, cat: DeviceCategory, isOn: Boolean): String = when (cat) {
+private fun deviceStatusText(device: Device, cat: DeviceCategory, isOn: Boolean): String =
+    stringResource(cardStatusRes(device, cat, isOn))
+
+/** Resolves the status string resource for a card from its category and current state. */
+private fun cardStatusRes(device: Device, cat: DeviceCategory, isOn: Boolean): Int = when (cat) {
     DeviceCategory.DOOR, DeviceCategory.BLINDS ->
-        stringResource(if (isOn) R.string.card_status_open else R.string.card_status_closed)
+        if (isOn) R.string.card_status_open else R.string.card_status_closed
     DeviceCategory.ALARM ->
-        stringResource(if (isOn) R.string.card_status_armed else R.string.card_status_disarmed)
-    DeviceCategory.SPEAKER -> stringResource(
-        when (device.state?.status?.lowercase()) {
-            "playing" -> R.string.card_status_playing
-            "paused"  -> R.string.card_status_paused
-            else      -> R.string.card_status_stopped
-        }
-    )
-    DeviceCategory.VACUUM -> stringResource(
-        when (device.state?.status?.lowercase()) {
-            "docked" -> R.string.card_status_docked
-            "active" -> R.string.card_status_active
-            else     -> R.string.card_status_off
-        }
-    )
-    else -> stringResource(if (isOn) R.string.card_status_on else R.string.card_status_off)
+        if (isOn) R.string.card_status_armed else R.string.card_status_disarmed
+    DeviceCategory.SPEAKER -> when (device.state?.status?.lowercase()) {
+        DeviceStatus.PLAYING -> R.string.card_status_playing
+        DeviceStatus.PAUSED  -> R.string.card_status_paused
+        else                 -> R.string.card_status_stopped
+    }
+    DeviceCategory.VACUUM -> when (device.state?.status?.lowercase()) {
+        DeviceStatus.DOCKED -> R.string.card_status_docked
+        DeviceStatus.ACTIVE -> R.string.card_status_active
+        else                -> R.string.card_status_off
+    }
+    else -> if (isOn) R.string.card_status_on else R.string.card_status_off
 }

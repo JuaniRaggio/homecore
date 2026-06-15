@@ -17,6 +17,8 @@ object DeviceStatus {
     const val CLOSED = "closed"
     const val ACTIVE = "active"
     const val PLAYING = "playing"
+    const val PAUSED = "paused"
+    const val DOCKED = "docked"
     // The alarm statuses come back from the API in camelCase (verified against /devices).
     const val ARMED_STAY = "armedStay"
     const val ARMED_AWAY = "armedAway"
