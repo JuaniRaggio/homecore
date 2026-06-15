@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceAction
 import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.data.model.category
@@ -264,11 +265,11 @@ private fun DeviceCardFooter(
                 Text("$level%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.weight(Weight.Fill))
                 CardIconButton(Icons.Default.KeyboardArrowUp, enabled = level < 100) {
-                    onAction("setLevel", listOf((level + CurtainStep).coerceAtMost(100)))
+                    onAction(DeviceAction.SET_LEVEL.api, listOf((level + CurtainStep).coerceAtMost(100)))
                 }
                 Spacer(Modifier.width(Spacing.sm))
                 CardIconButton(Icons.Default.KeyboardArrowDown, enabled = level > 0) {
-                    onAction("setLevel", listOf((level - CurtainStep).coerceAtLeast(0)))
+                    onAction(DeviceAction.SET_LEVEL.api, listOf((level - CurtainStep).coerceAtLeast(0)))
                 }
             }
         }
