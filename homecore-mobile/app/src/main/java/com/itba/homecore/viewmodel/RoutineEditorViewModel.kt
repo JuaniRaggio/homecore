@@ -31,7 +31,11 @@ data class RoutineEditorState(
     val active: Boolean = true,
     val favorite: Boolean = false,
     val actions: List<RoutineAction> = emptyList(),
-    val devices: List<Device> = emptyList()
+    val devices: List<Device> = emptyList(),
+    // Home the routine belongs to: set from the active home on create, preserved on edit so the
+    // routine keeps showing under its home. crossHome is preserved untouched on edit.
+    val homeId: String? = null,
+    val crossHome: Boolean? = null
 )
 
 class RoutineEditorViewModel(
@@ -46,13 +50,16 @@ class RoutineEditorViewModel(
 
     private var routineId: String? = null
 
-    /** [id] null starts a blank routine (create); otherwise loads it for editing. */
-    fun start(id: String?) {
+    /**
+     * [id] null starts a blank routine (create), assigned to [currentHomeId] so it shows under
+     * the active home; otherwise loads the routine for editing (preserving its home).
+     */
+    fun start(id: String?, currentHomeId: String?) {
         routineId = id
         viewModelScope.launch {
             val devices = devicesRepository.getDevices().getOrNull() ?: emptyList()
             if (id == null) {
-                _state.value = RoutineEditorState(loading = false, isNew = true, devices = devices)
+                _state.value = RoutineEditorState(loading = false, isNew = true, devices = devices, homeId = currentHomeId)
                 return@launch
             }
             val routine = routinesRepository.getRoutine(id).getOrNull()
@@ -70,7 +77,9 @@ class RoutineEditorViewModel(
                 active = routine.metadata?.active ?: true,
                 favorite = routine.metadata?.favorite ?: false,
                 actions = routine.actions,
-                devices = devices
+                devices = devices,
+                homeId = routine.metadata?.homeId,
+                crossHome = routine.metadata?.crossHome
             )
         }
     }
@@ -116,7 +125,9 @@ class RoutineEditorViewModel(
                 active = s.active,
                 time = normalizedTime,
                 days = s.days.sorted(),
-                description = s.description.trim().ifBlank { null }
+                description = s.description.trim().ifBlank { null },
+                homeId = s.homeId,
+                crossHome = s.crossHome
             )
         )
         viewModelScope.launch {

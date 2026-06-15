@@ -61,6 +61,7 @@ private fun availableActions(cat: DeviceCategory): List<DeviceAction> = when (ca
 @Composable
 fun RoutineEditorScreen(
     routineId: String?,
+    homeId: String?,
     onBack: () -> Unit,
     viewModel: RoutineEditorViewModel = viewModel()
 ) {
@@ -68,7 +69,7 @@ fun RoutineEditorScreen(
     var showActionPicker by rememberSaveable { mutableStateOf(false) }
     var showDelete by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(routineId) { viewModel.start(routineId) }
+    LaunchedEffect(routineId) { viewModel.start(routineId, homeId) }
 
     Column(
         modifier = Modifier

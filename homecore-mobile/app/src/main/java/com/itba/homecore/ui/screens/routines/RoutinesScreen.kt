@@ -63,6 +63,7 @@ fun RoutinesScreen(
     if (editorOpen) {
         RoutineEditorScreen(
             routineId = editorId,
+            homeId = selectedHome?.id,
             onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
         )
         return
