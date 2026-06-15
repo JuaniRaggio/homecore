@@ -43,7 +43,6 @@ fun ProfileScreen(
     var showChangePassword by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
 
-    // Load the logged-in user's name/email.
     LaunchedEffect(Unit) {
         authVm.loadProfile()
     }
@@ -60,7 +59,6 @@ fun ProfileScreen(
             .padding(top = Spacing.xl, bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
-        // Darker outer box that contains all content.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,7 +71,6 @@ fun ProfileScreen(
                     .padding(Spacing.xl),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xl)
             ) {
-                // Lighter inner box (SurfaceVariant) with gear icon at the top-right corner.
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

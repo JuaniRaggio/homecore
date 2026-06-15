@@ -53,7 +53,6 @@ fun RegisterScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
-        // Scrollable content first
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
