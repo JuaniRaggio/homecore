@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,6 +56,7 @@ fun ProfileScreen(
     val isDarkTheme by themeVm.isDarkTheme.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
 
     // Load the logged-in user's name/email and the real activity history.
     LaunchedEffect(Unit) {
@@ -89,7 +91,7 @@ fun ProfileScreen(
                     .padding(Spacing.xl),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xl)
             ) {
-                // Lighter inner box (SurfaceVariant) containing only ProfileCard.
+                // Lighter inner box (SurfaceVariant) with gear icon at the top-right corner.
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -98,17 +100,21 @@ fun ProfileScreen(
                 ) {
                     ProfileCard(
                         name = displayName,
-                        email = email,
-                        onChangePassword = { showChangePassword = true }
+                        email = email
                     )
+                    IconButton(
+                        onClick = { showSettings = true },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = Spacing.sm, y = -Spacing.sm)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.cd_settings),
+                            tint = TextPrimary
+                        )
+                    }
                 }
-
-                LanguageSelector()
-
-                ThemeSelector(
-                    isDark = isDarkTheme,
-                    onToggle = { themeVm.setDarkTheme(it) }
-                )
 
                 LogoutButton(onClick = { showLogoutDialog = true })
 
@@ -132,11 +138,80 @@ fun ProfileScreen(
         )
     }
 
+    if (showSettings) {
+        SettingsSheet(
+            isDarkTheme = isDarkTheme,
+            onToggleTheme = { themeVm.setDarkTheme(it) },
+            onChangePassword = {
+                showSettings = false
+                showChangePassword = true
+            },
+            onDismiss = { showSettings = false }
+        )
+    }
+
     if (showChangePassword) {
         ChangePasswordSheet(
             viewModel = authVm,
             onDismiss = { showChangePassword = false }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsSheet(
+    isDarkTheme: Boolean,
+    onToggleTheme: (Boolean) -> Unit,
+    onChangePassword: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Surface,
+        dragHandle = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.xl)
+                .padding(bottom = Spacing.xl3),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_title),
+                    color = TextPrimary,
+                    fontSize = TextSize.xl,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(Weight.Fill)
+                )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.cd_close),
+                    tint = TextPrimary,
+                    modifier = Modifier
+                        .size(IconSize.lg)
+                        .clickable(onClick = onDismiss)
+                )
+            }
+
+            LanguageSelector()
+
+            ThemeSelector(isDark = isDarkTheme, onToggle = onToggleTheme)
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                PillAction(
+                    text = stringResource(R.string.manage_password),
+                    onClick = onChangePassword
+                )
+            }
+        }
     }
 }
 
@@ -203,8 +278,7 @@ private fun LogoutConfirmDialog(
 @Composable
 private fun ProfileCard(
     name: String,
-    email: String,
-    onChangePassword: () -> Unit
+    email: String
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -247,10 +321,6 @@ private fun ProfileCard(
             fontSize = TextSize.md,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-
-        Spacer(Modifier.height(Spacing.xs2))
-
-        PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
     }
 }
 

@@ -256,7 +256,7 @@ private fun RoutineCard(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 Surface(
                     shape = RoundedCornerShape(Radius.card),
-                    color = AccentDark,
+                    color = ExecuteButtonColor,
                     modifier = Modifier.clickable(enabled = !isExecuting, onClick = onExecute)
                 ) {
                     if (isExecuting) {

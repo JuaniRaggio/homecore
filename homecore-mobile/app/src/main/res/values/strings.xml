@@ -155,6 +155,8 @@
     <string name="theme_title">Tema</string>
     <string name="theme_dark">Oscuro</string>
     <string name="theme_light">Claro</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="cd_settings">Ajustes</string>
     <string name="logout">Cerrar sesión</string>
     <string name="logout_title">¿Cerrar sesión?</string>
     <string name="logout_message">Vas a tener que volver a iniciar sesión la próxima vez que abras la app.</string>

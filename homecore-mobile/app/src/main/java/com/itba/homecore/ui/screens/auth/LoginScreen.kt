@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -53,8 +54,15 @@ fun LoginScreen(
         }
     }
 
+    val loginGradient = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0.0f to Color(0xFF06060A),
+            0.7f to Color(0xFF101017),
+            1.0f to Color(0xFF2A2A3C)
+        )
+    )
     Box(
-        modifier = Modifier.fillMaxSize().background(Background),
+        modifier = Modifier.fillMaxSize().background(loginGradient),
         contentAlignment = Alignment.Center
     ) {
         Column(

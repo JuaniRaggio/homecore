@@ -63,6 +63,8 @@ data class AppColors(
     val pillBackground: Color,
     val pillText: Color,
     val avatarBackground: Color,
+    // Action buttons
+    val executeButtonColor: Color,
     // Theme flag (useful for conditional icons / alpha)
     val isDark: Boolean
 )
@@ -81,6 +83,7 @@ fun darkAppColors() = AppColors(
     pillBackground  = Color(0xFFE8E9F0),
     pillText        = Color(0xFF1F2030),
     avatarBackground = Color(0xFF6C7080),
+    executeButtonColor = Color(0xFF3A7CA5),
     isDark          = true
 )
 
@@ -100,6 +103,7 @@ fun lightAppColors() = AppColors(
     pillBackground  = Color(0xFF1A1A2E),
     pillText        = Color(0xFFF3F4F7),
     avatarBackground = Color(0xFF8A909C),
+    executeButtonColor = Color(0xFF2D6A8F),
     isDark          = false
 )
 
@@ -123,3 +127,4 @@ val ToggleOff: Color       @Composable @ReadOnlyComposable get() = LocalAppColor
 val PillBackground: Color  @Composable @ReadOnlyComposable get() = LocalAppColors.current.pillBackground
 val PillText: Color        @Composable @ReadOnlyComposable get() = LocalAppColors.current.pillText
 val AvatarBackground: Color @Composable @ReadOnlyComposable get() = LocalAppColors.current.avatarBackground
+val ExecuteButtonColor: Color @Composable @ReadOnlyComposable get() = LocalAppColors.current.executeButtonColor
