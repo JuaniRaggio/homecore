@@ -100,11 +100,14 @@ class DevicesViewModel(
             // Filter by the selected home (when set), then resolve each device's room name
             // from the rooms list (the /devices payload only carries the room id).
             val homeId = currentHomeId
+            // Within a home, show only its rooms and the devices in those rooms. Orphan rooms
+            // (no home) and orphan devices (no room) are not shown in a home view, mirroring the
+            // web, which lists devices by walking each home's rooms.
             val rooms = if (homeId == null) allRooms
-                        else allRooms.filter { r -> r.home == null || r.home.id == homeId }
+                        else allRooms.filter { r -> r.home?.id == homeId }
             val roomIds = rooms.map { it.id }.toSet()
             val devices = if (homeId == null) allDevices
-                          else allDevices.filter { d -> d.room == null || d.room.id in roomIds }
+                          else allDevices.filter { d -> d.room?.id in roomIds }
 
             val enriched = devices.map { d ->
                 val roomId = d.room?.id

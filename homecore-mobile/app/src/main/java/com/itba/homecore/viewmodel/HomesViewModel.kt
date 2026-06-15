@@ -56,8 +56,11 @@ class HomesViewModel(
                 _state.value = HomesUiState.Error(homesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            // Preserve the selection if the home still exists after reload.
+            // Preserve the selection if the home still exists after reload; otherwise default
+            // to the first home. The app always operates within a home (like the web, which is
+            // always inside /casa/:homeId), so there is no real "no home" browsing state.
             val selection = currentSelectedHome?.let { sel -> homes.find { it.id == sel.id } }
+                ?: homes.firstOrNull()
             currentSelectedHome = selection
             _state.value = HomesUiState.Success(homes, roomsRes.getOrNull() ?: emptyList(), selection)
         }

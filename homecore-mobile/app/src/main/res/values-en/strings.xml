@@ -45,7 +45,8 @@
     <string name="nav_profile">User</string>
 
     <!-- Devices screen -->
-    <string name="house_default">Summer House</string>
+    <string name="house_default">No home</string>
+    <string name="device_needs_room">Create a room before adding a device.</string>
     <string name="search_device">Search device</string>
     <string name="new_device">+ New Device</string>
     <string name="new_room">+ New Room</string>

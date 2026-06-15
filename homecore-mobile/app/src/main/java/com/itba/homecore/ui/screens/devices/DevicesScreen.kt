@@ -128,7 +128,9 @@ fun DevicesScreen(
         AddRoomSheet(
             onDismiss = { showAddRoom = false },
             onCreate = { name ->
-                viewModel.createRoom(name) { showAddRoom = false }
+                // Link the room to the active home so it is not orphaned (the device list is
+                // scoped per home and rooms without a home would never show).
+                viewModel.createRoom(name, selectedHome?.id) { showAddRoom = false }
             }
         )
     }

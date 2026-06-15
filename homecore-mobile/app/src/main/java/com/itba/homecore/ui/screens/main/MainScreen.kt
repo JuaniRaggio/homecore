@@ -139,7 +139,14 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                                 selected = selected == tab,
                                 onClick = { selected = tab },
                                 icon = { Icon(tab.icon, contentDescription = null) },
-                                label = { Text(stringResource(tab.labelRes)) },
+                                label = {
+                                    Text(
+                                        text = stringResource(tab.labelRes),
+                                        fontSize = TextSize.navLabel,
+                                        maxLines = 1,
+                                        softWrap = false
+                                    )
+                                },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor   = AccentDark,
                                     selectedTextColor   = AccentDark,
