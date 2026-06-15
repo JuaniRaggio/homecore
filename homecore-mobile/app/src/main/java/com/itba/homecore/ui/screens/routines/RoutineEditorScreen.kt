@@ -231,7 +231,7 @@ private fun ActionRow(device: Device?, actionName: String, onRemove: () -> Unit)
         Spacer(Modifier.width(Spacing.sm))
         Column(modifier = Modifier.weight(Weight.Fill)) {
             Text(device?.name ?: "-", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
-            Text(actionLabel(actionName), color = TextSecondary, fontSize = TextSize.sm)
+            Text(deviceActionLabel(actionName), color = TextSecondary, fontSize = TextSize.sm)
         }
         Icon(
             Icons.Default.Close,
