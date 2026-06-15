@@ -32,6 +32,7 @@ import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.components.HcTextField
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.LanguageSelector
+import com.itba.homecore.ui.components.ThemeSelector
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.ui.util.deviceActionLabel
 import com.itba.homecore.ui.util.formatLogTimestamp
@@ -39,16 +40,19 @@ import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ChangePasswordState
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
+import com.itba.homecore.viewmodel.ThemeViewModel
 
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit = {},
     devicesVm: DevicesViewModel = viewModel(),
-    authVm: AuthViewModel = viewModel()
+    authVm: AuthViewModel = viewModel(),
+    themeVm: ThemeViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
     val logs by devicesVm.logs.collectAsStateWithLifecycle()
     val profile by authVm.profile.collectAsStateWithLifecycle()
+    val isDarkTheme by themeVm.isDarkTheme.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
 
@@ -100,6 +104,11 @@ fun ProfileScreen(
                 }
 
                 LanguageSelector()
+
+                ThemeSelector(
+                    isDark = isDarkTheme,
+                    onToggle = { themeVm.setDarkTheme(it) }
+                )
 
                 LogoutButton(onClick = { showLogoutDialog = true })
 
@@ -515,5 +524,5 @@ private fun estimateConsumption(devices: List<Device>): String {
         }
         w
     }
-    return "${watts}W"
+    return "${watts} W"
 }

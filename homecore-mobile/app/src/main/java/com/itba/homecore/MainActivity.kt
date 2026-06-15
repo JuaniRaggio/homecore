@@ -18,35 +18,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.itba.homecore.data.local.SessionManager
 import com.itba.homecore.ui.screens.auth.LoginScreen
 import com.itba.homecore.ui.screens.auth.RecoverScreen
 import com.itba.homecore.ui.screens.auth.RegisterScreen
 import com.itba.homecore.ui.screens.auth.VerifyScreen
 import com.itba.homecore.ui.screens.main.MainScreen
 import com.itba.homecore.ui.theme.Accent
-import com.itba.homecore.ui.theme.Background
+import com.itba.homecore.ui.theme.LocalAppColors
 import com.itba.homecore.ui.theme.HomeCoreTheme
 import com.itba.homecore.util.AppNotifier
+import com.itba.homecore.util.RoutineScheduler
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.NotificationEvents
+import com.itba.homecore.viewmodel.ThemeViewModel
+import kotlinx.coroutines.runBlocking
 
 enum class AppScreen { LOGIN, REGISTER, VERIFY, RECOVER, HOME }
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyPersistedLocale()
         enableEdgeToEdge()
         setContent {
-            HomeCoreTheme {
+            val themeVm: ThemeViewModel = viewModel()
+            val isDarkTheme by themeVm.isDarkTheme.collectAsStateWithLifecycle()
+
+            HomeCoreTheme(isDarkTheme = isDarkTheme) {
                 val authViewModel: AuthViewModel = viewModel()
                 val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
                 val context = LocalContext.current
 
-                // Ask for notification permission (API 33+) and post system
-                // notifications emitted from anywhere via NotificationEvents.
                 val notifPermission = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission()
-                ) { /* result ignored: AppNotifier no-ops if denied */ }
+                ) { /* result ignored */ }
                 LaunchedEffect(Unit) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -55,8 +61,10 @@ class MainActivity : AppCompatActivity() {
                 LaunchedEffect(Unit) {
                     NotificationEvents.events.collect { AppNotifier.notify(context, it.title, it.message) }
                 }
+                LaunchedEffect(isLoggedIn) {
+                    if (isLoggedIn == true) RoutineScheduler.start() else RoutineScheduler.stop()
+                }
 
-                // currentScreen only applies when there is NO session (login/register)
                 var currentScreen by remember { mutableStateOf(AppScreen.LOGIN) }
 
                 when (isLoggedIn) {
@@ -68,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     false -> when (currentScreen) {
                         AppScreen.LOGIN -> LoginScreen(
                             viewModel            = authViewModel,
-                            onLoginSuccess       = { /* isLoggedIn becomes true and MainScreen is rendered */ },
+                            onLoginSuccess       = {},
                             onNavigateToRegister = { currentScreen = AppScreen.REGISTER },
                             onNavigateToRecover  = { currentScreen = AppScreen.RECOVER }
                         )
@@ -88,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                             onDone    = { currentScreen = AppScreen.LOGIN },
                             onBack    = { currentScreen = AppScreen.LOGIN }
                         )
-                        AppScreen.HOME -> { /* unreachable when isLoggedIn = false */ }
+                        AppScreen.HOME -> {}
                     }
                 }
             }
@@ -96,10 +104,21 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+private fun AppCompatActivity.applyPersistedLocale() {
+    val saved = runBlocking { SessionManager(applicationContext).getLanguage() } ?: return
+    val locale = java.util.Locale(saved)
+    java.util.Locale.setDefault(locale)
+    val config = android.content.res.Configuration(resources.configuration)
+    config.setLocale(locale)
+    @Suppress("DEPRECATION")
+    resources.updateConfiguration(config, resources.displayMetrics)
+}
+
 @Composable
 private fun SplashScreen() {
+    val bg = LocalAppColors.current.background
     Box(
-        modifier = Modifier.fillMaxSize().background(Background),
+        modifier = Modifier.fillMaxSize().background(bg),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(color = Accent)

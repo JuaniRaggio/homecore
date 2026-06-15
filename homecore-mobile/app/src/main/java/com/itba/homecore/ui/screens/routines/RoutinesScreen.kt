@@ -223,7 +223,7 @@ private fun RoutineCard(
             if (sched.isNotBlank()) {
                 Text(
                     text = sched,
-                    color = Accent,
+                    color = AccentText,
                     fontSize = TextSize.base
                 )
             }

@@ -100,6 +100,7 @@ class RoutineEditorViewModel(
             UiMessages.emit("La rutina necesita un nombre")
             return
         }
+        val normalizedTime = normalizeTime(s.time)
         // The API rejects routines with no actions ("Actions array cannot be empty").
         if (s.actions.isEmpty()) {
             UiMessages.emit("Agregá al menos una acción a la rutina")
@@ -113,7 +114,7 @@ class RoutineEditorViewModel(
             metadata = RoutineMetadata(
                 favorite = s.favorite,
                 active = s.active,
-                time = s.time.ifBlank { null },
+                time = normalizedTime,
                 days = s.days.sorted(),
                 description = s.description.trim().ifBlank { null }
             )
@@ -138,11 +139,25 @@ class RoutineEditorViewModel(
         }
     }
 
+    /** "8:0" -> "08:00", "08:00:00" -> "08:00", "" -> null. */
+    private fun normalizeTime(raw: String): String? {
+        val s = raw.trim()
+        if (s.isBlank()) return null
+        val parts = s.split(":")
+        if (parts.size < 2) return s
+        val hh = parts[0].trim().padStart(2, '0')
+        val mm = parts[1].trim().padStart(2, '0').take(2)
+        return "$hh:$mm"
+    }
+
     fun execute() {
         val id = routineId ?: return
         viewModelScope.launch {
             routinesRepository.executeRoutine(id)
-                .onSuccess { UiMessages.emit("Rutina ejecutada") }
+                .onSuccess {
+                    UiMessages.emit("Rutina ejecutada")
+                    RoutineExecutionEvents.emit()
+                }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la rutina") }
         }
     }
