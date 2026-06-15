@@ -7,9 +7,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.itba.homecore.R
+import com.itba.homecore.data.model.AcFanSpeed
+import com.itba.homecore.data.model.AcMode
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceAction
+import com.itba.homecore.data.model.DeviceStatus
+import com.itba.homecore.data.model.DispenseUnit
+import com.itba.homecore.data.model.FridgeMode
+import com.itba.homecore.data.model.OvenConvection
+import com.itba.homecore.data.model.OvenGrill
+import com.itba.homecore.data.model.OvenHeat
 import com.itba.homecore.data.model.Room
+import com.itba.homecore.data.model.SpeakerGenre
+import com.itba.homecore.data.model.VacuumMode
 import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.theme.*
 
@@ -48,7 +58,7 @@ fun LightControls(device: Device, onAction: OnAction) {
 @Composable
 fun DoorControls(device: Device, onAction: OnAction) {
     val opened = device.isOn()
-    val locked = device.state?.lock?.lowercase() == "locked"
+    val locked = device.state?.lock?.lowercase() == DeviceStatus.LOCKED
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
         SectionLabel(stringResource(R.string.act_state))
         Text(
@@ -145,12 +155,12 @@ fun WaterControls(device: Device, onAction: OnAction) {
 @Composable
 private fun DispenseControl(onAction: OnAction) {
     // Canonical API units (faucet.dispense expects ml/cl/dl/l/...); label them in Spanish.
-    val units = listOf("ml", "cl", "dl", "l")
+    val units = DispenseUnit.all
     val unitLabels = mapOf(
-        "ml" to stringResource(R.string.unit_ml),
-        "cl" to stringResource(R.string.unit_cl),
-        "dl" to stringResource(R.string.unit_dl),
-        "l" to stringResource(R.string.unit_l)
+        DispenseUnit.ML to stringResource(R.string.unit_ml),
+        DispenseUnit.CL to stringResource(R.string.unit_cl),
+        DispenseUnit.DL to stringResource(R.string.unit_dl),
+        DispenseUnit.L to stringResource(R.string.unit_l)
     )
     var amount by rememberSaveable { mutableStateOf("") }
     var unit by rememberSaveable { mutableStateOf(units.first()) }

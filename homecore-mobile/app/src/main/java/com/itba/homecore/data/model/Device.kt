@@ -84,7 +84,7 @@ fun Device.category(): DeviceCategory {
 
 fun Device.isOn(): Boolean {
     val s = state?.status?.lowercase() ?: return false
-    return s in listOf("on", "opened", "active", "playing", "armedstay", "armedaway", "unlocked")
+    return s in DeviceStatus.activeStates
 }
 
 fun Device.isFavorite(): Boolean = metadata?.favorite == true
