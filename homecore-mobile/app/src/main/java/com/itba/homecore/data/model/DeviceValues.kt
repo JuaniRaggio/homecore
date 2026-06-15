@@ -17,12 +17,13 @@ object DeviceStatus {
     const val CLOSED = "closed"
     const val ACTIVE = "active"
     const val PLAYING = "playing"
-    const val ARMED_STAY = "armedstay"
-    const val ARMED_AWAY = "armedaway"
+    // The alarm statuses come back from the API in camelCase (verified against /devices).
+    const val ARMED_STAY = "armedStay"
+    const val ARMED_AWAY = "armedAway"
     const val LOCKED = "locked"
     const val UNLOCKED = "unlocked"
 
-    /** Statuses treated as "device is on/running". */
+    /** Statuses treated as "device is on/running". Compared case-insensitively (see Device.isOn). */
     val activeStates = listOf(ON, OPENED, ACTIVE, PLAYING, ARMED_STAY, ARMED_AWAY, UNLOCKED)
 }
 
@@ -39,7 +40,8 @@ object AcFanSpeed {
 }
 
 object SpeakerGenre {
-    const val CLASSICAL = "classical"
+    // The API genre set is Spanish-form (verified: /devices returns "latina", the web uses "clasica").
+    const val CLASSICAL = "clasica"
     const val COUNTRY = "country"
     const val DANCE = "dance"
     const val LATINA = "latina"

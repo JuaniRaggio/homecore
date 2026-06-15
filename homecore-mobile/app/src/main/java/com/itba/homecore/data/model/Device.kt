@@ -83,8 +83,9 @@ fun Device.category(): DeviceCategory {
 }
 
 fun Device.isOn(): Boolean {
-    val s = state?.status?.lowercase() ?: return false
-    return s in DeviceStatus.activeStates
+    val s = state?.status ?: return false
+    // Case-insensitive so a value like "armedAway" matches regardless of how the API cases it.
+    return DeviceStatus.activeStates.any { it.equals(s, ignoreCase = true) }
 }
 
 fun Device.isFavorite(): Boolean = metadata?.favorite == true
