@@ -5,7 +5,7 @@ package com.itba.homecore.data.model
  * STATUS_MAP (curtain = up/down, speaker = play/stop, vacuum = start/dock, ...). The
  * full, bespoke per-type controls live in `ui/screens/devices/controls`.
  */
-data class QuickToggle(val onAction: String, val offAction: String)
+data class QuickToggle(val onAction: DeviceAction, val offAction: DeviceAction)
 
 object DeviceCapabilities {
 
@@ -14,13 +14,13 @@ object DeviceCapabilities {
      * (e.g. fridge) so the card hides the switch.
      */
     fun quickToggle(category: DeviceCategory): QuickToggle? = when (category) {
-        DeviceCategory.LAMP, DeviceCategory.AC, DeviceCategory.OVEN -> QuickToggle("turnOn", "turnOff")
-        DeviceCategory.DOOR, DeviceCategory.FAUCET                  -> QuickToggle("open", "close")
-        DeviceCategory.BLINDS                                       -> QuickToggle("up", "down")
-        DeviceCategory.ALARM                                        -> QuickToggle("armAway", "disarm")
-        DeviceCategory.SPEAKER                                      -> QuickToggle("play", "stop")
-        DeviceCategory.VACUUM                                       -> QuickToggle("start", "dock")
-        DeviceCategory.LOCK                                         -> QuickToggle("unlock", "lock")
+        DeviceCategory.LAMP, DeviceCategory.AC, DeviceCategory.OVEN -> QuickToggle(DeviceAction.TURN_ON, DeviceAction.TURN_OFF)
+        DeviceCategory.DOOR, DeviceCategory.FAUCET                  -> QuickToggle(DeviceAction.OPEN, DeviceAction.CLOSE)
+        DeviceCategory.BLINDS                                       -> QuickToggle(DeviceAction.UP, DeviceAction.DOWN)
+        DeviceCategory.ALARM                                        -> QuickToggle(DeviceAction.ARM_AWAY, DeviceAction.DISARM)
+        DeviceCategory.SPEAKER                                      -> QuickToggle(DeviceAction.PLAY, DeviceAction.STOP)
+        DeviceCategory.VACUUM                                       -> QuickToggle(DeviceAction.START, DeviceAction.DOCK)
+        DeviceCategory.LOCK                                         -> QuickToggle(DeviceAction.UNLOCK, DeviceAction.LOCK)
         DeviceCategory.REFRIGERATOR, DeviceCategory.OTHER           -> null
     }
 }

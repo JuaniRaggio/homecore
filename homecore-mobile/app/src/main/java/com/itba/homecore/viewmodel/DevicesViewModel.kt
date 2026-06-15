@@ -45,20 +45,37 @@ class DevicesViewModel(
     private val _logs = MutableStateFlow<List<DeviceLog>>(emptyList())
     val logs: StateFlow<List<DeviceLog>> = _logs.asStateFlow()
 
-    init { load() }
+    private var currentHomeId: String? = null
+
+    init {
+        load()
+        // Refresh devices after any routine fires so the UI shows the new state.
+        viewModelScope.launch {
+            RoutineExecutionEvents.events.collect { refresh(showLoading = false) }
+        }
+    }
 
     /** Loads the recent action history from the API. */
     fun loadLogs(limit: Int = 10) {
         viewModelScope.launch {
-            repository.getLogs(limit, 0).onSuccess { _logs.value = it }
+            repository.getLogs(limit, 0)
+                .onSuccess { _logs.value = it }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo cargar el historial") }
         }
     }
 
     fun load() = refresh(showLoading = true)
 
+    /** Switches the active home filter and reloads. Passing null shows all homes. */
+    fun loadForHome(homeId: String?) {
+        currentHomeId = homeId
+        refresh(showLoading = true)
+    }
+
     /**
      * Loads rooms and devices. The two calls are independent, so they run concurrently.
      * [showLoading] is false for refreshes after an action, to avoid flashing the spinner.
+     * Results are filtered by [currentHomeId] when set.
      */
     private fun refresh(showLoading: Boolean) {
         viewModelScope.launch {
@@ -69,19 +86,29 @@ class DevicesViewModel(
                 rooms.await() to devices.await()
             }
 
-            val rooms   = roomsRes.getOrNull()
-            val devices = devicesRes.getOrNull()
+            val allRooms   = roomsRes.getOrNull()
+            val allDevices = devicesRes.getOrNull()
 
-            if (rooms == null) {
+            if (allRooms == null) {
                 _state.value = DevicesUiState.Error(roomsRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            if (devices == null) {
+            if (allDevices == null) {
                 _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            // The /devices payload carries the room id but not its name, so resolve the
-            // name from the rooms list (otherwise every device shows "No room").
+            // Filter by the selected home (when set), then resolve each device's room name
+            // from the rooms list (the /devices payload only carries the room id).
+            val homeId = currentHomeId
+            // Within a home, show only its rooms and the devices in those rooms. Orphan rooms
+            // (no home) and orphan devices (no room) are not shown in a home view, mirroring the
+            // web, which lists devices by walking each home's rooms.
+            val rooms = if (homeId == null) allRooms
+                        else allRooms.filter { r -> r.home?.id == homeId }
+            val roomIds = rooms.map { it.id }.toSet()
+            val devices = if (homeId == null) allDevices
+                          else allDevices.filter { d -> d.room?.id in roomIds }
+
             val enriched = devices.map { d ->
                 val roomId = d.room?.id
                 if (roomId != null && d.room?.name == null) {
@@ -100,7 +127,7 @@ class DevicesViewModel(
     fun toggleDevice(device: Device, turnOn: Boolean) {
         val toggle = DeviceCapabilities.quickToggle(device.category()) ?: return
         val action = if (turnOn) toggle.onAction else toggle.offAction
-        runAction(device.id, action)
+        runAction(device.id, action.api)
     }
 
     /** Runs an arbitrary device action (used by the detail screen) and refreshes on success. */

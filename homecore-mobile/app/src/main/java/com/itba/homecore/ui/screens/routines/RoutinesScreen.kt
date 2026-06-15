@@ -18,8 +18,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
@@ -28,20 +26,34 @@ import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.descriptionText
 import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
+import com.itba.homecore.ui.components.AddFab
+import com.itba.homecore.ui.components.FabAction
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
+import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.viewmodel.HomesUiState
+import com.itba.homecore.viewmodel.HomesViewModel
 import com.itba.homecore.viewmodel.RoutinesUiState
 import com.itba.homecore.viewmodel.RoutinesViewModel
 import com.itba.homecore.viewmodel.UiMessages
 
 @Composable
-fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
+fun RoutinesScreen(
+    viewModel: RoutinesViewModel = viewModel(),
+    homesVm: HomesViewModel = viewModel()
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val executingId by viewModel.executingId.collectAsStateWithLifecycle()
+    val homesState by homesVm.state.collectAsStateWithLifecycle()
+    val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
+    val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
+    LaunchedEffect(selectedHome?.id) { viewModel.loadForHome(selectedHome?.id) }
+
     var search by rememberSaveable { mutableStateOf("") }
     val noScheduleMsg = stringResource(R.string.routine_no_schedule_error)
 
@@ -51,49 +63,41 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
     if (editorOpen) {
         RoutineEditorScreen(
             routineId = editorId,
-            onBack = { editorOpen = false; viewModel.load() }
+            onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
         )
         return
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.xl)
-            .padding(bottom = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.base)
-    ) {
-        HouseHeader()
-        HcSearchBar(
-            value = search,
-            onValueChange = { search = it },
-            placeholder = stringResource(R.string.search_routine)
-        )
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
+    // Pending delete kept as id + name so the dialog survives rotation.
+    var deleteRoutineId by rememberSaveable { mutableStateOf<String?>(null) }
+    var deleteRoutineName by rememberSaveable { mutableStateOf("") }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.xl)
+                .padding(bottom = Spacing.huge),
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
         ) {
-            Surface(
-                shape = RoundedCornerShape(Radius.card),
-                color = AccentDark,
-                modifier = Modifier.clickable { editorId = null; editorOpen = true }
-            ) {
-                Text(
-                    text = stringResource(R.string.new_routine),
-                    color = Color.White,
-                    fontSize = TextSize.sm,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
-                )
-            }
-        }
+            HouseHeader(
+                homes = homes,
+                selectedHome = selectedHome,
+                onHomeSelect = { homesVm.selectHome(it) },
+                onAddHome = { showCreateHome = true }
+            )
+            HcSearchBar(
+                value = search,
+                onValueChange = { search = it },
+                placeholder = stringResource(R.string.search_routine)
+            )
 
-        when (val s = state) {
+            when (val s = state) {
             is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
-            is RoutinesUiState.Error -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
+            is RoutinesUiState.Error ->
+                StatusMessage(s.message, isError = true, onRetry = { viewModel.loadForHome(selectedHome?.id) })
             is RoutinesUiState.Success -> {
                 val filtered = remember(s.routines, search) {
                     if (search.isBlank()) s.routines
@@ -112,6 +116,7 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
                                 onToggleBlocked = { UiMessages.emit(noScheduleMsg) },
                                 onToggleFavorite = { viewModel.toggleFavorite(r) },
                                 onOpen = { editorId = r.id; editorOpen = true },
+                                onDelete = { deleteRoutineId = r.id; deleteRoutineName = r.name },
                                 modifier = cell
                             )
                         }
@@ -119,6 +124,41 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
                 }
             }
         }
+        }
+
+        AddFab(
+            actions = listOf(FabAction(stringResource(R.string.new_routine)) { editorId = null; editorOpen = true }),
+            contentDescription = stringResource(R.string.cd_add)
+        )
+    }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
+        )
+    }
+
+    deleteRoutineId?.let { id ->
+        AlertDialog(
+            onDismissRequest = { deleteRoutineId = null },
+            containerColor = Surface,
+            title = { Text(stringResource(R.string.delete_routine_title), color = TextPrimary, fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.delete_routine_message, deleteRoutineName), color = TextSecondary) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.deleteRoutine(id); deleteRoutineId = null }) {
+                    Text(stringResource(R.string.delete_confirm), color = ErrorColor, fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteRoutineId = null }) {
+                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                }
+            }
+        )
     }
 }
 
@@ -131,6 +171,7 @@ private fun RoutineCard(
     onToggleBlocked: () -> Unit,
     onToggleFavorite: () -> Unit,
     onOpen: () -> Unit,
+    onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isActive = routine.isActive()
@@ -156,9 +197,9 @@ private fun RoutineCard(
                     text = routine.name,
                     color = titleColor,
                     fontSize = TextSize.xxl,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(Weight.Fill)
                 )
-                Spacer(Modifier.width(Spacing.sm))
                 Icon(
                     imageVector = if (routine.isFavorite()) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = stringResource(R.string.cd_favorite),
@@ -167,7 +208,7 @@ private fun RoutineCard(
                         .size(IconSize.md)
                         .clickable(onClick = onToggleFavorite)
                 )
-                Spacer(Modifier.weight(Weight.Fill))
+                Spacer(Modifier.width(Spacing.sm))
                 if (schedulable) {
                     Switch(
                         checked = isActive,
@@ -192,6 +233,10 @@ private fun RoutineCard(
                         )
                     }
                 }
+                OverflowMenu(
+                    contentDescription = stringResource(R.string.cd_routine_options),
+                    onDelete = onDelete
+                )
             }
             val desc = routine.descriptionText()
             if (desc.isNotBlank()) {
@@ -204,22 +249,14 @@ private fun RoutineCard(
             }
             val sched = routineScheduleLabel(routine)
             if (sched.isNotBlank()) {
-                Text(
-                    text = sched,
-                    color = Accent,
-                    fontSize = TextSize.base
-                )
+                Text(text = sched, color = AccentText, fontSize = TextSize.base)
             }
-            // Push "Run now" to the bottom so it sits at the same place on every card,
-            // regardless of whether the routine has a description/schedule above.
+            // Push "Run now" to the bottom so it sits in the same place on every card.
             Spacer(Modifier.weight(Weight.Fill))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 Surface(
                     shape = RoundedCornerShape(Radius.card),
-                    color = AccentDark,
+                    color = ExecuteButtonColor,
                     modifier = Modifier.clickable(enabled = !isExecuting, onClick = onExecute)
                 ) {
                     if (isExecuting) {

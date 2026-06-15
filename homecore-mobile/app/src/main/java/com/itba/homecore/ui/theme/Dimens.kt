@@ -59,6 +59,7 @@ object IconSize {
 
 /** Text sizes (sp), mapped from design-tokens.md mobile scale. */
 object TextSize {
+    val navLabel = 11.sp  // bottom navigation labels: fits the longest tab ("Dispositivos") on one line
     val sm       = 12.sp
     val base     = 13.sp
     val md       = 14.sp

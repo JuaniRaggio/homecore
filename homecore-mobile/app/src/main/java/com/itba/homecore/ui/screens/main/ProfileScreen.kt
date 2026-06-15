@@ -1,7 +1,6 @@
 package com.itba.homecore.ui.screens.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,8 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,32 +19,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
-import com.itba.homecore.data.model.Device
-import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.components.HcTextField
-import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.components.LanguageSelector
+import com.itba.homecore.ui.components.ThemeSelector
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ChangePasswordState
-import com.itba.homecore.viewmodel.DevicesUiState
-import com.itba.homecore.viewmodel.DevicesViewModel
+import com.itba.homecore.viewmodel.ThemeViewModel
 
 @Composable
 fun ProfileScreen(
-    userName: String = "Maria Fernandez",
     onLogout: () -> Unit = {},
-    devicesVm: DevicesViewModel = viewModel(),
-    authVm: AuthViewModel = viewModel()
+    authVm: AuthViewModel = viewModel(),
+    themeVm: ThemeViewModel = viewModel()
 ) {
-    val devicesState by devicesVm.state.collectAsStateWithLifecycle()
+    val profile by authVm.profile.collectAsStateWithLifecycle()
+    val isDarkTheme by themeVm.isDarkTheme.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
+
+    // Load the logged-in user's name/email.
+    LaunchedEffect(Unit) {
+        authVm.loadProfile()
+    }
+
+    val displayName = profile?.fullName?.ifBlank { null } ?: stringResource(R.string.profile_default_name)
+    val email = profile?.email.orEmpty()
 
     Column(
         modifier = Modifier
@@ -54,22 +57,50 @@ fun ProfileScreen(
             .background(Background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = Spacing.xl)
-            .padding(bottom = Spacing.xl),
+            .padding(top = Spacing.xl, bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
-        HouseHeader()
+        // Darker outer box that contains all content.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Surface, RoundedCornerShape(Radius.card))
+                .padding(Spacing.sm)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Spacing.xl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+            ) {
+                // Lighter inner box (SurfaceVariant) with gear icon at the top-right corner.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(SurfaceVariant, RoundedCornerShape(Radius.xl2))
+                        .padding(vertical = Spacing.xl4, horizontal = Spacing.xl)
+                ) {
+                    ProfileCard(
+                        name = displayName,
+                        email = email
+                    )
+                    IconButton(
+                        onClick = { showSettings = true },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = Spacing.sm, y = -Spacing.sm)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.cd_settings),
+                            tint = TextPrimary
+                        )
+                    }
+                }
 
-        ProfileCard(
-            userName = userName,
-            onChangePassword = { showChangePassword = true }
-        )
-
-
-        LogoutButton(onClick = { showLogoutDialog = true })
-
-        ConsumptionCard(state = devicesState)
-
-        HistoryCard(state = devicesState)
+                LogoutButton(onClick = { showLogoutDialog = true })
+            }
+        }
     }
 
     if (showLogoutDialog) {
@@ -82,11 +113,80 @@ fun ProfileScreen(
         )
     }
 
+    if (showSettings) {
+        SettingsSheet(
+            isDarkTheme = isDarkTheme,
+            onToggleTheme = { themeVm.setDarkTheme(it) },
+            onChangePassword = {
+                showSettings = false
+                showChangePassword = true
+            },
+            onDismiss = { showSettings = false }
+        )
+    }
+
     if (showChangePassword) {
         ChangePasswordSheet(
             viewModel = authVm,
             onDismiss = { showChangePassword = false }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsSheet(
+    isDarkTheme: Boolean,
+    onToggleTheme: (Boolean) -> Unit,
+    onChangePassword: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Surface,
+        dragHandle = null
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.xl)
+                .padding(bottom = Spacing.xl3),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_title),
+                    color = TextPrimary,
+                    fontSize = TextSize.xl,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(Weight.Fill)
+                )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.cd_close),
+                    tint = TextPrimary,
+                    modifier = Modifier
+                        .size(IconSize.lg)
+                        .clickable(onClick = onDismiss)
+                )
+            }
+
+            LanguageSelector()
+
+            ThemeSelector(isDark = isDarkTheme, onToggle = onToggleTheme)
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                PillAction(
+                    text = stringResource(R.string.manage_password),
+                    onClick = onChangePassword
+                )
+            }
+        }
     }
 }
 
@@ -151,67 +251,64 @@ private fun LogoutConfirmDialog(
 }
 
 @Composable
-private fun ProfileCard(userName: String, onChangePassword: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(SurfaceVariant, RoundedCornerShape(Radius.card))
-            .padding(Spacing.xl3)
+private fun ProfileCard(
+    name: String,
+    email: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.base)
+        Text(
+            text = stringResource(R.string.profile),
+            color = TextPrimary,
+            fontSize = TextSize.xxl,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Avatar = initials of the user's name + last name.
+        Box(
+            modifier = Modifier
+                .size(IconSize.avatar)
+                .background(AvatarBackground, CircleShape),
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.profile),
-                color = TextPrimary,
-                fontSize = TextSize.xl,
+                text = initialsOf(name),
+                color = Color.White,
+                fontSize = TextSize.headline,
                 fontWeight = FontWeight.Bold
             )
-
-            // Avatar (Box with overlay)
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.avatar)
-                        .background(AvatarBackground, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(IconSize.button)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.xl)
-                        .background(SurfaceVariant, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = TextPrimary,
-                        modifier = Modifier.size(IconSize.xs)
-                    )
-                }
-            }
-
-            Text(
-                text = userName,
-                color = TextPrimary,
-                fontSize = TextSize.xxl,
-                fontWeight = FontWeight.Bold
-            )
-
-            PillAction(stringResource(R.string.manage_account)) { /* TODO */ }
-            PillAction(stringResource(R.string.manage_password), onClick = onChangePassword)
         }
+
+        Text(
+            text = name,
+            color = TextPrimary,
+            fontSize = TextSize.title,
+            fontWeight = FontWeight.Bold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        Text(
+            text = email.ifBlank { "—" },
+            color = TextSecondary,
+            fontSize = TextSize.md,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
     }
 }
+
+/** Initials from a full name: "Juan García" → "JG", "Juan" → "J". */
+private fun initialsOf(name: String): String {
+    val parts = name.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+    return when {
+        parts.isEmpty()   -> "?"
+        parts.size == 1   -> parts[0].take(1).uppercase()
+        else              -> "${parts.first().first()}${parts.last().first()}".uppercase()
+    }
+}
+
 
 @Composable
 private fun PillAction(text: String, onClick: () -> Unit) {
@@ -225,136 +322,13 @@ private fun PillAction(text: String, onClick: () -> Unit) {
         Text(
             text = text,
             color = PillText,
-            fontSize = TextSize.base,
+            fontSize = TextSize.md,
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = Spacing.md),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
-    }
-}
-
-@Composable
-private fun ConsumptionCard(state: DevicesUiState) {
-    val (wattsLabel, runningCount) = when (state) {
-        is DevicesUiState.Success -> {
-            val running = state.devices.count { it.isOn() }
-            estimateConsumption(state.devices) to running
-        }
-        else -> "—" to 0
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(Stroke.hairline, AccentDark.copy(alpha = Alpha.strongBorder), RoundedCornerShape(Radius.card))
-            .padding(Spacing.xl)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
-            Text(
-                text = stringResource(R.string.consumption),
-                color = TextPrimary,
-                fontSize = TextSize.xl,
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = wattsLabel,
-                        color = Accent,
-                        fontSize = TextSize.display,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.current_consumption),
-                        color = TextSecondary,
-                        fontSize = TextSize.sm
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .width(Stroke.hairline)
-                        .height(Spacing.huge2)
-                        .background(SurfaceVariant)
-                )
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = runningCount.toString(),
-                        color = Accent,
-                        fontSize = TextSize.display,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.devices_running),
-                        color = TextSecondary,
-                        fontSize = TextSize.sm,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun HistoryCard(state: DevicesUiState) {
-    val recent = when (state) {
-        is DevicesUiState.Success -> state.devices.take(5)
-        else -> emptyList()
-    }
-
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        Text(
-            text = stringResource(R.string.history),
-            color = TextPrimary,
-            fontSize = TextSize.xxl,
-            fontWeight = FontWeight.Bold
-        )
-        if (recent.isEmpty()) {
-            Text(stringResource(R.string.no_recent_events), color = TextSecondary, fontSize = TextSize.base)
-        } else {
-            recent.forEachIndexed { idx, d ->
-                HistoryRow(device = d, minutesAgo = (idx + 1) * 5)
-            }
-        }
-    }
-}
-
-@Composable
-private fun HistoryRow(device: Device, minutesAgo: Int) {
-    val action = stringResource(
-        if (device.isOn()) R.string.history_turned_on else R.string.history_turned_off,
-        device.name
-    )
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.md)
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = Spacing.xs)
-                .size(IconSize.dot)
-                .background(Accent, CircleShape)
-        )
-        Column {
-            Text(
-                text = action,
-                color = TextPrimary,
-                fontSize = TextSize.md,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = stringResource(R.string.minutes_ago, minutesAgo),
-                color = TextSecondary,
-                fontSize = TextSize.sm
-            )
-        }
     }
 }
 
@@ -460,20 +434,4 @@ private fun ChangePasswordSheet(
             }
         }
     }
-}
-
-private fun estimateConsumption(devices: List<Device>): String {
-    val watts = devices.filter { it.isOn() }.sumOf { d ->
-        val w: Int = when (d.type.name.lowercase()) {
-            "lamp" -> 8
-            "ac" -> 1200
-            "oven" -> 1500
-            "refrigerator" -> 150
-            "speaker" -> 20
-            "vacuum" -> 90
-            else -> 5
-        }
-        w
-    }
-    return "${watts}W"
 }

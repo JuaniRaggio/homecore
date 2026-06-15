@@ -44,7 +44,8 @@ data class DeviceState(
     @SerializedName("fanSpeed")           val fanSpeed: String? = null,
     @SerializedName("heat")               val heat: String? = null,
     @SerializedName("grill")              val grill: String? = null,
-    @SerializedName("convection")         val convection: String? = null
+    @SerializedName("convection")         val convection: String? = null,
+    @SerializedName("location")           val location: String? = null
 )
 
 /**
@@ -82,8 +83,9 @@ fun Device.category(): DeviceCategory {
 }
 
 fun Device.isOn(): Boolean {
-    val s = state?.status?.lowercase() ?: return false
-    return s in listOf("on", "opened", "active", "playing", "armedstay", "armedaway", "unlocked")
+    val s = state?.status ?: return false
+    // Case-insensitive so a value like "armedAway" matches regardless of how the API cases it.
+    return DeviceStatus.activeStates.any { it.equals(s, ignoreCase = true) }
 }
 
 fun Device.isFavorite(): Boolean = metadata?.favorite == true

@@ -5,8 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Apartment
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.*
@@ -18,13 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.ui.screens.devices.DeviceDetailScreen
 import com.itba.homecore.ui.screens.devices.DevicesScreen
-import com.itba.homecore.ui.screens.homes.HomesScreen
 import com.itba.homecore.ui.screens.routines.RoutinesScreen
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
@@ -35,7 +35,7 @@ private enum class Tab(val icon: ImageVector, val labelRes: Int) {
     HOME(Icons.Default.Home, R.string.nav_home),
     DEVICES(Icons.Default.Tv, R.string.nav_devices),
     ROUTINES(Icons.AutoMirrored.Filled.List, R.string.nav_routines),
-    HOMES(Icons.Default.Apartment, R.string.nav_homes),
+    ACTIVITY(Icons.Default.Insights, R.string.nav_activity),
     PROFILE(Icons.Default.Person, R.string.nav_profile)
 }
 
@@ -94,7 +94,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                     )
                     Tab.DEVICES  -> DevicesScreen(onDeviceClick = openDevice, columns = columns)
                     Tab.ROUTINES -> RoutinesScreen()
-                    Tab.HOMES    -> HomesScreen()
+                    Tab.ACTIVITY -> ActivityScreen()
                     Tab.PROFILE  -> ProfileScreen(onLogout = onLogout)
                 }
             }
@@ -139,7 +139,14 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                                 selected = selected == tab,
                                 onClick = { selected = tab },
                                 icon = { Icon(tab.icon, contentDescription = null) },
-                                label = { Text(stringResource(tab.labelRes)) },
+                                label = {
+                                    Text(
+                                        text = stringResource(tab.labelRes),
+                                        fontSize = TextSize.navLabel,
+                                        maxLines = 1,
+                                        softWrap = false
+                                    )
+                                },
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor   = AccentDark,
                                     selectedTextColor   = AccentDark,

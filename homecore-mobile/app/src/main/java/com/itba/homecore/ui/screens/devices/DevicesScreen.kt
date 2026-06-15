@@ -18,7 +18,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.*
-import com.itba.homecore.ui.components.ActionPill
+import com.itba.homecore.ui.components.AddFab
+import com.itba.homecore.ui.components.FabAction
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.OverflowMenu
@@ -27,18 +28,27 @@ import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
+import com.itba.homecore.viewmodel.HomesUiState
+import com.itba.homecore.viewmodel.HomesViewModel
 
 // --- Screen -------------------------------------------------------------------
 @Composable
 fun DevicesScreen(
     onDeviceClick: (String) -> Unit,
     columns: Int = 2,
-    viewModel: DevicesViewModel = viewModel()
+    viewModel: DevicesViewModel = viewModel(),
+    homesVm: HomesViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val homesState by homesVm.state.collectAsStateWithLifecycle()
+    val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
+    val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
+    LaunchedEffect(selectedHome?.id) { viewModel.loadForHome(selectedHome?.id) }
     var search by rememberSaveable { mutableStateOf("") }
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
+
     // Pending room actions kept as id+name strings so they survive rotation.
     var renameRoomId by rememberSaveable { mutableStateOf<String?>(null) }
     var renameRoomName by rememberSaveable { mutableStateOf("") }
@@ -48,55 +58,61 @@ fun DevicesScreen(
     val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
     val noRoomLabel = stringResource(R.string.room_none)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.xl)
-            .padding(top = Spacing.sm, bottom = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.base)
-    ) {
-        HouseHeader()
-        HcSearchBar(
-            value = search,
-            onValueChange = { search = it },
-            placeholder = stringResource(R.string.search_device)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.End)
+    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = Spacing.xl)
+                .padding(top = Spacing.sm, bottom = Spacing.huge),
+            verticalArrangement = Arrangement.spacedBy(Spacing.base)
         ) {
-            ActionPill(text = stringResource(R.string.new_device), onClick = { showAddDevice = true })
-            ActionPill(text = stringResource(R.string.new_room), onClick = { showAddRoom = true })
-        }
+            HouseHeader(
+                homes = homes,
+                selectedHome = selectedHome,
+                onHomeSelect = { homesVm.selectHome(it) },
+                onAddHome = { showCreateHome = true }
+            )
+            HcSearchBar(
+                value = search,
+                onValueChange = { search = it },
+                placeholder = stringResource(R.string.search_device)
+            )
 
-        when (val s = state) {
-            is DevicesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
-            is DevicesUiState.Error   -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
-            is DevicesUiState.Success -> {
-                val grouped = remember(s.devices, s.rooms, search, noRoomLabel) {
-                    groupDevicesByRoom(s.devices, s.rooms, search, noRoomLabel)
-                }
-
-                if (grouped.isEmpty()) {
-                    StatusMessage(stringResource(R.string.empty_devices))
-                } else {
-                    grouped.forEach { group ->
-                        RoomCard(
-                            group    = group,
-                            columns  = columns,
-                            onToggle  = { device, newState -> viewModel.toggleDevice(device, newState) },
-                            onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
-                            onOpen = { device -> onDeviceClick(device.id) },
-                            onDeviceAction = { device, action, params -> viewModel.runAction(device.id, action, params) },
-                            onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
-                            onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
-                        )
+            when (val s = state) {
+                is DevicesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
+                is DevicesUiState.Error   -> StatusMessage(s.message, isError = true, onRetry = { viewModel.loadForHome(selectedHome?.id) })
+                is DevicesUiState.Success -> {
+                    val grouped = remember(s.devices, s.rooms, search, noRoomLabel) {
+                        groupDevicesByRoom(s.devices, s.rooms, search, noRoomLabel)
+                    }
+                    if (grouped.isEmpty()) {
+                        StatusMessage(stringResource(R.string.empty_devices))
+                    } else {
+                        grouped.forEach { group ->
+                            RoomCard(
+                                group = group,
+                                columns = columns,
+                                onToggle = { device, newState -> viewModel.toggleDevice(device, newState) },
+                                onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
+                                onOpen = { device -> onDeviceClick(device.id) },
+                                onDeviceAction = { device, action, params -> viewModel.runAction(device.id, action, params) },
+                                onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
+                                onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
+                            )
+                        }
                     }
                 }
             }
         }
+
+        AddFab(
+            actions = listOf(
+                FabAction(stringResource(R.string.new_device)) { showAddDevice = true },
+                FabAction(stringResource(R.string.new_room)) { showAddRoom = true }
+            ),
+            contentDescription = stringResource(R.string.cd_add)
+        )
     }
 
     if (showAddDevice) {
@@ -112,7 +128,9 @@ fun DevicesScreen(
         AddRoomSheet(
             onDismiss = { showAddRoom = false },
             onCreate = { name ->
-                viewModel.createRoom(name) { showAddRoom = false }
+                // Link the room to the active home so it is not orphaned (the device list is
+                // scoped per home and rooms without a home would never show).
+                viewModel.createRoom(name, selectedHome?.id) { showAddRoom = false }
             }
         )
     }
@@ -124,6 +142,16 @@ fun DevicesScreen(
             initial = renameRoomName,
             onConfirm = { newName -> viewModel.renameRoom(id, newName); renameRoomId = null },
             onDismiss = { renameRoomId = null }
+        )
+    }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
         )
     }
 

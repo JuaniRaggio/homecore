@@ -7,6 +7,8 @@ data class Routine(
     @SerializedName("name")        val name: String = "",
     @SerializedName("description") val description: String? = null,
     @SerializedName("actions")     val actions: List<RoutineAction> = emptyList(),
+    @SerializedName("time")        val time: String? = null,
+    @SerializedName("days")        val days: List<Int>? = null,
     @SerializedName("metadata")    val metadata: RoutineMetadata? = null
 )
 
@@ -22,11 +24,17 @@ data class RoutineMetadata(
     @SerializedName("time")        val time: String? = null,
     @SerializedName("days")        val days: List<Int>? = null,
     @SerializedName("description") val description: String? = null,
-    @SerializedName("homeId")      val homeId: String? = null
+    @SerializedName("homeId")      val homeId: String? = null,
+    @SerializedName("crossHome")   val crossHome: Boolean? = null
 )
 
 fun Routine.isFavorite(): Boolean = metadata?.favorite == true
 fun Routine.isActive(): Boolean = metadata?.active ?: true
-fun Routine.time(): String = metadata?.time.orEmpty()
-fun Routine.days(): List<Int> = metadata?.days ?: emptyList()
-fun Routine.descriptionText(): String = description ?: metadata?.description.orEmpty()
+fun Routine.time(): String =
+    time?.takeIf { it.isNotBlank() } ?: metadata?.time?.takeIf { it.isNotBlank() }.orEmpty()
+
+fun Routine.days(): List<Int> =
+    days?.takeIf { it.isNotEmpty() } ?: metadata?.days ?: emptyList()
+
+fun Routine.descriptionText(): String =
+    description?.takeIf { it.isNotBlank() } ?: metadata?.description.orEmpty()

@@ -29,13 +29,36 @@ class RoutinesViewModel(
     private val _executingId = MutableStateFlow<String?>(null)
     val executingId: StateFlow<String?> = _executingId.asStateFlow()
 
+    // Null means "no home selected": show all. When set, only routines belonging to
+    // that home (or marked crossHome) are shown.
+    private var currentHomeId: String? = null
+
     init { load() }
+
+    /**
+     * Switches the active home filter and reloads.
+     * Routines are scoped to a home via [com.itba.homecore.data.model.RoutineMetadata.homeId].
+     * Passing null clears the filter and shows all routines.
+     */
+    fun loadForHome(homeId: String?) {
+        currentHomeId = homeId
+        load()
+    }
 
     fun load() {
         viewModelScope.launch {
             _state.value = RoutinesUiState.Loading
             repository.getRoutines()
-                .onSuccess { _state.value = RoutinesUiState.Success(it) }
+                .onSuccess { all ->
+                    val homeId = currentHomeId
+                    // Mirror the web (RoutinesView.vue): within a selected home, show only
+                    // routines explicitly marked crossHome or assigned to that home. Routines
+                    // with no homeId are not shared everywhere; they only show in the unfiltered
+                    // view (no home selected).
+                    val routines = if (homeId == null) all
+                        else all.filter { r -> r.metadata?.crossHome == true || r.metadata?.homeId == homeId }
+                    _state.value = RoutinesUiState.Success(routines)
+                }
                 .onFailure { _state.value = RoutinesUiState.Error(it.message ?: "Error al cargar rutinas") }
         }
     }
@@ -46,8 +69,11 @@ class RoutinesViewModel(
             repository.executeRoutine(routine.id)
                 .onSuccess {
                     UiMessages.emit("Rutina ejecutada")
-                    // Also surface it as a system notification.
                     NotificationEvents.emit("HomeCore", "Rutina ejecutada: ${routine.name}")
+                    // Tell DevicesViewModel to refetch: the execute endpoint does not
+                    // return new device state, so without this the UI stays stale even
+                    // when the backend did fire the actions.
+                    RoutineExecutionEvents.emit()
                 }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la rutina") }
             _executingId.value = null
@@ -76,5 +102,17 @@ class RoutinesViewModel(
         _state.value = current.copy(
             routines = current.routines.map { if (it.id == updated.id) updated else it }
         )
+    }
+
+    /**
+     * Deletes the routine from the API. Because [com.itba.homecore.data.model.RoutineMetadata.homeId]
+     * ties each routine to a home, removing it from the API removes it from this home's view.
+     */
+    fun deleteRoutine(routineId: String) {
+        viewModelScope.launch {
+            repository.deleteRoutine(routineId)
+                .onSuccess { load() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo eliminar la rutina") }
+        }
     }
 }

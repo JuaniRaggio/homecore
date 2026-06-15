@@ -108,23 +108,27 @@ fun AddDeviceSheet(
                         fontSize = TextSize.lg,
                         fontWeight = FontWeight.SemiBold
                     )
-                    RoomChip(
-                        label = stringResource(R.string.room_none),
-                        selected = selectedRoomId == null,
-                        onClick = { selectedRoomId = null },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    rooms.chunked(2).forEach { row ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.base)) {
-                            row.forEach { room ->
-                                RoomChip(
-                                    label = room.name,
-                                    selected = selectedRoomId == room.id,
-                                    onClick = { selectedRoomId = room.id },
-                                    modifier = Modifier.weight(Weight.Fill)
-                                )
+                    // A device must belong to a room (and therefore to a home), mirroring the
+                    // web: there is no "no room" option here.
+                    if (rooms.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.device_needs_room),
+                            color = TextSecondary,
+                            fontSize = TextSize.md
+                        )
+                    } else {
+                        rooms.chunked(2).forEach { row ->
+                            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.base)) {
+                                row.forEach { room ->
+                                    RoomChip(
+                                        label = room.name,
+                                        selected = selectedRoomId == room.id,
+                                        onClick = { selectedRoomId = room.id },
+                                        modifier = Modifier.weight(Weight.Fill)
+                                    )
+                                }
+                                if (row.size == 1) Spacer(Modifier.weight(Weight.Fill))
                             }
-                            if (row.size == 1) Spacer(Modifier.weight(Weight.Fill))
                         }
                     }
 
@@ -132,9 +136,10 @@ fun AddDeviceSheet(
                         text = stringResource(R.string.create_device),
                         onClick = {
                             val type = selectedType ?: return@HcButton
-                            onCreate(name.trim(), type.typeName, selectedRoomId)
+                            val roomId = selectedRoomId ?: return@HcButton
+                            onCreate(name.trim(), type.typeName, roomId)
                         },
-                        enabled = name.isNotBlank() && selectedType != null
+                        enabled = name.isNotBlank() && selectedType != null && selectedRoomId != null
                     )
                 }
             }

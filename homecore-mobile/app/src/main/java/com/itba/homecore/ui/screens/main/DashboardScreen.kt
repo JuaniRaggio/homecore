@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,9 +27,12 @@ import com.itba.homecore.ui.components.PanelCard
 import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.screens.devices.DeviceCard
+import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
+import com.itba.homecore.viewmodel.HomesUiState
+import com.itba.homecore.viewmodel.HomesViewModel
 import com.itba.homecore.viewmodel.RoutinesUiState
 import com.itba.homecore.viewmodel.RoutinesViewModel
 import com.itba.homecore.viewmodel.UiMessages
@@ -40,11 +44,20 @@ fun DashboardScreen(
     onSeeAllDevices: () -> Unit = {},
     columns: Int = 2,
     devicesVm: DevicesViewModel = viewModel(),
-    routinesVm: RoutinesViewModel = viewModel()
+    routinesVm: RoutinesViewModel = viewModel(),
+    homesVm: HomesViewModel = viewModel()
 ) {
     val devicesState by devicesVm.state.collectAsStateWithLifecycle()
     val routinesState by routinesVm.state.collectAsStateWithLifecycle()
+    val homesState by homesVm.state.collectAsStateWithLifecycle()
+    val homes = (homesState as? HomesUiState.Success)?.homes ?: emptyList()
+    val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
+    LaunchedEffect(selectedHome?.id) {
+        devicesVm.loadForHome(selectedHome?.id)
+        routinesVm.loadForHome(selectedHome?.id)
+    }
     val noNotifications = stringResource(R.string.no_new_notifications)
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -57,6 +70,10 @@ fun DashboardScreen(
     ) {
         HouseHeader(
             showNotifications = true,
+            homes = homes,
+            selectedHome = selectedHome,
+            onHomeSelect = { homesVm.selectHome(it) },
+            onAddHome = { showCreateHome = true },
             onNotificationsClick = { UiMessages.emit(noNotifications) }
         )
 
@@ -127,6 +144,16 @@ fun DashboardScreen(
             }
         }
     }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
+        )
+    }
 }
 
 @Composable
@@ -171,7 +198,7 @@ private fun FavoriteRoutineCard(
             ) {
                 Surface(
                     shape = RoundedCornerShape(Radius.card),
-                    color = AccentDark,
+                    color = ExecuteButtonColor,
                     modifier = Modifier.clickable(onClick = onExecute)
                 ) {
                     Text(

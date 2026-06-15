@@ -46,8 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceAction
 import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.DeviceCategory
+import com.itba.homecore.data.model.DeviceStatus
 import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.data.model.isOn
@@ -104,7 +106,7 @@ fun DeviceCard(
     val isFavorite = device.isFavorite()
     val isDoor     = cat == DeviceCategory.DOOR || cat == DeviceCategory.LOCK
     val isLamp     = cat == DeviceCategory.LAMP
-    val highlight  = isDoor && device.state?.status?.lowercase() in listOf("locked", "closed")
+    val highlight  = isDoor && device.state?.status?.lowercase() in listOf(DeviceStatus.LOCKED, DeviceStatus.CLOSED)
 
     val borderColor = if (highlight) AccentDark else Accent.copy(alpha = Alpha.hairlineBorder)
     val iconBg      = if (isLamp) LampIconBg else Color.Transparent
@@ -167,11 +169,18 @@ fun DeviceCard(
                 lineHeight = LineHeight.compact
             )
             Spacer(Modifier.height(Spacing.xs))
-            Text(
-                text = deviceStatusText(device, cat, isOn),
-                color = if (isOn) SuccessColor else TextSecondary,
-                fontSize = TextSize.sm
-            )
+            val statusColor = if (isOn) SuccessColor else TextSecondary
+            Box(
+                modifier = Modifier
+                    .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(Radius.xl))
+                    .padding(horizontal = Spacing.sm, vertical = 2.dp)
+            ) {
+                Text(
+                    text = deviceStatusText(device, cat, isOn),
+                    color = statusColor,
+                    fontSize = TextSize.sm
+                )
+            }
 
             Spacer(Modifier.weight(Weight.Fill))
             DeviceCardFooter(device, cat, isOn, onToggle, onAction)
@@ -225,7 +234,7 @@ private fun DeviceCardFooter(
         )
 
         DeviceCategory.DOOR -> {
-            val locked = device.state?.lock?.lowercase() == "locked"
+            val locked = device.state?.lock?.lowercase() == DeviceStatus.LOCKED
             StatusBadge(
                 text = stringResource(
                     when { locked -> R.string.badge_locked; isOn -> R.string.badge_open; else -> R.string.badge_closed }
@@ -264,11 +273,11 @@ private fun DeviceCardFooter(
                 Text("$level%", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.weight(Weight.Fill))
                 CardIconButton(Icons.Default.KeyboardArrowUp, enabled = level < 100) {
-                    onAction("setLevel", listOf((level + CurtainStep).coerceAtMost(100)))
+                    onAction(DeviceAction.SET_LEVEL.api, listOf((level + CurtainStep).coerceAtMost(100)))
                 }
                 Spacer(Modifier.width(Spacing.sm))
                 CardIconButton(Icons.Default.KeyboardArrowDown, enabled = level > 0) {
-                    onAction("setLevel", listOf((level - CurtainStep).coerceAtLeast(0)))
+                    onAction(DeviceAction.SET_LEVEL.api, listOf((level - CurtainStep).coerceAtLeast(0)))
                 }
             }
         }
@@ -338,18 +347,18 @@ private fun SpeakerFooter(
     onToggle: (Boolean) -> Unit,
     onAction: (action: String, params: List<Any>) -> Unit
 ) {
-    val playing = device.state?.status?.lowercase() == "playing"
+    val playing = device.state?.status?.lowercase() == DeviceStatus.PLAYING
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         CardIconButton(Icons.Default.PowerSettingsNew, highlighted = isOn) { onToggle(!isOn) }
-        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong", emptyList()) }
+        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction(DeviceAction.PREVIOUS_SONG.api, emptyList()) }
         CardIconButton(
             if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
             accent = true
-        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume", emptyList()) }
-        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong", emptyList()) }
+        ) { onAction((if (!isOn) DeviceAction.PLAY else if (playing) DeviceAction.PAUSE else DeviceAction.RESUME).api, emptyList()) }
+        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction(DeviceAction.NEXT_SONG.api, emptyList()) }
     }
 }
 
@@ -381,24 +390,28 @@ private fun CardIconButton(
     }
 }
 
-/** Selectable option in the device creation flow. */
+/**
+ * Selectable option in the device creation flow. The API type key comes from
+ * [DeviceCategory.typeName] so it is not duplicated here.
+ */
 data class DeviceTypeOption(
     val category: DeviceCategory,
-    val typeName: String,
     val labelRes: Int
-)
+) {
+    val typeName: String get() = category.typeName
+}
 
 /** The 11 types supported by the HCI API (same keys as homecore-web). */
 val selectableDeviceTypes: List<DeviceTypeOption> = listOf(
-    DeviceTypeOption(DeviceCategory.LAMP,         "lamp",         R.string.dtype_lamp),
-    DeviceTypeOption(DeviceCategory.DOOR,         "door",         R.string.dtype_door),
-    DeviceTypeOption(DeviceCategory.ALARM,        "alarm",        R.string.dtype_alarm),
-    DeviceTypeOption(DeviceCategory.FAUCET,       "faucet",       R.string.dtype_faucet),
-    DeviceTypeOption(DeviceCategory.BLINDS,       "blinds",       R.string.dtype_blinds),
-    DeviceTypeOption(DeviceCategory.AC,           "ac",           R.string.dtype_ac),
-    DeviceTypeOption(DeviceCategory.SPEAKER,      "speaker",      R.string.dtype_speaker),
-    DeviceTypeOption(DeviceCategory.VACUUM,       "vacuum",       R.string.dtype_vacuum),
-    DeviceTypeOption(DeviceCategory.REFRIGERATOR, "refrigerator", R.string.dtype_refrigerator),
-    DeviceTypeOption(DeviceCategory.OVEN,         "oven",         R.string.dtype_oven),
-    DeviceTypeOption(DeviceCategory.LOCK,         "lock",         R.string.dtype_lock)
+    DeviceTypeOption(DeviceCategory.LAMP,         R.string.dtype_lamp),
+    DeviceTypeOption(DeviceCategory.DOOR,         R.string.dtype_door),
+    DeviceTypeOption(DeviceCategory.ALARM,        R.string.dtype_alarm),
+    DeviceTypeOption(DeviceCategory.FAUCET,       R.string.dtype_faucet),
+    DeviceTypeOption(DeviceCategory.BLINDS,       R.string.dtype_blinds),
+    DeviceTypeOption(DeviceCategory.AC,           R.string.dtype_ac),
+    DeviceTypeOption(DeviceCategory.SPEAKER,      R.string.dtype_speaker),
+    DeviceTypeOption(DeviceCategory.VACUUM,       R.string.dtype_vacuum),
+    DeviceTypeOption(DeviceCategory.REFRIGERATOR, R.string.dtype_refrigerator),
+    DeviceTypeOption(DeviceCategory.OVEN,         R.string.dtype_oven),
+    DeviceTypeOption(DeviceCategory.LOCK,         R.string.dtype_lock)
 )

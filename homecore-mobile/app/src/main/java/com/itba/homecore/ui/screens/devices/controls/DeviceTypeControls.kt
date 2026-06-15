@@ -7,7 +7,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.itba.homecore.R
+import com.itba.homecore.data.model.AcFanSpeed
+import com.itba.homecore.data.model.AcMode
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceAction
+import com.itba.homecore.data.model.DeviceStatus
+import com.itba.homecore.data.model.DispenseUnit
+import com.itba.homecore.data.model.FridgeMode
+import com.itba.homecore.data.model.OvenConvection
+import com.itba.homecore.data.model.OvenGrill
+import com.itba.homecore.data.model.OvenHeat
+import com.itba.homecore.data.model.Room
+import com.itba.homecore.data.model.SpeakerGenre
+import com.itba.homecore.data.model.VacuumMode
 import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.theme.*
 
@@ -16,6 +28,7 @@ import com.itba.homecore.ui.theme.*
  * dedicated control components (LightControls, AcControls, ...). They all share the
  * primitives in DeviceControlPrimitives.kt and take the same contract:
  * the current [device] and an [onAction] that sends (apiAction, params) to the API.
+ * The action name always comes from [DeviceAction] so it stays aligned with the backend.
  */
 
 private typealias OnAction = (String, List<Any>) -> Unit
@@ -25,18 +38,18 @@ private typealias OnAction = (String, List<Any>) -> Unit
 fun LightControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         ControlButtonsRow(
-            stringResource(R.string.act_turn_on) to { onAction("turnOn", emptyList()) },
-            stringResource(R.string.act_turn_off) to { onAction("turnOff", emptyList()) }
+            stringResource(R.string.act_turn_on) to { onAction(DeviceAction.TURN_ON.api, emptyList()) },
+            stringResource(R.string.act_turn_off) to { onAction(DeviceAction.TURN_OFF.api, emptyList()) }
         )
         ControlSlider(
             label = stringResource(R.string.act_brightness),
             initial = device.state?.brightness ?: 100,
             min = 0, max = 100, unit = "%"
-        ) { onAction("setBrightness", listOf(it)) }
+        ) { onAction(DeviceAction.SET_BRIGHTNESS.api, listOf(it)) }
 
         Column {
             SectionLabel(stringResource(R.string.act_color))
-            ColorSwatchRow { onAction("setColor", listOf(it)) }
+            ColorSwatchRow { onAction(DeviceAction.SET_COLOR.api, listOf(it)) }
         }
     }
 }
@@ -45,7 +58,7 @@ fun LightControls(device: Device, onAction: OnAction) {
 @Composable
 fun DoorControls(device: Device, onAction: OnAction) {
     val opened = device.isOn()
-    val locked = device.state?.lock?.lowercase() == "locked"
+    val locked = device.state?.lock?.lowercase() == DeviceStatus.LOCKED
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
         SectionLabel(stringResource(R.string.act_state))
         Text(
@@ -56,13 +69,13 @@ fun DoorControls(device: Device, onAction: OnAction) {
         )
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            ControlButton(stringResource(R.string.act_open), { onAction("open", emptyList()) }, Modifier.weight(Weight.Fill), enabled = !locked && !opened)
-            ControlButton(stringResource(R.string.act_close), { onAction("close", emptyList()) }, Modifier.weight(Weight.Fill), enabled = !locked && opened)
+            ControlButton(stringResource(R.string.act_open), { onAction(DeviceAction.OPEN.api, emptyList()) }, Modifier.weight(Weight.Fill), enabled = !locked && !opened)
+            ControlButton(stringResource(R.string.act_close), { onAction(DeviceAction.CLOSE.api, emptyList()) }, Modifier.weight(Weight.Fill), enabled = !locked && opened)
         }
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            ControlButton(stringResource(R.string.act_lock), { onAction("lock", emptyList()) }, Modifier.weight(Weight.Fill), enabled = !opened && !locked, filled = false)
-            ControlButton(stringResource(R.string.act_unlock), { onAction("unlock", emptyList()) }, Modifier.weight(Weight.Fill), enabled = locked, filled = false)
+            ControlButton(stringResource(R.string.act_lock), { onAction(DeviceAction.LOCK.api, emptyList()) }, Modifier.weight(Weight.Fill), enabled = !opened && !locked, filled = false)
+            ControlButton(stringResource(R.string.act_unlock), { onAction(DeviceAction.UNLOCK.api, emptyList()) }, Modifier.weight(Weight.Fill), enabled = locked, filled = false)
         }
     }
 }
@@ -71,8 +84,8 @@ fun DoorControls(device: Device, onAction: OnAction) {
 @Composable
 fun LockControls(device: Device, onAction: OnAction) {
     ControlButtonsRow(
-        stringResource(R.string.act_lock) to { onAction("lock", emptyList()) },
-        stringResource(R.string.act_unlock) to { onAction("unlock", emptyList()) }
+        stringResource(R.string.act_lock) to { onAction(DeviceAction.LOCK.api, emptyList()) },
+        stringResource(R.string.act_unlock) to { onAction(DeviceAction.UNLOCK.api, emptyList()) }
     )
 }
 
@@ -80,6 +93,7 @@ fun LockControls(device: Device, onAction: OnAction) {
 @Composable
 fun AlarmControls(device: Device, onAction: OnAction) {
     var code by rememberSaveable { mutableStateOf("") }
+    var newCode by rememberSaveable { mutableStateOf("") }
     val hasCode = code.isNotBlank()
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
         SectionLabel(stringResource(R.string.act_security_code))
@@ -91,28 +105,36 @@ fun AlarmControls(device: Device, onAction: OnAction) {
         )
         ControlButton(
             text = stringResource(R.string.act_arm_away),
-            onClick = { onAction("armAway", listOf(code)) },
+            onClick = { onAction(DeviceAction.ARM_AWAY.api, listOf(code)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = hasCode
         )
         ControlButton(
             text = stringResource(R.string.act_arm_stay),
-            onClick = { onAction("armStay", listOf(code)) },
+            onClick = { onAction(DeviceAction.ARM_STAY.api, listOf(code)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = hasCode
         )
         ControlButton(
             text = stringResource(R.string.act_disarm),
-            onClick = { onAction("disarm", listOf(code)) },
+            onClick = { onAction(DeviceAction.DISARM.api, listOf(code)) },
             modifier = Modifier.fillMaxWidth(),
             enabled = hasCode,
             filled = false
         )
+        // changeSecurityCode needs both the current and the new code (API: old, new).
+        SectionLabel(stringResource(R.string.act_new_code))
+        ControlTextField(
+            value = newCode,
+            onValueChange = { newCode = it.filter { c -> c.isDigit() }.take(4) },
+            placeholder = stringResource(R.string.act_new_code),
+            modifier = Modifier.fillMaxWidth()
+        )
         ControlButton(
             text = stringResource(R.string.act_change_code),
-            onClick = { onAction("changeSecurityCode", listOf(code)) },
+            onClick = { onAction(DeviceAction.CHANGE_SECURITY_CODE.api, listOf(code, newCode)) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = hasCode,
+            enabled = hasCode && newCode.isNotBlank(),
             filled = false
         )
     }
@@ -123,8 +145,8 @@ fun AlarmControls(device: Device, onAction: OnAction) {
 fun WaterControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
         ControlButtonsRow(
-            stringResource(R.string.act_open) to { onAction("open", emptyList()) },
-            stringResource(R.string.act_close) to { onAction("close", emptyList()) }
+            stringResource(R.string.act_open) to { onAction(DeviceAction.OPEN.api, emptyList()) },
+            stringResource(R.string.act_close) to { onAction(DeviceAction.CLOSE.api, emptyList()) }
         )
         DispenseControl(onAction)
     }
@@ -133,12 +155,12 @@ fun WaterControls(device: Device, onAction: OnAction) {
 @Composable
 private fun DispenseControl(onAction: OnAction) {
     // Canonical API units (faucet.dispense expects ml/cl/dl/l/...); label them in Spanish.
-    val units = listOf("ml", "cl", "dl", "l")
+    val units = DispenseUnit.all
     val unitLabels = mapOf(
-        "ml" to stringResource(R.string.unit_ml),
-        "cl" to stringResource(R.string.unit_cl),
-        "dl" to stringResource(R.string.unit_dl),
-        "l" to stringResource(R.string.unit_l)
+        DispenseUnit.ML to stringResource(R.string.unit_ml),
+        DispenseUnit.CL to stringResource(R.string.unit_cl),
+        DispenseUnit.DL to stringResource(R.string.unit_dl),
+        DispenseUnit.L to stringResource(R.string.unit_l)
     )
     var amount by rememberSaveable { mutableStateOf("") }
     var unit by rememberSaveable { mutableStateOf(units.first()) }
@@ -154,7 +176,7 @@ private fun DispenseControl(onAction: OnAction) {
         ControlButton(
             text = stringResource(R.string.act_dispense),
             // Quantity is a volume in the selected unit; the API accepts 1..100.
-            onClick = { amount.toIntOrNull()?.takeIf { it > 0 }?.coerceAtMost(100)?.let { onAction("dispense", listOf(it, unit)) } },
+            onClick = { amount.toIntOrNull()?.takeIf { it > 0 }?.coerceAtMost(100)?.let { onAction(DeviceAction.DISPENSE.api, listOf(it, unit)) } },
             modifier = Modifier.fillMaxWidth(),
             enabled = amount.isNotBlank()
         )
@@ -168,14 +190,14 @@ fun CurtainControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         // Up/down step by CurtainStep (web parity) for precise control; the slider sets any value.
         ControlButtonsRow(
-            stringResource(R.string.act_up) to { onAction("setLevel", listOf((level + CurtainStep).coerceAtMost(100))) },
-            stringResource(R.string.act_down) to { onAction("setLevel", listOf((level - CurtainStep).coerceAtLeast(0))) }
+            stringResource(R.string.act_up) to { onAction(DeviceAction.SET_LEVEL.api, listOf((level + CurtainStep).coerceAtMost(100))) },
+            stringResource(R.string.act_down) to { onAction(DeviceAction.SET_LEVEL.api, listOf((level - CurtainStep).coerceAtLeast(0))) }
         )
         ControlSlider(
             label = stringResource(R.string.act_position),
             initial = level,
             min = 0, max = 100, unit = "%"
-        ) { onAction("setLevel", listOf(it)) }
+        ) { onAction(DeviceAction.SET_LEVEL.api, listOf(it)) }
     }
 }
 
@@ -184,30 +206,30 @@ fun CurtainControls(device: Device, onAction: OnAction) {
 fun AcControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         ControlButtonsRow(
-            stringResource(R.string.act_turn_on) to { onAction("turnOn", emptyList()) },
-            stringResource(R.string.act_turn_off) to { onAction("turnOff", emptyList()) }
+            stringResource(R.string.act_turn_on) to { onAction(DeviceAction.TURN_ON.api, emptyList()) },
+            stringResource(R.string.act_turn_off) to { onAction(DeviceAction.TURN_OFF.api, emptyList()) }
         )
         ControlSlider(
             label = stringResource(R.string.act_temperature),
             initial = device.state?.temperature ?: 24,
             min = 18, max = 38, unit = "°C"
-        ) { onAction("setTemperature", listOf(it)) }
+        ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
         val acModes = mapOf(
-            "cool" to stringResource(R.string.ac_mode_cool),
-            "heat" to stringResource(R.string.ac_mode_heat),
-            "fan" to stringResource(R.string.ac_mode_fan)
+            AcMode.COOL to stringResource(R.string.ac_mode_cool),
+            AcMode.HEAT to stringResource(R.string.ac_mode_heat),
+            AcMode.FAN to stringResource(R.string.ac_mode_fan)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_mode),
-            options = listOf("cool", "heat", "fan"),
+            options = AcMode.all,
             selected = device.state?.mode,
             labelFor = { acModes[it] ?: it }
-        ) { onAction("setMode", listOf(it)) }
+        ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
         SegmentedSelector(
             label = stringResource(R.string.act_fan_speed),
-            options = listOf("auto", "25", "50", "75", "100"),
+            options = AcFanSpeed.all,
             selected = null
-        ) { onAction("setFanSpeed", listOf(it)) }
+        ) { onAction(DeviceAction.SET_FAN_SPEED.api, listOf(it)) }
     }
 }
 
@@ -216,71 +238,70 @@ fun AcControls(device: Device, onAction: OnAction) {
 fun SpeakerControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         ControlButtonsRow(
-            stringResource(R.string.act_play) to { onAction("play", emptyList()) },
-            stringResource(R.string.act_pause) to { onAction("pause", emptyList()) },
-            stringResource(R.string.act_stop) to { onAction("stop", emptyList()) }
+            stringResource(R.string.act_play) to { onAction(DeviceAction.PLAY.api, emptyList()) },
+            stringResource(R.string.act_pause) to { onAction(DeviceAction.PAUSE.api, emptyList()) },
+            stringResource(R.string.act_stop) to { onAction(DeviceAction.STOP.api, emptyList()) }
         )
         ControlButtonsRow(
-            stringResource(R.string.act_previous) to { onAction("previousSong", emptyList()) },
-            stringResource(R.string.act_resume) to { onAction("resume", emptyList()) },
-            stringResource(R.string.act_next) to { onAction("nextSong", emptyList()) }
+            stringResource(R.string.act_previous) to { onAction(DeviceAction.PREVIOUS_SONG.api, emptyList()) },
+            stringResource(R.string.act_resume) to { onAction(DeviceAction.RESUME.api, emptyList()) },
+            stringResource(R.string.act_next) to { onAction(DeviceAction.NEXT_SONG.api, emptyList()) }
         )
         ControlSlider(
             label = stringResource(R.string.act_volume),
             initial = device.state?.volume ?: 5,
             min = 0, max = 10
-        ) { onAction("setVolume", listOf(it)) }
+        ) { onAction(DeviceAction.SET_VOLUME.api, listOf(it)) }
         val genres = mapOf(
-            "classical" to stringResource(R.string.genre_classical),
-            "country" to stringResource(R.string.genre_country),
-            "dance" to stringResource(R.string.genre_dance),
-            "latina" to stringResource(R.string.genre_latina),
-            "pop" to stringResource(R.string.genre_pop),
-            "rock" to stringResource(R.string.genre_rock)
+            SpeakerGenre.CLASSICAL to stringResource(R.string.genre_classical),
+            SpeakerGenre.COUNTRY to stringResource(R.string.genre_country),
+            SpeakerGenre.DANCE to stringResource(R.string.genre_dance),
+            SpeakerGenre.LATINA to stringResource(R.string.genre_latina),
+            SpeakerGenre.POP to stringResource(R.string.genre_pop),
+            SpeakerGenre.ROCK to stringResource(R.string.genre_rock)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_genre),
-            options = listOf("classical", "country", "dance", "latina", "pop", "rock"),
+            options = SpeakerGenre.all,
             selected = device.state?.genre,
             labelFor = { genres[it] ?: it }
-        ) { onAction("setGenre", listOf(it)) }
+        ) { onAction(DeviceAction.SET_GENRE.api, listOf(it)) }
     }
 }
 
 // -- Vacuum ------------------------------------------------------------------------
 @Composable
-fun VacuumControls(device: Device, onAction: OnAction) {
-    var location by rememberSaveable { mutableStateOf("") }
+fun VacuumControls(device: Device, rooms: List<Room>, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         ControlButtonsRow(
-            stringResource(R.string.act_start) to { onAction("start", emptyList()) },
-            stringResource(R.string.act_pause) to { onAction("pause", emptyList()) },
-            stringResource(R.string.act_dock) to { onAction("dock", emptyList()) }
+            stringResource(R.string.act_start) to { onAction(DeviceAction.START.api, emptyList()) },
+            stringResource(R.string.act_pause) to { onAction(DeviceAction.PAUSE.api, emptyList()) },
+            stringResource(R.string.act_dock) to { onAction(DeviceAction.DOCK.api, emptyList()) }
         )
         val vacuumModes = mapOf(
-            "vacuum" to stringResource(R.string.vacuum_mode_vacuum),
-            "mop" to stringResource(R.string.vacuum_mode_mop)
+            VacuumMode.VACUUM to stringResource(R.string.vacuum_mode_vacuum),
+            VacuumMode.MOP to stringResource(R.string.vacuum_mode_mop)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_mode),
-            options = listOf("vacuum", "mop"),
+            options = VacuumMode.all,
             selected = device.state?.mode,
             labelFor = { vacuumModes[it] ?: it }
-        ) { onAction("setMode", listOf(it)) }
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            SectionLabel(stringResource(R.string.act_location))
-            ControlTextField(
-                value = location,
-                onValueChange = { location = it },
-                placeholder = stringResource(R.string.act_location),
-                modifier = Modifier.fillMaxWidth()
-            )
-            ControlButton(
-                text = stringResource(R.string.act_location),
-                onClick = { onAction("setLocation", listOf(location.trim())) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = location.isNotBlank()
-            )
+        ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
+        // setLocation takes a room id, so pick from the user's rooms (not free text).
+        if (rooms.isEmpty()) {
+            Column {
+                SectionLabel(stringResource(R.string.act_location))
+                Text(stringResource(R.string.act_no_rooms), color = TextSecondary, fontSize = TextSize.md)
+            }
+        } else {
+            val roomNames = rooms.associate { it.id to it.name }
+            SegmentedSelector(
+                label = stringResource(R.string.act_location),
+                options = rooms.map { it.id },
+                selected = device.state?.location,
+                labelFor = { roomNames[it] ?: it }
+            ) { onAction(DeviceAction.SET_LOCATION.api, listOf(it)) }
         }
     }
 }
@@ -293,23 +314,23 @@ fun FridgeControls(device: Device, onAction: OnAction) {
             label = stringResource(R.string.act_temperature),
             initial = device.state?.temperature ?: 4,
             min = 2, max = 8, unit = "°C"
-        ) { onAction("setTemperature", listOf(it)) }
+        ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
         ControlSlider(
             label = stringResource(R.string.act_freezer_temp),
             initial = device.state?.freezerTemperature ?: -16,
             min = -20, max = -8, unit = "°C"
-        ) { onAction("setFreezerTemperature", listOf(it)) }
+        ) { onAction(DeviceAction.SET_FREEZER_TEMPERATURE.api, listOf(it)) }
         val fridgeModes = mapOf(
-            "default" to stringResource(R.string.fridge_mode_default),
-            "vacation" to stringResource(R.string.fridge_mode_vacation),
-            "party" to stringResource(R.string.fridge_mode_party)
+            FridgeMode.DEFAULT to stringResource(R.string.fridge_mode_default),
+            FridgeMode.VACATION to stringResource(R.string.fridge_mode_vacation),
+            FridgeMode.PARTY to stringResource(R.string.fridge_mode_party)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_mode),
-            options = listOf("default", "vacation", "party"),
+            options = FridgeMode.all,
             selected = device.state?.mode,
             labelFor = { fridgeModes[it] ?: it }
-        ) { onAction("setMode", listOf(it)) }
+        ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
     }
 }
 
@@ -318,46 +339,46 @@ fun FridgeControls(device: Device, onAction: OnAction) {
 fun OvenControls(device: Device, onAction: OnAction) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xl)) {
         ControlButtonsRow(
-            stringResource(R.string.act_turn_on) to { onAction("turnOn", emptyList()) },
-            stringResource(R.string.act_turn_off) to { onAction("turnOff", emptyList()) }
+            stringResource(R.string.act_turn_on) to { onAction(DeviceAction.TURN_ON.api, emptyList()) },
+            stringResource(R.string.act_turn_off) to { onAction(DeviceAction.TURN_OFF.api, emptyList()) }
         )
         ControlSlider(
             label = stringResource(R.string.act_temperature),
             initial = device.state?.temperature ?: 90,
             min = 90, max = 230, step = 10, unit = "°C"
-        ) { onAction("setTemperature", listOf(it)) }
+        ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
         val heatSources = mapOf(
-            "conventional" to stringResource(R.string.oven_heat_conventional),
-            "bottom" to stringResource(R.string.oven_heat_bottom),
-            "top" to stringResource(R.string.oven_heat_top)
+            OvenHeat.CONVENTIONAL to stringResource(R.string.oven_heat_conventional),
+            OvenHeat.BOTTOM to stringResource(R.string.oven_heat_bottom),
+            OvenHeat.TOP to stringResource(R.string.oven_heat_top)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_heat_source),
-            options = listOf("conventional", "bottom", "top"),
+            options = OvenHeat.all,
             selected = device.state?.heat,
             labelFor = { heatSources[it] ?: it }
-        ) { onAction("setHeat", listOf(it)) }
+        ) { onAction(DeviceAction.SET_HEAT.api, listOf(it)) }
         val grillModes = mapOf(
-            "large" to stringResource(R.string.oven_grill_large),
-            "eco" to stringResource(R.string.oven_grill_eco),
-            "off" to stringResource(R.string.oven_grill_off)
+            OvenGrill.LARGE to stringResource(R.string.oven_grill_large),
+            OvenGrill.ECO to stringResource(R.string.oven_grill_eco),
+            OvenGrill.OFF to stringResource(R.string.oven_grill_off)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_grill),
-            options = listOf("large", "eco", "off"),
+            options = OvenGrill.all,
             selected = device.state?.grill,
             labelFor = { grillModes[it] ?: it }
-        ) { onAction("setGrill", listOf(it)) }
+        ) { onAction(DeviceAction.SET_GRILL.api, listOf(it)) }
         val convectionModes = mapOf(
-            "normal" to stringResource(R.string.oven_conv_normal),
-            "eco" to stringResource(R.string.oven_conv_eco),
-            "off" to stringResource(R.string.oven_conv_off)
+            OvenConvection.NORMAL to stringResource(R.string.oven_conv_normal),
+            OvenConvection.ECO to stringResource(R.string.oven_conv_eco),
+            OvenConvection.OFF to stringResource(R.string.oven_conv_off)
         )
         SegmentedSelector(
             label = stringResource(R.string.act_convection),
-            options = listOf("normal", "eco", "off"),
+            options = OvenConvection.all,
             selected = device.state?.convection,
             labelFor = { convectionModes[it] ?: it }
-        ) { onAction("setConvection", listOf(it)) }
+        ) { onAction(DeviceAction.SET_CONVECTION.api, listOf(it)) }
     }
 }
