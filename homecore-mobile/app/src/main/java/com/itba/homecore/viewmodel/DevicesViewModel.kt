@@ -8,6 +8,7 @@ import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
+import com.itba.homecore.data.api.SocketManager
 import com.itba.homecore.data.repository.DevicesRepository
 import com.itba.homecore.di.AppModule
 import kotlinx.coroutines.async
@@ -133,6 +134,7 @@ class DevicesViewModel(
 
     /** Runs an arbitrary device action (used by the detail screen) and refreshes on success. */
     fun runAction(deviceId: String, action: String, params: List<Any> = emptyList()) {
+        SocketManager.markLocalActivity()
         viewModelScope.launch {
             repository.executeAction(deviceId, action, params)
                 .onSuccess { refresh(showLoading = false) }
@@ -150,6 +152,7 @@ class DevicesViewModel(
 
     /** Creates a device and reloads the list. [onDone] runs only on success (keeps the sheet open on error). */
     fun createDevice(name: String, typeName: String, roomId: String?, onDone: () -> Unit = {}) {
+        SocketManager.markLocalActivity()
         viewModelScope.launch {
             repository.createDevice(name, typeName, roomId)
                 .onSuccess {
@@ -185,6 +188,7 @@ class DevicesViewModel(
     }
 
     fun deleteDevice(deviceId: String, onDone: () -> Unit = {}) {
+        SocketManager.markLocalActivity()
         viewModelScope.launch {
             repository.deleteDevice(deviceId)
                 .onSuccess { refresh(showLoading = false); onDone() }

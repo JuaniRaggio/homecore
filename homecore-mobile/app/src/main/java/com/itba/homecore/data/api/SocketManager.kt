@@ -25,6 +25,22 @@ object SocketManager {
 
     private var socket: Socket? = null
 
+    // The server echoes the sender's own changes, so we suppress notifications (but still
+    // refresh) for a short window after this client performed an action — only external
+    // changes should notify. See [markLocalActivity].
+    private const val SELF_ECHO_WINDOW_MS = 3_000L
+
+    @Volatile
+    private var lastLocalActionAt = 0L
+
+    /** Call right before/after this client mutates a device, so its own echo doesn't notify. */
+    fun markLocalActivity() {
+        lastLocalActionAt = android.os.SystemClock.elapsedRealtime()
+    }
+
+    private fun isLocalEcho(): Boolean =
+        android.os.SystemClock.elapsedRealtime() - lastLocalActionAt < SELF_ECHO_WINDOW_MS
+
     /** Connects with the session [token]; no-op if already connected. */
     fun connect(token: String) {
         if (socket != null) return
@@ -65,6 +81,7 @@ object SocketManager {
 
     private fun onDeviceEvent(args: Array<out Any?>) {
         DeviceSyncEvents.emit()
+        if (isLocalEcho()) return
         val payload = args.firstOrNull() as? JSONObject
         val name = payload?.deviceName()
         val state = payload?.optJSONObject("data")?.let { stateText(it) }
@@ -78,6 +95,7 @@ object SocketManager {
 
     private fun notifyDevice(args: Array<out Any?>, fallback: String) {
         DeviceSyncEvents.emit()
+        if (isLocalEcho()) return
         val name = (args.firstOrNull() as? JSONObject)?.deviceName()
         NotificationEvents.emit(TITLE, if (name != null) "$fallback: $name" else fallback)
     }
