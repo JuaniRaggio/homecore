@@ -114,29 +114,7 @@ fun RoutineEditorScreen(
         )
 
         Text(stringResource(R.string.routine_days_label), color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = TextSize.lg)
-        val dayNames = stringArrayResource(R.array.routine_days)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
-        ) {
-            DAYS_ORDER.forEach { day ->
-                val selected = day in state.days
-                Surface(
-                    shape = RoundedCornerShape(Radius.lg),
-                    color = if (selected) AccentDark else Color.Transparent,
-                    border = if (selected) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
-                    modifier = Modifier.weight(Weight.Fill).clickable { viewModel.toggleDay(day) }
-                ) {
-                    Text(
-                        text = dayNames.getOrNull(day).orEmpty(),
-                        color = if (selected) Color.White else TextSecondary,
-                        fontSize = TextSize.sm,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
-                    )
-                }
-            }
-        }
+        DaysRow(selected = state.days, onToggle = viewModel::toggleDay)
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.routine_active_label), color = TextPrimary, fontSize = TextSize.lg, modifier = Modifier.weight(Weight.Fill))
