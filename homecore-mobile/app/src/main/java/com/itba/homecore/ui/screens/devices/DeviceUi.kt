@@ -106,7 +106,7 @@ fun DeviceCard(
     val isFavorite = device.isFavorite()
     val isDoor     = cat == DeviceCategory.DOOR || cat == DeviceCategory.LOCK
     val isLamp     = cat == DeviceCategory.LAMP
-    val highlight  = isDoor && device.state?.status?.lowercase() in listOf("locked", "closed")
+    val highlight  = isDoor && device.state?.status?.lowercase() in listOf(DeviceStatus.LOCKED, DeviceStatus.CLOSED)
 
     val borderColor = if (highlight) AccentDark else Accent.copy(alpha = Alpha.hairlineBorder)
     val iconBg      = if (isLamp) LampIconBg else Color.Transparent
@@ -227,7 +227,7 @@ private fun DeviceCardFooter(
         )
 
         DeviceCategory.DOOR -> {
-            val locked = device.state?.lock?.lowercase() == "locked"
+            val locked = device.state?.lock?.lowercase() == DeviceStatus.LOCKED
             StatusBadge(
                 text = stringResource(
                     when { locked -> R.string.badge_locked; isOn -> R.string.badge_open; else -> R.string.badge_closed }
