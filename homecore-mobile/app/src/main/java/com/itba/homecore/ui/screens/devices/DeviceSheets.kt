@@ -108,8 +108,8 @@ fun AddDeviceSheet(
                         fontSize = TextSize.lg,
                         fontWeight = FontWeight.SemiBold
                     )
-                    // A device must belong to a room (and therefore to a home), mirroring the
-                    // web: there is no "no room" option here.
+                    // A device must belong to a room (and therefore to a home): there is no
+                    // "no room" option here.
                     if (rooms.isEmpty()) {
                         Text(
                             text = stringResource(R.string.device_needs_room),
