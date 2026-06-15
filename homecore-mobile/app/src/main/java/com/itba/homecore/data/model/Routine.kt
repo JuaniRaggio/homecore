@@ -29,6 +29,11 @@ data class RoutineMetadata(
 
 fun Routine.isFavorite(): Boolean = metadata?.favorite == true
 fun Routine.isActive(): Boolean = metadata?.active ?: true
-fun Routine.time(): String = (time ?: metadata?.time).orEmpty()
-fun Routine.days(): List<Int> = days ?: metadata?.days ?: emptyList()
-fun Routine.descriptionText(): String = description ?: metadata?.description.orEmpty()
+fun Routine.time(): String =
+    time?.takeIf { it.isNotBlank() } ?: metadata?.time?.takeIf { it.isNotBlank() }.orEmpty()
+
+fun Routine.days(): List<Int> =
+    days?.takeIf { it.isNotEmpty() } ?: metadata?.days ?: emptyList()
+
+fun Routine.descriptionText(): String =
+    description?.takeIf { it.isNotBlank() } ?: metadata?.description.orEmpty()
