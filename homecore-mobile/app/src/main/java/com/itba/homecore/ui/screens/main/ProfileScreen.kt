@@ -1,7 +1,6 @@
 package com.itba.homecore.ui.screens.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,48 +19,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
-import com.itba.homecore.data.model.Device
-import com.itba.homecore.data.model.DeviceLog
-import com.itba.homecore.data.model.isOn
-import com.itba.homecore.data.model.resolvedAction
 import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.components.HcTextField
-import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.LanguageSelector
 import com.itba.homecore.ui.components.ThemeSelector
 import com.itba.homecore.ui.theme.*
-import com.itba.homecore.ui.util.deviceActionLabel
-import com.itba.homecore.ui.util.formatLogTimestamp
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ChangePasswordState
-import com.itba.homecore.viewmodel.DevicesUiState
-import com.itba.homecore.viewmodel.DevicesViewModel
 import com.itba.homecore.viewmodel.ThemeViewModel
 
 @Composable
 fun ProfileScreen(
     onLogout: () -> Unit = {},
-    devicesVm: DevicesViewModel = viewModel(),
     authVm: AuthViewModel = viewModel(),
     themeVm: ThemeViewModel = viewModel()
 ) {
-    val devicesState by devicesVm.state.collectAsStateWithLifecycle()
-    val logs by devicesVm.logs.collectAsStateWithLifecycle()
     val profile by authVm.profile.collectAsStateWithLifecycle()
     val isDarkTheme by themeVm.isDarkTheme.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
 
-    // Load the logged-in user's name/email and the real activity history.
+    // Load the logged-in user's name/email.
     LaunchedEffect(Unit) {
         authVm.loadProfile()
-        devicesVm.loadLogs()
     }
 
     val displayName = profile?.fullName?.ifBlank { null } ?: stringResource(R.string.profile_default_name)
@@ -73,12 +57,10 @@ fun ProfileScreen(
             .background(Background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = Spacing.xl)
-            .padding(bottom = Spacing.xl),
+            .padding(top = Spacing.xl, bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
-        HouseHeader()
-
-        // Darker outer box that contains all content below header.
+        // Darker outer box that contains all content.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,13 +99,6 @@ fun ProfileScreen(
                 }
 
                 LogoutButton(onClick = { showLogoutDialog = true })
-
-                ConsumptionCard(state = devicesState)
-
-                HistoryCard(
-                    logs = logs,
-                    devices = (devicesState as? DevicesUiState.Success)?.devices ?: emptyList()
-                )
             }
         }
     }
@@ -357,126 +332,6 @@ private fun PillAction(text: String, onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun ConsumptionCard(state: DevicesUiState) {
-    val (wattsLabel, runningCount) = when (state) {
-        is DevicesUiState.Success -> {
-            val running = state.devices.count { it.isOn() }
-            estimateConsumption(state.devices) to running
-        }
-        else -> "—" to 0
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(Stroke.hairline, AccentDark.copy(alpha = Alpha.strongBorder), RoundedCornerShape(Radius.card))
-            .padding(Spacing.xl)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.base)) {
-            Text(
-                text = stringResource(R.string.consumption),
-                color = TextPrimary,
-                fontSize = TextSize.xl,
-                fontWeight = FontWeight.Bold
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = wattsLabel,
-                        color = Accent,
-                        fontSize = TextSize.display,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.current_consumption),
-                        color = TextSecondary,
-                        fontSize = TextSize.sm
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .width(Stroke.hairline)
-                        .height(Spacing.huge2)
-                        .background(SurfaceVariant)
-                )
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = runningCount.toString(),
-                        color = Accent,
-                        fontSize = TextSize.display,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.devices_running),
-                        color = TextSecondary,
-                        fontSize = TextSize.sm,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                    )
-                }
-            }
-        }
-    }
-}
-
-/** Real activity history from /devices/logs; the device name is resolved from [devices]. */
-@Composable
-private fun HistoryCard(logs: List<DeviceLog>, devices: List<Device>) {
-    val deviceNamesById = remember(devices) { devices.associate { it.id to it.name } }
-
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        Text(
-            text = stringResource(R.string.history),
-            color = TextPrimary,
-            fontSize = TextSize.xxl,
-            fontWeight = FontWeight.Bold
-        )
-        if (logs.isEmpty()) {
-            Text(stringResource(R.string.no_recent_events), color = TextSecondary, fontSize = TextSize.base)
-        } else {
-            logs.forEach { log ->
-                val deviceName = deviceNamesById[log.deviceId] ?: stringResource(R.string.device_generic)
-                HistoryRow(log = log, deviceName = deviceName)
-            }
-        }
-    }
-}
-
-@Composable
-private fun HistoryRow(log: DeviceLog, deviceName: String) {
-    val action = deviceActionLabel(log.resolvedAction())
-    val time = formatLogTimestamp(log.timestamp)
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.md)
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = Spacing.xs)
-                .size(IconSize.dot)
-                .background(Accent, CircleShape)
-        )
-        Column {
-            Text(
-                text = deviceName,
-                color = TextPrimary,
-                fontSize = TextSize.md,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = listOf(action, time).filter { it.isNotBlank() }.joinToString("  ·  "),
-                color = TextSecondary,
-                fontSize = TextSize.sm
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChangePasswordSheet(
@@ -579,20 +434,4 @@ private fun ChangePasswordSheet(
             }
         }
     }
-}
-
-private fun estimateConsumption(devices: List<Device>): String {
-    val watts = devices.filter { it.isOn() }.sumOf { d ->
-        val w: Int = when (d.type.name.lowercase()) {
-            "lamp" -> 8
-            "ac" -> 1200
-            "oven" -> 1500
-            "refrigerator" -> 150
-            "speaker" -> 20
-            "vacuum" -> 90
-            else -> 5
-        }
-        w
-    }
-    return "${watts} W"
 }

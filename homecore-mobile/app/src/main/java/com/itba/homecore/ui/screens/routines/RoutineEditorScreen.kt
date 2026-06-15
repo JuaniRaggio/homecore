@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceAction
 import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.data.model.RoutineAction
 import com.itba.homecore.data.model.category
@@ -34,45 +35,23 @@ import com.itba.homecore.ui.components.HcTextField
 import com.itba.homecore.ui.screens.devices.deviceColorFor
 import com.itba.homecore.ui.screens.devices.deviceIconFor
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.deviceActionLabel
 import com.itba.homecore.viewmodel.RoutineEditorViewModel
 
 // Day chips shown Mon..Sun; the int is the index into the routine_days array (0=Sun..6=Sat).
 private val DAYS_ORDER = listOf(1, 2, 3, 4, 5, 6, 0)
 
 /** Param-less actions offered per device type when adding a routine step. */
-private fun availableActions(cat: DeviceCategory): List<String> = when (cat) {
-    DeviceCategory.LAMP, DeviceCategory.AC, DeviceCategory.OVEN -> listOf("turnOn", "turnOff")
-    DeviceCategory.DOOR   -> listOf("open", "close", "lock", "unlock")
-    DeviceCategory.LOCK   -> listOf("lock", "unlock")
-    DeviceCategory.FAUCET -> listOf("open", "close")
-    DeviceCategory.BLINDS -> listOf("up", "down")
-    DeviceCategory.SPEAKER -> listOf("play", "pause", "stop", "resume", "nextSong", "previousSong")
-    DeviceCategory.VACUUM -> listOf("start", "pause", "dock")
+private fun availableActions(cat: DeviceCategory): List<DeviceAction> = when (cat) {
+    DeviceCategory.LAMP, DeviceCategory.AC, DeviceCategory.OVEN -> listOf(DeviceAction.TURN_ON, DeviceAction.TURN_OFF)
+    DeviceCategory.DOOR   -> listOf(DeviceAction.OPEN, DeviceAction.CLOSE, DeviceAction.LOCK, DeviceAction.UNLOCK)
+    DeviceCategory.LOCK   -> listOf(DeviceAction.LOCK, DeviceAction.UNLOCK)
+    DeviceCategory.FAUCET -> listOf(DeviceAction.OPEN, DeviceAction.CLOSE)
+    DeviceCategory.BLINDS -> listOf(DeviceAction.UP, DeviceAction.DOWN)
+    DeviceCategory.SPEAKER -> listOf(DeviceAction.PLAY, DeviceAction.PAUSE, DeviceAction.STOP, DeviceAction.RESUME, DeviceAction.NEXT_SONG, DeviceAction.PREVIOUS_SONG)
+    DeviceCategory.VACUUM -> listOf(DeviceAction.START, DeviceAction.PAUSE, DeviceAction.DOCK)
     else -> emptyList()
 }
-
-@Composable
-private fun actionLabel(action: String): String = stringResource(
-    when (action) {
-        "turnOn" -> R.string.act_turn_on
-        "turnOff" -> R.string.act_turn_off
-        "open" -> R.string.act_open
-        "close" -> R.string.act_close
-        "lock" -> R.string.act_lock
-        "unlock" -> R.string.act_unlock
-        "up" -> R.string.act_up
-        "down" -> R.string.act_down
-        "play" -> R.string.act_play
-        "pause" -> R.string.act_pause
-        "stop" -> R.string.act_stop
-        "resume" -> R.string.act_resume
-        "nextSong" -> R.string.act_next
-        "previousSong" -> R.string.act_previous
-        "start" -> R.string.act_start
-        "dock" -> R.string.act_dock
-        else -> R.string.act_turn_on
-    }
-)
 
 /**
  * Create / edit / detail of a routine. Mirrors the web's new-edit-detail scope: name,
@@ -252,7 +231,7 @@ private fun ActionRow(device: Device?, actionName: String, onRemove: () -> Unit)
         Spacer(Modifier.width(Spacing.sm))
         Column(modifier = Modifier.weight(Weight.Fill)) {
             Text(device?.name ?: "-", color = TextPrimary, fontSize = TextSize.md, fontWeight = FontWeight.Medium)
-            Text(actionLabel(actionName), color = TextSecondary, fontSize = TextSize.sm)
+            Text(deviceActionLabel(actionName), color = TextSecondary, fontSize = TextSize.sm)
         }
         Icon(
             Icons.Default.Close,
@@ -308,10 +287,10 @@ private fun ActionPickerDialog(
                             shape = RoundedCornerShape(Radius.lg),
                             color = Color.Transparent,
                             border = BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
-                            modifier = Modifier.fillMaxWidth().clickable { onPick(device, action) }
+                            modifier = Modifier.fillMaxWidth().clickable { onPick(device, action.api) }
                         ) {
                             Text(
-                                text = actionLabel(action),
+                                text = deviceActionLabel(action.api),
                                 color = TextPrimary,
                                 fontSize = TextSize.md,
                                 modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.base)

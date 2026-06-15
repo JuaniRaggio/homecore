@@ -127,7 +127,7 @@ class DevicesViewModel(
     fun toggleDevice(device: Device, turnOn: Boolean) {
         val toggle = DeviceCapabilities.quickToggle(device.category()) ?: return
         val action = if (turnOn) toggle.onAction else toggle.offAction
-        runAction(device.id, action)
+        runAction(device.id, action.api)
     }
 
     /** Runs an arbitrary device action (used by the detail screen) and refreshes on success. */
