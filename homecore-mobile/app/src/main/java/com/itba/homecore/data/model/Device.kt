@@ -51,9 +51,8 @@ data class DeviceState(
 )
 
 /**
- * Device categories we render with custom UI. [patterns] mirror the web's resolveTypeKey
- * (device-helpers.js): the API type name may come in English or Spanish, so we match by
- * substring against a set of aliases. Falls back to OTHER.
+ * Device categories we render with custom UI. The API type name may come in English or
+ * Spanish, so [patterns] match by substring against a set of aliases. Falls back to OTHER.
  */
 enum class DeviceCategory(val typeName: String, val patterns: List<String>) {
     LAMP("lamp", listOf("lamp", "light", "luz")),
