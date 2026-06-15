@@ -2,7 +2,10 @@ package com.itba.homecore.ui.screens.routines
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +31,7 @@ import com.itba.homecore.data.model.days
 import com.itba.homecore.data.model.descriptionText
 import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
+import com.itba.homecore.ui.components.ActionPill
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.StatusMessage
@@ -60,7 +64,6 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            .verticalScroll(rememberScrollState())
             .padding(horizontal = Spacing.xl)
             .padding(bottom = Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.base)
@@ -72,51 +75,65 @@ fun RoutinesScreen(viewModel: RoutinesViewModel = viewModel()) {
             placeholder = stringResource(R.string.search_routine)
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Surface(
-                shape = RoundedCornerShape(Radius.card),
-                color = AccentDark,
-                modifier = Modifier.clickable { editorId = null; editorOpen = true }
-            ) {
-                Text(
-                    text = stringResource(R.string.new_routine),
-                    color = Color.White,
-                    fontSize = TextSize.sm,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
-                )
-            }
-        }
 
-        when (val s = state) {
-            is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
-            is RoutinesUiState.Error -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
-            is RoutinesUiState.Success -> {
-                val filtered = remember(s.routines, search) {
-                    if (search.isBlank()) s.routines
-                    else s.routines.filter { it.name.contains(search, ignoreCase = true) }
-                }
-                if (filtered.isEmpty()) {
-                    StatusMessage(stringResource(R.string.empty_routines))
-                } else {
-                    UniformGrid(items = filtered, columns = 1) { r, cell ->
-                        key(r.id) {
-                            RoutineCard(
-                                routine = r,
-                                isExecuting = r.id == executingId,
-                                onExecute = { viewModel.execute(r) },
-                                onToggleActive = { viewModel.toggleActive(r) },
-                                onToggleBlocked = { UiMessages.emit(noScheduleMsg) },
-                                onToggleFavorite = { viewModel.toggleFavorite(r) },
-                                onOpen = { editorId = r.id; editorOpen = true },
-                                modifier = cell
-                            )
+        Box(){
+            Box(modifier = Modifier.verticalScroll(rememberScrollState())){
+                when (val s = state) {
+                    is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
+                    is RoutinesUiState.Error -> StatusMessage(s.message, isError = true, onRetry = { viewModel.load() })
+                    is RoutinesUiState.Success -> {
+                        val filtered = remember(s.routines, search) {
+                            if (search.isBlank()) s.routines
+                            else s.routines.filter { it.name.contains(search, ignoreCase = true) }
+                        }
+                        if (filtered.isEmpty()) {
+                            StatusMessage(stringResource(R.string.empty_routines))
+                        } else {
+                            UniformGrid(items = filtered, columns = 1) { r, cell ->
+                                key(r.id) {
+                                    RoutineCard(
+                                        routine = r,
+                                        isExecuting = r.id == executingId,
+                                        onExecute = { viewModel.execute(r) },
+                                        onToggleActive = { viewModel.toggleActive(r) },
+                                        onToggleBlocked = { UiMessages.emit(noScheduleMsg) },
+                                        onToggleFavorite = { viewModel.toggleFavorite(r) },
+                                        onOpen = { editorId = r.id; editorOpen = true },
+                                        modifier = cell
+                                    )
+                                }
+                            }
                         }
                     }
                 }
+
+            }
+
+            FloatingActionButton(onClick = {},
+                modifier = Modifier.align(Alignment.BottomEnd)) {
+                Column() {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(Radius.card),
+                            color = AccentDark,
+                            modifier = Modifier.clickable { editorId = null; editorOpen = true }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.new_routine),
+                                color = Color.White,
+                                fontSize = TextSize.sm,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(horizontal = Spacing.base, vertical = Spacing.xs)
+                            )
+                        }
+                    }
+
+                }
+
+
             }
         }
     }
