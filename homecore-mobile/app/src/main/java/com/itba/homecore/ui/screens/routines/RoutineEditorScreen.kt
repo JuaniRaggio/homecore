@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -191,6 +192,43 @@ fun RoutineEditorScreen(
             dismissButton = {
                 TextButton(onClick = { showDelete = false }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
             }
+        )
+    }
+}
+
+/** Mon..Sun chips; tapping one toggles that day in the schedule. */
+@Composable
+private fun DaysRow(selected: Set<Int>, onToggle: (Int) -> Unit) {
+    val dayNames = stringArrayResource(R.array.routine_days)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
+    ) {
+        DAYS_ORDER.forEach { day ->
+            DayChip(
+                label = dayNames.getOrNull(day).orEmpty(),
+                selected = day in selected,
+                onClick = { onToggle(day) },
+                modifier = Modifier.weight(Weight.Fill)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DayChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        shape = RoundedCornerShape(Radius.lg),
+        color = if (selected) AccentDark else Color.Transparent,
+        border = if (selected) null else BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
+        modifier = modifier.clickable(onClick = onClick)
+    ) {
+        Text(
+            text = label,
+            color = if (selected) Color.White else TextSecondary,
+            fontSize = TextSize.sm,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.xs)
         )
     }
 }
