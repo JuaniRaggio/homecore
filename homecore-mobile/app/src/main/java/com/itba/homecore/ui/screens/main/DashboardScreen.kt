@@ -171,7 +171,7 @@ private fun FavoriteRoutineCard(
             ) {
                 Surface(
                     shape = RoundedCornerShape(Radius.card),
-                    color = AccentDark,
+                    color = ExecuteButtonColor,
                     modifier = Modifier.clickable(onClick = onExecute)
                 ) {
                     Text(

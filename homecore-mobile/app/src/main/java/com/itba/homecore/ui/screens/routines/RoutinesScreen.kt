@@ -236,7 +236,7 @@ private fun RoutineCard(
             ) {
                 Surface(
                     shape = RoundedCornerShape(Radius.card),
-                    color = AccentDark,
+                    color = ExecuteButtonColor,
                     modifier = Modifier.clickable(enabled = !isExecuting, onClick = onExecute)
                 ) {
                     if (isExecuting) {
