@@ -346,11 +346,15 @@ fun ActionPill(text: String, onClick: () -> Unit, modifier: Modifier = Modifier)
  * Overflow (⋮) menu with Rename / Delete actions. Shared by rooms and homes so the
  * affordance stays consistent.
  */
+/**
+ * Overflow (⋮) menu. [onRename] is optional — omit it to hide the rename entry,
+ * e.g. for routines where only delete is supported.
+ */
 @Composable
 fun OverflowMenu(
     contentDescription: String,
-    onRename: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onRename: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -362,10 +366,12 @@ fun OverflowMenu(
             onDismissRequest = { expanded = false },
             containerColor = Surface
         ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.act_rename), color = TextPrimary) },
-                onClick = { expanded = false; onRename() }
-            )
+            if (onRename != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.act_rename), color = TextPrimary) },
+                    onClick = { expanded = false; onRename() }
+                )
+            }
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.act_delete), color = ErrorColor) },
                 onClick = { expanded = false; onDelete() }

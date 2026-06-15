@@ -29,6 +29,7 @@ import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.theme.*
@@ -51,6 +52,10 @@ fun RoutinesScreen(
     LaunchedEffect(selectedHome?.id) { viewModel.loadForHome(selectedHome?.id) }
     var search by rememberSaveable { mutableStateOf("") }
     val notAvailable = stringResource(R.string.not_available_yet)
+
+    // Pending delete: store id + name in rememberSaveable so they survive rotation.
+    var deleteRoutineId by rememberSaveable { mutableStateOf<String?>(null) }
+    var deleteRoutineName by rememberSaveable { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -109,13 +114,51 @@ fun RoutinesScreen(
                                 isExecuting = r.id == executingId,
                                 onExecute = { viewModel.execute(r) },
                                 onToggleActive = { viewModel.toggleActive(r) },
-                                onToggleFavorite = { viewModel.toggleFavorite(r) }
+                                onToggleFavorite = { viewModel.toggleFavorite(r) },
+                                onDelete = {
+                                    deleteRoutineId = r.id
+                                    deleteRoutineName = r.name
+                                }
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    deleteRoutineId?.let { id ->
+        AlertDialog(
+            onDismissRequest = { deleteRoutineId = null },
+            containerColor = Surface,
+            title = {
+                Text(
+                    stringResource(R.string.delete_routine_title),
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.delete_routine_message, deleteRoutineName),
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.deleteRoutine(id); deleteRoutineId = null }) {
+                    Text(
+                        stringResource(R.string.delete_confirm),
+                        color = ErrorColor,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteRoutineId = null }) {
+                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                }
+            }
+        )
     }
 }
 
@@ -125,7 +168,8 @@ private fun RoutineCard(
     isExecuting: Boolean,
     onExecute: () -> Unit,
     onToggleActive: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    onDelete: () -> Unit
 ) {
     val isActive = routine.isActive()
     val titleColor = if (isActive) TextPrimary else TextSecondary
@@ -145,9 +189,9 @@ private fun RoutineCard(
                     text = routine.name,
                     color = titleColor,
                     fontSize = TextSize.xxl,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(Modifier.width(Spacing.sm))
                 Icon(
                     imageVector = if (routine.isFavorite()) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = stringResource(R.string.cd_favorite),
@@ -156,7 +200,6 @@ private fun RoutineCard(
                         .size(IconSize.md)
                         .clickable(onClick = onToggleFavorite)
                 )
-                Spacer(Modifier.weight(1f))
                 Switch(
                     checked = isActive,
                     onCheckedChange = { onToggleActive() },
@@ -168,6 +211,10 @@ private fun RoutineCard(
                         uncheckedBorderColor = Color.Transparent
                     ),
                     modifier = Modifier.scale(0.85f)
+                )
+                OverflowMenu(
+                    contentDescription = stringResource(R.string.cd_routine_options),
+                    onDelete = onDelete
                 )
             }
             val desc = routine.descriptionText()

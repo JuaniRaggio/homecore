@@ -7,6 +7,7 @@ import com.itba.homecore.data.model.Routine
  */
 interface RoutinesRepository {
     suspend fun getRoutines(): Result<List<Routine>>
+    suspend fun getRoutineById(id: String): Result<Routine>
     suspend fun executeRoutine(id: String): Result<Unit>
     suspend fun toggleFavorite(routine: Routine): Result<Routine>
     suspend fun toggleActive(routine: Routine): Result<Routine>

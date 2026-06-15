@@ -193,6 +193,9 @@
     <string name="delete_room_title">Delete room?</string>
     <string name="delete_room_message">Delete \"%1$s\"? Its devices will be left without a room.</string>
     <string name="cd_room_options">Room options</string>
+    <string name="delete_routine_title">Delete routine?</string>
+    <string name="delete_routine_message">Delete \"%1$s\"? This action cannot be undone.</string>
+    <string name="cd_routine_options">Routine options</string>
 
     <!-- Homes (RF17-RF19) -->
     <string name="homes_title">Homes</string>

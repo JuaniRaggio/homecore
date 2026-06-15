@@ -14,6 +14,10 @@ class RemoteRoutinesRepository : RoutinesRepository {
         apiCall("Error al obtener rutinas") { routinesApi.getAllRoutines() }
     }
 
+    override suspend fun getRoutineById(id: String): Result<Routine> = runCatching {
+        apiCall("Error al obtener la rutina") { routinesApi.getRoutine(id) }
+    }
+
     override suspend fun executeRoutine(id: String): Result<Unit> = runCatching {
         apiCall("No se pudo ejecutar la rutina") { routinesApi.executeRoutine(id).close() }
     }
