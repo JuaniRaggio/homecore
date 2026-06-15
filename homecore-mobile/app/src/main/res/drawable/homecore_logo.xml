@@ -1,0 +1,49 @@
+<!-- HomeCore logo (hexagon + house + signal), ported from assets/homecore-icono.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="140dp"
+    android:viewportWidth="120"
+    android:viewportHeight="140">
+    <group
+        android:translateX="6"
+        android:translateY="8">
+        <path
+            android:pathData="M54,0 L108,31 L108,93 L54,124 L0,93 L0,31 Z"
+            android:fillColor="#0C447C"
+            android:strokeColor="#378ADD"
+            android:strokeWidth="1.4" />
+        <path
+            android:pathData="M54,9 L100,34 L100,90 L54,115 L8,90 L8,34 Z"
+            android:strokeColor="#185FA5"
+            android:strokeWidth="0.8" />
+        <path
+            android:pathData="M54,17 L98,40 L10,40 Z"
+            android:fillColor="#378ADD" />
+        <path
+            android:pathData="M54,22 L80,46 L80,76 L28,76 L28,46 Z"
+            android:strokeColor="#B5D4F4"
+            android:strokeWidth="1.8"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M47,56 L61,56 A3,3 0 0,1 64,59 L64,73 A3,3 0 0,1 61,76 L47,76 A3,3 0 0,1 44,73 L44,59 A3,3 0 0,1 47,56 Z"
+            android:fillColor="#042C53" />
+        <path
+            android:pathData="M36,67 A18,18 0 0,1 72,67"
+            android:strokeColor="#85B7EB"
+            android:strokeWidth="1.3"
+            android:strokeAlpha="0.4" />
+        <path
+            android:pathData="M41,73 A13,13 0 0,1 67,73"
+            android:strokeColor="#85B7EB"
+            android:strokeWidth="1.3"
+            android:strokeAlpha="0.65" />
+        <path
+            android:pathData="M46,79 A8,8 0 0,1 62,79"
+            android:strokeColor="#85B7EB"
+            android:strokeWidth="1.3"
+            android:strokeAlpha="0.9" />
+        <path
+            android:pathData="M51,81 A3,3 0 1,1 57,81 A3,3 0 1,1 51,81 Z"
+            android:fillColor="#378ADD" />
+    </group>
+</vector>

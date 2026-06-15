@@ -1,6 +1,7 @@
 package com.itba.homecore.ui.screens.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -8,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
+import com.itba.homecore.ui.components.LanguageSelector
+import com.itba.homecore.ui.components.ThemeSelector
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ThemeViewModel
@@ -34,7 +36,6 @@ fun ProfileScreen(
     val isDarkTheme by themeVm.isDarkTheme.collectAsStateWithLifecycle()
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
-    var showSettings by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { authVm.loadProfile() }
 
@@ -53,7 +54,9 @@ fun ProfileScreen(
         ProfilePanel(
             name = displayName,
             email = email,
-            onSettings = { showSettings = true },
+            isDark = isDarkTheme,
+            onToggleTheme = { themeVm.setDarkTheme(it) },
+            onChangePassword = { showChangePassword = true },
             onLogout = { showLogoutDialog = true }
         )
     }
@@ -65,15 +68,6 @@ fun ProfileScreen(
         )
     }
 
-    if (showSettings) {
-        SettingsSheet(
-            isDarkTheme = isDarkTheme,
-            onToggleTheme = { themeVm.setDarkTheme(it) },
-            onChangePassword = { showSettings = false; showChangePassword = true },
-            onDismiss = { showSettings = false }
-        )
-    }
-
     if (showChangePassword) {
         ChangePasswordSheet(
             viewModel = authVm,
@@ -82,12 +76,14 @@ fun ProfileScreen(
     }
 }
 
-/** Surface card holding the profile (with a settings shortcut) and the logout button. */
+/** Surface card with the profile, the personalization options (language / theme) and account actions. */
 @Composable
 private fun ProfilePanel(
     name: String,
     email: String,
-    onSettings: () -> Unit,
+    isDark: Boolean,
+    onToggleTheme: (Boolean) -> Unit,
+    onChangePassword: () -> Unit,
     onLogout: () -> Unit
 ) {
     Box(
@@ -109,18 +105,13 @@ private fun ProfilePanel(
                     .padding(vertical = Spacing.xl4, horizontal = Spacing.xl)
             ) {
                 ProfileCard(name = name, email = email)
-                IconButton(
-                    onClick = onSettings,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = Spacing.sm, y = -Spacing.sm)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.cd_settings),
-                        tint = TextPrimary
-                    )
-                }
+            }
+
+            LanguageSelector()
+            ThemeSelector(isDark = isDark, onToggle = onToggleTheme)
+
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                PillAction(text = stringResource(R.string.manage_password), onClick = onChangePassword)
             }
 
             LogoutButton(onClick = onLogout)
@@ -180,6 +171,28 @@ private fun initialsOf(name: String): String {
         parts.isEmpty() -> "?"
         parts.size == 1 -> parts[0].take(1).uppercase()
         else            -> "${parts.first().first()}${parts.last().first()}".uppercase()
+    }
+}
+
+@Composable
+private fun PillAction(text: String, onClick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(Radius.full),
+        color = PillBackground,
+        modifier = Modifier
+            .fillMaxWidth(Fraction.actionWidth)
+            .clickable(onClick = onClick)
+    ) {
+        Text(
+            text = text,
+            color = PillText,
+            fontSize = TextSize.md,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.md),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
