@@ -164,7 +164,10 @@ private fun HomeCard(
             .clickable(role = Role.Button, onClick = onSelect)
             .padding(Spacing.base)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = home.name,
@@ -188,6 +191,9 @@ private fun HomeCard(
                 }
             }
 
+            // Push the "add room" action to the bottom so it sits at the same place on
+            // every card (the grid gives all cards the tallest card's height).
+            Spacer(Modifier.weight(Weight.Fill))
             ActionPill(
                 text = stringResource(R.string.add_room),
                 onClick = onAddRoom,
