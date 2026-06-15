@@ -29,8 +29,8 @@ class RoutinesViewModel(
     private val _executingId = MutableStateFlow<String?>(null)
     val executingId: StateFlow<String?> = _executingId.asStateFlow()
 
-    // Null means "no home selected → show all". When set, only routines with
-    // metadata.homeId == currentHomeId (or with no homeId assigned yet) are shown.
+    // Null means "no home selected": show all. When set, only routines belonging to
+    // that home (or marked crossHome) are shown.
     private var currentHomeId: String? = null
 
     init { load() }
@@ -51,10 +51,12 @@ class RoutinesViewModel(
             repository.getRoutines()
                 .onSuccess { all ->
                     val homeId = currentHomeId
-                    // Routines with homeId == null are treated as shared (visible in every home).
-                    // Routines with a homeId are exclusive to that home.
+                    // Mirror the web (RoutinesView.vue): within a selected home, show only
+                    // routines explicitly marked crossHome or assigned to that home. Routines
+                    // with no homeId are not shared everywhere; they only show in the unfiltered
+                    // view (no home selected).
                     val routines = if (homeId == null) all
-                        else all.filter { r -> r.metadata?.homeId == null || r.metadata.homeId == homeId }
+                        else all.filter { r -> r.metadata?.crossHome == true || r.metadata?.homeId == homeId }
                     _state.value = RoutinesUiState.Success(routines)
                 }
                 .onFailure { _state.value = RoutinesUiState.Error(it.message ?: "Error al cargar rutinas") }

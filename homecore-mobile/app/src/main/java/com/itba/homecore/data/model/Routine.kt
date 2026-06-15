@@ -24,7 +24,8 @@ data class RoutineMetadata(
     @SerializedName("time")        val time: String? = null,
     @SerializedName("days")        val days: List<Int>? = null,
     @SerializedName("description") val description: String? = null,
-    @SerializedName("homeId")      val homeId: String? = null
+    @SerializedName("homeId")      val homeId: String? = null,
+    @SerializedName("crossHome")   val crossHome: Boolean? = null
 )
 
 fun Routine.isFavorite(): Boolean = metadata?.favorite == true
