@@ -49,6 +49,7 @@ import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceAction
 import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.DeviceCategory
+import com.itba.homecore.data.model.DeviceStatus
 import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.data.model.isOn
