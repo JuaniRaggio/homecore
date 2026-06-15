@@ -287,10 +287,10 @@ private fun ActionPickerDialog(
                             shape = RoundedCornerShape(Radius.lg),
                             color = Color.Transparent,
                             border = BorderStroke(Stroke.hairline, Accent.copy(alpha = Alpha.hairlineBorder)),
-                            modifier = Modifier.fillMaxWidth().clickable { onPick(device, action) }
+                            modifier = Modifier.fillMaxWidth().clickable { onPick(device, action.api) }
                         ) {
                             Text(
-                                text = actionLabel(action),
+                                text = deviceActionLabel(action.api),
                                 color = TextPrimary,
                                 fontSize = TextSize.md,
                                 modifier = Modifier.padding(vertical = Spacing.sm, horizontal = Spacing.base)
