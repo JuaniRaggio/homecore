@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,7 @@ import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.PanelCard
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.screens.devices.DeviceCard
+import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
@@ -54,6 +56,7 @@ fun DashboardScreen(
         routinesVm.loadForHome(selectedHome?.id)
     }
     val noNotifications = stringResource(R.string.no_new_notifications)
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -69,6 +72,7 @@ fun DashboardScreen(
             homes = homes,
             selectedHome = selectedHome,
             onHomeSelect = { homesVm.selectHome(it) },
+            onAddHome = { showCreateHome = true },
             onNotificationsClick = { UiMessages.emit(noNotifications) }
         )
 
@@ -145,6 +149,16 @@ fun DashboardScreen(
                 }
             }
         }
+    }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
+        )
     }
 }
 

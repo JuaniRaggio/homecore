@@ -29,6 +29,7 @@ import com.itba.homecore.data.model.isActive
 import com.itba.homecore.data.model.isFavorite
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
+import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.routineScheduleLabel
@@ -54,6 +55,7 @@ fun RoutinesScreen(
     val notAvailable = stringResource(R.string.not_available_yet)
 
     // Pending delete: store id + name in rememberSaveable so they survive rotation.
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
     var deleteRoutineId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteRoutineName by rememberSaveable { mutableStateOf("") }
 
@@ -69,7 +71,8 @@ fun RoutinesScreen(
         HouseHeader(
             homes = homes,
             selectedHome = selectedHome,
-            onHomeSelect = { homesVm.selectHome(it) }
+            onHomeSelect = { homesVm.selectHome(it) },
+            onAddHome = { showCreateHome = true }
         )
         HcSearchBar(
             value = search,
@@ -125,6 +128,16 @@ fun RoutinesScreen(
                 }
             }
         }
+    }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
+        )
     }
 
     deleteRoutineId?.let { id ->

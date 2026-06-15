@@ -43,6 +43,7 @@ fun DevicesScreen(
     val selectedHome = (homesState as? HomesUiState.Success)?.selectedHome
     LaunchedEffect(selectedHome?.id) { viewModel.loadForHome(selectedHome?.id) }
     var search by rememberSaveable { mutableStateOf("") }
+    var showCreateHome by rememberSaveable { mutableStateOf(false) }
     var showAddDevice by rememberSaveable { mutableStateOf(false) }
     var showAddRoom by rememberSaveable { mutableStateOf(false) }
     // Pending room actions kept as id+name strings so they survive rotation.
@@ -66,7 +67,8 @@ fun DevicesScreen(
         HouseHeader(
             homes = homes,
             selectedHome = selectedHome,
-            onHomeSelect = { homesVm.selectHome(it) }
+            onHomeSelect = { homesVm.selectHome(it) },
+            onAddHome = { showCreateHome = true }
         )
         HcSearchBar(
             value = search,
@@ -133,6 +135,16 @@ fun DevicesScreen(
             initial = renameRoomName,
             onConfirm = { newName -> viewModel.renameRoom(id, newName); renameRoomId = null },
             onDismiss = { renameRoomId = null }
+        )
+    }
+
+    if (showCreateHome) {
+        RenameDialog(
+            title = stringResource(R.string.create_home),
+            label = stringResource(R.string.home_name_label),
+            initial = "",
+            onConfirm = { homesVm.createHome(it) { showCreateHome = false } },
+            onDismiss = { showCreateHome = false }
         )
     }
 
