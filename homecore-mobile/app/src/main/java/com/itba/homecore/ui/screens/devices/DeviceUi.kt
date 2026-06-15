@@ -345,12 +345,12 @@ private fun SpeakerFooter(
         horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         CardIconButton(Icons.Default.PowerSettingsNew, highlighted = isOn) { onToggle(!isOn) }
-        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction("previousSong", emptyList()) }
+        CardIconButton(Icons.Default.SkipPrevious, enabled = isOn) { onAction(DeviceAction.PREVIOUS_SONG.api, emptyList()) }
         CardIconButton(
             if (playing) Icons.Default.Pause else Icons.Default.PlayArrow,
             accent = true
-        ) { onAction(if (!isOn) "play" else if (playing) "pause" else "resume", emptyList()) }
-        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction("nextSong", emptyList()) }
+        ) { onAction((if (!isOn) DeviceAction.PLAY else if (playing) DeviceAction.PAUSE else DeviceAction.RESUME).api, emptyList()) }
+        CardIconButton(Icons.Default.SkipNext, enabled = isOn) { onAction(DeviceAction.NEXT_SONG.api, emptyList()) }
     }
 }
 
@@ -382,24 +382,28 @@ private fun CardIconButton(
     }
 }
 
-/** Selectable option in the device creation flow. */
+/**
+ * Selectable option in the device creation flow. The API type key comes from
+ * [DeviceCategory.typeName] so it is not duplicated here.
+ */
 data class DeviceTypeOption(
     val category: DeviceCategory,
-    val typeName: String,
     val labelRes: Int
-)
+) {
+    val typeName: String get() = category.typeName
+}
 
 /** The 11 types supported by the HCI API (same keys as homecore-web). */
 val selectableDeviceTypes: List<DeviceTypeOption> = listOf(
-    DeviceTypeOption(DeviceCategory.LAMP,         "lamp",         R.string.dtype_lamp),
-    DeviceTypeOption(DeviceCategory.DOOR,         "door",         R.string.dtype_door),
-    DeviceTypeOption(DeviceCategory.ALARM,        "alarm",        R.string.dtype_alarm),
-    DeviceTypeOption(DeviceCategory.FAUCET,       "faucet",       R.string.dtype_faucet),
-    DeviceTypeOption(DeviceCategory.BLINDS,       "blinds",       R.string.dtype_blinds),
-    DeviceTypeOption(DeviceCategory.AC,           "ac",           R.string.dtype_ac),
-    DeviceTypeOption(DeviceCategory.SPEAKER,      "speaker",      R.string.dtype_speaker),
-    DeviceTypeOption(DeviceCategory.VACUUM,       "vacuum",       R.string.dtype_vacuum),
-    DeviceTypeOption(DeviceCategory.REFRIGERATOR, "refrigerator", R.string.dtype_refrigerator),
-    DeviceTypeOption(DeviceCategory.OVEN,         "oven",         R.string.dtype_oven),
-    DeviceTypeOption(DeviceCategory.LOCK,         "lock",         R.string.dtype_lock)
+    DeviceTypeOption(DeviceCategory.LAMP,         R.string.dtype_lamp),
+    DeviceTypeOption(DeviceCategory.DOOR,         R.string.dtype_door),
+    DeviceTypeOption(DeviceCategory.ALARM,        R.string.dtype_alarm),
+    DeviceTypeOption(DeviceCategory.FAUCET,       R.string.dtype_faucet),
+    DeviceTypeOption(DeviceCategory.BLINDS,       R.string.dtype_blinds),
+    DeviceTypeOption(DeviceCategory.AC,           R.string.dtype_ac),
+    DeviceTypeOption(DeviceCategory.SPEAKER,      R.string.dtype_speaker),
+    DeviceTypeOption(DeviceCategory.VACUUM,       R.string.dtype_vacuum),
+    DeviceTypeOption(DeviceCategory.REFRIGERATOR, R.string.dtype_refrigerator),
+    DeviceTypeOption(DeviceCategory.OVEN,         R.string.dtype_oven),
+    DeviceTypeOption(DeviceCategory.LOCK,         R.string.dtype_lock)
 )
