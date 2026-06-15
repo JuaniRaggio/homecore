@@ -40,8 +40,9 @@ object AcFanSpeed {
 }
 
 object SpeakerGenre {
-    // The API genre set is Spanish-form (verified: /devices returns "latina", the web uses "clasica").
-    const val CLASSICAL = "clasica"
+    // The API genre set is inconsistent: "classical" is English but "latina" is Spanish.
+    // Both verified live against /devices (setGenre ["classical"] -> 200, stored "classical").
+    const val CLASSICAL = "classical"
     const val COUNTRY = "country"
     const val DANCE = "dance"
     const val LATINA = "latina"

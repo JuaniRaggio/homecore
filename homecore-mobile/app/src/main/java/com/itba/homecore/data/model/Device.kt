@@ -12,8 +12,10 @@ data class Device(
 )
 
 data class DeviceType(
-    @SerializedName("id")   val id: String = "",
-    @SerializedName("name") val name: String = ""
+    @SerializedName("id")         val id: String = "",
+    @SerializedName("name")       val name: String = "",
+    // Watts drawn while on; comes from the /devicetypes catalog. Used for the consumption estimate.
+    @SerializedName("powerUsage") val powerUsage: Double? = null
 )
 
 data class DeviceMeta(

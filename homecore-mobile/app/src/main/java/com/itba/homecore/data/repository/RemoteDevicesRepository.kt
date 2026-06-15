@@ -21,16 +21,19 @@ class RemoteDevicesRepository : DevicesRepository {
 
     override suspend fun getDevices(): Result<List<Device>> = runCatching {
         apiCall("Error al obtener dispositivos") {
-            // The /devices payload carries the type id but not its name, so resolve the
-            // name from the /devicetypes catalog (same as the web). Without this every
-            // device falls back to OTHER and shows no type-specific controls.
+            // The /devices payload carries only the type id, so resolve the full type from the
+            // /devicetypes catalog (same as the web). Without the name every device falls back
+            // to OTHER and shows no type-specific controls; powerUsage feeds the consumption estimate.
             val devices = devicesApi.getAllDevices()
             val types = deviceTypes()
             devices.map { d ->
-                if (d.type.name.isBlank() && d.type.id.isNotBlank()) {
-                    val name = types.firstOrNull { it.id == d.type.id }?.name
-                    if (name != null) d.copy(type = d.type.copy(name = name)) else d
-                } else d
+                val catalogType = types.firstOrNull { it.id == d.type.id } ?: return@map d
+                d.copy(
+                    type = d.type.copy(
+                        name = d.type.name.ifBlank { catalogType.name },
+                        powerUsage = d.type.powerUsage ?: catalogType.powerUsage
+                    )
+                )
             }
         }
     }
