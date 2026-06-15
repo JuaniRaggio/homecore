@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Room
 import com.itba.homecore.ui.components.HcButton
+import com.itba.homecore.ui.components.SheetHeader
 import com.itba.homecore.ui.theme.*
 
 // --- Device creation (2 steps) --------------------------------------------------
@@ -262,32 +263,6 @@ fun AddRoomSheet(
 }
 
 // --- Common ---------------------------------------------------------------------
-
-@Composable
-private fun SheetHeader(title: String, onClose: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = Spacing.sm),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            color = TextPrimary,
-            fontSize = TextSize.xxxl,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(Weight.Fill)
-        )
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = stringResource(R.string.cd_close),
-            tint = TextPrimary,
-            modifier = Modifier
-                .size(IconSize.xl)
-                .clickable(onClick = onClose)
-        )
-    }
-}
 
 @Composable
 private fun SheetTextField(

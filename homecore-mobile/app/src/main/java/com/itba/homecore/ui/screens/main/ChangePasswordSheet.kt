@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.itba.homecore.R
 import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.components.HcTextField
+import com.itba.homecore.ui.components.SheetHeader
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ChangePasswordState
@@ -52,26 +52,12 @@ internal fun ChangePasswordSheet(
                 .padding(bottom = Spacing.xl3),
             verticalArrangement = Arrangement.spacedBy(Spacing.base)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.change_password_title),
-                    color = TextPrimary,
-                    fontSize = TextSize.xl,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(Weight.Fill)
-                )
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.cd_close),
-                    tint = TextPrimary,
-                    modifier = Modifier
-                        .size(IconSize.lg)
-                        .clickable(onClick = onDismiss)
-                )
-            }
+            SheetHeader(
+                title = stringResource(R.string.change_password_title),
+                onClose = onDismiss,
+                titleSize = TextSize.xl,
+                closeIconSize = IconSize.lg
+            )
 
             if (done) {
                 Row(

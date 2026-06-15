@@ -3,8 +3,6 @@ package com.itba.homecore.ui.screens.main
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.itba.homecore.R
 import com.itba.homecore.ui.components.LanguageSelector
+import com.itba.homecore.ui.components.SheetHeader
 import com.itba.homecore.ui.components.ThemeSelector
 import com.itba.homecore.ui.theme.*
 
@@ -40,26 +39,12 @@ internal fun SettingsSheet(
                 .padding(bottom = Spacing.xl3),
             verticalArrangement = Arrangement.spacedBy(Spacing.xl)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.settings_title),
-                    color = TextPrimary,
-                    fontSize = TextSize.xl,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(Weight.Fill)
-                )
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.cd_close),
-                    tint = TextPrimary,
-                    modifier = Modifier
-                        .size(IconSize.lg)
-                        .clickable(onClick = onDismiss)
-                )
-            }
+            SheetHeader(
+                title = stringResource(R.string.settings_title),
+                onClose = onDismiss,
+                titleSize = TextSize.xl,
+                closeIconSize = IconSize.lg
+            )
 
             LanguageSelector()
 

@@ -117,37 +117,16 @@ fun RoutineEditorScreen(
         Text(stringResource(R.string.routine_days_label), color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = TextSize.lg)
         DaysRow(selected = state.days, onToggle = viewModel::toggleDay)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.routine_active_label), color = TextPrimary, fontSize = TextSize.lg, modifier = Modifier.weight(Weight.Fill))
-            Switch(
-                checked = state.active,
-                onCheckedChange = viewModel::setActive,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White, checkedTrackColor = ToggleOn,
-                    uncheckedThumbColor = Color.White, uncheckedTrackColor = ToggleOff,
-                    uncheckedBorderColor = Color.Transparent
-                )
-            )
-        }
+        ActiveRow(active = state.active, onToggle = viewModel::setActive)
 
         HorizontalDivider(color = SurfaceVariant)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.routine_actions_label), color = TextPrimary, fontSize = TextSize.lg, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(Weight.Fill))
-            IconButton(onClick = { showActionPicker = true }) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.routine_add_action), tint = Accent)
-            }
-        }
-        if (state.actions.isEmpty()) {
-            Text(stringResource(R.string.routine_no_actions), color = TextSecondary, fontSize = TextSize.base)
-        } else {
-            state.actions.forEachIndexed { index, action ->
-                // The routine payload only carries the device id; resolve the full device
-                // (for its name) from the loaded list when possible.
-                val device = state.devices.firstOrNull { it.id == action.device?.id } ?: action.device
-                ActionRow(device = device, actionName = action.actionName, onRemove = { viewModel.removeAction(index) })
-            }
-        }
+        ActionsSection(
+            actions = state.actions,
+            devices = state.devices,
+            onAdd = { showActionPicker = true },
+            onRemove = viewModel::removeAction
+        )
 
         Spacer(Modifier.height(Spacing.sm))
 
@@ -193,6 +172,58 @@ fun RoutineEditorScreen(
                 TextButton(onClick = { showDelete = false }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
             }
         )
+    }
+}
+
+@Composable
+private fun ActiveRow(active: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            stringResource(R.string.routine_active_label),
+            color = TextPrimary,
+            fontSize = TextSize.lg,
+            modifier = Modifier.weight(Weight.Fill)
+        )
+        Switch(
+            checked = active,
+            onCheckedChange = onToggle,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White, checkedTrackColor = ToggleOn,
+                uncheckedThumbColor = Color.White, uncheckedTrackColor = ToggleOff,
+                uncheckedBorderColor = Color.Transparent
+            )
+        )
+    }
+}
+
+/** Header with an add button, then the routine's action steps (or an empty hint). */
+@Composable
+private fun ColumnScope.ActionsSection(
+    actions: List<RoutineAction>,
+    devices: List<Device>,
+    onAdd: () -> Unit,
+    onRemove: (Int) -> Unit
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            stringResource(R.string.routine_actions_label),
+            color = TextPrimary,
+            fontSize = TextSize.lg,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(Weight.Fill)
+        )
+        IconButton(onClick = onAdd) {
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.routine_add_action), tint = Accent)
+        }
+    }
+    if (actions.isEmpty()) {
+        Text(stringResource(R.string.routine_no_actions), color = TextSecondary, fontSize = TextSize.base)
+    } else {
+        actions.forEachIndexed { index, action ->
+            // The routine step only carries the device id; resolve the full device for its name.
+            val device = devices.firstOrNull { it.id == action.device?.id } ?: action.device
+            ActionRow(device = device, actionName = action.actionName, onRemove = { onRemove(index) })
+        }
     }
 }
 
