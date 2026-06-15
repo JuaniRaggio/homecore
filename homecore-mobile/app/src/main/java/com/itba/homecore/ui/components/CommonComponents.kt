@@ -223,7 +223,7 @@ fun HouseHeader(
             }
 
             if (showNotifications) {
-                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(Weight.Fill))
                 Box(
                     modifier = Modifier
                         .size(IconSize.bell)
