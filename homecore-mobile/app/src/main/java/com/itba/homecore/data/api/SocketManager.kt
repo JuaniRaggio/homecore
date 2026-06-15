@@ -57,12 +57,12 @@ object SocketManager {
                 on(Socket.EVENT_CONNECT_ERROR) { Log.w(TAG, "connect error: ${it.firstOrNull()}") }
 
                 // A device's state changed: refresh + notify (this is the state-change event).
-                on("deviceEvent") { args -> onDeviceEvent(args) }
+                on("deviceEvent") { args -> Log.d(TAG, "deviceEvent RAW: ${args.firstOrNull()}"); onDeviceEvent(args) }
                 // Created/deleted: refresh + notify.
-                on("deviceCreated") { args -> notifyDevice(args, "Se agregó un dispositivo") }
-                on("deviceDeleted") { args -> notifyDevice(args, "Se eliminó un dispositivo") }
+                on("deviceCreated") { args -> Log.d(TAG, "deviceCreated RAW: ${args.firstOrNull()}"); notifyDevice(args, "Se agregó un dispositivo") }
+                on("deviceDeleted") { args -> Log.d(TAG, "deviceDeleted RAW: ${args.firstOrNull()}"); notifyDevice(args, "Se eliminó un dispositivo") }
                 // Updated only refreshes (deviceEvent already notifies state changes; avoids duplicates).
-                on("deviceUpdated") { DeviceSyncEvents.emit() }
+                on("deviceUpdated") { args -> Log.d(TAG, "deviceUpdated RAW: ${args.firstOrNull()}"); DeviceSyncEvents.emit() }
                 // Home sharing events.
                 on("homeShared") { NotificationEvents.emit(TITLE, "Te compartieron un hogar") }
                 on("homeUnshared") { NotificationEvents.emit(TITLE, "Dejaron de compartirte un hogar") }
