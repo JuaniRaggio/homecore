@@ -29,6 +29,7 @@ import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.screens.devices.DeviceCard
 import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 import com.itba.homecore.viewmodel.HomesUiState
@@ -59,25 +60,14 @@ fun DashboardScreen(
     val noNotifications = stringResource(R.string.no_new_notifications)
     var showCreateHome by rememberSaveable { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = Spacing.xl)
-            .padding(bottom = Spacing.xl),
-        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
-    ) {
-        HouseHeader(
-            showNotifications = true,
-            homes = homes,
-            selectedHome = selectedHome,
-            onHomeSelect = { homesVm.selectHome(it) },
-            onAddHome = { showCreateHome = true },
-            onNotificationsClick = { UiMessages.emit(noNotifications) }
-        )
+    // Adaptability (RNF4/RNF5): on phones the two summary panels stack vertically; on
+    // tablets/landscape they sit side by side as parallel sections (routines | devices),
+    // turning the scroll-heavy single column into a glanceable two-column overview. The
+    // device grid drops to 2 cells per row since each panel now occupies half the width.
+    val wide = isWideScreen()
+    val deviceCols = if (wide) 2 else columns
 
-        // -- Favorite routines -----------------------------
+    val routinesPanel: @Composable () -> Unit = {
         PanelCard(
             title = stringResource(R.string.favorite_routines),
             actionLabel = stringResource(R.string.see_all),
@@ -107,7 +97,9 @@ fun DashboardScreen(
                 }
             }
         }
+    }
 
+    val devicesPanel: @Composable () -> Unit = {
         PanelCard(
             title = stringResource(R.string.favorite_devices),
             actionLabel = stringResource(R.string.see_all),
@@ -127,7 +119,7 @@ fun DashboardScreen(
                             fontSize = TextSize.base
                         )
                     } else {
-                        UniformGrid(items = favs, columns = columns) { d, cell ->
+                        UniformGrid(items = favs, columns = deviceCols) { d, cell ->
                             key(d.id) {
                                 DeviceCard(
                                     device = d,
@@ -142,6 +134,38 @@ fun DashboardScreen(
                     }
                 }
             }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Background)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = Spacing.xl)
+            .padding(bottom = Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xl)
+    ) {
+        HouseHeader(
+            showNotifications = true,
+            homes = homes,
+            selectedHome = selectedHome,
+            onHomeSelect = { homesVm.selectHome(it) },
+            onAddHome = { showCreateHome = true },
+            onNotificationsClick = { UiMessages.emit(noNotifications) }
+        )
+
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xl)
+            ) {
+                Box(modifier = Modifier.weight(1f)) { routinesPanel() }
+                Box(modifier = Modifier.weight(1f)) { devicesPanel() }
+            }
+        } else {
+            routinesPanel()
+            devicesPanel()
         }
     }
 

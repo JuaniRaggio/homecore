@@ -16,7 +16,6 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,6 +26,7 @@ import com.itba.homecore.ui.screens.devices.DeviceDetailScreen
 import com.itba.homecore.ui.screens.devices.DevicesScreen
 import com.itba.homecore.ui.screens.routines.RoutinesScreen
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 import com.itba.homecore.viewmodel.UiMessages
@@ -38,9 +38,6 @@ private enum class Tab(val icon: ImageVector, val labelRes: Int) {
     ACTIVITY(Icons.Default.Insights, R.string.nav_activity),
     PROFILE(Icons.Default.Person, R.string.nav_profile)
 }
-
-/** Tablet/landscape breakpoint (dp). Below this it's treated as a phone. */
-private const val WIDE_BREAKPOINT_DP = 600
 
 @Composable
 fun MainScreen(onLogout: () -> Unit = {}) {
@@ -68,7 +65,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
 
     // Adaptability: on wide screens (tablets / phone landscape) navigation
     // moves to a side rail and grids use more columns; on phones it's a bottom bar.
-    val wide = LocalConfiguration.current.screenWidthDp >= WIDE_BREAKPOINT_DP
+    val wide = isWideScreen()
     val columns = if (wide) 3 else 2
 
     val content: @Composable () -> Unit = {
