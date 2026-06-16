@@ -244,6 +244,16 @@ sin uso y vacío.
   (se auto-selecciona el primero al entrar).
 - **Configuración inline**: idioma/tema/contraseña viven directo en Usuario (se
   quitó la rueda de configuración que abría un sheet).
+- **Las rutinas se atan a un hogar (decisión de usabilidad, no limitación técnica).**
+  Cada rutina se crea dentro del hogar activo (`metadata.homeId`) y aparece solo en
+  el Inicio/lista de ese hogar. La API soporta rutinas *cross-home* y, de hecho, sus
+  **acciones pueden afectar dispositivos de cualquier hogar** (el picker muestra
+  todos), así que la flexibilidad de efecto ya existe. Aun así, **mobile no permite
+  crear rutinas cross-home a propósito**: no hay una vista que represente con
+  claridad una rutina que afecta a múltiples casas (¿en qué Inicio aparece?, ¿cómo
+  se comunica su alcance?). Atarla a un hogar mantiene la navegación y la jerarquía
+  de información claras. La infraestructura `crossHome` queda en el modelo y el
+  filtro solo para **interoperar** con rutinas cross-home creadas desde la web.
 
 **Componentes reutilizables** (`ui/components/`, un archivo por componente):
 `HouseHeader` (con **slot opcional** de campana de notificaciones), `PanelCard`
@@ -441,27 +451,23 @@ rotación usa `rememberSaveable`.
 
 ---
 
-## 19. Pendientes conocidos y mejoras futuras
+## 19. Pendientes y mejoras (no exigidos por el enunciado)
 
-- **Tests automatizados (principal deuda).** Hoy solo está el template generado por
-  Android Studio (`ExampleUnitTest` / `ExampleInstrumentedTest`). La arquitectura
-  está lista para testear (VMs con inyección de interfaces por constructor);
-  faltan tests de los ViewModels (filtros de hogar/rutina, `isOn`, `toggleDevice`),
-  de las extensiones de dominio (`category()`, `DeviceAction.fromApi`) y del
-  `unwrapResult`/`apiCall`.
+El enunciado **no pide tests automatizados**; el "testing" que sí corresponde es
+**manual** (API Levels probados, teléfono/tablet, orientación, español/inglés),
+documentado en `docs/tercera_entrega/checklist_testing.md` y reflejado en las
+capturas del informe. Lo de abajo son mejoras de calidad, no requisitos.
+
+- **Tests automatizados (mejora de calidad).** Hoy solo está el template de Android
+  Studio. La arquitectura está lista para testear (VMs con inyección de interfaces
+  por constructor); sumarían valor tests de los ViewModels (filtros de hogar/rutina,
+  `isOn`, `toggleDevice`), de las extensiones de dominio (`category()`,
+  `DeviceAction.fromApi`) y del `unwrapResult`/`apiCall`.
 - **Ejecución en background.** `RoutineScheduler` (scheduling, RF23) y el WebSocket
   corren solo con la app viva; scheduling/notificaciones con la app cerrada
   requerirían `WorkManager`/foreground service.
 - **Alarma `changeSecurityCode` en rutinas.** Queda fuera del picker de rutinas
   (necesita código viejo + nuevo); el resto de acciones de alarma sí están.
-- **Rutinas cross-home (mejora futura).** Hoy cada rutina se liga a un hogar (su
-  "base", vía `metadata.homeId`) y solo aparece en el Inicio/lista de ese hogar;
-  sus acciones igual pueden afectar dispositivos de cualquier hogar (el picker
-  muestra todos), así que la flexibilidad de efecto ya existe. La mejora sería
-  permitir marcar una rutina como `crossHome` (no atada a ningún hogar) para que
-  se muestre y ejecute en TODOS los hogares. La infraestructura ya está lista:
-  `RoutineMetadata.crossHome`, el `fullBody` lo serializa, el filtro de
-  `RoutinesViewModel` ya respeta `crossHome == true || homeId == hogarActual`, y
-  `RoutineEditorState` lo preserva al editar. Falta solo: un toggle "Afecta a
-  todos los hogares" en el editor (setea `crossHome=true`, `homeId=null`) y
-  mostrarlas en el Inicio aunque no sean favoritas. La web ya lo soporta.
+
+> Nota: que las rutinas se aten a un solo hogar **no** es un pendiente sino una
+> decisión de usabilidad deliberada (ver §8).
