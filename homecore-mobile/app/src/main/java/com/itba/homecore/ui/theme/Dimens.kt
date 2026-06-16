@@ -117,5 +117,4 @@ object Size {
 /** Relative fractions (of a container or the screen). */
 object Fraction {
     const val actionWidth = 0.85f   // primary action pill width vs its container
-    const val gridMaxHeight = 0.32f // UniformGrid cell height cap vs screen height
 }

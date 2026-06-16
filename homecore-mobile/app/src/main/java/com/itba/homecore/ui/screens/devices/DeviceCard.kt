@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
@@ -99,14 +100,18 @@ fun DeviceCard(
                 color = TextPrimary,
                 fontSize = TextSize.lg,
                 fontWeight = FontWeight.SemiBold,
-                lineHeight = LineHeight.normal
+                lineHeight = LineHeight.normal,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(Spacing.xs))
             Text(
                 text = roomLabel,
                 color = TextSecondary,
                 fontSize = TextSize.sm,
-                lineHeight = LineHeight.compact
+                lineHeight = LineHeight.compact,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.height(Spacing.xs))
             val statusColor = if (isOn) SuccessColor else TextSecondary
