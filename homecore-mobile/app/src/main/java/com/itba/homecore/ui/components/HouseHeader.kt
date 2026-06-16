@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
@@ -13,9 +14,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Home
@@ -23,8 +27,9 @@ import com.itba.homecore.ui.theme.*
 
 /**
  * Shared header with a home-picker dropdown and optional notifications bell.
- * Tapping the chevron opens a full-width menu listing [homes]; the selected home is
- * highlighted. An "+ Nueva Propiedad" entry at the bottom fires [onAddHome].
+ * Tapping the chevron opens a full-width menu listing [homes]; the selected home is highlighted.
+ * Each row has a trailing pencil that opens a rename dialog ([onRenameHome]); an add entry at the
+ * bottom fires [onAddHome]. The dropdown is the single entry point to manage homes (no Homes screen).
  */
 @Composable
 fun HouseHeader(
@@ -33,13 +38,25 @@ fun HouseHeader(
     selectedHome: Home? = null,
     onHomeSelect: (Home) -> Unit = {},
     onAddHome: () -> Unit = {},
+    onRenameHome: (Home, String) -> Unit = { _, _ -> },
     showNotifications: Boolean = false,
     onNotificationsClick: () -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
+    // The home currently being renamed (its row pencil was tapped); drives the rename dialog.
+    var editingHome by remember { mutableStateOf<Home?>(null) }
 
-    // Full-width Box as anchor so the DropdownMenu spans the same width.
-    Box(modifier = modifier.fillMaxWidth()) {
+    // The menu spans the full width of the header (so it lines up under the title) but no wider:
+    // a DropdownMenu is a popup, so `fillMaxWidth` would stretch it across the whole screen and
+    // under the side rail / camera cutout. Instead we measure the header width at runtime and give
+    // the menu exactly that width, anchored at the header's start. The header already sits inside
+    // the inset content area, so this keeps the menu (and the rename pencils) within the safe area
+    // on any screen size, no hardcoded dimensions.
+    val density = LocalDensity.current
+    var headerWidthPx by remember { mutableStateOf(0) }
+    val menuWidthDp = with(density) { headerWidthPx.toDp() }
+
+    Box(modifier = modifier.fillMaxWidth().onSizeChanged { headerWidthPx = it.width }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,20 +117,40 @@ fun HouseHeader(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             containerColor = Surface,
-            shape = RoundedCornerShape(Radius.card),
-            modifier = Modifier.fillMaxWidth()
+            shape = RoundedCornerShape(Radius.card)
         ) {
+          Column(modifier = if (headerWidthPx > 0) Modifier.width(menuWidthDp) else Modifier) {
             homes.forEach { home ->
                 val isSelected = selectedHome?.id == home.id
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            text = home.name,
-                            color = TextPrimary,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        // Name centered across the full row, rename pencil pinned to the end.
+                        // The pencil consumes its own tap, so it renames without selecting the home.
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = home.name,
+                                color = TextPrimary,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.Center)
+                                    .padding(horizontal = IconSize.bell)
+                            )
+                            IconButton(
+                                onClick = { editingHome = home; expanded = false },
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = stringResource(R.string.cd_edit_home),
+                                    tint = TextPrimary,
+                                    modifier = Modifier.size(IconSize.sm)
+                                )
+                            }
+                        }
                     },
                     onClick = { onHomeSelect(home); expanded = false },
                     modifier = if (isSelected) Modifier.background(AccentDark) else Modifier,
@@ -133,6 +170,17 @@ fun HouseHeader(
                 },
                 onClick = { onAddHome(); expanded = false },
                 colors = MenuDefaults.itemColors(textColor = Accent)
+            )
+          }
+        }
+
+        editingHome?.let { home ->
+            RenameDialog(
+                title = stringResource(R.string.rename_home_title),
+                label = stringResource(R.string.home_name_label),
+                initial = home.name,
+                onConfirm = { newName -> onRenameHome(home, newName); editingHome = null },
+                onDismiss = { editingHome = null }
             )
         }
     }

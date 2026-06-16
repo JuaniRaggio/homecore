@@ -1,7 +1,24 @@
 package com.itba.homecore.data.model
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
+@Serializable
 data class Routine(
     @SerializedName("id")          val id: String = "",
     @SerializedName("name")        val name: String = "",
@@ -12,12 +29,14 @@ data class Routine(
     @SerializedName("metadata")    val metadata: RoutineMetadata? = null
 )
 
+@Serializable
 data class RoutineAction(
     @SerializedName("device")     val device: Device? = null,
     @SerializedName("actionName") val actionName: String = "",
-    @SerializedName("params")     val params: List<Any> = emptyList()
+    @SerializedName("params")     @Serializable(with = AnyListSerializer::class) val params: List<Any> = emptyList()
 )
 
+@Serializable
 data class RoutineMetadata(
     @SerializedName("favorite")    val favorite: Boolean? = null,
     @SerializedName("active")      val active: Boolean? = null,
@@ -27,6 +46,43 @@ data class RoutineMetadata(
     @SerializedName("homeId")      val homeId: String? = null,
     @SerializedName("crossHome")   val crossHome: Boolean? = null
 )
+
+/**
+ * Routine action params come as a heterogeneous list (strings, ints, booleans) the
+ * API echoes back. kotlinx.serialization can't auto-handle [Any], so we encode/decode
+ * via [JsonElement] preserving the primitive type.
+ */
+object AnyListSerializer : KSerializer<List<Any>> {
+    private val delegate = ListSerializer(JsonElement.serializer())
+    override val descriptor: SerialDescriptor = delegate.descriptor
+
+    override fun serialize(encoder: Encoder, value: List<Any>) {
+        val json = encoder as? JsonEncoder ?: error("AnyListSerializer requires JSON")
+        val arr = JsonArray(value.map { toJsonElement(it) })
+        json.encodeJsonElement(arr)
+    }
+
+    override fun deserialize(decoder: Decoder): List<Any> {
+        val json = decoder as? JsonDecoder ?: error("AnyListSerializer requires JSON")
+        val arr = json.decodeJsonElement() as? JsonArray ?: return emptyList()
+        return arr.mapNotNull { fromJsonElement(it) }
+    }
+
+    private fun toJsonElement(v: Any?): JsonElement = when (v) {
+        null         -> JsonNull
+        is JsonElement -> v
+        is Boolean   -> JsonPrimitive(v)
+        is Number    -> JsonPrimitive(v)
+        is String    -> JsonPrimitive(v)
+        else         -> JsonPrimitive(v.toString())
+    }
+
+    private fun fromJsonElement(e: JsonElement): Any? {
+        if (e is JsonNull) return null
+        val p = (e as? JsonPrimitive)?.takeIf { !it.isString } ?: return (e as? JsonPrimitive)?.content
+        return p.booleanOrNull ?: p.intOrNull ?: p.doubleOrNull ?: p.jsonPrimitive.content
+    }
+}
 
 fun Routine.isFavorite(): Boolean = metadata?.favorite == true
 fun Routine.isActive(): Boolean = metadata?.active ?: true

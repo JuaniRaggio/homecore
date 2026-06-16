@@ -293,6 +293,7 @@
     <string name="home_name_hint">E.g. Summer house</string>
     <string name="create_home">Create home</string>
     <string name="rename_home_title">Rename home</string>
+    <string name="cd_edit_home">Rename home</string>
     <string name="delete_home_title">Delete home?</string>
     <string name="delete_home_message">Delete \"%1$s\"? Its rooms will be left without a home.</string>
     <string name="empty_homes">No homes</string>

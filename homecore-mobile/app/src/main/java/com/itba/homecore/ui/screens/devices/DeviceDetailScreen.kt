@@ -19,6 +19,7 @@ import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.category
 import com.itba.homecore.ui.components.HcTextField
+import com.itba.homecore.ui.components.RenameDialog
 import com.itba.homecore.ui.screens.devices.controls.*
 import com.itba.homecore.ui.theme.*
 
@@ -135,34 +136,4 @@ fun DeviceDetailScreen(
             }
         )
     }
-}
-
-/** Shared rename dialog (a single text field + save), reused for devices and rooms. */
-@Composable
-fun RenameDialog(
-    title: String,
-    label: String,
-    initial: String,
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var name by rememberSaveable { mutableStateOf(initial) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = Surface,
-        title = { Text(title, color = TextPrimary, fontWeight = FontWeight.Bold) },
-        text = {
-            HcTextField(label = label, value = name, onValueChange = { name = it })
-        },
-        confirmButton = {
-            TextButton(onClick = { if (name.isNotBlank()) onConfirm(name.trim()) }) {
-                Text(stringResource(R.string.cp_save), color = Accent, fontWeight = FontWeight.SemiBold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel), color = TextSecondary)
-            }
-        }
-    )
 }

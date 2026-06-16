@@ -12,8 +12,9 @@ const val WIDE_BREAKPOINT_DP = 600
 
 /**
  * Single source of truth for the app-wide responsive behavior. True on tablets (any orientation)
- * and on phones in landscape, where screens use multi-pane / two-column layouts instead of the
- * single-column phone layout.
+ * and on phones in landscape, where screens use a side rail and multi-pane / two-column layouts
+ * instead of the single-column phone layout. Grids size their column count to the real available
+ * width (see the device list), so the panes stay usable across the whole wide range.
  */
 @Composable
 fun isWideScreen(): Boolean = LocalConfiguration.current.screenWidthDp >= WIDE_BREAKPOINT_DP

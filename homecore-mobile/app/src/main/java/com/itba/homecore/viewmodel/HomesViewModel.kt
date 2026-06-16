@@ -68,4 +68,13 @@ class HomesViewModel(
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo crear el hogar") }
         }
     }
+
+    /** Renames [id] to [newName]; reload keeps the active selection (matched by id). */
+    fun renameHome(id: String, newName: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch {
+            homesRepository.renameHome(id, newName)
+                .onSuccess { load(); onDone() }
+                .onFailure { UiMessages.emit(it.message ?: "No se pudo renombrar el hogar") }
+        }
+    }
 }
