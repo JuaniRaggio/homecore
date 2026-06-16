@@ -14,9 +14,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Home
@@ -43,8 +46,17 @@ fun HouseHeader(
     // The home currently being renamed (its row pencil was tapped); drives the rename dialog.
     var editingHome by remember { mutableStateOf<Home?>(null) }
 
-    // Full-width Box as anchor so the DropdownMenu spans the same width.
-    Box(modifier = modifier.fillMaxWidth()) {
+    // The menu spans the full width of the header (so it lines up under the title) but no wider:
+    // a DropdownMenu is a popup, so `fillMaxWidth` would stretch it across the whole screen and
+    // under the side rail / camera cutout. Instead we measure the header width at runtime and give
+    // the menu exactly that width, anchored at the header's start. The header already sits inside
+    // the inset content area, so this keeps the menu (and the rename pencils) within the safe area
+    // on any screen size, no hardcoded dimensions.
+    val density = LocalDensity.current
+    var headerWidthPx by remember { mutableStateOf(0) }
+    val menuWidthDp = with(density) { headerWidthPx.toDp() }
+
+    Box(modifier = modifier.fillMaxWidth().onSizeChanged { headerWidthPx = it.width }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,30 +117,39 @@ fun HouseHeader(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             containerColor = Surface,
-            shape = RoundedCornerShape(Radius.card),
-            modifier = Modifier.fillMaxWidth()
+            shape = RoundedCornerShape(Radius.card)
         ) {
+          Column(modifier = if (headerWidthPx > 0) Modifier.width(menuWidthDp) else Modifier) {
             homes.forEach { home ->
                 val isSelected = selectedHome?.id == home.id
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            text = home.name,
-                            color = TextPrimary,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    },
-                    // Pencil renames this home without selecting it (the IconButton consumes the tap).
-                    trailingIcon = {
-                        IconButton(onClick = { editingHome = home; expanded = false }) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.cd_edit_home),
-                                tint = TextPrimary,
-                                modifier = Modifier.size(IconSize.sm)
+                        // Name centered across the full row, rename pencil pinned to the end.
+                        // The pencil consumes its own tap, so it renames without selecting the home.
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = home.name,
+                                color = TextPrimary,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.Center)
+                                    .padding(horizontal = IconSize.bell)
                             )
+                            IconButton(
+                                onClick = { editingHome = home; expanded = false },
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = stringResource(R.string.cd_edit_home),
+                                    tint = TextPrimary,
+                                    modifier = Modifier.size(IconSize.sm)
+                                )
+                            }
                         }
                     },
                     onClick = { onHomeSelect(home); expanded = false },
@@ -150,6 +171,7 @@ fun HouseHeader(
                 onClick = { onAddHome(); expanded = false },
                 colors = MenuDefaults.itemColors(textColor = Accent)
             )
+          }
         }
 
         editingHome?.let { home ->
