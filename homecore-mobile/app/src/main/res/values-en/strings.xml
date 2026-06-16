@@ -39,7 +39,7 @@
 
     <!-- Bottom nav -->
     <string name="nav_home">Home</string>
-    <string name="nav_devices">Devices</string>
+    <string name="nav_devices">Rooms</string>
     <string name="nav_routines">Routines</string>
     <string name="nav_activity">Activity</string>
     <string name="nav_profile">User</string>

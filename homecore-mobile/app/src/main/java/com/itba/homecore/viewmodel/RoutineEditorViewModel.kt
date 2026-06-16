@@ -3,6 +3,7 @@ package com.itba.homecore.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.Routine
 import com.itba.homecore.data.model.RoutineAction
 import com.itba.homecore.data.model.RoutineMetadata
@@ -32,6 +33,8 @@ data class RoutineEditorState(
     val favorite: Boolean = false,
     val actions: List<RoutineAction> = emptyList(),
     val devices: List<Device> = emptyList(),
+    // Rooms of the active home, offered as the target for the vacuum's setLocation action.
+    val rooms: List<Room> = emptyList(),
     // Home the routine belongs to: set from the active home on create, preserved on edit so the
     // routine keeps showing under its home. crossHome is preserved untouched on edit.
     val homeId: String? = null,
@@ -58,13 +61,15 @@ class RoutineEditorViewModel(
         routineId = id
         viewModelScope.launch {
             val devices = devicesRepository.getDevices().getOrNull() ?: emptyList()
+            val rooms = devicesRepository.getRooms().getOrNull().orEmpty()
+                .filter { currentHomeId == null || it.home?.id == currentHomeId }
             if (id == null) {
-                _state.value = RoutineEditorState(loading = false, isNew = true, devices = devices, homeId = currentHomeId)
+                _state.value = RoutineEditorState(loading = false, isNew = true, devices = devices, rooms = rooms, homeId = currentHomeId)
                 return@launch
             }
             val routine = routinesRepository.getRoutine(id).getOrNull()
             if (routine == null) {
-                _state.update { it.copy(loading = false, devices = devices) }
+                _state.update { it.copy(loading = false, devices = devices, rooms = rooms) }
                 return@launch
             }
             _state.value = RoutineEditorState(
@@ -78,6 +83,7 @@ class RoutineEditorViewModel(
                 favorite = routine.metadata?.favorite ?: false,
                 actions = routine.actions,
                 devices = devices,
+                rooms = rooms,
                 homeId = routine.metadata?.homeId,
                 crossHome = routine.metadata?.crossHome
             )

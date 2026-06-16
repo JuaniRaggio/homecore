@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceCategory
+import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.RoutineAction
 import com.itba.homecore.data.model.category
 import com.itba.homecore.ui.components.HcButton
@@ -145,6 +146,7 @@ fun RoutineEditorScreen(
     if (showActionPicker) {
         ActionPickerDialog(
             devices = state.devices,
+            rooms = state.rooms,
             onPick = { device, action, params -> viewModel.addAction(device, action, params); showActionPicker = false },
             onDismiss = { showActionPicker = false }
         )
@@ -290,6 +292,7 @@ private fun ActionRow(device: Device?, actionName: String, onRemove: () -> Unit)
 @Composable
 private fun ActionPickerDialog(
     devices: List<Device>,
+    rooms: List<Room>,
     onPick: (Device, String, List<Any>) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -329,7 +332,7 @@ private fun ActionPickerDialog(
                         }
                     }
                     else -> s.params.forEachIndexed { i, field ->
-                        ParamInput(field, paramValues[i]) { paramValues[i] = it }
+                        ParamInput(field, paramValues[i], rooms) { paramValues[i] = it }
                     }
                 }
             }
@@ -376,7 +379,7 @@ private fun ActionOption(label: String, onClick: () -> Unit) {
 
 /** Renders the input for a single action parameter, reporting the chosen value via [onChange]. */
 @Composable
-private fun ParamInput(field: ParamField, value: Any?, onChange: (Any) -> Unit) {
+private fun ParamInput(field: ParamField, value: Any?, rooms: List<Room>, onChange: (Any) -> Unit) {
     when (field) {
         is ParamField.Num -> ControlSlider(
             label = stringResource(field.labelRes),
@@ -406,6 +409,21 @@ private fun ParamInput(field: ParamField, value: Any?, onChange: (Any) -> Unit) 
             SectionLabel(stringResource(field.labelRes))
             ColorSwatchRow { onChange(it) }
         }
+
+        is ParamField.Rooms -> {
+            if (rooms.isEmpty()) {
+                SectionLabel(stringResource(field.labelRes))
+                Text(stringResource(R.string.act_no_rooms), color = TextSecondary, fontSize = TextSize.md)
+            } else {
+                val labels = rooms.associate { it.id to it.name }
+                SegmentedSelector(
+                    label = stringResource(field.labelRes),
+                    options = rooms.map { it.id },
+                    selected = value as? String,
+                    labelFor = { labels[it] ?: it }
+                ) { onChange(it) }
+            }
+        }
     }
 }
 
@@ -415,6 +433,7 @@ private fun defaultParam(field: ParamField): Any? = when (field) {
     is ParamField.Choice -> field.options.firstOrNull()?.value
     is ParamField.Code -> ""
     is ParamField.ColorPick -> null
+    is ParamField.Rooms -> null
 }
 
 private fun paramValid(field: ParamField, value: Any?): Boolean = when (field) {

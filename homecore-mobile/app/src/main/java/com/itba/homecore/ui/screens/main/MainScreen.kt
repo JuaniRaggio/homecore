@@ -7,8 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,7 +33,7 @@ import com.itba.homecore.viewmodel.UiMessages
 
 private enum class Tab(val icon: ImageVector, val labelRes: Int) {
     HOME(Icons.Default.Home, R.string.nav_home),
-    DEVICES(Icons.Default.Tv, R.string.nav_devices),
+    DEVICES(Icons.Default.MeetingRoom, R.string.nav_devices),
     ROUTINES(Icons.AutoMirrored.Filled.List, R.string.nav_routines),
     ACTIVITY(Icons.Default.Insights, R.string.nav_activity),
     PROFILE(Icons.Default.Person, R.string.nav_profile)

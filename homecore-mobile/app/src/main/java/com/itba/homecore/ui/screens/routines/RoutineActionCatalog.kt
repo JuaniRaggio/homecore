@@ -31,6 +31,9 @@ sealed interface ParamField {
 
     /** A preset color swatch (lamp), emitted as a hex string. */
     data class ColorPick(override val labelRes: Int) : ParamField
+
+    /** A room of the current home (vacuum location); emitted as the room id. */
+    data class Rooms(override val labelRes: Int) : ParamField
 }
 
 /** An action offered in the routine editor, with the parameters it needs (empty = runs as-is). */
@@ -102,7 +105,8 @@ fun routineActionsFor(cat: DeviceCategory): List<RoutineActionSpec> = when (cat)
     DeviceCategory.VACUUM -> listOf(
         spec(DeviceAction.START), spec(DeviceAction.PAUSE), spec(DeviceAction.DOCK),
         spec(DeviceAction.SET_MODE, choice(R.string.act_mode,
-            VacuumMode.VACUUM to R.string.vacuum_mode_vacuum, VacuumMode.MOP to R.string.vacuum_mode_mop))
+            VacuumMode.VACUUM to R.string.vacuum_mode_vacuum, VacuumMode.MOP to R.string.vacuum_mode_mop)),
+        spec(DeviceAction.SET_LOCATION, ParamField.Rooms(R.string.act_location))
     )
     DeviceCategory.REFRIGERATOR -> listOf(
         spec(DeviceAction.SET_TEMPERATURE, ParamField.Num(R.string.act_temperature, 2, 8, unit = "°C", default = 4)),
