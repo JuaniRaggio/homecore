@@ -25,6 +25,12 @@ object ApiClient {
     /** True while an auth token is held in memory. The 401 interceptor clears it. */
     fun hasToken(): Boolean = token != null
 
+    /** Current JWT (or null). Shared with the Ktor client so both clients send the same session. */
+    fun currentToken(): String? = token
+
+    /** Clears the in-memory token (used by the Ktor 401 handler to mirror Retrofit's behavior). */
+    fun clearToken() { this.token = null }
+
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
