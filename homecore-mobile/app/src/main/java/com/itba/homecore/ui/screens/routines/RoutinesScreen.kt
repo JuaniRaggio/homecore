@@ -59,8 +59,8 @@ fun RoutinesScreen(
     val noScheduleMsg = stringResource(R.string.routine_no_schedule_error)
 
     // Adaptability (RNF4/RNF5): the routine editor (create when id is null, edit otherwise)
-    // replaces the whole screen on phones, but on tablets/landscape it lives in the right pane
-    // next to the list, so the user keeps the list of routines in view while editing one.
+    // replaces the whole screen on phones, but on wide screens it lives in the right pane next to
+    // the list, so the user keeps the routine list in view while editing one.
     val wide = isWideScreen()
     var editorOpen by rememberSaveable { mutableStateOf(false) }
     var editorId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -136,29 +136,26 @@ fun RoutinesScreen(
     }
 
     if (wide) {
-        Box(modifier = Modifier.fillMaxSize().background(Background)) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                    listPane()
-                }
-                VerticalDivider(color = SurfaceVariant)
-                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
-                    if (editorOpen) {
-                        RoutineEditorScreen(
-                            routineId = editorId,
-                            homeId = selectedHome?.id,
-                            onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
-                        )
-                    } else {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            StatusMessage(stringResource(R.string.select_routine_hint))
-                        }
+        Row(modifier = Modifier.fillMaxSize().background(Background)) {
+            // The add button stays in its usual bottom-end spot, scoped to the list pane.
+            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                listPane()
+                AddFab(actions = fabActions, contentDescription = fabCd)
+            }
+            VerticalDivider(color = SurfaceVariant)
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
+                if (editorOpen) {
+                    RoutineEditorScreen(
+                        routineId = editorId,
+                        homeId = selectedHome?.id,
+                        onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        StatusMessage(stringResource(R.string.select_routine_hint))
                     }
                 }
             }
-            // On wide layouts the add button docks at the bottom center, over the divider between
-            // panes: a deliberately out-of-the-way spot, fine because adding is infrequent.
-            AddFab(actions = fabActions, contentDescription = fabCd, alignment = Alignment.BottomCenter)
         }
     } else {
         Box(modifier = Modifier.fillMaxSize().background(Background)) {

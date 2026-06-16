@@ -89,7 +89,7 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                         onSeeAllDevices = { selected = Tab.DEVICES },
                         columns = columns
                     )
-                    Tab.DEVICES  -> DevicesScreen(onDeviceClick = openDevice, columns = columns)
+                    Tab.DEVICES  -> DevicesScreen(onDeviceClick = openDevice)
                     Tab.ROUTINES -> RoutinesScreen()
                     Tab.ACTIVITY -> ActivityScreen()
                     Tab.PROFILE  -> ProfileScreen(onLogout = onLogout)
