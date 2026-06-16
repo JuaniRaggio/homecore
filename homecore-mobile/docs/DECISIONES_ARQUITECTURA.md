@@ -360,3 +360,14 @@ preparada la app para agregar `values-en/strings.xml`.
 - Alta de rutina y de dispositivo (botones "+ Nueva …" hoy son placeholders).
 - Historial real desde el endpoint de logs (hoy se deriva de los dispositivos en
   modo prototipo).
+- **Rutinas cross-home (mejora futura).** Hoy cada rutina se liga a un hogar (su
+  "base", vía `metadata.homeId`) y solo aparece en el Inicio/lista de ese hogar;
+  sus acciones igual pueden afectar dispositivos de cualquier hogar (el picker
+  muestra todos), así que la flexibilidad de efecto ya existe. La mejora sería
+  permitir marcar una rutina como `crossHome` (no atada a ningún hogar) para que
+  se muestre y ejecute en TODOS los hogares. La infraestructura ya está lista:
+  `RoutineMetadata.crossHome`, el `fullBody` lo serializa, el filtro de
+  `RoutinesViewModel` ya respeta `crossHome == true || homeId == hogarActual`, y
+  `RoutineEditorState` lo preserva al editar. Falta solo: un toggle "Afecta a
+  todos los hogares" en el editor (setea `crossHome=true`, `homeId=null`) y
+  mostrarlas en el Inicio aunque no sean favoritas. La web ya lo soporta.
