@@ -60,9 +60,10 @@ The debug APK is generated at:
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-> A full end-user installation guide (sideloading the APK on a physical device)
-> exists separately in the project deliverables; this README stays focused on
-> developers.
+> This README stays focused on developers. The deliverable also includes, at the
+> root of this project: the full report (**informe**) as a `.pdf`, and a
+> step-by-step end-user installation guide in [`INSTALL.md`](./INSTALL.md)
+> (sideloading the APK on a physical device).
 
 ## Backend wiring
 
