@@ -25,15 +25,19 @@ import com.itba.homecore.ui.theme.*
 data class FabAction(val label: String, val onClick: () -> Unit)
 
 /**
- * Bottom-right "add" floating button. With a single [actions] entry it fires it directly;
- * with several it expands into a labeled speed-dial. Must be placed inside a Box (it aligns
- * itself to the bottom-end), so screens have one consistent add affordance.
+ * Floating "add" button. With a single [actions] entry it fires it directly; with several it
+ * expands into a labeled speed-dial. Must be placed inside a Box; [alignment] controls where it
+ * docks (bottom-end on phones, bottom-center on the divider of wide master-detail layouts).
  */
 @Composable
-fun BoxScope.AddFab(actions: List<FabAction>, contentDescription: String) {
+fun BoxScope.AddFab(
+    actions: List<FabAction>,
+    contentDescription: String,
+    alignment: Alignment = Alignment.BottomEnd
+) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     Column(
-        modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.xl),
+        modifier = Modifier.align(alignment).padding(Spacing.xl),
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {

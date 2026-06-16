@@ -136,25 +136,29 @@ fun RoutinesScreen(
     }
 
     if (wide) {
-        Row(modifier = Modifier.fillMaxSize().background(Background)) {
-            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                listPane()
-                AddFab(actions = fabActions, contentDescription = fabCd)
-            }
-            VerticalDivider(color = SurfaceVariant)
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
-                if (editorOpen) {
-                    RoutineEditorScreen(
-                        routineId = editorId,
-                        homeId = selectedHome?.id,
-                        onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
-                    )
-                } else {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        StatusMessage(stringResource(R.string.select_routine_hint))
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    listPane()
+                }
+                VerticalDivider(color = SurfaceVariant)
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
+                    if (editorOpen) {
+                        RoutineEditorScreen(
+                            routineId = editorId,
+                            homeId = selectedHome?.id,
+                            onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
+                        )
+                    } else {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            StatusMessage(stringResource(R.string.select_routine_hint))
+                        }
                     }
                 }
             }
+            // On wide layouts the add button docks at the bottom center, over the divider between
+            // panes: a deliberately out-of-the-way spot, fine because adding is infrequent.
+            AddFab(actions = fabActions, contentDescription = fabCd, alignment = Alignment.BottomCenter)
         }
     } else {
         Box(modifier = Modifier.fillMaxSize().background(Background)) {

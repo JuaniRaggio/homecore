@@ -223,9 +223,9 @@ de auth y el de OkHttp.
 **Navegación:** manual. `MainActivity` maneja el flujo de auth (enum `AppScreen`:
 login / register / verify / recover) y, una vez logueado, monta `MainScreen` con
 una **bottom navigation de 5 tabs**. En pantallas anchas (tablet / teléfono
-horizontal) el bottom bar se reemplaza por un `NavigationRail` y las grillas pasan
-a 3 columnas (ver sección 16, RNF4/RNF5). `navigation/` (Navigation Compose) quedó
-sin uso y vacío.
+horizontal) el bottom bar se reemplaza por un `NavigationRail` y varias pantallas
+adoptan layouts multi-panel (ver sección 15, RNF4/RNF5). `navigation/`
+(Navigation Compose) quedó sin uso y vacío.
 
 | Tab (label)        | Pantalla            | Contenido                                                            |
 |--------------------|---------------------|----------------------------------------------------------------------|
@@ -386,12 +386,36 @@ solo lugar** y elimina el riesgo de drift entre pantallas.
 
 ## 15. Adaptabilidad a dispositivo y orientación (RNF4 / RNF5)
 
-`MainScreen` usa un breakpoint (`WIDE_BREAKPOINT_DP = 600`): en teléfonos en
-vertical hay **bottom navigation** y grillas de **2 columnas**; en tablet o
-teléfono horizontal la navegación pasa a un **`NavigationRail`** lateral y las
-grillas a **3 columnas**. No es solo redimensionar: cambia la estructura de
-navegación y la densidad de la información. El estado de UI que debe sobrevivir la
-rotación usa `rememberSaveable`.
+El breakpoint vive en un único lugar (`ui/util/WindowSize.kt`): `isWideScreen()`
+(`screenWidthDp >= WIDE_BREAKPOINT_DP = 600`) es la fuente de verdad que consultan
+todas las pantallas, y `Modifier.readableWidth()` limita el ancho de un bloque de
+contenido en pantallas anchas. Así "ancho" significa lo mismo en toda la app
+(tablet en cualquier orientación y teléfono en horizontal) y no se repite el
+cálculo por pantalla.
+
+La adaptación **no es una mera redistribución/redimensionamiento**: cada pantalla
+cambia su estructura de información y su jerarquía visual cuando hay espacio:
+
+- **Navegación**: bottom `NavigationBar` (compacto) -> `NavigationRail` lateral
+  (ancho). Cambia el patrón de navegación, no su tamaño.
+- **Habitaciones**: lista de una columna (compacto) -> **master-detail** (ancho):
+  la lista de habitaciones/dispositivos queda a la izquierda y el detalle del
+  dispositivo seleccionado se abre en el panel derecho, sin navegación a pantalla
+  completa. Mantiene el contexto de la lista mientras se opera un dispositivo.
+- **Rutinas**: el editor reemplaza la pantalla (compacto) -> vive en el panel
+  derecho junto a la lista (ancho), mismo patrón master-detail.
+- **Inicio**: dos paneles apilados (compacto) -> dos secciones en paralelo
+  (Rutinas | Dispositivos) que se ven de un vistazo sin scrollear; la grilla de
+  dispositivos baja a 2 columnas porque cada panel ocupa media pantalla.
+- **Actividad**: consumo sobre el historial (compacto) -> el consumo se vuelve una
+  columna lateral fija junto al historial, de modo que el resumen no desaparece al
+  crecer la lista.
+- **Auth y Usuario**: contenido de columna única limitado con `readableWidth()` y
+  centrado, para no estirar formularios a un ancho ilegible en tablet.
+
+Los paneles que no aplican (sin selección) muestran un placeholder
+(`select_device_hint`, `select_routine_hint`). El estado de UI que debe sobrevivir
+la rotación usa `rememberSaveable` (incluida la selección del master-detail).
 
 ---
 

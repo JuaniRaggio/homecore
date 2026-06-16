@@ -126,29 +126,33 @@ fun DevicesScreen(
     }
 
     if (wide) {
-        Row(modifier = Modifier.fillMaxSize().background(Background)) {
-            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                listPane()
-                AddFab(actions = fabActions, contentDescription = fabCd)
-            }
-            VerticalDivider(color = SurfaceVariant)
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
-                if (selectedDevice != null) {
-                    DeviceDetailScreen(
-                        device = selectedDevice,
-                        rooms = rooms,
-                        onAction = { action, params -> viewModel.runAction(selectedDevice.id, action, params) },
-                        onRename = { viewModel.renameDevice(selectedDevice.id, it) },
-                        onMoveToRoom = { viewModel.setDeviceRoom(selectedDevice.id, it) },
-                        onDelete = { viewModel.deleteDevice(selectedDevice.id) { selectedDeviceId = null } },
-                        onBack = { selectedDeviceId = null }
-                    )
-                } else {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        StatusMessage(stringResource(R.string.select_device_hint))
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    listPane()
+                }
+                VerticalDivider(color = SurfaceVariant)
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
+                    if (selectedDevice != null) {
+                        DeviceDetailScreen(
+                            device = selectedDevice,
+                            rooms = rooms,
+                            onAction = { action, params -> viewModel.runAction(selectedDevice.id, action, params) },
+                            onRename = { viewModel.renameDevice(selectedDevice.id, it) },
+                            onMoveToRoom = { viewModel.setDeviceRoom(selectedDevice.id, it) },
+                            onDelete = { viewModel.deleteDevice(selectedDevice.id) { selectedDeviceId = null } },
+                            onBack = { selectedDeviceId = null }
+                        )
+                    } else {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            StatusMessage(stringResource(R.string.select_device_hint))
+                        }
                     }
                 }
             }
+            // On wide layouts the add button docks at the bottom center, over the divider between
+            // panes: a deliberately out-of-the-way spot, fine because adding is infrequent.
+            AddFab(actions = fabActions, contentDescription = fabCd, alignment = Alignment.BottomCenter)
         }
     } else {
         Box(modifier = Modifier.fillMaxSize().background(Background)) {

@@ -99,9 +99,21 @@ fun MainScreen(onLogout: () -> Unit = {}) {
     }
 
     if (wide) {
+        // Edge-to-edge is on, so the background fills behind the status bar and the camera
+        // cutout, but the rail and content must stay inside the safe area. In landscape the
+        // cutout sits on a side edge (over the rail), so we inset for systemBars + cutout: the
+        // rail clears the start + top/bottom, and the content clears the rest. With no rail
+        // (full-screen detail) the content clears every side itself.
+        val safeInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout)
+        val contentSides =
+            if (inDetail) WindowInsetsSides.Horizontal + WindowInsetsSides.Vertical
+            else WindowInsetsSides.End + WindowInsetsSides.Vertical
         Row(modifier = Modifier.fillMaxSize().background(Background)) {
             if (!inDetail) {
-                NavigationRail(containerColor = Surface) {
+                NavigationRail(
+                    containerColor = Surface,
+                    windowInsets = safeInsets.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical)
+                ) {
                     Tab.entries.forEach { tab ->
                         NavigationRailItem(
                             selected = selected == tab,
@@ -119,7 +131,12 @@ fun MainScreen(onLogout: () -> Unit = {}) {
                     }
                 }
             }
-            Box(modifier = Modifier.weight(Weight.Fill).fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .weight(Weight.Fill)
+                    .fillMaxSize()
+                    .windowInsetsPadding(safeInsets.only(contentSides))
+            ) {
                 content()
                 SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
             }
