@@ -94,7 +94,8 @@ fun RoutinesScreen(
                 homes = homes,
                 selectedHome = selectedHome,
                 onHomeSelect = { homesVm.selectHome(it) },
-                onAddHome = { showCreateHome = true }
+                onAddHome = { showCreateHome = true },
+                onRenameHome = { home, newName -> homesVm.renameHome(home.id, newName) }
             )
             HcSearchBar(
                 value = search,
