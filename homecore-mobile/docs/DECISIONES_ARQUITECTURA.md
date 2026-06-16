@@ -5,22 +5,23 @@
 > **justificación** y, cuando corresponde, la referencia al contenido de la
 > materia (clases 20–22) o al feedback de la segunda entrega.
 
-**Última actualización:** 2026-06-11
-**Stack:** Kotlin · Jetpack Compose · Material 3 · MVVM · Coroutines/StateFlow
+**Última actualización:** 2026-06-15
+**Stack:** Kotlin · Jetpack Compose · Material 3 · MVVM · Coroutines/StateFlow · Retrofit/OkHttp · Socket.IO
 
 ---
 
-## 1. Objetivo de esta etapa
+## 1. Objetivo y estado
 
-Construir toda la estructura base de la app (pantallas, navegación, estados,
-componentes reutilizables) **sin depender del backend**, usando datos de
-prototipo, de modo que más adelante se pueda reconectar la API real **sin tocar
-la UI ni los ViewModels**.
+La UI y los ViewModels se construyeron **desacoplados del origen de datos**
+(dependen de **interfaces** de repositorio), de modo que el backend real se
+integró **sin tocar la UI ni los ViewModels**. Hoy la app corre **siempre contra
+la API HCI real** (`https://hci.it.itba.edu.ar/api/`); la capa de prototipo/mock
+que se usó al inicio fue eliminada.
 
-Esta decisión surgió de una necesidad concreta: durante la integración real
-aparecían errores de `Invalid token` que bloqueaban el desarrollo de la
-interfaz. Desacoplar la UI de la red permite avanzar con el diseño en paralelo a
-la resolución de problemas de backend.
+El desacople surgió de una necesidad concreta: durante la integración aparecían
+errores de `Invalid token` que bloqueaban el desarrollo de la interfaz. Separar
+la UI de la red permitió avanzar con el diseño en paralelo y volvió trivial el
+swap al backend real.
 
 ---
 
@@ -32,12 +33,10 @@ como exige el proyecto y como se vio en la materia (clase 22):
 ```
 ┌─────────────┐     ┌──────────────┐     ┌──────────────────────┐
 │  UI         │ ──▶ │  ViewModel   │ ──▶ │ Repository (interfaz)│
-│  (Compose)  │ ◀── │  (StateFlow) │ ◀── │                      │
-└─────────────┘     └──────────────┘     └──────────┬───────────┘
-   observa            expone estado         ┌────────┴────────┐
-   estado             llama al repo         │                 │
-                                       Mock*Repository   Remote*Repository
-                                       (datos locales)   (Retrofit / API HCI)
+│  (Compose)  │ ◀── │  (StateFlow) │ ◀── │          │           │
+└─────────────┘     └──────────────┘     └──────────┴───────────┘
+   observa            expone estado              Remote*Repository
+   estado             llama al repo            (Retrofit / API HCI)
 ```
 
 **Reglas que se respetan:**
@@ -46,7 +45,7 @@ como exige el proyecto y como se vio en la materia (clase 22):
   contiene lógica de negocio.
 - El ViewModel **no conoce Retrofit**: depende de una **interfaz** de
   repositorio, no de una implementación.
-- El repositorio encapsula el origen de datos (mock o red).
+- El repositorio encapsula el origen de datos (la API HCI vía Retrofit).
 
 **Por qué:** es la arquitectura que pide el enunciado, facilita el testing y
 evita el acoplamiento temprano. En la clase 20 se remarcó que las funciones de
@@ -55,59 +54,38 @@ de red; este diseño lo garantiza estructuralmente.
 
 ---
 
-## 3. Estrategia mock-first con interfaces intercambiables
-
-> **Actualización (2026-06-13): la capa mock fue eliminada.** Una vez validada la
-> integración con el backend real, se borraron `data/mock/MockData.kt` y las
-> implementaciones `Mock*Repository`, y `AppModule` quedó proveyendo directamente
-> las implementaciones `Remote*` (sin flag `USE_MOCK`). Las interfaces de
-> repositorio se mantienen (la UI y los ViewModels siguen dependiendo de la
-> abstracción). El resto de esta sección queda como registro histórico de por qué
-> se usó mock-first durante el desarrollo.
+## 3. Inyección de dependencias: interfaces + service locator
 
 ### Decisión
 
-Cada repositorio se definió como **interfaz** con **dos implementaciones**:
-
-| Interfaz             | Mock (prototipo)          | Real (backend)              |
-|----------------------|---------------------------|-----------------------------|
-| `DevicesRepository`  | `MockDevicesRepository`   | `RemoteDevicesRepository`   |
-| `RoutinesRepository` | `MockRoutinesRepository`  | `RemoteRoutinesRepository`  |
-| `AuthRepository`     | `MockAuthRepository`      | `RemoteAuthRepository`      |
-
-La selección se hace en **un único punto**, `di/AppModule.kt`:
+Cada repositorio es una **interfaz** implementada por una clase `Remote*`
+(Retrofit contra la API HCI). El cableado se hace en **un único punto**,
+`di/AppModule.kt`, un `object` service-locator con instancias `lazy`:
 
 ```kotlin
 object AppModule {
-    const val USE_MOCK = true   // ⬅️ cambiar a false para usar el backend real
-
-    val devicesRepository: DevicesRepository by lazy {
-        if (USE_MOCK) MockDevicesRepository() else RemoteDevicesRepository()
-    }
-    // ...
+    val devicesRepository: DevicesRepository by lazy { RemoteDevicesRepository() }
+    val routinesRepository: RoutinesRepository by lazy { RemoteRoutinesRepository() }
+    val homesRepository: HomesRepository by lazy { RemoteHomesRepository() }
+    fun authRepository(context: Context): AuthRepository = RemoteAuthRepository(context.applicationContext)
 }
 ```
 
+> **Histórico:** al inicio cada interfaz tenía además una implementación
+> `Mock*Repository` (datos en memoria que reproducían los mockups) seleccionada
+> con un flag `USE_MOCK`. Una vez validada la integración real, la capa mock y el
+> flag se eliminaron; quedaron solo las `Remote*`. Las **interfaces se mantienen**:
+> la UI y los ViewModels siguen dependiendo de la abstracción, no de Retrofit.
+
 ### Por qué
 
-- **Swap trivial:** reconectar el backend es cambiar `USE_MOCK = false`. Ni la
-  UI ni los ViewModels se modifican, porque dependen de la abstracción
-  (principio de inversión de dependencias).
+- **Inversión de dependencias:** la UI/VM dependen de la interfaz, no de la
+  implementación. Esto permitió el swap mock → real sin tocarlas, y habilita
+  inyectar fakes en tests.
 - **Service Locator en vez de un framework de DI (Hilt/Koin):** para un proyecto
-  académico, agregar Hilt sumaría plugins, procesadores de anotaciones y
-  complejidad de build. Un `object` con un flag cumple el mismo objetivo
-  (un solo lugar de decisión) sin costo de infraestructura.
-- **Las implementaciones `Remote*` ya están listas:** son la lógica Retrofit que
-  ya existía, solo movida detrás de la interfaz. No se descartó trabajo.
-
-### Datos mock
-
-`data/mock/MockData.kt` mantiene **listas mutables en memoria** que reproducen
-los mockups (rutinas "Buenos días" / "Buenas noches" / "Riego automático";
-dispositivos favoritos "Lámpara principal" / "Puerta principal"). Son mutables
-para que las acciones (encender, marcar favorito, ejecutar) **se reflejen en
-vivo** durante la sesión. Cada operación incluye un `delay()` corto para simular
-latencia y poder validar los **estados de carga** de la UI.
+  académico, Hilt sumaría plugins, procesadores de anotaciones y complejidad de
+  build. Un `object` con instancias `lazy` cumple el mismo objetivo (un único
+  lugar de cableado) sin esa infraestructura.
 
 ---
 
@@ -211,9 +189,6 @@ de auth y el de OkHttp.
 - El mensaje es **específico**, atendiendo el feedback de la segunda entrega que
   criticaba mensajes genéricos como "Ocurrió un error inesperado".
 
-> Nota: en la etapa mock (`USE_MOCK = true`) esta capa no se ejercita porque no
-> hay red, pero queda lista para cuando se reconecte el backend.
-
 ---
 
 ## 7. Decisiones del modelo de datos
@@ -243,30 +218,43 @@ de auth y el de OkHttp.
 
 ---
 
-## 8. Pantallas migradas (el feed)
+## 8. Pantallas y navegación
 
-Se construyeron las tres pantallas del feed siguiendo los mockups:
+**Navegación:** manual. `MainActivity` maneja el flujo de auth (enum `AppScreen`:
+login / register / verify / recover) y, una vez logueado, monta `MainScreen` con
+una **bottom navigation de 5 tabs**. En pantallas anchas (tablet / teléfono
+horizontal) el bottom bar se reemplaza por un `NavigationRail` y las grillas pasan
+a 3 columnas (ver sección 16, RNF4/RNF5). `navigation/` (Navigation Compose) quedó
+sin uso y vacío.
 
-| Pantalla        | Contenido                                                        |
-|-----------------|-----------------------------------------------------------------|
-| `DashboardScreen` | Rutinas favoritas + dispositivos favoritos (grilla de 2 columnas) |
-| `RoutinesScreen`  | Búsqueda, alta de rutina, cards con switch / estrella / "Ejecutar ahora" |
-| `ProfileScreen`   | Perfil, consumo, historial y cerrar sesión                      |
+| Tab (label)        | Pantalla            | Contenido                                                            |
+|--------------------|---------------------|----------------------------------------------------------------------|
+| Inicio             | `DashboardScreen`   | Rutinas favoritas + dispositivos favoritos                           |
+| Habitaciones       | `DevicesScreen`     | Dispositivos **agrupados por habitación** + alta de dispositivo/habitación (FAB) |
+| Rutinas            | `RoutinesScreen` / `RoutineEditorScreen` | Búsqueda, lista, crear/editar/ejecutar rutinas (con acciones parametrizadas) |
+| Actividad          | `ActivityScreen`    | Consumo eléctrico estimado + historial real de acciones              |
+| Usuario            | `ProfileScreen`     | Perfil, idioma, tema, cambiar contraseña, cerrar sesión              |
 
-**Componentes reutilizables** (`ui/components/CommonComponents.kt`):
+- El tab "Dispositivos" se renombró a **"Habitaciones"** (ícono `MeetingRoom`):
+  la vista muestra los dispositivos separados por habitación y aloja el botón para
+  crear habitaciones, así que el nombre es más representativo y hace ese botón más
+  fácil de encontrar.
+- **Hogares no es un tab**: se gestionan desde el **dropdown del `HouseHeader`**
+  (seleccionar hogar + "Nueva propiedad"). La app siempre opera dentro de un hogar
+  (se auto-selecciona el primero al entrar).
+- **Configuración inline**: idioma/tema/contraseña viven directo en Usuario (se
+  quitó la rueda de configuración que abría un sheet).
 
-- `HouseHeader` — encabezado con el nombre del hogar y **slot opcional** para la
-  campana de notificaciones.
-- `PanelCard` — tarjeta con título, acción "Ver todas" y un **slot de contenido**
-  (`content: @Composable ColumnScope.() -> Unit`).
+**Componentes reutilizables** (`ui/components/`, un archivo por componente):
+`HouseHeader` (con **slot opcional** de campana de notificaciones), `PanelCard`
+(título + acción + **slot de contenido**), `UniformGrid` (grilla donde todas las
+cards comparten la altura de la más alta, vía `SubcomposeLayout`), `AddFab`,
+`HcButtons`, `HcInputs`, `StatusComponents`, `SheetHeader`.
 
-**Por qué slots:** la clase 20 presentó la **API de slots** de Compose como el
-patrón para maximizar reutilización dejando "espacios vacíos" que el llamador
-rellena. `HouseHeader` y `PanelCard` lo aplican: el mismo encabezado sirve para
-Inicio (con campana) y para Usuario/Rutinas (sin campana) sin duplicar código.
-
-La estructura visual usa `Column` / `Row` / `Box` anidados y `Scaffold` con sus
-slots (`topBar`, `bottomBar`), tal como se vio en la misma clase.
+**Por qué slots:** la clase 20 presentó la **API de slots** de Compose para
+maximizar reutilización. `HouseHeader`/`PanelCard` lo aplican: el mismo encabezado
+sirve con y sin campana sin duplicar código. La estructura usa `Column`/`Row`/`Box`
+y `Scaffold` (`bottomBar`), como se vio en esa clase.
 
 ---
 
@@ -304,8 +292,9 @@ ajustó:
 > `kotlin-android` explícito ni se usa `kotlinOptions {}` (la extensión se
 > registra sola). Verificar siempre la versión de AGP antes de tocar plugins.
 
-No se modificó la lista de dependencias: Retrofit / OkHttp / Gson se mantienen
-porque se necesitan para las implementaciones `Remote*` al reconectar el backend.
+Dependencias de red: Retrofit / OkHttp / Gson para las implementaciones `Remote*`
+contra la API HCI, y `socket.io-client` para el tiempo real (sección 16; se
+excluye su `org.json` para usar el de la plataforma).
 
 ---
 
@@ -327,15 +316,113 @@ de diseño (acento `#818cf8`, fondo `#0f0f14`, etc.). **No se usa dynamic color.
 
 ---
 
-## 12. Internacionalización
+## 12. Internacionalización (RNF1)
 
-Todos los textos visibles se definen en `res/values/strings.xml` (`R.string.*`),
-no como literales en el código. Esto cumple el RNF1 (español/inglés) y deja
-preparada la app para agregar `values-en/strings.xml`.
+Todos los textos visibles salen de recursos (`R.string.*`), no de literales en el
+código. Hay **paridad completa** entre `res/values/strings.xml` (español, default)
+y `res/values-en/strings.xml` (inglés) — ~248 claves cada uno. El idioma puede
+**cambiarse desde Usuario** (se aplica con `AppCompatDelegate.setApplicationLocales`
+y se persiste); `MainActivity` extiende `AppCompatActivity` para que el locale por
+app funcione con Compose.
+
+**Excepción documentada:** la capa de datos (repositorios, `SocketManager`,
+`RoutineScheduler`) emite mensajes al usuario como **literales en español**
+(snackbars/notificaciones/excepciones). Es el único lugar con texto en español
+embebido, por no tener `Context`/`stringResource`. Los **identificadores y
+comentarios son siempre en inglés**.
 
 ---
 
-## 13. Mapa de decisiones ↔ contenidos de la materia
+## 13. Unificación de strings de la API
+
+Los strings que viajan a la API se centralizaron en **una única fuente** cada uno,
+para que no haya literales sueltos que deriven del backend:
+
+- **`DeviceAction` (enum, `data/model`)**: los 34 nombres de acción canónicos
+  (`turnOn`, `setMode`, `setBrightness`, …) tal como los espera la API en
+  `PATCH /devices/{id}/{action}`. Todo control y todo paso de rutina referencia
+  `DeviceAction.X.api`, nunca un literal.
+- **`DeviceValues` (`data/model`)**: valores de estado/parámetro (`DeviceStatus`,
+  `AcMode`, `SpeakerGenre`, `OvenHeat`, …). Verificados **en vivo** contra la API.
+  Hallazgo importante: la API es **inconsistente** — los modos son inglés
+  (`cool`/`heat`/`fan`, `party`/`vacation`) pero el género es español-ish
+  (`clasica`, `latina`); el status de alarma es camelCase (`armedAway`). Por eso
+  no se puede inferir por idioma; se confirmó tocando los endpoints.
+- **`DeviceCategory` (enum)**: los 11 tipos (`typeName` + `patterns` de alias para
+  tolerar nombres en inglés/español que devuelve la API).
+
+**Por qué:** si uno de estos strings está mal, se rompe el control del dispositivo
+contra el backend. Centralizarlos hace que un cambio de la API se ajuste en **un
+solo lugar** y elimina el riesgo de drift entre pantallas.
+
+---
+
+## 14. Controles por tipo y rutinas con acciones parametrizadas
+
+- **Controles por dispositivo** (`ui/screens/devices/controls/`): un composable
+  por tipo (`LightControls`, `AcControls`, …) que comparten **primitives**
+  (`ControlSlider`, `SegmentedSelector`/`LabeledSelector`, `ColorSwatchRow`,
+  `ControlTextField`). Cada tipo arma su layout pero el estilo es único.
+- **Rutinas con parámetros** (`RoutineActionCatalog`): define, por tipo, la
+  **totalidad** de acciones con sus parámetros (`Num`, `Choice`, `Code`,
+  `ColorPick`, `Rooms`). El picker de rutinas es de 3 etapas (dispositivo →
+  acción → parámetros) y **reusa los mismos primitives** para recolectar el valor.
+  Así una rutina puede hacer todo lo que el detalle del dispositivo (no solo
+  on/off): temperatura, modo, brillo, color, ubicación de la aspiradora, etc.
+- **Consumo eléctrico (RF22):** `ActivityScreen` suma el `DeviceType.powerUsage`
+  (del catálogo `/devicetypes`) de los dispositivos encendidos, igual que la web.
+
+---
+
+## 15. Adaptabilidad a dispositivo y orientación (RNF4 / RNF5)
+
+`MainScreen` usa un breakpoint (`WIDE_BREAKPOINT_DP = 600`): en teléfonos en
+vertical hay **bottom navigation** y grillas de **2 columnas**; en tablet o
+teléfono horizontal la navegación pasa a un **`NavigationRail`** lateral y las
+grillas a **3 columnas**. No es solo redimensionar: cambia la estructura de
+navegación y la densidad de la información. El estado de UI que debe sobrevivir la
+rotación usa `rememberSaveable`.
+
+---
+
+## 16. Tiempo real (WebSocket) y notificaciones (RF20)
+
+- **WebSocket (`data/api/SocketManager.kt`, Socket.IO):** conecta al loguear con
+  `{ token, apiKey }` en el handshake (transporte polling) y escucha
+  `deviceEvent` / `deviceCreated` / `deviceDeleted` / `deviceUpdated` y
+  `homeShared` / `homeUnshared`. Ante un evento **refresca el estado en vivo**
+  (`DeviceSyncEvents` → `DevicesViewModel`) y **notifica los cambios externos**.
+  Como el server reenvía al propio emisor, se **suprime el eco propio** (por
+  `deviceId`, marcado en `runAction`/create/delete) y se **dedupea** por device.
+  El payload solo trae `deviceId`, así que el nombre se resuelve con
+  `DeviceRegistry` (mapa id→nombre que mantiene `DevicesViewModel`).
+- **Notificaciones (`NotificationEvents` → `AppNotifier`):** canal + permiso
+  `POST_NOTIFICATIONS` (API 33+). Disparan: rutina programada ejecutada
+  ("Se ejecutó la rutina X en Casa Y", vía `RoutineScheduler`), cambios externos
+  de dispositivos y hogar compartido/descompartido. La ejecución **manual** no
+  notifica (solo snackbar).
+- **Limitación documentada:** `RoutineScheduler` (scheduling client-side, RF23) y
+  el socket corren **mientras la app está viva**; notificaciones con la app
+  cerrada requerirían `WorkManager`/foreground service (fuera del alcance).
+
+---
+
+## 17. Modularización y comentarios
+
+- Los archivos grandes se dividieron **por componente**: `CommonComponents` →
+  `HouseHeader`/`AddFab`/`UniformGrid`/`HcInputs`/`HcButtons`/`StatusComponents`/
+  `SheetHeader`; `DeviceUi` → `DeviceCard`/`DeviceCardFooter`/`DeviceIcons`/
+  `DeviceTypeOption`; `ProfileScreen` → `+ Settings…`/`ChangePasswordSheet`;
+  `DeviceSheets` → `AddDeviceSheet`/`AddRoomSheet`/`SheetTextField`. Mismo paquete
+  y mismas firmas: cero cambios en los call sites.
+- **Comentarios:** solo cuando agregan algo más que el código (el *por qué*, no el
+  *qué*); se eliminaron los que repetían la línea siguiente y los que **acoplaban
+  a la web** ("mirroring the web", `client.js`, etc.) — la alineación con la API
+  se documenta acá, no en comentarios dispersos.
+
+---
+
+## 18. Mapa de decisiones ↔ contenidos de la materia
 
 | Decisión                                  | Clase / concepto                                  |
 |-------------------------------------------|---------------------------------------------------|
@@ -348,15 +435,33 @@ preparada la app para agregar `values-en/strings.xml`.
 | MVVM por capas, repos detrás de interfaz  | Clase 22 — arquitectura y separación de capas     |
 | `sealed UiState` (Loading/Success/Error)  | Clase 22 — estados sin combinaciones inválidas    |
 | `StateFlow` + `viewModelScope`            | Clase 22 — estado y corrutinas en el ViewModel    |
+| `DeviceAction`/`DeviceValues` (un valor canónico por string) | Clase 21 — alineación del modelo con la API |
+| Primitives de control + componentes por archivo | Clase 20 — reutilización y composición            |
+| `SharedFlow` para 401 / notificaciones / refresh del socket | Clase 22 — flujos de eventos desacoplados |
 
 ---
 
-## 14. Pendientes conocidos (TODO)
+## 19. Pendientes conocidos y mejoras futuras
 
-- `RemoteDevicesRepository.setDeviceFavorite` es optimista: la API HCI no expone
-  un endpoint claro de favorito de dispositivo; al reconectar habrá que definir
-  la llamada real (probablemente `PUT /devices/{id}` con metadata).
-- Navegación desde "Ver todas" del feed hacia las pantallas completas.
-- Alta de rutina y de dispositivo (botones "+ Nueva …" hoy son placeholders).
-- Historial real desde el endpoint de logs (hoy se deriva de los dispositivos en
-  modo prototipo).
+- **Tests automatizados (principal deuda).** Hoy solo está el template generado por
+  Android Studio (`ExampleUnitTest` / `ExampleInstrumentedTest`). La arquitectura
+  está lista para testear (VMs con inyección de interfaces por constructor);
+  faltan tests de los ViewModels (filtros de hogar/rutina, `isOn`, `toggleDevice`),
+  de las extensiones de dominio (`category()`, `DeviceAction.fromApi`) y del
+  `unwrapResult`/`apiCall`.
+- **Ejecución en background.** `RoutineScheduler` (scheduling, RF23) y el WebSocket
+  corren solo con la app viva; scheduling/notificaciones con la app cerrada
+  requerirían `WorkManager`/foreground service.
+- **Alarma `changeSecurityCode` en rutinas.** Queda fuera del picker de rutinas
+  (necesita código viejo + nuevo); el resto de acciones de alarma sí están.
+- **Rutinas cross-home (mejora futura).** Hoy cada rutina se liga a un hogar (su
+  "base", vía `metadata.homeId`) y solo aparece en el Inicio/lista de ese hogar;
+  sus acciones igual pueden afectar dispositivos de cualquier hogar (el picker
+  muestra todos), así que la flexibilidad de efecto ya existe. La mejora sería
+  permitir marcar una rutina como `crossHome` (no atada a ningún hogar) para que
+  se muestre y ejecute en TODOS los hogares. La infraestructura ya está lista:
+  `RoutineMetadata.crossHome`, el `fullBody` lo serializa, el filtro de
+  `RoutinesViewModel` ya respeta `crossHome == true || homeId == hogarActual`, y
+  `RoutineEditorState` lo preserva al editar. Falta solo: un toggle "Afecta a
+  todos los hogares" en el editor (setea `crossHome=true`, `homeId=null`) y
+  mostrarlas en el Inicio aunque no sean favoritas. La web ya lo soporta.
