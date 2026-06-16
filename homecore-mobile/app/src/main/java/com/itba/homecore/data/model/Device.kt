@@ -1,7 +1,9 @@
 package com.itba.homecore.data.model
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Device(
     @SerializedName("id")       val id: String = "",
     @SerializedName("name")     val name: String = "",
@@ -11,6 +13,7 @@ data class Device(
     @SerializedName("metadata") val metadata: DeviceMeta? = null
 )
 
+@Serializable
 data class DeviceType(
     @SerializedName("id")         val id: String = "",
     @SerializedName("name")       val name: String = "",
@@ -18,10 +21,12 @@ data class DeviceType(
     @SerializedName("powerUsage") val powerUsage: Double? = null
 )
 
+@Serializable
 data class DeviceMeta(
     @SerializedName("favorite") val favorite: Boolean? = null
 )
 
+@Serializable
 data class RoomRef(
     @SerializedName("id")   val id: String = "",
     @SerializedName("name") val name: String? = null
@@ -31,6 +36,7 @@ data class RoomRef(
  * State carries different fields depending on the device type — all nullable.
  * Examples: "on"/"off", "opened"/"closed", "locked"/"unlocked", etc.
  */
+@Serializable
 data class DeviceState(
     @SerializedName("status")             val status: String? = null,
     @SerializedName("brightness")         val brightness: Int? = null,
