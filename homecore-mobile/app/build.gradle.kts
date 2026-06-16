@@ -76,6 +76,10 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.datastore.preferences)
+    // org.json is provided by the Android platform; exclude the bundled copy to avoid a clash.
+    implementation(libs.socket.io.client) {
+        exclude(group = "org.json", module = "json")
+    }
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -51,10 +51,9 @@ class RoutinesViewModel(
             repository.getRoutines()
                 .onSuccess { all ->
                     val homeId = currentHomeId
-                    // Mirror the web (RoutinesView.vue): within a selected home, show only
-                    // routines explicitly marked crossHome or assigned to that home. Routines
-                    // with no homeId are not shared everywhere; they only show in the unfiltered
-                    // view (no home selected).
+                    // Within a selected home, show only routines explicitly marked crossHome or
+                    // assigned to that home. Routines with no homeId are not shared everywhere;
+                    // they only show in the unfiltered view (no home selected).
                     val routines = if (homeId == null) all
                         else all.filter { r -> r.metadata?.crossHome == true || r.metadata?.homeId == homeId }
                     _state.value = RoutinesUiState.Success(routines)
@@ -68,8 +67,9 @@ class RoutinesViewModel(
             _executingId.value = routine.id
             repository.executeRoutine(routine.id)
                 .onSuccess {
+                    // Manual execution shows only an in-app snackbar (no system notification);
+                    // the scheduler is the one that posts notifications for scheduled runs.
                     UiMessages.emit("Rutina ejecutada")
-                    NotificationEvents.emit("HomeCore", "Rutina ejecutada: ${routine.name}")
                     // Tell DevicesViewModel to refetch: the execute endpoint does not
                     // return new device state, so without this the UI stays stale even
                     // when the backend did fire the actions.

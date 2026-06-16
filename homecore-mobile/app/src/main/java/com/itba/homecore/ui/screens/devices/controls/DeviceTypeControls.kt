@@ -24,8 +24,7 @@ import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.theme.*
 
 /**
- * Bespoke controls per device type, one composable each — mirroring the web's
- * dedicated control components (LightControls, AcControls, ...). They all share the
+ * Bespoke controls per device type, one composable each. They all share the
  * primitives in DeviceControlPrimitives.kt and take the same contract:
  * the current [device] and an [onAction] that sends (apiAction, params) to the API.
  * The action name always comes from [DeviceAction] so it stays aligned with the backend.
@@ -214,16 +213,14 @@ fun AcControls(device: Device, onAction: OnAction) {
             initial = device.state?.temperature ?: 24,
             min = 18, max = 38, unit = "°C"
         ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
-        val acModes = mapOf(
-            AcMode.COOL to stringResource(R.string.ac_mode_cool),
-            AcMode.HEAT to stringResource(R.string.ac_mode_heat),
-            AcMode.FAN to stringResource(R.string.ac_mode_fan)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_mode),
-            options = AcMode.all,
-            selected = device.state?.mode,
-            labelFor = { acModes[it] ?: it }
+            options = listOf(
+                AcMode.COOL to R.string.ac_mode_cool,
+                AcMode.HEAT to R.string.ac_mode_heat,
+                AcMode.FAN to R.string.ac_mode_fan
+            ),
+            selected = device.state?.mode
         ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
         SegmentedSelector(
             label = stringResource(R.string.act_fan_speed),
@@ -252,19 +249,17 @@ fun SpeakerControls(device: Device, onAction: OnAction) {
             initial = device.state?.volume ?: 5,
             min = 0, max = 10
         ) { onAction(DeviceAction.SET_VOLUME.api, listOf(it)) }
-        val genres = mapOf(
-            SpeakerGenre.CLASSICAL to stringResource(R.string.genre_classical),
-            SpeakerGenre.COUNTRY to stringResource(R.string.genre_country),
-            SpeakerGenre.DANCE to stringResource(R.string.genre_dance),
-            SpeakerGenre.LATINA to stringResource(R.string.genre_latina),
-            SpeakerGenre.POP to stringResource(R.string.genre_pop),
-            SpeakerGenre.ROCK to stringResource(R.string.genre_rock)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_genre),
-            options = SpeakerGenre.all,
-            selected = device.state?.genre,
-            labelFor = { genres[it] ?: it }
+            options = listOf(
+                SpeakerGenre.CLASSICAL to R.string.genre_classical,
+                SpeakerGenre.COUNTRY to R.string.genre_country,
+                SpeakerGenre.DANCE to R.string.genre_dance,
+                SpeakerGenre.LATINA to R.string.genre_latina,
+                SpeakerGenre.POP to R.string.genre_pop,
+                SpeakerGenre.ROCK to R.string.genre_rock
+            ),
+            selected = device.state?.genre
         ) { onAction(DeviceAction.SET_GENRE.api, listOf(it)) }
     }
 }
@@ -278,15 +273,13 @@ fun VacuumControls(device: Device, rooms: List<Room>, onAction: OnAction) {
             stringResource(R.string.act_pause) to { onAction(DeviceAction.PAUSE.api, emptyList()) },
             stringResource(R.string.act_dock) to { onAction(DeviceAction.DOCK.api, emptyList()) }
         )
-        val vacuumModes = mapOf(
-            VacuumMode.VACUUM to stringResource(R.string.vacuum_mode_vacuum),
-            VacuumMode.MOP to stringResource(R.string.vacuum_mode_mop)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_mode),
-            options = VacuumMode.all,
-            selected = device.state?.mode,
-            labelFor = { vacuumModes[it] ?: it }
+            options = listOf(
+                VacuumMode.VACUUM to R.string.vacuum_mode_vacuum,
+                VacuumMode.MOP to R.string.vacuum_mode_mop
+            ),
+            selected = device.state?.mode
         ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
         // setLocation takes a room id, so pick from the user's rooms (not free text).
         if (rooms.isEmpty()) {
@@ -320,16 +313,14 @@ fun FridgeControls(device: Device, onAction: OnAction) {
             initial = device.state?.freezerTemperature ?: -16,
             min = -20, max = -8, unit = "°C"
         ) { onAction(DeviceAction.SET_FREEZER_TEMPERATURE.api, listOf(it)) }
-        val fridgeModes = mapOf(
-            FridgeMode.DEFAULT to stringResource(R.string.fridge_mode_default),
-            FridgeMode.VACATION to stringResource(R.string.fridge_mode_vacation),
-            FridgeMode.PARTY to stringResource(R.string.fridge_mode_party)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_mode),
-            options = FridgeMode.all,
-            selected = device.state?.mode,
-            labelFor = { fridgeModes[it] ?: it }
+            options = listOf(
+                FridgeMode.DEFAULT to R.string.fridge_mode_default,
+                FridgeMode.VACATION to R.string.fridge_mode_vacation,
+                FridgeMode.PARTY to R.string.fridge_mode_party
+            ),
+            selected = device.state?.mode
         ) { onAction(DeviceAction.SET_MODE.api, listOf(it)) }
     }
 }
@@ -347,38 +338,32 @@ fun OvenControls(device: Device, onAction: OnAction) {
             initial = device.state?.temperature ?: 90,
             min = 90, max = 230, step = 10, unit = "°C"
         ) { onAction(DeviceAction.SET_TEMPERATURE.api, listOf(it)) }
-        val heatSources = mapOf(
-            OvenHeat.CONVENTIONAL to stringResource(R.string.oven_heat_conventional),
-            OvenHeat.BOTTOM to stringResource(R.string.oven_heat_bottom),
-            OvenHeat.TOP to stringResource(R.string.oven_heat_top)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_heat_source),
-            options = OvenHeat.all,
-            selected = device.state?.heat,
-            labelFor = { heatSources[it] ?: it }
+            options = listOf(
+                OvenHeat.CONVENTIONAL to R.string.oven_heat_conventional,
+                OvenHeat.BOTTOM to R.string.oven_heat_bottom,
+                OvenHeat.TOP to R.string.oven_heat_top
+            ),
+            selected = device.state?.heat
         ) { onAction(DeviceAction.SET_HEAT.api, listOf(it)) }
-        val grillModes = mapOf(
-            OvenGrill.LARGE to stringResource(R.string.oven_grill_large),
-            OvenGrill.ECO to stringResource(R.string.oven_grill_eco),
-            OvenGrill.OFF to stringResource(R.string.oven_grill_off)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_grill),
-            options = OvenGrill.all,
-            selected = device.state?.grill,
-            labelFor = { grillModes[it] ?: it }
+            options = listOf(
+                OvenGrill.LARGE to R.string.oven_grill_large,
+                OvenGrill.ECO to R.string.oven_grill_eco,
+                OvenGrill.OFF to R.string.oven_grill_off
+            ),
+            selected = device.state?.grill
         ) { onAction(DeviceAction.SET_GRILL.api, listOf(it)) }
-        val convectionModes = mapOf(
-            OvenConvection.NORMAL to stringResource(R.string.oven_conv_normal),
-            OvenConvection.ECO to stringResource(R.string.oven_conv_eco),
-            OvenConvection.OFF to stringResource(R.string.oven_conv_off)
-        )
-        SegmentedSelector(
+        LabeledSelector(
             label = stringResource(R.string.act_convection),
-            options = OvenConvection.all,
-            selected = device.state?.convection,
-            labelFor = { convectionModes[it] ?: it }
+            options = listOf(
+                OvenConvection.NORMAL to R.string.oven_conv_normal,
+                OvenConvection.ECO to R.string.oven_conv_eco,
+                OvenConvection.OFF to R.string.oven_conv_off
+            ),
+            selected = device.state?.convection
         ) { onAction(DeviceAction.SET_CONVECTION.api, listOf(it)) }
     }
 }

@@ -3,6 +3,7 @@ package com.itba.homecore.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.Routine
 import com.itba.homecore.data.model.RoutineAction
 import com.itba.homecore.data.model.RoutineMetadata
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 /**
  * Editable state for a single routine, used both to create a new one and to edit an
  * existing one (detail screen). Holds the working copy of every field plus the device
- * list needed by the action picker, mirroring the web new/edit/detail views.
+ * list needed by the action picker.
  */
 data class RoutineEditorState(
     val loading: Boolean = true,
@@ -31,7 +32,13 @@ data class RoutineEditorState(
     val active: Boolean = true,
     val favorite: Boolean = false,
     val actions: List<RoutineAction> = emptyList(),
-    val devices: List<Device> = emptyList()
+    val devices: List<Device> = emptyList(),
+    // Rooms of the active home, offered as the target for the vacuum's setLocation action.
+    val rooms: List<Room> = emptyList(),
+    // Home the routine belongs to: set from the active home on create, preserved on edit so the
+    // routine keeps showing under its home. crossHome is preserved untouched on edit.
+    val homeId: String? = null,
+    val crossHome: Boolean? = null
 )
 
 class RoutineEditorViewModel(
@@ -46,18 +53,23 @@ class RoutineEditorViewModel(
 
     private var routineId: String? = null
 
-    /** [id] null starts a blank routine (create); otherwise loads it for editing. */
-    fun start(id: String?) {
+    /**
+     * [id] null starts a blank routine (create), assigned to [currentHomeId] so it shows under
+     * the active home; otherwise loads the routine for editing (preserving its home).
+     */
+    fun start(id: String?, currentHomeId: String?) {
         routineId = id
         viewModelScope.launch {
             val devices = devicesRepository.getDevices().getOrNull() ?: emptyList()
+            val rooms = devicesRepository.getRooms().getOrNull().orEmpty()
+                .filter { currentHomeId == null || it.home?.id == currentHomeId }
             if (id == null) {
-                _state.value = RoutineEditorState(loading = false, isNew = true, devices = devices)
+                _state.value = RoutineEditorState(loading = false, isNew = true, devices = devices, rooms = rooms, homeId = currentHomeId)
                 return@launch
             }
             val routine = routinesRepository.getRoutine(id).getOrNull()
             if (routine == null) {
-                _state.update { it.copy(loading = false, devices = devices) }
+                _state.update { it.copy(loading = false, devices = devices, rooms = rooms) }
                 return@launch
             }
             _state.value = RoutineEditorState(
@@ -70,7 +82,10 @@ class RoutineEditorViewModel(
                 active = routine.metadata?.active ?: true,
                 favorite = routine.metadata?.favorite ?: false,
                 actions = routine.actions,
-                devices = devices
+                devices = devices,
+                rooms = rooms,
+                homeId = routine.metadata?.homeId,
+                crossHome = routine.metadata?.crossHome
             )
         }
     }
@@ -85,8 +100,8 @@ class RoutineEditorViewModel(
         it.copy(days = if (day in it.days) it.days - day else it.days + day)
     }
 
-    fun addAction(device: Device, actionName: String) = _state.update {
-        it.copy(actions = it.actions + RoutineAction(device = device, actionName = actionName, params = emptyList()))
+    fun addAction(device: Device, actionName: String, params: List<Any>) = _state.update {
+        it.copy(actions = it.actions + RoutineAction(device = device, actionName = actionName, params = params))
     }
 
     fun removeAction(index: Int) = _state.update {
@@ -116,7 +131,9 @@ class RoutineEditorViewModel(
                 active = s.active,
                 time = normalizedTime,
                 days = s.days.sorted(),
-                description = s.description.trim().ifBlank { null }
+                description = s.description.trim().ifBlank { null },
+                homeId = s.homeId,
+                crossHome = s.crossHome
             )
         )
         viewModelScope.launch {

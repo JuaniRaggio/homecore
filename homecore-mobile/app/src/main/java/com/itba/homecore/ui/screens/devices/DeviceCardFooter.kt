@@ -7,28 +7,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AcUnit
-import androidx.compose.material.icons.filled.Blinds
-import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.DevicesOther
 import androidx.compose.material.icons.filled.DoorFront
-import androidx.compose.material.icons.filled.Kitchen
-import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Microwave
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Speaker
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -42,175 +31,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.itba.homecore.R
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceAction
 import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.DeviceCategory
 import com.itba.homecore.data.model.DeviceStatus
-import com.itba.homecore.data.model.category
-import com.itba.homecore.data.model.isFavorite
-import com.itba.homecore.data.model.isOn
 import com.itba.homecore.ui.theme.*
-
-/** Material icon per device category. Single place (avoids duplication). */
-fun deviceIconFor(cat: DeviceCategory): ImageVector = when (cat) {
-    DeviceCategory.LAMP         -> Icons.Default.Lightbulb
-    DeviceCategory.DOOR         -> Icons.Default.DoorFront
-    DeviceCategory.ALARM        -> Icons.Default.Security
-    DeviceCategory.FAUCET       -> Icons.Default.WaterDrop
-    DeviceCategory.BLINDS       -> Icons.Default.Blinds
-    DeviceCategory.AC           -> Icons.Default.AcUnit
-    DeviceCategory.SPEAKER      -> Icons.Default.Speaker
-    DeviceCategory.VACUUM       -> Icons.Default.CleaningServices
-    DeviceCategory.REFRIGERATOR -> Icons.Default.Kitchen
-    DeviceCategory.OVEN         -> Icons.Default.Microwave
-    DeviceCategory.LOCK         -> Icons.Default.Lock
-    else                        -> Icons.Default.DevicesOther
-}
-
-/** Accent color per category (taken from the design tokens). */
-fun deviceColorFor(cat: DeviceCategory): Color = when (cat) {
-    DeviceCategory.LAMP         -> DeviceLight
-    DeviceCategory.DOOR         -> DeviceDoor
-    DeviceCategory.ALARM        -> DeviceAlarm
-    DeviceCategory.FAUCET       -> DeviceWater
-    DeviceCategory.BLINDS       -> DeviceCurtain
-    DeviceCategory.AC           -> DeviceAC
-    DeviceCategory.SPEAKER      -> DeviceSpeaker
-    DeviceCategory.VACUUM       -> DeviceVacuum
-    DeviceCategory.REFRIGERATOR -> DeviceFridge
-    DeviceCategory.OVEN         -> DeviceOven
-    DeviceCategory.LOCK         -> DeviceLock
-    else                        -> DeviceUnknown
-}
-
-/**
- * Shared device card used both in the favorites grid (Inicio) and the devices list.
- * Single source of truth for the card layout, replacing the two copies that had
- * already drifted in colors, switch scale and door-highlight logic.
- */
-@Composable
-fun DeviceCard(
-    device: Device,
-    onToggle: (Boolean) -> Unit,
-    onFavoriteClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    onAction: (action: String, params: List<Any>) -> Unit = { _, _ -> }
-) {
-    val cat        = device.category()
-    val isOn       = device.isOn()
-    val isFavorite = device.isFavorite()
-    val isDoor     = cat == DeviceCategory.DOOR || cat == DeviceCategory.LOCK
-    val isLamp     = cat == DeviceCategory.LAMP
-    val highlight  = isDoor && device.state?.status?.lowercase() in listOf(DeviceStatus.LOCKED, DeviceStatus.CLOSED)
-
-    val borderColor = if (highlight) AccentDark else Accent.copy(alpha = Alpha.hairlineBorder)
-    val iconBg      = if (isLamp) LampIconBg else Color.Transparent
-    val iconTint    = if (isLamp) DeviceLight else TextPrimary
-    val roomLabel   = device.room?.name ?: stringResource(R.string.room_none)
-
-    Box(
-        modifier = modifier
-            .background(Surface, RoundedCornerShape(Radius.xl))
-            .border(BorderStroke(Stroke.hairline, borderColor), RoundedCornerShape(Radius.xl))
-            .clickable(onClick = onClick)
-            .padding(Spacing.base)
-    ) {
-        // Fills the cell (UniformGrid gives every card the same height); a weighted spacer
-        // pushes the status + toggle to the bottom so the toggle sits bottom-right on every
-        // card regardless of how many lines the name takes.
-        Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(IconSize.box)
-                        .background(iconBg, RoundedCornerShape(Radius.sm)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = deviceIconFor(cat),
-                        contentDescription = null,
-                        tint = iconTint,
-                        modifier = Modifier.size(IconSize.md)
-                    )
-                }
-                Icon(
-                    imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
-                    contentDescription = stringResource(R.string.cd_favorite),
-                    tint = if (isFavorite) FavoriteStar else TextSecondary,
-                    modifier = Modifier
-                        .size(IconSize.lg)
-                        .clickable(onClick = onFavoriteClick)
-                )
-            }
-
-            Spacer(Modifier.height(Spacing.md))
-
-            Text(
-                text = device.name,
-                color = TextPrimary,
-                fontSize = TextSize.lg,
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = LineHeight.normal
-            )
-            Spacer(Modifier.height(Spacing.xs))
-            Text(
-                text = roomLabel,
-                color = TextSecondary,
-                fontSize = TextSize.sm,
-                lineHeight = LineHeight.compact
-            )
-            Spacer(Modifier.height(Spacing.xs))
-            val statusColor = if (isOn) SuccessColor else TextSecondary
-            Box(
-                modifier = Modifier
-                    .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(Radius.xl))
-                    .padding(horizontal = Spacing.sm, vertical = 2.dp)
-            ) {
-                Text(
-                    text = deviceStatusText(device, cat, isOn),
-                    color = statusColor,
-                    fontSize = TextSize.sm
-                )
-            }
-
-            Spacer(Modifier.weight(Weight.Fill))
-            DeviceCardFooter(device, cat, isOn, onToggle, onAction)
-        }
-    }
-}
-
-/** Short, state-aware status line shown on the card (mirrors the web statusText). */
-@Composable
-private fun deviceStatusText(device: Device, cat: DeviceCategory, isOn: Boolean): String = when (cat) {
-    DeviceCategory.DOOR, DeviceCategory.BLINDS ->
-        stringResource(if (isOn) R.string.card_status_open else R.string.card_status_closed)
-    DeviceCategory.ALARM ->
-        stringResource(if (isOn) R.string.card_status_armed else R.string.card_status_disarmed)
-    DeviceCategory.SPEAKER -> stringResource(
-        when (device.state?.status?.lowercase()) {
-            "playing" -> R.string.card_status_playing
-            "paused"  -> R.string.card_status_paused
-            else      -> R.string.card_status_stopped
-        }
-    )
-    DeviceCategory.VACUUM -> stringResource(
-        when (device.state?.status?.lowercase()) {
-            "docked" -> R.string.card_status_docked
-            "active" -> R.string.card_status_active
-            else     -> R.string.card_status_off
-        }
-    )
-    else -> stringResource(if (isOn) R.string.card_status_on else R.string.card_status_off)
-}
 
 /**
  * Per-type footer for the device card. Alarm and door show a status badge; speaker shows
@@ -219,7 +46,7 @@ private fun deviceStatusText(device: Device, cat: DeviceCategory, isOn: Boolean)
  * detail screen, so the card only reflects the armed/disarmed state.
  */
 @Composable
-private fun DeviceCardFooter(
+internal fun DeviceCardFooter(
     device: Device,
     cat: DeviceCategory,
     isOn: Boolean,
@@ -264,7 +91,7 @@ private fun DeviceCardFooter(
         }
 
         DeviceCategory.BLINDS -> {
-            // Step the level by CurtainStep (web parity) instead of fully opening/closing.
+            // Step the level by CurtainStep instead of fully opening/closing.
             val level = device.state?.level ?: 0
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -389,29 +216,3 @@ private fun CardIconButton(
         Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(IconSize.md))
     }
 }
-
-/**
- * Selectable option in the device creation flow. The API type key comes from
- * [DeviceCategory.typeName] so it is not duplicated here.
- */
-data class DeviceTypeOption(
-    val category: DeviceCategory,
-    val labelRes: Int
-) {
-    val typeName: String get() = category.typeName
-}
-
-/** The 11 types supported by the HCI API (same keys as homecore-web). */
-val selectableDeviceTypes: List<DeviceTypeOption> = listOf(
-    DeviceTypeOption(DeviceCategory.LAMP,         R.string.dtype_lamp),
-    DeviceTypeOption(DeviceCategory.DOOR,         R.string.dtype_door),
-    DeviceTypeOption(DeviceCategory.ALARM,        R.string.dtype_alarm),
-    DeviceTypeOption(DeviceCategory.FAUCET,       R.string.dtype_faucet),
-    DeviceTypeOption(DeviceCategory.BLINDS,       R.string.dtype_blinds),
-    DeviceTypeOption(DeviceCategory.AC,           R.string.dtype_ac),
-    DeviceTypeOption(DeviceCategory.SPEAKER,      R.string.dtype_speaker),
-    DeviceTypeOption(DeviceCategory.VACUUM,       R.string.dtype_vacuum),
-    DeviceTypeOption(DeviceCategory.REFRIGERATOR, R.string.dtype_refrigerator),
-    DeviceTypeOption(DeviceCategory.OVEN,         R.string.dtype_oven),
-    DeviceTypeOption(DeviceCategory.LOCK,         R.string.dtype_lock)
-)

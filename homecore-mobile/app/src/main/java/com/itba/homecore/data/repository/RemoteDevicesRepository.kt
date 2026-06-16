@@ -21,16 +21,19 @@ class RemoteDevicesRepository : DevicesRepository {
 
     override suspend fun getDevices(): Result<List<Device>> = runCatching {
         apiCall("Error al obtener dispositivos") {
-            // The /devices payload carries the type id but not its name, so resolve the
-            // name from the /devicetypes catalog (same as the web). Without this every
-            // device falls back to OTHER and shows no type-specific controls.
+            // The /devices payload carries only the type id, so resolve the full type from the
+            // /devicetypes catalog. Without the name every device falls back to OTHER and shows
+            // no type-specific controls; powerUsage feeds the consumption estimate.
             val devices = devicesApi.getAllDevices()
             val types = deviceTypes()
             devices.map { d ->
-                if (d.type.name.isBlank() && d.type.id.isNotBlank()) {
-                    val name = types.firstOrNull { it.id == d.type.id }?.name
-                    if (name != null) d.copy(type = d.type.copy(name = name)) else d
-                } else d
+                val catalogType = types.firstOrNull { it.id == d.type.id } ?: return@map d
+                d.copy(
+                    type = d.type.copy(
+                        name = d.type.name.ifBlank { catalogType.name },
+                        powerUsage = d.type.powerUsage ?: catalogType.powerUsage
+                    )
+                )
             }
         }
     }
@@ -41,8 +44,8 @@ class RemoteDevicesRepository : DevicesRepository {
 
     override suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit> = runCatching {
         apiCall("No se pudo actualizar el favorito") {
-            // The API has no favorite endpoint: like the web app, the device is re-sent
-            // via PUT with the favorite flag merged into its metadata.
+            // The API has no favorite endpoint: the device is re-sent via PUT with the
+            // favorite flag merged into its metadata.
             val device = devicesApi.getDevice(deviceId)
             devicesApi.updateDevice(deviceId, fullBody(device, favorite = favorite))
         }
@@ -82,7 +85,7 @@ class RemoteDevicesRepository : DevicesRepository {
         apiCall("No se pudo crear la habitación") {
             val body = mutableMapOf<String, Any?>("name" to name.trim())
             // POST /rooms takes a home reference: use the one chosen by the caller
-            // or fall back to the user's first home, mirroring how the web creates rooms.
+            // or fall back to the user's first home.
             val resolvedHomeId = homeId ?: runCatching { homesApi.getAllHomes().firstOrNull() }.getOrNull()?.id
             resolvedHomeId?.let { body["home"] = mapOf("id" to it) }
             roomsApi.createRoom(body)
@@ -114,7 +117,7 @@ class RemoteDevicesRepository : DevicesRepository {
     private suspend fun deviceTypes(): List<DeviceType> =
         typesCache ?: devicesApi.getDeviceTypes().also { typesCache = it }
 
-    /** Full PUT body as the API expects it (same shape the web app sends on update). */
+    /** Full PUT body as the API expects it on update. */
     private fun fullBody(
         device: Device,
         name: String = device.name,

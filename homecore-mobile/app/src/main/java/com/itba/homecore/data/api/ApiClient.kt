@@ -59,9 +59,9 @@ object ApiClient {
     }
 
     /**
-     * The HCI API wraps successful responses in { "result": ... }. Mirroring what the
-     * web app does in client.js, the payload is unwrapped in this single place so the
-     * Retrofit interfaces can declare plain types (List<Device>, AuthResponse, etc.).
+     * The HCI API wraps successful responses in { "result": ... }. The payload is unwrapped
+     * in this single place so the Retrofit interfaces can declare plain types
+     * (List<Device>, AuthResponse, etc.).
      * Bodies that are not JSON or have no "result" key pass through unchanged.
      * Note: the logging interceptor prints the already-unwrapped body.
      */

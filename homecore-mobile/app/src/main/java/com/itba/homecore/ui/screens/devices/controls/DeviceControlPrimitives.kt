@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +40,7 @@ fun SectionLabel(text: String) {
     )
 }
 
-/** Labeled numeric slider that applies on release (matches the web). */
+/** Labeled numeric slider that applies its value on release, not while dragging (avoids spamming the API). */
 @Composable
 fun ControlSlider(
     label: String,
@@ -124,6 +125,28 @@ fun SegmentedSelector(
             }
         }
     }
+}
+
+/**
+ * [SegmentedSelector] whose options each carry a label string resource, so callers pass
+ * `(apiValue to labelRes)` pairs and the localized labels are resolved here. The first of each
+ * pair is the canonical value sent to the API; the second is only for display.
+ */
+@Composable
+fun LabeledSelector(
+    label: String,
+    options: List<Pair<String, Int>>,
+    selected: String?,
+    onSelect: (String) -> Unit
+) {
+    val labels = options.associate { (value, res) -> value to stringResource(res) }
+    SegmentedSelector(
+        label = label,
+        options = options.map { it.first },
+        selected = selected,
+        labelFor = { labels[it] ?: it },
+        onSelect = onSelect
+    )
 }
 
 private val COLOR_SWATCHES = listOf(

@@ -106,7 +106,7 @@ object LineHeight {
 /** Scale factor applied to Material Switches so they fit the compact cards. */
 const val SwitchScale = 0.85f
 
-/** Curtain (blinds) open/close step, matching the web's 20% increments. */
+/** Curtain (blinds) open/close step, in percent. */
 const val CurtainStep = 20
 
 /** One-off sizes that don't belong to a scale. */

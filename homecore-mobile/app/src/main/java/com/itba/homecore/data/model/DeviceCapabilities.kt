@@ -1,9 +1,9 @@
 package com.itba.homecore.data.model
 
 /**
- * On/off-equivalent action pair for the device card's quick switch, mirroring the web
- * STATUS_MAP (curtain = up/down, speaker = play/stop, vacuum = start/dock, ...). The
- * full, bespoke per-type controls live in `ui/screens/devices/controls`.
+ * On/off-equivalent action pair for the device card's quick switch (curtain = up/down,
+ * speaker = play/stop, vacuum = start/dock, ...). The full, bespoke per-type controls
+ * live in `ui/screens/devices/controls`.
  */
 data class QuickToggle(val onAction: DeviceAction, val offAction: DeviceAction)
 

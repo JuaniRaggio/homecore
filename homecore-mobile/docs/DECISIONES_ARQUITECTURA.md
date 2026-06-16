@@ -231,6 +231,15 @@ de auth y el de OkHttp.
   `days()`): centralizan la interpretación del estado para **no duplicar lógica**
   en cada pantalla, atendiendo el feedback de la segunda entrega sobre funciones
   duplicadas (`getDeviceInfo`, `formatTime`, etc.).
+- **`door` (Puerta) vs `lock` (Cerradura) son tipos distintos de la API.** El
+  catálogo `/devicetypes` define **11 tipos** e incluye ambos (verificado contra la
+  API real). La **puerta** se abre/cierra **y** trae el lock integrado (`state.status`
+  opened/closed + `state.lock` locked/unlocked; acciones `open`/`close`/`lock`/`unlock`).
+  La **cerradura** es un dispositivo independiente que solo se traba/destraba
+  (`lock`/`unlock`). Por eso existen `DeviceCategory.DOOR` y `DeviceCategory.LOCK`
+  separados, con `DoorControls` (4 acciones) y `LockControls` (2). Nota: la web está
+  más incompleta acá — su `resolveTypeKey` no tiene patrón para `lock`, así que un
+  dispositivo cerradura cae a manejo genérico; mobile lo modela completo.
 
 ---
 

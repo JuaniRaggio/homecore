@@ -8,6 +8,8 @@ import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.Room
 import com.itba.homecore.data.model.category
 import com.itba.homecore.data.model.isFavorite
+import com.itba.homecore.data.api.DeviceRegistry
+import com.itba.homecore.data.api.SocketManager
 import com.itba.homecore.data.repository.DevicesRepository
 import com.itba.homecore.di.AppModule
 import kotlinx.coroutines.async
@@ -49,9 +51,13 @@ class DevicesViewModel(
 
     init {
         load()
-        // Refresh devices after any routine fires so the UI shows the new state.
+        // Refresh devices after any routine fires, or when the WebSocket reports an external
+        // change, so the UI shows the new state without a manual reload.
         viewModelScope.launch {
             RoutineExecutionEvents.events.collect { refresh(showLoading = false) }
+        }
+        viewModelScope.launch {
+            DeviceSyncEvents.events.collect { refresh(showLoading = false) }
         }
     }
 
@@ -97,12 +103,9 @@ class DevicesViewModel(
                 _state.value = DevicesUiState.Error(devicesRes.exceptionOrNull()?.message ?: "Error al cargar")
                 return@launch
             }
-            // Filter by the selected home (when set), then resolve each device's room name
-            // from the rooms list (the /devices payload only carries the room id).
             val homeId = currentHomeId
-            // Within a home, show only its rooms and the devices in those rooms. Orphan rooms
-            // (no home) and orphan devices (no room) are not shown in a home view, mirroring the
-            // web, which lists devices by walking each home's rooms.
+            // Within a home, orphan rooms (no home) and orphan devices (no room) are hidden.
+            // The /devices payload carries the room id but not its name, so it is resolved below.
             val rooms = if (homeId == null) allRooms
                         else allRooms.filter { r -> r.home?.id == homeId }
             val roomIds = rooms.map { it.id }.toSet()
@@ -116,13 +119,14 @@ class DevicesViewModel(
                     if (roomName != null) d.copy(room = d.room!!.copy(name = roomName)) else d
                 } else d
             }
+            DeviceRegistry.update(enriched)
             _state.value = DevicesUiState.Success(rooms, enriched)
         }
     }
 
     /**
-     * Card quick switch. The on/off-equivalent action per type comes from the shared
-     * [DeviceCapabilities] (mirrors the web), so e.g. a curtain sends up/down — never on/off.
+     * Card quick switch. The on/off-equivalent action per type comes from [DeviceCapabilities],
+     * so e.g. a curtain sends up/down — never on/off.
      */
     fun toggleDevice(device: Device, turnOn: Boolean) {
         val toggle = DeviceCapabilities.quickToggle(device.category()) ?: return
@@ -132,6 +136,7 @@ class DevicesViewModel(
 
     /** Runs an arbitrary device action (used by the detail screen) and refreshes on success. */
     fun runAction(deviceId: String, action: String, params: List<Any> = emptyList()) {
+        SocketManager.markLocalActivity(deviceId)
         viewModelScope.launch {
             repository.executeAction(deviceId, action, params)
                 .onSuccess { refresh(showLoading = false) }
@@ -149,6 +154,7 @@ class DevicesViewModel(
 
     /** Creates a device and reloads the list. [onDone] runs only on success (keeps the sheet open on error). */
     fun createDevice(name: String, typeName: String, roomId: String?, onDone: () -> Unit = {}) {
+        SocketManager.markLocalActivity(null)
         viewModelScope.launch {
             repository.createDevice(name, typeName, roomId)
                 .onSuccess {
@@ -184,6 +190,7 @@ class DevicesViewModel(
     }
 
     fun deleteDevice(deviceId: String, onDone: () -> Unit = {}) {
+        SocketManager.markLocalActivity(deviceId)
         viewModelScope.launch {
             repository.deleteDevice(deviceId)
                 .onSuccess { refresh(showLoading = false); onDone() }

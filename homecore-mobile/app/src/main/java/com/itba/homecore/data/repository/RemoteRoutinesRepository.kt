@@ -61,10 +61,9 @@ class RemoteRoutinesRepository : RoutinesRepository {
     )
 
     /**
-     * Full routine body for POST/PUT. Mirrors the web's payload exactly:
-     * top-level name/description/actions/time/days plus metadata. The HCI API
-     * reads schedule from the top level (not metadata), so missing them there
-     * leaves the routine unschedulable. Actions reduced to { device:{id}, actionName, params }.
+     * Full routine body for POST/PUT: top-level name/description/actions/time/days plus
+     * metadata. The HCI API reads schedule from the top level (not metadata), so missing
+     * them there leaves the routine unschedulable. Actions reduced to { device:{id}, actionName, params }.
      */
     private fun fullBody(routine: Routine): Map<String, Any?> {
         val description = routine.description ?: routine.metadata?.description

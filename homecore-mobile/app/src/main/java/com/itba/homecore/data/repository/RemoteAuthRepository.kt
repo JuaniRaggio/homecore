@@ -37,9 +37,8 @@ class RemoteAuthRepository(context: Context) : AuthRepository {
 
     /**
      * Two-step registration: create the account, then trigger the verification code
-     * email (/send-verification), mirroring the web flow. A 409 means the email is
-     * already taken, surfaced as [EmailAlreadyRegisteredException] so the UI can send
-     * the user to sign in.
+     * email (/send-verification). A 409 means the email is already taken, surfaced as
+     * [EmailAlreadyRegisteredException] so the UI can send the user to sign in.
      */
     override suspend fun register(name: String, lastName: String, email: String, password: String): Result<Unit> = runCatching {
         val fullName = if (lastName.isBlank()) name else "$name $lastName"
