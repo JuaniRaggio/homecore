@@ -106,7 +106,9 @@
     <string name="loading">Cargando…</string>
     <string name="retry">Reintentar</string>
     <string name="empty_devices">No hay dispositivos</string>
+    <string name="select_device_hint">Seleccioná un dispositivo para ver sus controles</string>
     <string name="empty_routines">No hay rutinas</string>
+    <string name="select_routine_hint">Seleccioná una rutina para editarla, o creá una nueva</string>
 
     <!-- Días de la semana (índice 0 = domingo, según la API) -->
     <string-array name="routine_days">

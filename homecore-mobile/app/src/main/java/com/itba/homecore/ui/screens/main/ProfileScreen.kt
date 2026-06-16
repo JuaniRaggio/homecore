@@ -23,6 +23,7 @@ import com.itba.homecore.R
 import com.itba.homecore.ui.components.LanguageSelector
 import com.itba.homecore.ui.components.ThemeSelector
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.readableWidth
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ThemeViewModel
 
@@ -49,9 +50,11 @@ fun ProfileScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = Spacing.xl)
             .padding(vertical = Spacing.xl),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Spacing.xl)
     ) {
         ProfilePanel(
+            modifier = Modifier.readableWidth(),
             name = displayName,
             email = email,
             isDark = isDarkTheme,
@@ -84,10 +87,11 @@ private fun ProfilePanel(
     isDark: Boolean,
     onToggleTheme: (Boolean) -> Unit,
     onChangePassword: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(Surface, RoundedCornerShape(Radius.card))
             .padding(Spacing.sm)

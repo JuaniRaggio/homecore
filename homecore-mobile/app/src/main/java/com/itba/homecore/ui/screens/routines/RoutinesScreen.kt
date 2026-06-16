@@ -36,6 +36,7 @@ import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.HomesUiState
 import com.itba.homecore.viewmodel.HomesViewModel
 import com.itba.homecore.viewmodel.RoutinesUiState
@@ -57,10 +58,13 @@ fun RoutinesScreen(
     var search by rememberSaveable { mutableStateOf("") }
     val noScheduleMsg = stringResource(R.string.routine_no_schedule_error)
 
-    // Routine editor shown over the list (create when id is null, edit otherwise).
+    // Adaptability (RNF4/RNF5): the routine editor (create when id is null, edit otherwise)
+    // replaces the whole screen on phones, but on tablets/landscape it lives in the right pane
+    // next to the list, so the user keeps the list of routines in view while editing one.
+    val wide = isWideScreen()
     var editorOpen by rememberSaveable { mutableStateOf(false) }
     var editorId by rememberSaveable { mutableStateOf<String?>(null) }
-    if (editorOpen) {
+    if (editorOpen && !wide) {
         RoutineEditorScreen(
             routineId = editorId,
             homeId = selectedHome?.id,
@@ -74,7 +78,10 @@ fun RoutinesScreen(
     var deleteRoutineId by rememberSaveable { mutableStateOf<String?>(null) }
     var deleteRoutineName by rememberSaveable { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+    val fabActions = listOf(FabAction(stringResource(R.string.new_routine)) { editorId = null; editorOpen = true })
+    val fabCd = stringResource(R.string.cd_add)
+
+    val listPane: @Composable () -> Unit = {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -96,41 +103,68 @@ fun RoutinesScreen(
             )
 
             when (val s = state) {
-            is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
-            is RoutinesUiState.Error ->
-                StatusMessage(s.message, isError = true, onRetry = { viewModel.loadForHome(selectedHome?.id) })
-            is RoutinesUiState.Success -> {
-                val filtered = remember(s.routines, search) {
-                    if (search.isBlank()) s.routines
-                    else s.routines.filter { it.name.contains(search, ignoreCase = true) }
-                }
-                if (filtered.isEmpty()) {
-                    StatusMessage(stringResource(R.string.empty_routines))
-                } else {
-                    UniformGrid(items = filtered, columns = 1) { r, cell ->
-                        key(r.id) {
-                            RoutineCard(
-                                routine = r,
-                                isExecuting = r.id == executingId,
-                                onExecute = { viewModel.execute(r) },
-                                onToggleActive = { viewModel.toggleActive(r) },
-                                onToggleBlocked = { UiMessages.emit(noScheduleMsg) },
-                                onToggleFavorite = { viewModel.toggleFavorite(r) },
-                                onOpen = { editorId = r.id; editorOpen = true },
-                                onDelete = { deleteRoutineId = r.id; deleteRoutineName = r.name },
-                                modifier = cell
-                            )
+                is RoutinesUiState.Loading -> StatusMessage(stringResource(R.string.loading))
+                is RoutinesUiState.Error ->
+                    StatusMessage(s.message, isError = true, onRetry = { viewModel.loadForHome(selectedHome?.id) })
+                is RoutinesUiState.Success -> {
+                    val filtered = remember(s.routines, search) {
+                        if (search.isBlank()) s.routines
+                        else s.routines.filter { it.name.contains(search, ignoreCase = true) }
+                    }
+                    if (filtered.isEmpty()) {
+                        StatusMessage(stringResource(R.string.empty_routines))
+                    } else {
+                        UniformGrid(items = filtered, columns = 1) { r, cell ->
+                            key(r.id) {
+                                RoutineCard(
+                                    routine = r,
+                                    isExecuting = r.id == executingId,
+                                    onExecute = { viewModel.execute(r) },
+                                    onToggleActive = { viewModel.toggleActive(r) },
+                                    onToggleBlocked = { UiMessages.emit(noScheduleMsg) },
+                                    onToggleFavorite = { viewModel.toggleFavorite(r) },
+                                    onOpen = { editorId = r.id; editorOpen = true },
+                                    onDelete = { deleteRoutineId = r.id; deleteRoutineName = r.name },
+                                    modifier = cell
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-        }
+    }
 
-        AddFab(
-            actions = listOf(FabAction(stringResource(R.string.new_routine)) { editorId = null; editorOpen = true }),
-            contentDescription = stringResource(R.string.cd_add)
-        )
+    if (wide) {
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    listPane()
+                }
+                VerticalDivider(color = SurfaceVariant)
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
+                    if (editorOpen) {
+                        RoutineEditorScreen(
+                            routineId = editorId,
+                            homeId = selectedHome?.id,
+                            onBack = { editorOpen = false; viewModel.loadForHome(selectedHome?.id) }
+                        )
+                    } else {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            StatusMessage(stringResource(R.string.select_routine_hint))
+                        }
+                    }
+                }
+            }
+            // On wide layouts the add button docks at the bottom center, over the divider between
+            // panes: a deliberately out-of-the-way spot, fine because adding is infrequent.
+            AddFab(actions = fabActions, contentDescription = fabCd, alignment = Alignment.BottomCenter)
+        }
+    } else {
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+            listPane()
+            AddFab(actions = fabActions, contentDescription = fabCd)
+        }
     }
 
     if (showCreateHome) {

@@ -26,6 +26,7 @@ import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 import com.itba.homecore.viewmodel.HomesUiState
@@ -56,9 +57,24 @@ fun DevicesScreen(
     var deleteRoomName by rememberSaveable { mutableStateOf("") }
 
     val rooms = (state as? DevicesUiState.Success)?.rooms ?: emptyList()
+    val devices = (state as? DevicesUiState.Success)?.devices ?: emptyList()
     val noRoomLabel = stringResource(R.string.room_none)
 
-    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+    // Adaptability (RNF4/RNF5): on tablets/landscape the room list and the device detail
+    // live side by side (master-detail), so selecting a device updates the right pane
+    // without a full-screen navigation. On phones the list fills the screen and tapping a
+    // device navigates to the detail via [onDeviceClick].
+    val wide = isWideScreen()
+    var selectedDeviceId by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedDevice = devices.firstOrNull { it.id == selectedDeviceId }
+
+    val fabActions = listOf(
+        FabAction(stringResource(R.string.new_device)) { showAddDevice = true },
+        FabAction(stringResource(R.string.new_room)) { showAddRoom = true }
+    )
+    val fabCd = stringResource(R.string.cd_add)
+
+    val listPane: @Composable () -> Unit = {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,7 +111,9 @@ fun DevicesScreen(
                                 columns = columns,
                                 onToggle = { device, newState -> viewModel.toggleDevice(device, newState) },
                                 onToggleFavorite = { device -> viewModel.toggleFavorite(device) },
-                                onOpen = { device -> onDeviceClick(device.id) },
+                                onOpen = { device ->
+                                    if (wide) selectedDeviceId = device.id else onDeviceClick(device.id)
+                                },
                                 onDeviceAction = { device, action, params -> viewModel.runAction(device.id, action, params) },
                                 onRenameRoom = { renameRoomId = group.roomId; renameRoomName = group.name },
                                 onDeleteRoom = { deleteRoomId = group.roomId; deleteRoomName = group.name }
@@ -105,14 +123,42 @@ fun DevicesScreen(
                 }
             }
         }
+    }
 
-        AddFab(
-            actions = listOf(
-                FabAction(stringResource(R.string.new_device)) { showAddDevice = true },
-                FabAction(stringResource(R.string.new_room)) { showAddRoom = true }
-            ),
-            contentDescription = stringResource(R.string.cd_add)
-        )
+    if (wide) {
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    listPane()
+                }
+                VerticalDivider(color = SurfaceVariant)
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().background(Background)) {
+                    if (selectedDevice != null) {
+                        DeviceDetailScreen(
+                            device = selectedDevice,
+                            rooms = rooms,
+                            onAction = { action, params -> viewModel.runAction(selectedDevice.id, action, params) },
+                            onRename = { viewModel.renameDevice(selectedDevice.id, it) },
+                            onMoveToRoom = { viewModel.setDeviceRoom(selectedDevice.id, it) },
+                            onDelete = { viewModel.deleteDevice(selectedDevice.id) { selectedDeviceId = null } },
+                            onBack = { selectedDeviceId = null }
+                        )
+                    } else {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            StatusMessage(stringResource(R.string.select_device_hint))
+                        }
+                    }
+                }
+            }
+            // On wide layouts the add button docks at the bottom center, over the divider between
+            // panes: a deliberately out-of-the-way spot, fine because adding is infrequent.
+            AddFab(actions = fabActions, contentDescription = fabCd, alignment = Alignment.BottomCenter)
+        }
+    } else {
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+            listPane()
+            AddFab(actions = fabActions, contentDescription = fabCd)
+        }
     }
 
     if (showAddDevice) {

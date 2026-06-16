@@ -223,9 +223,9 @@ de auth y el de OkHttp.
 **Navegación:** manual. `MainActivity` maneja el flujo de auth (enum `AppScreen`:
 login / register / verify / recover) y, una vez logueado, monta `MainScreen` con
 una **bottom navigation de 5 tabs**. En pantallas anchas (tablet / teléfono
-horizontal) el bottom bar se reemplaza por un `NavigationRail` y las grillas pasan
-a 3 columnas (ver sección 16, RNF4/RNF5). `navigation/` (Navigation Compose) quedó
-sin uso y vacío.
+horizontal) el bottom bar se reemplaza por un `NavigationRail` y varias pantallas
+adoptan layouts multi-panel (ver sección 15, RNF4/RNF5). `navigation/`
+(Navigation Compose) quedó sin uso y vacío.
 
 | Tab (label)        | Pantalla            | Contenido                                                            |
 |--------------------|---------------------|----------------------------------------------------------------------|
@@ -244,6 +244,16 @@ sin uso y vacío.
   (se auto-selecciona el primero al entrar).
 - **Configuración inline**: idioma/tema/contraseña viven directo en Usuario (se
   quitó la rueda de configuración que abría un sheet).
+- **Las rutinas se atan a un hogar (decisión de usabilidad, no limitación técnica).**
+  Cada rutina se crea dentro del hogar activo (`metadata.homeId`) y aparece solo en
+  el Inicio/lista de ese hogar. La API soporta rutinas *cross-home* y, de hecho, sus
+  **acciones pueden afectar dispositivos de cualquier hogar** (el picker muestra
+  todos), así que la flexibilidad de efecto ya existe. Aun así, **mobile no permite
+  crear rutinas cross-home a propósito**: no hay una vista que represente con
+  claridad una rutina que afecta a múltiples casas (¿en qué Inicio aparece?, ¿cómo
+  se comunica su alcance?). Atarla a un hogar mantiene la navegación y la jerarquía
+  de información claras. La infraestructura `crossHome` queda en el modelo y el
+  filtro solo para **interoperar** con rutinas cross-home creadas desde la web.
 
 **Componentes reutilizables** (`ui/components/`, un archivo por componente):
 `HouseHeader` (con **slot opcional** de campana de notificaciones), `PanelCard`
@@ -376,12 +386,36 @@ solo lugar** y elimina el riesgo de drift entre pantallas.
 
 ## 15. Adaptabilidad a dispositivo y orientación (RNF4 / RNF5)
 
-`MainScreen` usa un breakpoint (`WIDE_BREAKPOINT_DP = 600`): en teléfonos en
-vertical hay **bottom navigation** y grillas de **2 columnas**; en tablet o
-teléfono horizontal la navegación pasa a un **`NavigationRail`** lateral y las
-grillas a **3 columnas**. No es solo redimensionar: cambia la estructura de
-navegación y la densidad de la información. El estado de UI que debe sobrevivir la
-rotación usa `rememberSaveable`.
+El breakpoint vive en un único lugar (`ui/util/WindowSize.kt`): `isWideScreen()`
+(`screenWidthDp >= WIDE_BREAKPOINT_DP = 600`) es la fuente de verdad que consultan
+todas las pantallas, y `Modifier.readableWidth()` limita el ancho de un bloque de
+contenido en pantallas anchas. Así "ancho" significa lo mismo en toda la app
+(tablet en cualquier orientación y teléfono en horizontal) y no se repite el
+cálculo por pantalla.
+
+La adaptación **no es una mera redistribución/redimensionamiento**: cada pantalla
+cambia su estructura de información y su jerarquía visual cuando hay espacio:
+
+- **Navegación**: bottom `NavigationBar` (compacto) -> `NavigationRail` lateral
+  (ancho). Cambia el patrón de navegación, no su tamaño.
+- **Habitaciones**: lista de una columna (compacto) -> **master-detail** (ancho):
+  la lista de habitaciones/dispositivos queda a la izquierda y el detalle del
+  dispositivo seleccionado se abre en el panel derecho, sin navegación a pantalla
+  completa. Mantiene el contexto de la lista mientras se opera un dispositivo.
+- **Rutinas**: el editor reemplaza la pantalla (compacto) -> vive en el panel
+  derecho junto a la lista (ancho), mismo patrón master-detail.
+- **Inicio**: dos paneles apilados (compacto) -> dos secciones en paralelo
+  (Rutinas | Dispositivos) que se ven de un vistazo sin scrollear; la grilla de
+  dispositivos baja a 2 columnas porque cada panel ocupa media pantalla.
+- **Actividad**: consumo sobre el historial (compacto) -> el consumo se vuelve una
+  columna lateral fija junto al historial, de modo que el resumen no desaparece al
+  crecer la lista.
+- **Auth y Usuario**: contenido de columna única limitado con `readableWidth()` y
+  centrado, para no estirar formularios a un ancho ilegible en tablet.
+
+Los paneles que no aplican (sin selección) muestran un placeholder
+(`select_device_hint`, `select_routine_hint`). El estado de UI que debe sobrevivir
+la rotación usa `rememberSaveable` (incluida la selección del master-detail).
 
 ---
 
@@ -441,27 +475,23 @@ rotación usa `rememberSaveable`.
 
 ---
 
-## 19. Pendientes conocidos y mejoras futuras
+## 19. Pendientes y mejoras (no exigidos por el enunciado)
 
-- **Tests automatizados (principal deuda).** Hoy solo está el template generado por
-  Android Studio (`ExampleUnitTest` / `ExampleInstrumentedTest`). La arquitectura
-  está lista para testear (VMs con inyección de interfaces por constructor);
-  faltan tests de los ViewModels (filtros de hogar/rutina, `isOn`, `toggleDevice`),
-  de las extensiones de dominio (`category()`, `DeviceAction.fromApi`) y del
-  `unwrapResult`/`apiCall`.
+El enunciado **no pide tests automatizados**; el "testing" que sí corresponde es
+**manual** (API Levels probados, teléfono/tablet, orientación, español/inglés),
+documentado en `docs/tercera_entrega/checklist_testing.md` y reflejado en las
+capturas del informe. Lo de abajo son mejoras de calidad, no requisitos.
+
+- **Tests automatizados (mejora de calidad).** Hoy solo está el template de Android
+  Studio. La arquitectura está lista para testear (VMs con inyección de interfaces
+  por constructor); sumarían valor tests de los ViewModels (filtros de hogar/rutina,
+  `isOn`, `toggleDevice`), de las extensiones de dominio (`category()`,
+  `DeviceAction.fromApi`) y del `unwrapResult`/`apiCall`.
 - **Ejecución en background.** `RoutineScheduler` (scheduling, RF23) y el WebSocket
   corren solo con la app viva; scheduling/notificaciones con la app cerrada
   requerirían `WorkManager`/foreground service.
 - **Alarma `changeSecurityCode` en rutinas.** Queda fuera del picker de rutinas
   (necesita código viejo + nuevo); el resto de acciones de alarma sí están.
-- **Rutinas cross-home (mejora futura).** Hoy cada rutina se liga a un hogar (su
-  "base", vía `metadata.homeId`) y solo aparece en el Inicio/lista de ese hogar;
-  sus acciones igual pueden afectar dispositivos de cualquier hogar (el picker
-  muestra todos), así que la flexibilidad de efecto ya existe. La mejora sería
-  permitir marcar una rutina como `crossHome` (no atada a ningún hogar) para que
-  se muestre y ejecute en TODOS los hogares. La infraestructura ya está lista:
-  `RoutineMetadata.crossHome`, el `fullBody` lo serializa, el filtro de
-  `RoutinesViewModel` ya respeta `crossHome == true || homeId == hogarActual`, y
-  `RoutineEditorState` lo preserva al editar. Falta solo: un toggle "Afecta a
-  todos los hogares" en el editor (setea `crossHome=true`, `homeId=null`) y
-  mostrarlas en el Inicio aunque no sean favoritas. La web ya lo soporta.
+
+> Nota: que las rutinas se aten a un solo hogar **no** es un pendiente sino una
+> decisión de usabilidad deliberada (ver §8).

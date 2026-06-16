@@ -26,6 +26,7 @@ import com.itba.homecore.R
 import com.itba.homecore.ui.components.HcButton
 import com.itba.homecore.ui.components.HcTextField
 import com.itba.homecore.ui.theme.*
+import com.itba.homecore.ui.util.readableWidth
 import com.itba.homecore.viewmodel.AuthUiState
 import com.itba.homecore.viewmodel.AuthViewModel
 import com.itba.homecore.viewmodel.ResendState
@@ -53,10 +54,14 @@ fun VerifyScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(Background),
+        contentAlignment = Alignment.TopCenter
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .readableWidth()
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = Spacing.huge, vertical = Spacing.huge3)

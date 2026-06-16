@@ -27,6 +27,7 @@ import com.itba.homecore.ui.screens.devices.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.ui.util.deviceActionLabel
 import com.itba.homecore.ui.util.formatLogTimestamp
+import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.DevicesUiState
 import com.itba.homecore.viewmodel.DevicesViewModel
 import com.itba.homecore.viewmodel.HomesUiState
@@ -52,6 +53,12 @@ fun ActivityScreen(
 
     var showCreateHome by rememberSaveable { mutableStateOf(false) }
 
+    // Adaptability (RNF4/RNF5): on phones the consumption summary sits above the history list;
+    // on tablets/landscape the summary becomes a side column next to the history, so both are
+    // visible at once instead of the summary scrolling away as soon as the history grows.
+    val wide = isWideScreen()
+    val devices = (devicesState as? DevicesUiState.Success)?.devices ?: emptyList()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,12 +75,19 @@ fun ActivityScreen(
             onAddHome = { showCreateHome = true }
         )
 
-        ConsumptionCard(state = devicesState)
-
-        HistoryCard(
-            logs = logs,
-            devices = (devicesState as? DevicesUiState.Success)?.devices ?: emptyList()
-        )
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xl),
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(modifier = Modifier.weight(1f)) { ConsumptionCard(state = devicesState) }
+                Box(modifier = Modifier.weight(1.4f)) { HistoryCard(logs = logs, devices = devices) }
+            }
+        } else {
+            ConsumptionCard(state = devicesState)
+            HistoryCard(logs = logs, devices = devices)
+        }
     }
 
     if (showCreateHome) {
