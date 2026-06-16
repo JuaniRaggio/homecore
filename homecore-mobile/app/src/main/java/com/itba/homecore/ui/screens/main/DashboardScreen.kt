@@ -27,7 +27,7 @@ import com.itba.homecore.ui.components.PanelCard
 import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
 import com.itba.homecore.ui.screens.devices.DeviceCard
-import com.itba.homecore.ui.screens.devices.RenameDialog
+import com.itba.homecore.ui.components.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.DevicesUiState
@@ -152,6 +152,7 @@ fun DashboardScreen(
             selectedHome = selectedHome,
             onHomeSelect = { homesVm.selectHome(it) },
             onAddHome = { showCreateHome = true },
+            onRenameHome = { home, newName -> homesVm.renameHome(home.id, newName) },
             onNotificationsClick = { UiMessages.emit(noNotifications) }
         )
 

@@ -34,7 +34,7 @@ import com.itba.homecore.ui.components.OverflowMenu
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.components.routineScheduleLabel
-import com.itba.homecore.ui.screens.devices.RenameDialog
+import com.itba.homecore.ui.components.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.ui.util.isWideScreen
 import com.itba.homecore.viewmodel.HomesUiState

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
@@ -23,8 +24,9 @@ import com.itba.homecore.ui.theme.*
 
 /**
  * Shared header with a home-picker dropdown and optional notifications bell.
- * Tapping the chevron opens a full-width menu listing [homes]; the selected home is
- * highlighted. An "+ Nueva Propiedad" entry at the bottom fires [onAddHome].
+ * Tapping the chevron opens a full-width menu listing [homes]; the selected home is highlighted.
+ * Each row has a trailing pencil that opens a rename dialog ([onRenameHome]); an add entry at the
+ * bottom fires [onAddHome]. The dropdown is the single entry point to manage homes (no Homes screen).
  */
 @Composable
 fun HouseHeader(
@@ -33,10 +35,13 @@ fun HouseHeader(
     selectedHome: Home? = null,
     onHomeSelect: (Home) -> Unit = {},
     onAddHome: () -> Unit = {},
+    onRenameHome: (Home, String) -> Unit = { _, _ -> },
     showNotifications: Boolean = false,
     onNotificationsClick: () -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
+    // The home currently being renamed (its row pencil was tapped); drives the rename dialog.
+    var editingHome by remember { mutableStateOf<Home?>(null) }
 
     // Full-width Box as anchor so the DropdownMenu spans the same width.
     Box(modifier = modifier.fillMaxWidth()) {
@@ -115,6 +120,17 @@ fun HouseHeader(
                             modifier = Modifier.fillMaxWidth()
                         )
                     },
+                    // Pencil renames this home without selecting it (the IconButton consumes the tap).
+                    trailingIcon = {
+                        IconButton(onClick = { editingHome = home; expanded = false }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.cd_edit_home),
+                                tint = TextPrimary,
+                                modifier = Modifier.size(IconSize.sm)
+                            )
+                        }
+                    },
                     onClick = { onHomeSelect(home); expanded = false },
                     modifier = if (isSelected) Modifier.background(AccentDark) else Modifier,
                     colors = MenuDefaults.itemColors(textColor = TextPrimary)
@@ -133,6 +149,16 @@ fun HouseHeader(
                 },
                 onClick = { onAddHome(); expanded = false },
                 colors = MenuDefaults.itemColors(textColor = Accent)
+            )
+        }
+
+        editingHome?.let { home ->
+            RenameDialog(
+                title = stringResource(R.string.rename_home_title),
+                label = stringResource(R.string.home_name_label),
+                initial = home.name,
+                onConfirm = { newName -> onRenameHome(home, newName); editingHome = null },
+                onDismiss = { editingHome = null }
             )
         }
     }

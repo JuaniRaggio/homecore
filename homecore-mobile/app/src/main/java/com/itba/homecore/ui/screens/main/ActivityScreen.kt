@@ -23,7 +23,7 @@ import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.isOn
 import com.itba.homecore.data.model.resolvedAction
 import com.itba.homecore.ui.components.HouseHeader
-import com.itba.homecore.ui.screens.devices.RenameDialog
+import com.itba.homecore.ui.components.RenameDialog
 import com.itba.homecore.ui.theme.*
 import com.itba.homecore.ui.util.deviceActionLabel
 import com.itba.homecore.ui.util.formatLogTimestamp

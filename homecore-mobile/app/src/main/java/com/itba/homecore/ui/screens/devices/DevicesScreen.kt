@@ -23,6 +23,7 @@ import com.itba.homecore.ui.components.FabAction
 import com.itba.homecore.ui.components.HcSearchBar
 import com.itba.homecore.ui.components.HouseHeader
 import com.itba.homecore.ui.components.OverflowMenu
+import com.itba.homecore.ui.components.RenameDialog
 import com.itba.homecore.ui.components.StatusMessage
 import com.itba.homecore.ui.components.UniformGrid
 import com.itba.homecore.ui.theme.*
@@ -93,7 +94,8 @@ fun DevicesScreen(
                     homes = homes,
                     selectedHome = selectedHome,
                     onHomeSelect = { homesVm.selectHome(it) },
-                    onAddHome = { showCreateHome = true }
+                    onAddHome = { showCreateHome = true },
+                    onRenameHome = { home, newName -> homesVm.renameHome(home.id, newName) }
                 )
                 HcSearchBar(
                     value = search,
