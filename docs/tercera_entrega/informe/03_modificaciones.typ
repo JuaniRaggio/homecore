@@ -53,12 +53,6 @@ Anteriormente, en el prototipo no se mostraba la opción para eliminar. Es por e
 === Cambio de color en botón “Ejecutar ahora”
 Se mejoró la diferenciación visual de las acciones de mayor impacto dentro de la aplicación. Para ello, los botones destinados a la ejecución inmediata de rutinas adoptaron un color distintivo respecto de los demás controles, facilitando su identificación por parte del usuario y reduciendo posibles errores de interacción. Además, el estilo fue centralizado para garantizar consistencia visual y una mejor mantenibilidad del sistema.
 
-== Pantalla de Hogares
-
-== Pantalla de Autenticación
-
-En el prototipo.
-
 == Modificaciones generales a partir de la segunda entrega
 
 Hay ligeros cambios en los colores en varias partes de la app respecto al prototipo; esto se debe a que decidimos utilizar los design tokens de la aplicación web, en este caso se encuentran centralizados en `itba.homecore.ui.theme`.
