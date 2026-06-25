@@ -230,12 +230,17 @@ expone solo el `StateFlow` de lectura (`asStateFlow()`). La UI lo consume con
 - `.value =` cuando asignas un **valor absoluto** que no depende del anterior.
 - `.update {}` cuando el **valor nuevo se deriva del actual** (leer-modificar-escribir).
 
-**Caso `.value =` (DevicesViewModel, AuthViewModel, RoutinesViewModel):** el
-estado es un sealed y asignas un caso completo:
+**Caso `.value =` - valor absoluto (DevicesViewModel, AuthViewModel,
+RoutinesViewModel.load, HomesViewModel.load, ThemeViewModel):** el estado es un
+sealed o un valor que asignas completo, sin mirar el anterior:
 
 ```kotlin
 _state.value = DevicesUiState.Success(rooms, enriched)   // no mira lo que habia antes
 ```
+
+Tambien `RoutineEditorViewModel` usa `.value =` cuando **construye un estado nuevo
+de cero** al empezar a editar (`_state.value = RoutineEditorState(...)`, lineas 67
+y 75): es construccion fresca, no derivacion, asi que `.value =` es correcto.
 
 **Caso `.update {}` (RoutineEditorViewModel):** el estado es una sola data class
 con muchos campos, y cada setter cambia uno manteniendo el resto:
@@ -267,8 +272,42 @@ Es incorrecta:
 `.update {}` es leer lo que dice, tacharle un detalle y reescribir el resto igual.
 Solo el segundo necesita el protocolo de releer-y-reintentar para no pisar a otro.
 
-> Conclusion: el proyecto usa cada herramienta donde corresponde. No es cargo-
-> culteo de una sola. Eso es exactamente lo que demuestra criterio en la defensa.
+### 7.1 Las dos excepciones reales (importante saberlas)
+
+Para ser honestos: hay **dos lugares** que son leer-modificar-escribir pero estan
+hechos con `.value =` en vez de `.update {}`, contra la regla de arriba:
+
+- `HomesViewModel.selectHome` (lineas 60-61):
+  ```kotlin
+  val current = _state.value as? HomesUiState.Success ?: return   // LEE
+  _state.value = current.copy(selectedHome = home)                // ESCRIBE (derivado)
+  ```
+- `RoutinesViewModel.replaceRoutine` (lineas 100-105):
+  ```kotlin
+  val current = _state.value as? RoutinesUiState.Success ?: return       // LEE
+  _state.value = current.copy(routines = current.routines.map { ... })   // ESCRIBE (derivado)
+  ```
+
+Las dos son **benignas hoy**: entre la lectura y la escritura no hay ningun
+`suspend`, asi que corren de un saque en el hilo principal y nadie se intercala.
+Pero son **fragiles**: el dia que alguien meta un `await` en el medio, se romperia
+en silencio (lost update). La version robusta y consistente con la regla seria
+`.update { }`:
+
+```kotlin
+fun selectHome(home: Home) {
+    currentSelectedHome = home
+    _state.update { (it as? HomesUiState.Success)?.copy(selectedHome = home) ?: it }
+}
+```
+
+> Conclusion honesta: el proyecto usa la herramienta correcta en la **gran
+> mayoria** de los casos, y `RoutineEditorViewModel` es el ejemplo modelo (`.value
+> =` para construir de cero, `.update` para modificar campos). Quedan **dos
+> excepciones** (selectHome y replaceRoutine) que hoy son seguras pero conviene
+> alinear a `.update`. En la defensa: mejor reconocerlas y explicar por que son
+> benignas que afirmar "siempre usamos la herramienta correcta" y que te
+> encuentren la excepcion.
 
 ---
 
