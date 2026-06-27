@@ -2,8 +2,7 @@ package com.itba.homecore.data.api
 
 import com.itba.homecore.BuildConfig
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -17,21 +16,20 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 
 /**
- * Ktor-based HTTP client, used by [com.itba.homecore.data.repository.RemoteRoutinesRepository]
- * as a proof of concept of the Ktor pattern shown in class (`YesOrNoApi`).
+ * Ktor-based HTTP client backing every repository. Uses the pure-Kotlin CIO engine
+ * (no OkHttp / no Java HTTP stack) and kotlinx.serialization for JSON.
  *
- * Mirrors [ApiClient] in its responsibilities:
+ * Responsibilities:
  *  - Injects `X-API-Key` and the `Authorization: Bearer <token>` header.
- *  - Reads the token from [ApiClient] so the Retrofit and Ktor clients share the same session.
+ *  - Reads the token from [ApiClient] (the in-memory session token holder).
  *  - Unwraps the `{ "result": ... }` envelope via [unwrap].
  *  - Maps 401 responses to [SessionEvents.emitUnauthorized] when there was a token.
- *  - Surfaces the API's `error.description` as the exception message.
+ *  - Surfaces the API's `error.description` (and the HTTP status) as [KtorApiException].
  */
 object KtorClient {
 
@@ -42,7 +40,7 @@ object KtorClient {
         explicitNulls = false
     }
 
-    val http: HttpClient = HttpClient(OkHttp) {
+    val http: HttpClient = HttpClient(CIO) {
         expectSuccess = true
 
         install(ContentNegotiation) {
@@ -67,8 +65,8 @@ object KtorClient {
                 if (cause !is ClientRequestException) return@handleResponseExceptionWithRequest
 
                 val response = cause.response
-                val hadToken = ApiClient.hasToken()
-                if (response.status.value == 401 && hadToken) {
+                val status = response.status.value
+                if (status == 401 && ApiClient.hasToken()) {
                     ApiClient.clearToken()
                     SessionEvents.emitUnauthorized()
                 }
@@ -83,20 +81,16 @@ object KtorClient {
                         ?.trim('"')
                 }.getOrNull()
 
-                if (!description.isNullOrBlank()) throw KtorApiException(description, cause)
+                throw KtorApiException(description ?: "Error $status", status, cause)
             }
         }
     }
 }
 
-/** Exception thrown by [KtorClient] when the API responds with a non-2xx status with a description. */
-class KtorApiException(message: String, cause: Throwable? = null) : Exception(message, cause)
+/** Exception thrown by [KtorClient] for a non-2xx response, carrying the HTTP [status] and description. */
+class KtorApiException(message: String, val status: Int, cause: Throwable? = null) : Exception(message, cause)
 
-/** Envelope for `{ "result": T }` success responses returned by the HCI API. */
-@Serializable
-data class KtorEnvelope<T>(val result: T? = null)
-
-/** Decodes the response body and returns the inner `result`. */
+/** Decodes the response body and returns the inner `result` (or the whole object if there is no envelope). */
 suspend inline fun <reified T> HttpResponse.unwrap(): T {
     val text = bodyAsText()
     val element = KtorClient.json.parseToJsonElement(text)
@@ -107,7 +101,7 @@ suspend inline fun <reified T> HttpResponse.unwrap(): T {
 
 /**
  * Runs a Ktor block translating exceptions into a single user-facing message,
- * mirroring [apiCall] used by the Retrofit repositories.
+ * so the repositories do not duplicate the parsing.
  */
 suspend fun <T> ktorCall(fallback: String, block: suspend () -> T): T = try {
     block()

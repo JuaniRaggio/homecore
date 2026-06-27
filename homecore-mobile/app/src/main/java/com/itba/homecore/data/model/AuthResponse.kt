@@ -1,40 +1,46 @@
 package com.itba.homecore.data.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AuthResponse(
-    @SerializedName("token") val token: String?,
-    @SerializedName("user")  val user: User?
+    val token: String? = null,
+    val user: User? = null
 )
 
+@Serializable
 data class LoginRequest(
-    @SerializedName("email")    val email: String,
-    @SerializedName("password") val password: String
+    val email: String,
+    val password: String
 )
 
+@Serializable
 data class RegisterRequest(
-    @SerializedName("name")     val name: String,
-    @SerializedName("email")    val email: String,
-    @SerializedName("password") val password: String,
-    @SerializedName("metadata") val metadata: Map<String, Any> = emptyMap()
+    val name: String,
+    val email: String,
+    val password: String
 )
 
 // Single request body per shape, reused across endpoints (verify-account uses {code};
 // send-verification and forgot-password use {email}).
+@Serializable
 data class CodeRequest(
-    @SerializedName("code") val code: String
+    val code: String
 )
 
+@Serializable
 data class EmailRequest(
-    @SerializedName("email") val email: String
+    val email: String
 )
 
+@Serializable
 data class ResetPasswordRequest(
-    @SerializedName("code")     val code: String,
-    @SerializedName("password") val password: String
+    val code: String,
+    val password: String
 )
 
+@Serializable
 data class ChangePasswordRequest(
-    @SerializedName("oldPassword") val oldPassword: String,
-    @SerializedName("newPassword") val newPassword: String
+    val oldPassword: String,
+    val newPassword: String
 )

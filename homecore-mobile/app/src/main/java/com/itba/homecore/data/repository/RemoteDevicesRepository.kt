@@ -1,30 +1,44 @@
 package com.itba.homecore.data.repository
 
-import com.itba.homecore.data.api.ApiClient
-import com.itba.homecore.data.api.apiCall
+import com.itba.homecore.data.api.KtorClient
+import com.itba.homecore.data.api.ktorCall
+import com.itba.homecore.data.api.unwrap
 import com.itba.homecore.data.model.Device
 import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.DeviceType
+import com.itba.homecore.data.model.Home
 import com.itba.homecore.data.model.Room
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 
 /**
- * Implementation against the HCI API (Retrofit), wired in [com.itba.homecore.di.AppModule].
+ * Implementation against the HCI API (Ktor), wired in [com.itba.homecore.di.AppModule].
  */
 class RemoteDevicesRepository : DevicesRepository {
-    private val devicesApi = ApiClient.devicesApi
-    private val roomsApi   = ApiClient.roomsApi
-    private val homesApi   = ApiClient.homesApi
+    private val http = KtorClient.http
 
     // /devicetypes is a static catalog: fetched once and cached for the session.
     @Volatile
     private var typesCache: List<DeviceType>? = null
 
     override suspend fun getDevices(): Result<List<Device>> = runCatching {
-        apiCall("Error al obtener dispositivos") {
+        ktorCall("Error al obtener dispositivos") {
             // The /devices payload carries only the type id, so resolve the full type from the
             // /devicetypes catalog. Without the name every device falls back to OTHER and shows
             // no type-specific controls; powerUsage feeds the consumption estimate.
-            val devices = devicesApi.getAllDevices()
+            val devices = http.get("devices").unwrap<List<Device>>()
             val types = deviceTypes()
             devices.map { d ->
                 val catalogType = types.firstOrNull { it.id == d.type.id } ?: return@map d
@@ -39,96 +53,111 @@ class RemoteDevicesRepository : DevicesRepository {
     }
 
     override suspend fun executeAction(deviceId: String, action: String, params: List<Any>): Result<Unit> = runCatching {
-        apiCall("No se pudo ejecutar la acción") { devicesApi.executeAction(deviceId, action, params).close() }
+        ktorCall("No se pudo ejecutar la acción") {
+            http.patch("devices/$deviceId/$action") { setBody(JsonArray(params.map { anyToJson(it) })) }
+            Unit
+        }
     }
 
     override suspend fun setDeviceFavorite(deviceId: String, favorite: Boolean): Result<Unit> = runCatching {
-        apiCall("No se pudo actualizar el favorito") {
+        ktorCall("No se pudo actualizar el favorito") {
             // The API has no favorite endpoint: the device is re-sent via PUT with the
             // favorite flag merged into its metadata.
-            val device = devicesApi.getDevice(deviceId)
-            devicesApi.updateDevice(deviceId, fullBody(device, favorite = favorite))
+            val device = http.get("devices/$deviceId").unwrap<Device>()
+            http.put("devices/$deviceId") { setBody(fullBody(device, favorite = favorite)) }
+            Unit
         }
-        Unit
     }
 
     override suspend fun createDevice(name: String, typeName: String, roomId: String?): Result<Device> = runCatching {
-        apiCall("No se pudo crear el dispositivo") {
+        ktorCall("No se pudo crear el dispositivo") {
             // POST /devices requires the type ID, resolved by name from /devicetypes.
             val type = deviceTypes().firstOrNull { it.name.equals(typeName, ignoreCase = true) }
                 ?: throw Exception("Tipo de dispositivo desconocido: $typeName")
-            val body = mutableMapOf<String, Any?>(
-                "name" to name.trim(),
-                "type" to mapOf("id" to type.id)
-            )
-            if (roomId != null) body["room"] = mapOf("id" to roomId)
-            devicesApi.createDevice(body)
+            val body = buildJsonObject {
+                put("name", name.trim())
+                putJsonObject("type") { put("id", type.id) }
+                if (roomId != null) putJsonObject("room") { put("id", roomId) }
+            }
+            http.post("devices") { setBody(body) }.unwrap<Device>()
         }
     }
 
     override suspend fun renameDevice(deviceId: String, newName: String): Result<Device> = runCatching {
-        apiCall("No se pudo renombrar el dispositivo") {
-            val device = devicesApi.getDevice(deviceId)
-            devicesApi.updateDevice(deviceId, fullBody(device, name = newName.trim()))
+        ktorCall("No se pudo renombrar el dispositivo") {
+            val device = http.get("devices/$deviceId").unwrap<Device>()
+            http.put("devices/$deviceId") { setBody(fullBody(device, name = newName.trim())) }.unwrap<Device>()
         }
     }
 
     override suspend fun deleteDevice(deviceId: String): Result<Unit> = runCatching {
-        apiCall("No se pudo eliminar el dispositivo") { devicesApi.deleteDevice(deviceId) }
+        ktorCall("No se pudo eliminar el dispositivo") { http.delete("devices/$deviceId"); Unit }
     }
 
     override suspend fun getRooms(): Result<List<Room>> = runCatching {
-        apiCall("Error al obtener habitaciones") { roomsApi.getAllRooms() }
+        ktorCall("Error al obtener habitaciones") { http.get("rooms").unwrap<List<Room>>() }
     }
 
     override suspend fun createRoom(name: String, homeId: String?): Result<Room> = runCatching {
-        apiCall("No se pudo crear la habitación") {
-            val body = mutableMapOf<String, Any?>("name" to name.trim())
+        ktorCall("No se pudo crear la habitación") {
             // POST /rooms takes a home reference: use the one chosen by the caller
             // or fall back to the user's first home.
-            val resolvedHomeId = homeId ?: runCatching { homesApi.getAllHomes().firstOrNull() }.getOrNull()?.id
-            resolvedHomeId?.let { body["home"] = mapOf("id" to it) }
-            roomsApi.createRoom(body)
+            val resolvedHomeId = homeId
+                ?: runCatching { http.get("homes").unwrap<List<Home>>().firstOrNull() }.getOrNull()?.id
+            val body = buildJsonObject {
+                put("name", name.trim())
+                if (resolvedHomeId != null) putJsonObject("home") { put("id", resolvedHomeId) }
+            }
+            http.post("rooms") { setBody(body) }.unwrap<Room>()
         }
     }
 
     override suspend fun renameRoom(roomId: String, newName: String): Result<Room> = runCatching {
-        apiCall("No se pudo renombrar la habitación") {
-            roomsApi.updateRoom(roomId, mapOf("name" to newName.trim()))
+        ktorCall("No se pudo renombrar la habitación") {
+            http.put("rooms/$roomId") { setBody(buildJsonObject { put("name", newName.trim()) }) }.unwrap<Room>()
         }
     }
 
     override suspend fun deleteRoom(roomId: String): Result<Unit> = runCatching {
-        apiCall("No se pudo eliminar la habitación") { roomsApi.deleteRoom(roomId) }
+        ktorCall("No se pudo eliminar la habitación") { http.delete("rooms/$roomId"); Unit }
     }
 
     override suspend fun assignDeviceToRoom(deviceId: String, roomId: String): Result<Unit> = runCatching {
-        apiCall("No se pudo vincular el dispositivo") { roomsApi.addDeviceToRoom(roomId, deviceId) }
+        ktorCall("No se pudo vincular el dispositivo") { http.post("rooms/$roomId/devices/$deviceId"); Unit }
     }
 
     override suspend fun unassignDevice(deviceId: String): Result<Unit> = runCatching {
-        apiCall("No se pudo desvincular el dispositivo") { roomsApi.removeDeviceFromRoom(deviceId) }
+        ktorCall("No se pudo desvincular el dispositivo") { http.delete("rooms/devices/$deviceId"); Unit }
     }
 
     override suspend fun getLogs(limit: Int, offset: Int): Result<List<DeviceLog>> = runCatching {
-        apiCall("Error al obtener el historial") { devicesApi.getAllLogs(limit, offset) }
+        ktorCall("Error al obtener el historial") {
+            http.get("devices/logs/limit/$limit/offset/$offset").unwrap<List<DeviceLog>>()
+        }
     }
 
     private suspend fun deviceTypes(): List<DeviceType> =
-        typesCache ?: devicesApi.getDeviceTypes().also { typesCache = it }
+        typesCache ?: http.get("devicetypes").unwrap<List<DeviceType>>().also { typesCache = it }
 
     /** Full PUT body as the API expects it on update. */
     private fun fullBody(
         device: Device,
         name: String = device.name,
         favorite: Boolean? = device.metadata?.favorite
-    ): Map<String, Any?> {
-        val body = mutableMapOf<String, Any?>(
-            "name" to name,
-            "type" to mapOf("id" to device.type.id),
-            "metadata" to mapOf("favorite" to (favorite ?: false))
-        )
-        device.room?.id?.takeIf { it.isNotBlank() }?.let { body["room"] = mapOf("id" to it) }
-        return body
+    ): JsonObject = buildJsonObject {
+        put("name", name)
+        putJsonObject("type") { put("id", device.type.id) }
+        putJsonObject("metadata") { put("favorite", favorite ?: false) }
+        device.room?.id?.takeIf { it.isNotBlank() }?.let { roomId ->
+            putJsonObject("room") { put("id", roomId) }
+        }
+    }
+
+    private fun anyToJson(v: Any?): JsonElement = when (v) {
+        null       -> JsonNull
+        is Boolean -> JsonPrimitive(v)
+        is Number  -> JsonPrimitive(v)
+        is String  -> JsonPrimitive(v)
+        else       -> JsonPrimitive(v.toString())
     }
 }

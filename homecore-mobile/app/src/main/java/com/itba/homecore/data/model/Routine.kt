@@ -1,6 +1,5 @@
 package com.itba.homecore.data.model
 
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -20,31 +19,31 @@ import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable
 data class Routine(
-    @SerializedName("id")          val id: String = "",
-    @SerializedName("name")        val name: String = "",
-    @SerializedName("description") val description: String? = null,
-    @SerializedName("actions")     val actions: List<RoutineAction> = emptyList(),
-    @SerializedName("time")        val time: String? = null,
-    @SerializedName("days")        val days: List<Int>? = null,
-    @SerializedName("metadata")    val metadata: RoutineMetadata? = null
+    val id: String = "",
+    val name: String = "",
+    val description: String? = null,
+    val actions: List<RoutineAction> = emptyList(),
+    val time: String? = null,
+    val days: List<Int>? = null,
+    val metadata: RoutineMetadata? = null
 )
 
 @Serializable
 data class RoutineAction(
-    @SerializedName("device")     val device: Device? = null,
-    @SerializedName("actionName") val actionName: String = "",
-    @SerializedName("params")     @Serializable(with = AnyListSerializer::class) val params: List<Any> = emptyList()
+    val device: Device? = null,
+    val actionName: String = "",
+    @Serializable(with = AnyListSerializer::class) val params: List<Any> = emptyList()
 )
 
 @Serializable
 data class RoutineMetadata(
-    @SerializedName("favorite")    val favorite: Boolean? = null,
-    @SerializedName("active")      val active: Boolean? = null,
-    @SerializedName("time")        val time: String? = null,
-    @SerializedName("days")        val days: List<Int>? = null,
-    @SerializedName("description") val description: String? = null,
-    @SerializedName("homeId")      val homeId: String? = null,
-    @SerializedName("crossHome")   val crossHome: Boolean? = null
+    val favorite: Boolean? = null,
+    val active: Boolean? = null,
+    val time: String? = null,
+    val days: List<Int>? = null,
+    val description: String? = null,
+    val homeId: String? = null,
+    val crossHome: Boolean? = null
 )
 
 /**

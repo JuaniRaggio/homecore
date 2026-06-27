@@ -1,19 +1,20 @@
 package com.itba.homecore.data.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 /**
  * Action history entry. The API sometimes embeds the full device and sometimes only its id.
  */
+@Serializable
 data class DeviceLog(
-    @SerializedName("id")         val id: String = "",
-    @SerializedName("deviceId")   val deviceId: String? = null,
-    @SerializedName("device")     val device: Device? = null,
-    @SerializedName("actionName") val actionName: String? = null,
-    @SerializedName("action")     val action: String? = null,
+    val id: String = "",
+    val deviceId: String? = null,
+    val device: Device? = null,
+    val actionName: String? = null,
+    val action: String? = null,
     // params is intentionally omitted: the API returns it as either an array or a bare
-    // number depending on the action, which breaks Gson if typed; it is not displayed.
-    @SerializedName("timestamp")  val timestamp: String? = null
+    // number depending on the action. With ignoreUnknownKeys it is simply skipped; it is not displayed.
+    val timestamp: String? = null
 )
 
 fun DeviceLog.resolvedAction(): String = actionName ?: action ?: ""

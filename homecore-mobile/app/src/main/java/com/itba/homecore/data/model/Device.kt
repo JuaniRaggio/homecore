@@ -1,35 +1,34 @@
 package com.itba.homecore.data.model
 
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Device(
-    @SerializedName("id")       val id: String = "",
-    @SerializedName("name")     val name: String = "",
-    @SerializedName("type")     val type: DeviceType = DeviceType(),
-    @SerializedName("state")    val state: DeviceState? = null,
-    @SerializedName("room")     val room: RoomRef? = null,
-    @SerializedName("metadata") val metadata: DeviceMeta? = null
+    val id: String = "",
+    val name: String = "",
+    val type: DeviceType = DeviceType(),
+    val state: DeviceState? = null,
+    val room: RoomRef? = null,
+    val metadata: DeviceMeta? = null
 )
 
 @Serializable
 data class DeviceType(
-    @SerializedName("id")         val id: String = "",
-    @SerializedName("name")       val name: String = "",
+    val id: String = "",
+    val name: String = "",
     // Watts drawn while on; comes from the /devicetypes catalog. Used for the consumption estimate.
-    @SerializedName("powerUsage") val powerUsage: Double? = null
+    val powerUsage: Double? = null
 )
 
 @Serializable
 data class DeviceMeta(
-    @SerializedName("favorite") val favorite: Boolean? = null
+    val favorite: Boolean? = null
 )
 
 @Serializable
 data class RoomRef(
-    @SerializedName("id")   val id: String = "",
-    @SerializedName("name") val name: String? = null
+    val id: String = "",
+    val name: String? = null
 )
 
 /**
@@ -38,22 +37,22 @@ data class RoomRef(
  */
 @Serializable
 data class DeviceState(
-    @SerializedName("status")             val status: String? = null,
-    @SerializedName("brightness")         val brightness: Int? = null,
-    @SerializedName("color")              val color: String? = null,
-    @SerializedName("temperature")        val temperature: Int? = null,
-    @SerializedName("mode")               val mode: String? = null,
-    @SerializedName("volume")             val volume: Int? = null,
-    @SerializedName("level")              val level: Int? = null,
-    @SerializedName("batteryLevel")       val batteryLevel: Int? = null,
-    @SerializedName("freezerTemperature") val freezerTemperature: Int? = null,
-    @SerializedName("lock")               val lock: String? = null,
-    @SerializedName("genre")              val genre: String? = null,
-    @SerializedName("fanSpeed")           val fanSpeed: String? = null,
-    @SerializedName("heat")               val heat: String? = null,
-    @SerializedName("grill")              val grill: String? = null,
-    @SerializedName("convection")         val convection: String? = null,
-    @SerializedName("location")           val location: String? = null
+    val status: String? = null,
+    val brightness: Int? = null,
+    val color: String? = null,
+    val temperature: Int? = null,
+    val mode: String? = null,
+    val volume: Int? = null,
+    val level: Int? = null,
+    val batteryLevel: Int? = null,
+    val freezerTemperature: Int? = null,
+    val lock: String? = null,
+    val genre: String? = null,
+    val fanSpeed: String? = null,
+    val heat: String? = null,
+    val grill: String? = null,
+    val convection: String? = null,
+    val location: String? = null
 )
 
 /**

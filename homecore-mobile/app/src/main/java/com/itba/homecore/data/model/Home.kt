@@ -1,15 +1,16 @@
 package com.itba.homecore.data.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Home(
-    @SerializedName("id")       val id: String = "",
-    @SerializedName("name")     val name: String = "",
-    @SerializedName("metadata") val metadata: Map<String, Any?>? = null
+    val id: String = "",
+    val name: String = ""
 )
 
 /** Lightweight home reference embedded in a Room when the API includes it. */
+@Serializable
 data class HomeRef(
-    @SerializedName("id")   val id: String = "",
-    @SerializedName("name") val name: String? = null
+    val id: String = "",
+    val name: String? = null
 )
