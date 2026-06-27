@@ -3,6 +3,7 @@ package com.itba.homecore.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.itba.homecore.data.model.Device
+import com.itba.homecore.data.model.DeviceAction
 import com.itba.homecore.data.model.DeviceCapabilities
 import com.itba.homecore.data.model.DeviceLog
 import com.itba.homecore.data.model.Room
@@ -139,9 +140,43 @@ class DevicesViewModel(
         SocketManager.markLocalActivity(deviceId)
         viewModelScope.launch {
             repository.executeAction(deviceId, action, params)
-                .onSuccess { refresh(showLoading = false) }
+                .onSuccess {
+                    actionFeedback(deviceId, action)?.let { UiMessages.emit(it) }
+                    refresh(showLoading = false)
+                }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo ejecutar la acción") }
         }
+    }
+
+    /**
+     * Short Spanish confirmation for a successful discrete action (toggle, open/close, ...),
+     * prefixed with the device name when known. Returns null for continuous setters
+     * (brightness, volume, temperature, ...): the slider position is feedback enough.
+     */
+    private fun actionFeedback(deviceId: String, action: String): String? {
+        val msg = when (DeviceAction.fromApi(action)) {
+            DeviceAction.TURN_ON -> "Encendido"
+            DeviceAction.TURN_OFF -> "Apagado"
+            DeviceAction.OPEN -> "Abierto"
+            DeviceAction.CLOSE -> "Cerrado"
+            DeviceAction.LOCK -> "Trabado"
+            DeviceAction.UNLOCK -> "Destrabado"
+            DeviceAction.UP -> "Subiendo"
+            DeviceAction.DOWN -> "Bajando"
+            DeviceAction.PLAY, DeviceAction.RESUME -> "Reproduciendo"
+            DeviceAction.PAUSE -> "Pausado"
+            DeviceAction.STOP -> "Detenido"
+            DeviceAction.NEXT_SONG, DeviceAction.PREVIOUS_SONG -> "Cambiando canción"
+            DeviceAction.START -> "Iniciado"
+            DeviceAction.DOCK -> "Volviendo a la base"
+            DeviceAction.DISPENSE -> "Dispensando"
+            DeviceAction.ARM_AWAY, DeviceAction.ARM_STAY -> "Alarma activada"
+            DeviceAction.DISARM -> "Alarma desactivada"
+            DeviceAction.CHANGE_SECURITY_CODE -> "Código actualizado"
+            else -> null
+        } ?: return null
+        val name = DeviceRegistry.nameFor(deviceId)
+        return if (name != null) "$name: $msg" else msg
     }
 
     fun toggleFavorite(device: Device) {
@@ -158,6 +193,7 @@ class DevicesViewModel(
         viewModelScope.launch {
             repository.createDevice(name, typeName, roomId)
                 .onSuccess {
+                    UiMessages.emit("Dispositivo creado")
                     load()
                     onDone()
                 }
@@ -173,6 +209,7 @@ class DevicesViewModel(
         viewModelScope.launch {
             repository.createRoom(name, homeId)
                 .onSuccess {
+                    UiMessages.emit("Habitación creada")
                     load()
                     onDone()
                 }
