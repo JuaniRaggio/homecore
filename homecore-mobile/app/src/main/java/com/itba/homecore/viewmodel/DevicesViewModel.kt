@@ -221,7 +221,7 @@ class DevicesViewModel(
     fun renameDevice(deviceId: String, newName: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.renameDevice(deviceId, newName)
-                .onSuccess { refresh(showLoading = false); onDone() }
+                .onSuccess { UiMessages.emit("Dispositivo renombrado"); refresh(showLoading = false); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo renombrar el dispositivo") }
         }
     }
@@ -230,7 +230,7 @@ class DevicesViewModel(
         SocketManager.markLocalActivity(deviceId)
         viewModelScope.launch {
             repository.deleteDevice(deviceId)
-                .onSuccess { refresh(showLoading = false); onDone() }
+                .onSuccess { UiMessages.emit("Dispositivo eliminado"); refresh(showLoading = false); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo eliminar el dispositivo") }
         }
     }
@@ -241,7 +241,7 @@ class DevicesViewModel(
             val result = if (roomId == null) repository.unassignDevice(deviceId)
                          else repository.assignDeviceToRoom(deviceId, roomId)
             result
-                .onSuccess { refresh(showLoading = false); onDone() }
+                .onSuccess { UiMessages.emit("Dispositivo movido"); refresh(showLoading = false); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo mover el dispositivo") }
         }
     }
@@ -250,7 +250,7 @@ class DevicesViewModel(
     fun renameRoom(roomId: String, newName: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.renameRoom(roomId, newName)
-                .onSuccess { refresh(showLoading = false); onDone() }
+                .onSuccess { UiMessages.emit("Habitación renombrada"); refresh(showLoading = false); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo renombrar la habitación") }
         }
     }
@@ -258,7 +258,7 @@ class DevicesViewModel(
     fun deleteRoom(roomId: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             repository.deleteRoom(roomId)
-                .onSuccess { refresh(showLoading = false); onDone() }
+                .onSuccess { UiMessages.emit("Habitación eliminada"); refresh(showLoading = false); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo eliminar la habitación") }
         }
     }

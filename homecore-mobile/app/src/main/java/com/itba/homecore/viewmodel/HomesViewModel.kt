@@ -64,7 +64,7 @@ class HomesViewModel(
     fun createHome(name: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             homesRepository.createHome(name)
-                .onSuccess { load(); onDone() }
+                .onSuccess { UiMessages.emit("Hogar creado"); load(); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo crear el hogar") }
         }
     }
@@ -73,7 +73,7 @@ class HomesViewModel(
     fun renameHome(id: String, newName: String, onDone: () -> Unit = {}) {
         viewModelScope.launch {
             homesRepository.renameHome(id, newName)
-                .onSuccess { load(); onDone() }
+                .onSuccess { UiMessages.emit("Hogar renombrado"); load(); onDone() }
                 .onFailure { UiMessages.emit(it.message ?: "No se pudo renombrar el hogar") }
         }
     }

@@ -63,8 +63,8 @@ object SocketManager {
                 on(Socket.EVENT_CONNECT_ERROR) { Log.w(TAG, "connect error: ${it.firstOrNull()}") }
 
                 on("deviceEvent") { args -> onDeviceEvent(args) }
-                on("deviceCreated") { onExternalDeviceChange("Se agregó un dispositivo") }
-                on("deviceDeleted") { onExternalDeviceChange("Se eliminó un dispositivo") }
+                on("deviceCreated") { args -> onExternalDeviceChange(args, "Se agregó el dispositivo", "Se agregó un dispositivo") }
+                on("deviceDeleted") { args -> onExternalDeviceChange(args, "Se eliminó el dispositivo", "Se eliminó un dispositivo") }
                 // deviceUpdated only refreshes (deviceEvent already covers state-change notifications).
                 on("deviceUpdated") { DeviceSyncEvents.emit() }
                 on("homeShared") { NotificationEvents.emit(TITLE, "Te compartieron un hogar") }
@@ -86,8 +86,15 @@ object SocketManager {
 
     private fun onDeviceEvent(args: Array<out Any?>) {
         DeviceSyncEvents.emit()
-        val data = (args.firstOrNull() as? JSONObject)?.optJSONObject("data") ?: return
-        val deviceId = data.optString("deviceId").takeIf { it.isNotBlank() } ?: return
+        val payload = args.firstOrNull() as? JSONObject ?: return
+        val data = payload.optJSONObject("data")
+        // The device id may be at the top level (id / deviceId / device.id) or inside data.
+        val deviceId = firstNonBlank(
+            payload.optString("id"),
+            payload.optString("deviceId"),
+            data?.optString("deviceId"),
+            payload.optJSONObject("device")?.optString("id")
+        ) ?: return
         val now = SystemClock.elapsedRealtime()
 
         // Skip this client's own change, and collapse duplicate emissions for the same device.
@@ -95,16 +102,22 @@ object SocketManager {
         if (now - (lastNotifiedAt[deviceId] ?: 0L) < DEDUP_WINDOW_MS) return
         lastNotifiedAt[deviceId] = now
 
-        val name = DeviceRegistry.nameFor(deviceId) ?: "Un dispositivo"
-        val action = eventLabel(data.optString("event"))
-        NotificationEvents.emit(TITLE, if (action != null) "$name: $action" else "$name cambió de estado")
+        // Prefer the locally known name; fall back to a name embedded in the payload.
+        val payloadName = payload.optJSONObject("device")?.optString("name")?.takeIf { it.isNotBlank() }
+        val name = DeviceRegistry.nameFor(deviceId) ?: payloadName ?: "Un dispositivo"
+        // The action can arrive as an explicit "event" string, or be inferred from the new state.
+        val description = eventLabel(data?.optString("event").orEmpty()) ?: describeState(data)
+        NotificationEvents.emit(TITLE, "$name: $description")
     }
 
-    private fun onExternalDeviceChange(message: String) {
+    private fun onExternalDeviceChange(args: Array<out Any?>, withName: String, generic: String) {
         DeviceSyncEvents.emit()
         // No reliable deviceId for create/delete, so fall back to a global self-action window.
         if (SystemClock.elapsedRealtime() - lastLocalActionAt < SELF_ECHO_WINDOW_MS) return
-        NotificationEvents.emit(TITLE, message)
+        // Include the device name when the payload carries it (the backend sends `data.device`).
+        val name = (args.firstOrNull() as? JSONObject)?.optJSONObject("device")
+            ?.optString("name")?.takeIf { it.isNotBlank() }
+        NotificationEvents.emit(TITLE, if (name != null) "$withName \"$name\"" else generic)
     }
 
     /**
@@ -129,4 +142,30 @@ object SocketManager {
         DeviceAction.DISARM -> "Desactivada"
         else -> null
     }
+
+    /** Human description inferred from the new device state when there is no explicit event. */
+    private fun describeState(state: JSONObject?): String {
+        if (state == null) return "Estado actualizado"
+        when (state.optString("status")) {
+            "on" -> return "Encendido"
+            "off" -> return "Apagado"
+            "opened" -> return "Abierta"
+            "closed" -> return "Cerrada"
+            "active" -> return "Activada"
+            "inactive" -> return "Desactivada"
+            "playing" -> return "Reproduciendo"
+        }
+        when (state.optString("lock")) {
+            "locked" -> return "Bloqueada"
+            "unlocked" -> return "Desbloqueada"
+        }
+        if (state.has("brightness")) return "Brillo ${state.optInt("brightness")}%"
+        if (state.has("temperature")) return "Temperatura ${state.optInt("temperature")}°"
+        if (state.has("volume")) return "Volumen ${state.optInt("volume")}"
+        if (state.has("level")) return "Nivel ${state.optInt("level")}%"
+        return "Estado actualizado"
+    }
+
+    private fun firstNonBlank(vararg values: String?): String? =
+        values.firstOrNull { !it.isNullOrBlank() }
 }
